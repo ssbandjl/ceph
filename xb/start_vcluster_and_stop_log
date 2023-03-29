@@ -1,0 +1,2946 @@
+root@ubuntu22:~/project/stor/ceph/xb/ceph/build# bash -x ../src/vstart.sh --debug --new -x -i 10.132.33.30 --bluestore
++ set -e
++ '[' -n '' ']'
++ '[' -e CMakeCache.txt ']'
+++ get_cmake_variable ceph_SOURCE_DIR
+++ local variable=ceph_SOURCE_DIR
+++ grep ceph_SOURCE_DIR: CMakeCache.txt
+++ cut -d = -f 2
++ CEPH_ROOT=/root/project/stor/ceph/xb/ceph
+++ pwd
++ CEPH_BUILD_DIR=/root/project/stor/ceph/xb/ceph/build
++ '[' -z '' ']'
++ MGR_PYTHON_PATH=/root/project/stor/ceph/xb/ceph/src/pybind/mgr
++ '[' -n '' ']'
++ '[' -n /root/project/stor/ceph/xb/ceph ']'
++ '[' -z '' ']'
++ CEPHFS_SHELL=/root/project/stor/ceph/xb/ceph/src/tools/cephfs/shell/cephfs-shell
++ '[' -z '' ']'
++ PYBIND=/root/project/stor/ceph/xb/ceph/src/pybind
++ '[' -z '' ']'
++ CEPH_BIN=/root/project/stor/ceph/xb/ceph/build/bin
++ '[' -z '' ']'
++ CEPH_ADM=/root/project/stor/ceph/xb/ceph/build/bin/ceph
++ '[' -z '' ']'
++ INIT_CEPH=/root/project/stor/ceph/xb/ceph/build/bin/init-ceph
++ '[' -z '' ']'
++ CEPH_LIB=/root/project/stor/ceph/xb/ceph/build/lib
++ '[' -z '' ']'
++ CEPH_EXT_LIB=/root/project/stor/ceph/xb/ceph/build/external/lib
++ '[' -z '' ']'
++ OBJCLASS_PATH=/root/project/stor/ceph/xb/ceph/build/lib
++ '[' -z '' ']'
++ EC_PATH=/root/project/stor/ceph/xb/ceph/build/lib
++ '[' -z '' ']'
++ CEPH_PYTHON_COMMON=/root/project/stor/ceph/xb/ceph/src/python-common
++ '[' -z '' ']'
+++ pwd
++ PATH=/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ '[' -z /root/project/stor/ceph/xb/ceph/src/pybind ']'
++ '[' -n /root/project/stor/ceph/xb/ceph/src/python-common ']'
++ CEPH_PYTHON_COMMON=/root/project/stor/ceph/xb/ceph/src/python-common:
++ CYTHON_PYTHONPATH=/root/project/stor/ceph/xb/ceph/build/lib/cython_modules/lib.3
++ export PYTHONPATH=/root/project/stor/ceph/xb/ceph/src/pybind:/root/project/stor/ceph/xb/ceph/build/lib/cython_modules/lib.3:/root/project/stor/ceph/xb/ceph/src/python-common:
++ PYTHONPATH=/root/project/stor/ceph/xb/ceph/src/pybind:/root/project/stor/ceph/xb/ceph/build/lib/cython_modules/lib.3:/root/project/stor/ceph/xb/ceph/src/python-common:
++ export LD_LIBRARY_PATH=/root/project/stor/ceph/xb/ceph/build/lib:/root/project/stor/ceph/xb/ceph/build/external/lib:
++ LD_LIBRARY_PATH=/root/project/stor/ceph/xb/ceph/build/lib:/root/project/stor/ceph/xb/ceph/build/external/lib:
++ export DYLD_LIBRARY_PATH=/root/project/stor/ceph/xb/ceph/build/lib:/root/project/stor/ceph/xb/ceph/build/external/lib:
++ DYLD_LIBRARY_PATH=/root/project/stor/ceph/xb/ceph/build/lib:/root/project/stor/ceph/xb/ceph/build/external/lib:
++ export CEPH_DEV=1
++ CEPH_DEV=1
++ '[' -z '' ']'
++ CEPH_NUM_MON=
++ '[' -z '' ']'
++ CEPH_NUM_OSD=
++ '[' -z '' ']'
++ CEPH_NUM_MDS=
++ '[' -z '' ']'
++ CEPH_NUM_MGR=
++ '[' -z '' ']'
++ CEPH_NUM_FS=
++ '[' -z '' ']'
++ CEPH_NUM_RGW=
++ '[' -z '' ']'
++ GANESHA_DAEMON_NUM=
++ '[' -z '' -a -z '' -a -z '' -a -z '' -a -z '' ']'
++ kill_all=1
++ '[' -z '' ']'
++ CEPH_NUM_MON=3
++ '[' -z '' ']'
++ CEPH_NUM_OSD=3
++ '[' -z '' ']'
++ CEPH_NUM_MDS=3
++ '[' -z '' ']'
++ CEPH_NUM_MGR=1
++ '[' -z '' ']'
++ CEPH_NUM_FS=1
++ '[' -z '' ']'
++ CEPH_MAX_MDS=1
++ '[' -z '' ']'
++ CEPH_NUM_RGW=0
++ '[' -z '' ']'
++ GANESHA_DAEMON_NUM=0
++ '[' -z '' ']'
++ CEPH_DIR=/root/project/stor/ceph/xb/ceph/build
++ '[' -z '' ']'
++ CEPH_DEV_DIR=/root/project/stor/ceph/xb/ceph/build/dev
++ '[' -z '' ']'
++ CEPH_OUT_DIR=/root/project/stor/ceph/xb/ceph/build/out
++ '[' -z '' ']'
++ CEPH_ASOK_DIR=/root/project/stor/ceph/xb/ceph/build/asok
++ '[' -z '' ']'
++ CEPH_RGW_PORT=8000
++ '[' -z '' ']'
++ CEPH_CONF_PATH=/root/project/stor/ceph/xb/ceph/build
++ CEPH_OUT_CLIENT_DIR=/root/project/stor/ceph/xb/ceph/build/out
++ '[' 3 -gt 3 ']'
++ OSD_POOL_DEFAULT_SIZE=3
++ extra_conf=
++ new=0
++ standby=0
++ debug=0
++ trace=0
++ ip=
++ nodaemon=0
++ redirect=0
++ smallmds=0
++ short=0
++ crimson=0
++ ec=0
++ cephadm=0
++ parallel=true
++ restart=1
++ hitset=
++ overwrite_conf=0
++ cephx=1
++ gssapi_authx=0
++ cache=
+++ uname
++ '[' Linux = FreeBSD ']'
++ objectstore=bluestore
++ ceph_osd=ceph-osd
++ rgw_frontend=beast
++ rgw_compression=
++ lockdep=1
++ spdk_enabled=0
++ pmem_enabled=0
++ zoned_enabled=0
++ io_uring_enabled=0
++ with_jaeger=0
++ with_mgr_dashboard=true
+++ get_cmake_variable WITH_MGR_DASHBOARD_FRONTEND
+++ local variable=WITH_MGR_DASHBOARD_FRONTEND
+++ grep WITH_MGR_DASHBOARD_FRONTEND: CMakeCache.txt
+++ cut -d = -f 2
++ [[ ON != \O\N ]]
+++ get_cmake_variable WITH_RBD
+++ local variable=WITH_RBD
+++ grep WITH_RBD: CMakeCache.txt
+++ cut -d = -f 2
++ [[ ON != \O\N ]]
++ with_mgr_restful=false
++ filestore_path=
++ kstore_path=
++ declare -a block_devs
++ declare -a secondary_block_devs
++ secondary_block_devs_type=SSD
++ VSTART_SEC=client.vstart.sh
++ MON_ADDR=
++ DASH_URLS=
++ RESTFUL_URLS=
++ conf_fn=/root/project/stor/ceph/xb/ceph/build/ceph.conf
++ keyring_fn=/root/project/stor/ceph/xb/ceph/build/keyring
++ monmap_fn=/tmp/ceph_monmap.45206
++ inc_osd_num=0
++ msgr=21
++ read -r -d '' usage
++ true
++ crimson_smp=1
++ '[' 6 -ge 1 ']'
++ case $1 in
++ debug=1
++ shift
++ '[' 5 -ge 1 ']'
++ case $1 in
++ new=1
++ shift
++ '[' 4 -ge 1 ']'
++ case $1 in
++ cephx=1
++ shift
++ '[' 3 -ge 1 ']'
++ case $1 in
++ '[' -z 10.132.33.30 ']'
++ ip=10.132.33.30
++ shift
++ shift
++ '[' 1 -ge 1 ']'
++ case $1 in
++ objectstore=bluestore
++ shift
++ '[' 0 -ge 1 ']'
++ '[' 1 -eq 1 ']'
++ /root/project/stor/ceph/xb/ceph/build/bin/init-ceph stop
+=== mon.c === 
+Stopping Ceph mon.c on ubuntu22...kill  34717...done
+=== mon.b === 
+Stopping Ceph mon.b on ubuntu22...kill  34676...done
+=== mon.a === 
+Stopping Ceph mon.a on ubuntu22...kill  34635...done
++ '[' 1 -eq 0 ']'
++ '[' -e /root/project/stor/ceph/xb/ceph/build/ceph.conf ']'
++++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-conf -c /root/project/stor/ceph/xb/ceph/build/ceph.conf --show-config-value admin_socket
+++ dirname /root/project/stor/ceph/xb/ceph/build/asok/client.admin.45455.asok
++ asok_dir=/root/project/stor/ceph/xb/ceph/build/asok
++ rm -- /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ '[' /root/project/stor/ceph/xb/ceph/build/asok '!=' /var/run/ceph ']'
++ '[' -d /root/project/stor/ceph/xb/ceph/build/asok ']'
++ rm -f '/root/project/stor/ceph/xb/ceph/build/asok/*'
++ rmdir /root/project/stor/ceph/xb/ceph/build/asok
++ '[' -z /root/project/stor/ceph/xb/ceph/build/asok ']'
++ ARGS='-c /root/project/stor/ceph/xb/ceph/build/ceph.conf'
++ '[' 1 -eq 0 ']'
++ debug echo '** going verbose **'
++ echo '** going verbose **'
+** going verbose **
++ CMONDEBUG='
+        debug osd = 20
+        debug mon = 20
+        debug osd = 20
+        debug paxos = 20
+        debug auth = 20
+        debug mgrc = 20
+        debug ms = 1'
++ CCLIENTDEBUG='
+        debug client = 20'
++ CMDSDEBUG='
+        debug mds = 20'
++ '[' ceph-osd == crimson-osd ']'
++ '[' -n '' ']'
++ '[' -z '' ']'
++ '[' true ']'
+++ echo 40659
++ CEPH_PORT=40659
++ ss -a -n
++ egrep '\<LISTEN\>.+:40659\s+'
++ break
++ '[' -z /root/project/stor/ceph/xb/ceph/build/bin/init-ceph ']'
++ '[' -d /root/project/stor/ceph/xb/ceph/build/dev/osd0/. ']'
++ '[' -e /root/project/stor/ceph/xb/ceph/build/dev/sudo ']'
++ '[' 0 -eq 0 ']'
++ prun rm -f 'core*'
++ debug quoted_print rm -f 'core*'
++ quoted_print rm -f 'core*'
++ for s in "$@"
++ [[ rm =~   ]]
++ printf -- 'rm '
+rm + for s in "$@"
++ [[ -f =~   ]]
++ printf -- '-f '
+-f + for s in "$@"
++ [[ core* =~   ]]
++ printf -- 'core* '
+core* + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ rm -f 'core*'
++ '[' -d /root/project/stor/ceph/xb/ceph/build/asok ']'
++ mkdir -p /root/project/stor/ceph/xb/ceph/build/asok
++ '[' -d /root/project/stor/ceph/xb/ceph/build/out ']'
++ '[' -d /root/project/stor/ceph/xb/ceph/build/dev ']'
++ '[' -d /root/project/stor/ceph/xb/ceph/build/out ']'
++ '[' 0 -eq 0 ']'
++ find /root/project/stor/ceph/xb/ceph/build/out -type f -delete
++ '[' -d gmon ']'
++ '[' 1 -eq 1 ']'
++ '[' 1 -eq 1 ']'
++ '[' -e /root/project/stor/ceph/xb/ceph/build/keyring ']'
++ rm /root/project/stor/ceph/xb/ceph/build/keyring
+++ hostname -s
++ HOSTNAME=ubuntu22
++ '[' -n 10.132.33.30 ']'
++ IP=10.132.33.30
++ echo 'ip 10.132.33.30'
+ip 10.132.33.30
++ echo 'port 40659'
+port 40659
++ '[' -z /root/project/stor/ceph/xb/ceph/build/bin/ceph ']'
++ '[' 0 -gt 0 ']'
++ '[' 1 -eq 1 ']'
++ prepare_conf
++ local 'DAEMONOPTS=
+        log file = /root/project/stor/ceph/xb/ceph/build/out/$name.log
+        admin socket = /root/project/stor/ceph/xb/ceph/build/asok/$name.asok
+        chdir = ""
+        pid file = /root/project/stor/ceph/xb/ceph/build/out/$name.pid
+        heartbeat file = /root/project/stor/ceph/xb/ceph/build/out/$name.heartbeat
+'
++ local 'mgr_modules=iostat nfs'
++ true
++ mgr_modules+=' dashboard'
++ false
++ local msgr_conf=
++ '[' 21 -eq 21 ']'
++ msgr_conf='ms bind msgr2 = true
+                   ms bind msgr1 = true'
++ '[' 21 -eq 2 ']'
++ '[' 21 -eq 1 ']'
++ wconf
+++ date
+++ uuidgen
+++ format_conf 'ms bind msgr2 = true
+                   ms bind msgr1 = true'
+++ local 'opts=ms bind msgr2 = true
+                   ms bind msgr1 = true'
+++ local 'indent=        '
+++ local opt
+++ local formatted
+++ read -r opt
+++ '[' -z '' ']'
+++ formatted='ms bind msgr2 = true'
+++ read -r opt
+++ '[' -z 'ms bind msgr2 = true' ']'
+++ formatted+='
+        ms bind msgr1 = true'
+++ read -r opt
+++ echo 'ms bind msgr2 = true
+        ms bind msgr1 = true'
+++ format_conf ''
+++ local opts=
+++ local 'indent=        '
+++ local opt
+++ local formatted
+++ read -r opt
+++ '[' -z '' ']'
+++ formatted=
+++ read -r opt
+++ echo ''
++ '[' 1 -eq 1 -o 0 -eq 1 ']'
++ cat
++ '[' 0 -eq 1 ']'
++ '[' 1 -eq 1 ']'
++ wconf
++ '[' 1 -eq 1 -o 0 -eq 1 ']'
++ cat
++ '[' 1 -eq 1 ']'
++ wconf
++ '[' 1 -eq 1 -o 0 -eq 1 ']'
++ cat
++ '[' 0 -eq 1 ']'
++ '[' bluestore == bluestore ']'
++ '[' 0 -eq 1 ']'
++ '[' 0 -eq 1 ']'
++ BLUESTORE_OPTS='        bluestore block db path = /root/project/stor/ceph/xb/ceph/build/dev/osd$id/block.db.file
+        bluestore block db size = 1073741824
+        bluestore block db create = true
+        bluestore block wal path = /root/project/stor/ceph/xb/ceph/build/dev/osd$id/block.wal.file
+        bluestore block wal size = 1048576000
+        bluestore block wal create = true'
++ '[' 0 -eq 1 ']'
++ '[' 0 -eq 1 ']'
++ wconf
+++ format_conf ''
+++ local opts=
+++ local 'indent=        '
+++ local opt
+++ local formatted
+++ read -r opt
+++ '[' -z '' ']'
+++ formatted=
+++ read -r opt
+++ echo ''
++ '[' 1 -eq 1 -o 0 -eq 1 ']'
++ cat
++ do_rgw_conf
++ '[' 0 -eq 0 ']'
++ return 0
++ wconf
+++ id -u
+++ id -g
+++ format_conf ''
+++ local opts=
+++ local 'indent=        '
+++ local opt
+++ local formatted
+++ read -r opt
+++ '[' -z '' ']'
+++ formatted=
+++ read -r opt
+++ echo ''
+++ format_conf ''
+++ local opts=
+++ local 'indent=        '
+++ local opt
+++ local formatted
+++ read -r opt
+++ '[' -z '' ']'
+++ formatted=
+++ read -r opt
+++ echo ''
+++ format_conf ''
+++ local opts=
+++ local 'indent=        '
+++ local opt
+++ local formatted
+++ read -r opt
+++ '[' -z '' ']'
+++ formatted=
+++ read -r opt
+++ echo ''
+++ format_conf ''
+++ local opts=
+++ local 'indent=        '
+++ local opt
+++ local formatted
+++ read -r opt
+++ '[' -z '' ']'
+++ formatted=
+++ read -r opt
+++ echo ''
++ '[' 1 -eq 1 -o 0 -eq 1 ']'
++ cat
++ '[' 0 -eq 1 ']'
++ '[' 3 -gt 0 ']'
++ start_mon
++ local MONS=
++ local count=0
++ for f in a b c d e f g h i j k l m n o p q r s t u v w x y z
++ '[' 0 -eq 3 ']'
++ count=1
++ '[' -z '' ']'
++ MONS=a
++ for f in a b c d e f g h i j k l m n o p q r s t u v w x y z
++ '[' 1 -eq 3 ']'
++ count=2
++ '[' -z a ']'
++ MONS='a b'
++ for f in a b c d e f g h i j k l m n o p q r s t u v w x y z
++ '[' 2 -eq 3 ']'
++ count=3
++ '[' -z 'a b' ']'
++ MONS='a b c'
++ for f in a b c d e f g h i j k l m n o p q r s t u v w x y z
++ '[' 3 -eq 3 ']'
++ break
++ '[' 1 -eq 1 ']'
+++ echo 10.132.33.30
+++ grep '^127\.'
++ '[' ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --create-keyring --gen-key --name=mon. /root/project/stor/ceph/xb/ceph/build/keyring --cap mon 'allow *'
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --create-keyring --gen-key --name=mon. /root/project/stor/ceph/xb/ceph/build/keyring --cap mon 'allow *'
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --create-keyring --gen-key --name=mon. /root/project/stor/ceph/xb/ceph/build/keyring --cap mon 'allow *'
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool + for s in "$@"
++ [[ --create-keyring =~   ]]
++ printf -- '--create-keyring '
+--create-keyring + for s in "$@"
++ [[ --gen-key =~   ]]
++ printf -- '--gen-key '
+--gen-key + for s in "$@"
++ [[ --name=mon. =~   ]]
++ printf -- '--name=mon. '
+--name=mon. + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + for s in "$@"
++ [[ --cap =~   ]]
++ printf -- '--cap '
+--cap + for s in "$@"
++ [[ mon =~   ]]
++ printf -- 'mon '
+mon + for s in "$@"
++ [[ allow * =~   ]]
++ printf -- ''\''%s'\'' ' 'allow *'
+'allow *' + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --create-keyring --gen-key --name=mon. /root/project/stor/ceph/xb/ceph/build/keyring --cap mon 'allow *'
+creating /root/project/stor/ceph/xb/ceph/build/keyring
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --gen-key --name=client.admin --cap mon 'allow *' --cap osd 'allow *' --cap mds 'allow *' --cap mgr 'allow *' /root/project/stor/ceph/xb/ceph/build/keyring
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --gen-key --name=client.admin --cap mon 'allow *' --cap osd 'allow *' --cap mds 'allow *' --cap mgr 'allow *' /root/project/stor/ceph/xb/ceph/build/keyring
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --gen-key --name=client.admin --cap mon 'allow *' --cap osd 'allow *' --cap mds 'allow *' --cap mgr 'allow *' /root/project/stor/ceph/xb/ceph/build/keyring
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool + for s in "$@"
++ [[ --gen-key =~   ]]
++ printf -- '--gen-key '
+--gen-key + for s in "$@"
++ [[ --name=client.admin =~   ]]
++ printf -- '--name=client.admin '
+--name=client.admin + for s in "$@"
++ [[ --cap =~   ]]
++ printf -- '--cap '
+--cap + for s in "$@"
++ [[ mon =~   ]]
++ printf -- 'mon '
+mon + for s in "$@"
++ [[ allow * =~   ]]
++ printf -- ''\''%s'\'' ' 'allow *'
+'allow *' + for s in "$@"
++ [[ --cap =~   ]]
++ printf -- '--cap '
+--cap + for s in "$@"
++ [[ osd =~   ]]
++ printf -- 'osd '
+osd + for s in "$@"
++ [[ allow * =~   ]]
++ printf -- ''\''%s'\'' ' 'allow *'
+'allow *' + for s in "$@"
++ [[ --cap =~   ]]
++ printf -- '--cap '
+--cap + for s in "$@"
++ [[ mds =~   ]]
++ printf -- 'mds '
+mds + for s in "$@"
++ [[ allow * =~   ]]
++ printf -- ''\''%s'\'' ' 'allow *'
+'allow *' + for s in "$@"
++ [[ --cap =~   ]]
++ printf -- '--cap '
+--cap + for s in "$@"
++ [[ mgr =~   ]]
++ printf -- 'mgr '
+mgr + for s in "$@"
++ [[ allow * =~   ]]
++ printf -- ''\''%s'\'' ' 'allow *'
+'allow *' + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --gen-key --name=client.admin --cap mon 'allow *' --cap osd 'allow *' --cap mds 'allow *' --cap mgr 'allow *' /root/project/stor/ceph/xb/ceph/build/keyring
++ params=()
++ local params
++ local count=0
++ local mon_host=
++ for f in $MONS
++ '[' 21 -eq 1 ']'
++ '[' 21 -eq 2 ']'
++ '[' 21 -eq 21 ']'
++ A='[v2:10.132.33.30:40659,v1:10.132.33.30:40660]'
++ params+=("--addv" "$f" "$A")
++ mon_host=' [v2:10.132.33.30:40659,v1:10.132.33.30:40660]'
++ wconf
++ '[' 1 -eq 1 -o 0 -eq 1 ']'
++ cat
++ count=2
++ for f in $MONS
++ '[' 21 -eq 1 ']'
++ '[' 21 -eq 2 ']'
++ '[' 21 -eq 21 ']'
++ A='[v2:10.132.33.30:40661,v1:10.132.33.30:40662]'
++ params+=("--addv" "$f" "$A")
++ mon_host=' [v2:10.132.33.30:40659,v1:10.132.33.30:40660] [v2:10.132.33.30:40661,v1:10.132.33.30:40662]'
++ wconf
++ '[' 1 -eq 1 -o 0 -eq 1 ']'
++ cat
++ count=4
++ for f in $MONS
++ '[' 21 -eq 1 ']'
++ '[' 21 -eq 2 ']'
++ '[' 21 -eq 21 ']'
++ A='[v2:10.132.33.30:40663,v1:10.132.33.30:40664]'
++ params+=("--addv" "$f" "$A")
++ mon_host=' [v2:10.132.33.30:40659,v1:10.132.33.30:40660] [v2:10.132.33.30:40661,v1:10.132.33.30:40662] [v2:10.132.33.30:40663,v1:10.132.33.30:40664]'
++ wconf
++ '[' 1 -eq 1 -o 0 -eq 1 ']'
++ cat
++ count=6
++ wconf
++ '[' 1 -eq 1 -o 0 -eq 1 ']'
++ cat
++ prun /root/project/stor/ceph/xb/ceph/build/bin/monmaptool --create --clobber --addv a '[v2:10.132.33.30:40659,v1:10.132.33.30:40660]' --addv b '[v2:10.132.33.30:40661,v1:10.132.33.30:40662]' --addv c '[v2:10.132.33.30:40663,v1:10.132.33.30:40664]' --print /tmp/ceph_monmap.45206
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/monmaptool --create --clobber --addv a '[v2:10.132.33.30:40659,v1:10.132.33.30:40660]' --addv b '[v2:10.132.33.30:40661,v1:10.132.33.30:40662]' --addv c '[v2:10.132.33.30:40663,v1:10.132.33.30:40664]' --print /tmp/ceph_monmap.45206
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/monmaptool --create --clobber --addv a '[v2:10.132.33.30:40659,v1:10.132.33.30:40660]' --addv b '[v2:10.132.33.30:40661,v1:10.132.33.30:40662]' --addv c '[v2:10.132.33.30:40663,v1:10.132.33.30:40664]' --print /tmp/ceph_monmap.45206
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/monmaptool =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/monmaptool '
+/root/project/stor/ceph/xb/ceph/build/bin/monmaptool + for s in "$@"
++ [[ --create =~   ]]
++ printf -- '--create '
+--create + for s in "$@"
++ [[ --clobber =~   ]]
++ printf -- '--clobber '
+--clobber + for s in "$@"
++ [[ --addv =~   ]]
++ printf -- '--addv '
+--addv + for s in "$@"
++ [[ a =~   ]]
++ printf -- 'a '
+a + for s in "$@"
++ [[ [v2:10.132.33.30:40659,v1:10.132.33.30:40660] =~   ]]
++ printf -- '[v2:10.132.33.30:40659,v1:10.132.33.30:40660] '
+[v2:10.132.33.30:40659,v1:10.132.33.30:40660] + for s in "$@"
++ [[ --addv =~   ]]
++ printf -- '--addv '
+--addv + for s in "$@"
++ [[ b =~   ]]
++ printf -- 'b '
+b + for s in "$@"
++ [[ [v2:10.132.33.30:40661,v1:10.132.33.30:40662] =~   ]]
++ printf -- '[v2:10.132.33.30:40661,v1:10.132.33.30:40662] '
+[v2:10.132.33.30:40661,v1:10.132.33.30:40662] + for s in "$@"
++ [[ --addv =~   ]]
++ printf -- '--addv '
+--addv + for s in "$@"
++ [[ c =~   ]]
++ printf -- 'c '
+c + for s in "$@"
++ [[ [v2:10.132.33.30:40663,v1:10.132.33.30:40664] =~   ]]
++ printf -- '[v2:10.132.33.30:40663,v1:10.132.33.30:40664] '
+[v2:10.132.33.30:40663,v1:10.132.33.30:40664] + for s in "$@"
++ [[ --print =~   ]]
++ printf -- '--print '
+--print + for s in "$@"
++ [[ /tmp/ceph_monmap.45206 =~   ]]
++ printf -- '/tmp/ceph_monmap.45206 '
+/tmp/ceph_monmap.45206 + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/monmaptool --create --clobber --addv a '[v2:10.132.33.30:40659,v1:10.132.33.30:40660]' --addv b '[v2:10.132.33.30:40661,v1:10.132.33.30:40662]' --addv c '[v2:10.132.33.30:40663,v1:10.132.33.30:40664]' --print /tmp/ceph_monmap.45206
+/root/project/stor/ceph/xb/ceph/build/bin/monmaptool: monmap file /tmp/ceph_monmap.45206
+/root/project/stor/ceph/xb/ceph/build/bin/monmaptool: generated fsid 3eb9fe78-07f3-46ef-bb1b-d0c450bb41d4
+setting min_mon_release = pacific
+epoch 0
+fsid 3eb9fe78-07f3-46ef-bb1b-d0c450bb41d4
+last_changed 2023-03-29T22:27:56.553249+0800
+created 2023-03-29T22:27:56.553249+0800
+min_mon_release 16 (pacific)
+election_strategy: 1
+0: [v2:10.132.33.30:40659/0,v1:10.132.33.30:40660/0] mon.a
+1: [v2:10.132.33.30:40661/0,v1:10.132.33.30:40662/0] mon.b
+2: [v2:10.132.33.30:40663/0,v1:10.132.33.30:40664/0] mon.c
+/root/project/stor/ceph/xb/ceph/build/bin/monmaptool: writing epoch 0 to /tmp/ceph_monmap.45206 (3 monitors)
++ for f in $MONS
++ prun rm -rf -- /root/project/stor/ceph/xb/ceph/build/dev/mon.a
++ debug quoted_print rm -rf -- /root/project/stor/ceph/xb/ceph/build/dev/mon.a
++ quoted_print rm -rf -- /root/project/stor/ceph/xb/ceph/build/dev/mon.a
++ for s in "$@"
++ [[ rm =~   ]]
++ printf -- 'rm '
+rm + for s in "$@"
++ [[ -rf =~   ]]
++ printf -- '-rf '
+-rf + for s in "$@"
++ [[ -- =~   ]]
++ printf -- '-- '
+-- + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/dev/mon.a =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/dev/mon.a '
+/root/project/stor/ceph/xb/ceph/build/dev/mon.a + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ rm -rf -- /root/project/stor/ceph/xb/ceph/build/dev/mon.a
++ prun mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mon.a
++ debug quoted_print mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mon.a
++ quoted_print mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mon.a
++ for s in "$@"
++ [[ mkdir =~   ]]
++ printf -- 'mkdir '
+mkdir + for s in "$@"
++ [[ -p =~   ]]
++ printf -- '-p '
+-p + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/dev/mon.a =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/dev/mon.a '
+/root/project/stor/ceph/xb/ceph/build/dev/mon.a + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mon.a
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon --mkfs -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -i a --monmap=/tmp/ceph_monmap.45206 --keyring=/root/project/stor/ceph/xb/ceph/build/keyring
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon --mkfs -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -i a --monmap=/tmp/ceph_monmap.45206 --keyring=/root/project/stor/ceph/xb/ceph/build/keyring
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon --mkfs -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -i a --monmap=/tmp/ceph_monmap.45206 --keyring=/root/project/stor/ceph/xb/ceph/build/keyring
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph-mon '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph-mon + for s in "$@"
++ [[ --mkfs =~   ]]
++ printf -- '--mkfs '
+--mkfs + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ a =~   ]]
++ printf -- 'a '
+a + for s in "$@"
++ [[ --monmap=/tmp/ceph_monmap.45206 =~   ]]
++ printf -- '--monmap=/tmp/ceph_monmap.45206 '
+--monmap=/tmp/ceph_monmap.45206 + for s in "$@"
++ [[ --keyring=/root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '--keyring=/root/project/stor/ceph/xb/ceph/build/keyring '
+--keyring=/root/project/stor/ceph/xb/ceph/build/keyring + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon --mkfs -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -i a --monmap=/tmp/ceph_monmap.45206 --keyring=/root/project/stor/ceph/xb/ceph/build/keyring
++ for f in $MONS
++ prun rm -rf -- /root/project/stor/ceph/xb/ceph/build/dev/mon.b
++ debug quoted_print rm -rf -- /root/project/stor/ceph/xb/ceph/build/dev/mon.b
++ quoted_print rm -rf -- /root/project/stor/ceph/xb/ceph/build/dev/mon.b
++ for s in "$@"
++ [[ rm =~   ]]
++ printf -- 'rm '
+rm + for s in "$@"
++ [[ -rf =~   ]]
++ printf -- '-rf '
+-rf + for s in "$@"
++ [[ -- =~   ]]
++ printf -- '-- '
+-- + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/dev/mon.b =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/dev/mon.b '
+/root/project/stor/ceph/xb/ceph/build/dev/mon.b + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ rm -rf -- /root/project/stor/ceph/xb/ceph/build/dev/mon.b
++ prun mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mon.b
++ debug quoted_print mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mon.b
++ quoted_print mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mon.b
++ for s in "$@"
++ [[ mkdir =~   ]]
++ printf -- 'mkdir '
+mkdir + for s in "$@"
++ [[ -p =~   ]]
++ printf -- '-p '
+-p + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/dev/mon.b =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/dev/mon.b '
+/root/project/stor/ceph/xb/ceph/build/dev/mon.b + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mon.b
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon --mkfs -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -i b --monmap=/tmp/ceph_monmap.45206 --keyring=/root/project/stor/ceph/xb/ceph/build/keyring
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon --mkfs -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -i b --monmap=/tmp/ceph_monmap.45206 --keyring=/root/project/stor/ceph/xb/ceph/build/keyring
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon --mkfs -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -i b --monmap=/tmp/ceph_monmap.45206 --keyring=/root/project/stor/ceph/xb/ceph/build/keyring
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph-mon '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph-mon + for s in "$@"
++ [[ --mkfs =~   ]]
++ printf -- '--mkfs '
+--mkfs + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ b =~   ]]
++ printf -- 'b '
+b + for s in "$@"
++ [[ --monmap=/tmp/ceph_monmap.45206 =~   ]]
++ printf -- '--monmap=/tmp/ceph_monmap.45206 '
+--monmap=/tmp/ceph_monmap.45206 + for s in "$@"
++ [[ --keyring=/root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '--keyring=/root/project/stor/ceph/xb/ceph/build/keyring '
+--keyring=/root/project/stor/ceph/xb/ceph/build/keyring + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon --mkfs -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -i b --monmap=/tmp/ceph_monmap.45206 --keyring=/root/project/stor/ceph/xb/ceph/build/keyring
++ for f in $MONS
++ prun rm -rf -- /root/project/stor/ceph/xb/ceph/build/dev/mon.c
++ debug quoted_print rm -rf -- /root/project/stor/ceph/xb/ceph/build/dev/mon.c
++ quoted_print rm -rf -- /root/project/stor/ceph/xb/ceph/build/dev/mon.c
++ for s in "$@"
++ [[ rm =~   ]]
++ printf -- 'rm '
+rm + for s in "$@"
++ [[ -rf =~   ]]
++ printf -- '-rf '
+-rf + for s in "$@"
++ [[ -- =~   ]]
++ printf -- '-- '
+-- + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/dev/mon.c =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/dev/mon.c '
+/root/project/stor/ceph/xb/ceph/build/dev/mon.c + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ rm -rf -- /root/project/stor/ceph/xb/ceph/build/dev/mon.c
++ prun mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mon.c
++ debug quoted_print mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mon.c
++ quoted_print mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mon.c
++ for s in "$@"
++ [[ mkdir =~   ]]
++ printf -- 'mkdir '
+mkdir + for s in "$@"
++ [[ -p =~   ]]
++ printf -- '-p '
+-p + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/dev/mon.c =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/dev/mon.c '
+/root/project/stor/ceph/xb/ceph/build/dev/mon.c + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mon.c
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon --mkfs -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -i c --monmap=/tmp/ceph_monmap.45206 --keyring=/root/project/stor/ceph/xb/ceph/build/keyring
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon --mkfs -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -i c --monmap=/tmp/ceph_monmap.45206 --keyring=/root/project/stor/ceph/xb/ceph/build/keyring
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon --mkfs -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -i c --monmap=/tmp/ceph_monmap.45206 --keyring=/root/project/stor/ceph/xb/ceph/build/keyring
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph-mon '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph-mon + for s in "$@"
++ [[ --mkfs =~   ]]
++ printf -- '--mkfs '
+--mkfs + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ c =~   ]]
++ printf -- 'c '
+c + for s in "$@"
++ [[ --monmap=/tmp/ceph_monmap.45206 =~   ]]
++ printf -- '--monmap=/tmp/ceph_monmap.45206 '
+--monmap=/tmp/ceph_monmap.45206 + for s in "$@"
++ [[ --keyring=/root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '--keyring=/root/project/stor/ceph/xb/ceph/build/keyring '
+--keyring=/root/project/stor/ceph/xb/ceph/build/keyring + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon --mkfs -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -i c --monmap=/tmp/ceph_monmap.45206 --keyring=/root/project/stor/ceph/xb/ceph/build/keyring
++ prun rm -- /tmp/ceph_monmap.45206
++ debug quoted_print rm -- /tmp/ceph_monmap.45206
++ quoted_print rm -- /tmp/ceph_monmap.45206
++ for s in "$@"
++ [[ rm =~   ]]
++ printf -- 'rm '
+rm + for s in "$@"
++ [[ -- =~   ]]
++ printf -- '-- '
+-- + for s in "$@"
++ [[ /tmp/ceph_monmap.45206 =~   ]]
++ printf -- '/tmp/ceph_monmap.45206 '
+/tmp/ceph_monmap.45206 + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ rm -- /tmp/ceph_monmap.45206
++ for f in $MONS
++ run mon a /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon -i a -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ type=mon
++ shift
++ num=a
++ shift
++ eval 'valg=$valgrind_mon'
+++ valg=
++ '[' -z '' ']'
++ valg=
++ '[' -n '' ']'
++ '[' 0 -eq 0 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon -i a -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon -i a -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon -i a -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph-mon '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph-mon + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ a =~   ]]
++ printf -- 'a '
+a + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon -i a -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ for f in $MONS
++ run mon b /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon -i b -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ type=mon
++ shift
++ num=b
++ shift
++ eval 'valg=$valgrind_mon'
+++ valg=
++ '[' -z '' ']'
++ valg=
++ '[' -n '' ']'
++ '[' 0 -eq 0 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon -i b -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon -i b -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon -i b -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph-mon '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph-mon + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ b =~   ]]
++ printf -- 'b '
+b + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon -i b -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ for f in $MONS
++ run mon c /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon -i c -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ type=mon
++ shift
++ num=c
++ shift
++ eval 'valg=$valgrind_mon'
+++ valg=
++ '[' -z '' ']'
++ valg=
++ '[' -n '' ']'
++ '[' 0 -eq 0 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon -i c -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon -i c -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon -i c -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph-mon '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph-mon + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ c =~   ]]
++ printf -- 'c '
+c + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-mon -i c -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ '[' 0 -eq 1 ']'
++ debug echo Populating config ...
++ echo Populating config ...
+Populating config ...
++ cat
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf config assimilate-conf -i -
+
+[mgr]
+	mgr/telemetry/enable = false
+	mgr/telemetry/nag = false
++ '[' 1 -ne 0 ']'
++ debug echo Setting debug configs ...
++ echo Setting debug configs ...
+Setting debug configs ...
++ cat
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf config assimilate-conf -i -
++ '[' 0 -gt 0 ']'
++ '[' ceph-osd == crimson-osd ']'
++ '[' 1 -gt 0 ']'
++ start_mgr
++ local mgr=0
++ local ssl=1
++ MGR_PORT=41659
++ PROMETHEUS_PORT=9283
++ for name in x y z a b c d e f g h i j k l m n o p
++ '[' 0 -eq 1 ']'
++ mgr=1
++ '[' 1 -eq 1 ']'
++ mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mgr.x
++ key_fn=/root/project/stor/ceph/xb/ceph/build/dev/mgr.x/keyring
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --create-keyring --gen-key --name=mgr.x /root/project/stor/ceph/xb/ceph/build/dev/mgr.x/keyring
+creating /root/project/stor/ceph/xb/ceph/build/dev/mgr.x/keyring
++ ceph_adm -i /root/project/stor/ceph/xb/ceph/build/dev/mgr.x/keyring auth add mgr.x mon 'allow profile mgr' mds 'allow *' osd 'allow *'
++ '[' 1 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring -i /root/project/stor/ceph/xb/ceph/build/dev/mgr.x/keyring auth add mgr.x mon 'allow profile mgr' mds 'allow *' osd 'allow *'
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring -i /root/project/stor/ceph/xb/ceph/build/dev/mgr.x/keyring auth add mgr.x mon 'allow profile mgr' mds 'allow *' osd 'allow *'
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring -i /root/project/stor/ceph/xb/ceph/build/dev/mgr.x/keyring auth add mgr.x mon 'allow profile mgr' mds 'allow *' osd 'allow *'
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -k =~   ]]
++ printf -- '-k '
+-k + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/dev/mgr.x/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/dev/mgr.x/keyring '
+/root/project/stor/ceph/xb/ceph/build/dev/mgr.x/keyring + for s in "$@"
++ [[ auth =~   ]]
++ printf -- 'auth '
+auth + for s in "$@"
++ [[ add =~   ]]
++ printf -- 'add '
+add + for s in "$@"
++ [[ mgr.x =~   ]]
++ printf -- 'mgr.x '
+mgr.x + for s in "$@"
++ [[ mon =~   ]]
++ printf -- 'mon '
+mon + for s in "$@"
++ [[ allow profile mgr =~   ]]
++ printf -- ''\''%s'\'' ' 'allow profile mgr'
+'allow profile mgr' + for s in "$@"
++ [[ mds =~   ]]
++ printf -- 'mds '
+mds + for s in "$@"
++ [[ allow * =~   ]]
++ printf -- ''\''%s'\'' ' 'allow *'
+'allow *' + for s in "$@"
++ [[ osd =~   ]]
++ printf -- 'osd '
+osd + for s in "$@"
++ [[ allow * =~   ]]
++ printf -- ''\''%s'\'' ' 'allow *'
+'allow *' + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring -i /root/project/stor/ceph/xb/ceph/build/dev/mgr.x/keyring auth add mgr.x mon 'allow profile mgr' mds 'allow *' osd 'allow *'
+added key for mgr.x
++ wconf
++ '[' 1 -eq 1 -o 0 -eq 1 ']'
++ cat
++ true
++ local port_option=ssl_server_port
++ local http_proto=https
++ '[' 1 == 0 ']'
++ ceph_adm config set mgr mgr/dashboard/x/ssl_server_port 41659 --force
++ '[' 1 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring config set mgr mgr/dashboard/x/ssl_server_port 41659 --force
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring config set mgr mgr/dashboard/x/ssl_server_port 41659 --force
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring config set mgr mgr/dashboard/x/ssl_server_port 41659 --force
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -k =~   ]]
++ printf -- '-k '
+-k + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + for s in "$@"
++ [[ config =~   ]]
++ printf -- 'config '
+config + for s in "$@"
++ [[ set =~   ]]
++ printf -- 'set '
+set + for s in "$@"
++ [[ mgr =~   ]]
++ printf -- 'mgr '
+mgr + for s in "$@"
++ [[ mgr/dashboard/x/ssl_server_port =~   ]]
++ printf -- 'mgr/dashboard/x/ssl_server_port '
+mgr/dashboard/x/ssl_server_port + for s in "$@"
++ [[ 41659 =~   ]]
++ printf -- '41659 '
+41659 + for s in "$@"
++ [[ --force =~   ]]
++ printf -- '--force '
+--force + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring config set mgr mgr/dashboard/x/ssl_server_port 41659 --force
++ '[' 1 -eq 1 ']'
++ DASH_URLS=https://10.132.33.30:41659
++ MGR_PORT=42659
++ ceph_adm config set mgr mgr/prometheus/x/server_port 9283 --force
++ '[' 1 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring config set mgr mgr/prometheus/x/server_port 9283 --force
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring config set mgr mgr/prometheus/x/server_port 9283 --force
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring config set mgr mgr/prometheus/x/server_port 9283 --force
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -k =~   ]]
++ printf -- '-k '
+-k + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + for s in "$@"
++ [[ config =~   ]]
++ printf -- 'config '
+config + for s in "$@"
++ [[ set =~   ]]
++ printf -- 'set '
+set + for s in "$@"
++ [[ mgr =~   ]]
++ printf -- 'mgr '
+mgr + for s in "$@"
++ [[ mgr/prometheus/x/server_port =~   ]]
++ printf -- 'mgr/prometheus/x/server_port '
+mgr/prometheus/x/server_port + for s in "$@"
++ [[ 9283 =~   ]]
++ printf -- '9283 '
+9283 + for s in "$@"
++ [[ --force =~   ]]
++ printf -- '--force '
+--force + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring config set mgr mgr/prometheus/x/server_port 9283 --force
++ PROMETHEUS_PORT=10283
++ ceph_adm config set mgr mgr/restful/x/server_port 42659 --force
++ '[' 1 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring config set mgr mgr/restful/x/server_port 42659 --force
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring config set mgr mgr/restful/x/server_port 42659 --force
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring config set mgr mgr/restful/x/server_port 42659 --force
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -k =~   ]]
++ printf -- '-k '
+-k + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + for s in "$@"
++ [[ config =~   ]]
++ printf -- 'config '
+config + for s in "$@"
++ [[ set =~   ]]
++ printf -- 'set '
+set + for s in "$@"
++ [[ mgr =~   ]]
++ printf -- 'mgr '
+mgr + for s in "$@"
++ [[ mgr/restful/x/server_port =~   ]]
++ printf -- 'mgr/restful/x/server_port '
+mgr/restful/x/server_port + for s in "$@"
++ [[ 42659 =~   ]]
++ printf -- '42659 '
+42659 + for s in "$@"
++ [[ --force =~   ]]
++ printf -- '--force '
+--force + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring config set mgr mgr/restful/x/server_port 42659 --force
++ '[' 1 -eq 1 ']'
++ RESTFUL_URLS=https://10.132.33.30:42659
++ MGR_PORT=43659
++ debug echo 'Starting mgr.x'
++ echo 'Starting mgr.x'
+Starting mgr.x
++ run mgr x /root/project/stor/ceph/xb/ceph/build/bin/ceph-mgr -i x -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ type=mgr
++ shift
++ num=x
++ shift
++ eval 'valg=$valgrind_mgr'
+++ valg=
++ '[' -z '' ']'
++ valg=
++ '[' -n '' ']'
++ '[' 0 -eq 0 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph-mgr -i x -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-mgr -i x -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-mgr -i x -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph-mgr =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph-mgr '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph-mgr + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ x =~   ]]
++ printf -- 'x '
+x + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-mgr -i x -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ for name in x y z a b c d e f g h i j k l m n o p
++ '[' 1 -eq 1 ']'
++ break
++ ceph_adm mgr stat
++ jq -e .available
++ '[' 1 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring mgr stat
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring mgr stat
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring mgr stat
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -k =~   ]]
++ printf -- '-k '
+-k + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + for s in "$@"
++ [[ mgr =~   ]]
++ printf -- 'mgr '
+mgr + for s in "$@"
++ [[ stat =~   ]]
++ printf -- 'stat '
+stat + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring mgr stat
+false
++ debug echo 'waiting for mgr to become available'
++ echo 'waiting for mgr to become available'
+waiting for mgr to become available
++ sleep 1
++ ceph_adm mgr stat
++ jq -e .available
++ '[' 1 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring mgr stat
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring mgr stat
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring mgr stat
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -k =~   ]]
++ printf -- '-k '
+-k + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + for s in "$@"
++ [[ mgr =~   ]]
++ printf -- 'mgr '
+mgr + for s in "$@"
++ [[ stat =~   ]]
++ printf -- 'stat '
+stat + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring mgr stat
+false
++ debug echo 'waiting for mgr to become available'
++ echo 'waiting for mgr to become available'
+waiting for mgr to become available
++ sleep 1
++ ceph_adm mgr stat
++ jq -e .available
++ '[' 1 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring mgr stat
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring mgr stat
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring mgr stat
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -k =~   ]]
++ printf -- '-k '
+-k + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + for s in "$@"
++ [[ mgr =~   ]]
++ printf -- 'mgr '
+mgr + for s in "$@"
++ [[ stat =~   ]]
++ printf -- 'stat '
+stat + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring mgr stat
+false
++ debug echo 'waiting for mgr to become available'
++ echo 'waiting for mgr to become available'
+waiting for mgr to become available
++ sleep 1
++ ceph_adm mgr stat
++ jq -e .available
++ '[' 1 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring mgr stat
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring mgr stat
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring mgr stat
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -k =~   ]]
++ printf -- '-k '
+-k + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + for s in "$@"
++ [[ mgr =~   ]]
++ printf -- 'mgr '
+mgr + for s in "$@"
++ [[ stat =~   ]]
++ printf -- 'stat '
+stat + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring mgr stat
+true
++ '[' 1 -eq 1 ']'
++ true
++ ceph_adm -h
++ '[' 1 -eq 1 ']'
++ grep -c -q '^dashboard'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring -h
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring -h
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring -h
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -k =~   ]]
++ printf -- '-k '
+-k + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + for s in "$@"
++ [[ -h =~   ]]
++ printf -- '-h '
+-h + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring -h
++ DASHBOARD_ADMIN_SECRET_FILE=/root/project/stor/ceph/xb/ceph/build/dashboard-admin-secret.txt
++ printf admin
++ ceph_adm dashboard ac-user-create admin -i /root/project/stor/ceph/xb/ceph/build/dashboard-admin-secret.txt administrator --force-password
++ '[' 1 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring dashboard ac-user-create admin -i /root/project/stor/ceph/xb/ceph/build/dashboard-admin-secret.txt administrator --force-password
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring dashboard ac-user-create admin -i /root/project/stor/ceph/xb/ceph/build/dashboard-admin-secret.txt administrator --force-password
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring dashboard ac-user-create admin -i /root/project/stor/ceph/xb/ceph/build/dashboard-admin-secret.txt administrator --force-password
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -k =~   ]]
++ printf -- '-k '
+-k + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + for s in "$@"
++ [[ dashboard =~   ]]
++ printf -- 'dashboard '
+dashboard + for s in "$@"
++ [[ ac-user-create =~   ]]
++ printf -- 'ac-user-create '
+ac-user-create + for s in "$@"
++ [[ admin =~   ]]
++ printf -- 'admin '
+admin + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/dashboard-admin-secret.txt =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/dashboard-admin-secret.txt '
+/root/project/stor/ceph/xb/ceph/build/dashboard-admin-secret.txt + for s in "$@"
++ [[ administrator =~   ]]
++ printf -- 'administrator '
+administrator + for s in "$@"
++ [[ --force-password =~   ]]
++ printf -- '--force-password '
+--force-password + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring dashboard ac-user-create admin -i /root/project/stor/ceph/xb/ceph/build/dashboard-admin-secret.txt administrator --force-password
+{"username": "admin", "password": "$2b$12$l.V.zFaoE2ToIooHX/CpgOZ1yqZ5am/9TsakZdeSGSWUGggUaGLHC", "roles": ["administrator"], "name": null, "email": null, "lastUpdate": 1680100113, "enabled": true, "pwdExpirationDate": null, "pwdUpdateRequired": false}
++ '[' 1 '!=' 0 ']'
++ ceph_adm dashboard create-self-signed-cert
++ '[' 1 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring dashboard create-self-signed-cert
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring dashboard create-self-signed-cert
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring dashboard create-self-signed-cert
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -k =~   ]]
++ printf -- '-k '
+-k + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + for s in "$@"
++ [[ dashboard =~   ]]
++ printf -- 'dashboard '
+dashboard + for s in "$@"
++ [[ create-self-signed-cert =~   ]]
++ printf -- 'create-self-signed-cert '
+create-self-signed-cert + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring dashboard create-self-signed-cert
+Self-signed certificate created
++ false
++ '[' 0 -eq 1 ']'
++ '[' 3 -gt 0 ']'
++ start_osd
++ '[' 0 -gt 0 ']'
++ start=0
++ end=2
++ local osds_wait
+++ seq 0 2
++ for osd in `seq $start $end`
++ local extra_seastar_args
++ '[' ceph-osd == crimson-osd ']'
++ '[' 1 -eq 1 -o 0 -gt 0 ']'
++ wconf
++ '[' 1 -eq 1 -o 0 -eq 1 ']'
++ cat
++ '[' 0 -eq 1 ']'
++ '[' 0 -eq 1 ']'
++ rm -rf /root/project/stor/ceph/xb/ceph/build/dev/osd0
++ command -v btrfs
++ '[' -n '' ']'
++ '[' -n '' ']'
++ mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/osd0
++ '[' -n '' ']'
++ '[' -n '' ']'
++ '[' bluestore == bluestore ']'
++ wconf
++ '[' 1 -eq 1 -o 0 -eq 1 ']'
++ cat
+++ uuidgen
++ local uuid=848ae990-d167-487c-a341-0be1547a2f78
++ echo 'add osd0 848ae990-d167-487c-a341-0be1547a2f78'
+add osd0 848ae990-d167-487c-a341-0be1547a2f78
+++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --gen-print-key
++ OSD_SECRET=AQAWSyRk9M5/FRAAoeSm1aIBRzzO0JecYbmwkg==
++ echo '{"cephx_secret": "AQAWSyRk9M5/FRAAoeSm1aIBRzzO0JecYbmwkg=="}'
++ ceph_adm osd new 848ae990-d167-487c-a341-0be1547a2f78 -i /root/project/stor/ceph/xb/ceph/build/dev/osd0/new.json
++ '[' 1 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring osd new 848ae990-d167-487c-a341-0be1547a2f78 -i /root/project/stor/ceph/xb/ceph/build/dev/osd0/new.json
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring osd new 848ae990-d167-487c-a341-0be1547a2f78 -i /root/project/stor/ceph/xb/ceph/build/dev/osd0/new.json
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring osd new 848ae990-d167-487c-a341-0be1547a2f78 -i /root/project/stor/ceph/xb/ceph/build/dev/osd0/new.json
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -k =~   ]]
++ printf -- '-k '
+-k + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + for s in "$@"
++ [[ osd =~   ]]
++ printf -- 'osd '
+osd + for s in "$@"
++ [[ new =~   ]]
++ printf -- 'new '
+new + for s in "$@"
++ [[ 848ae990-d167-487c-a341-0be1547a2f78 =~   ]]
++ printf -- '848ae990-d167-487c-a341-0be1547a2f78 '
+848ae990-d167-487c-a341-0be1547a2f78 + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/dev/osd0/new.json =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/dev/osd0/new.json '
+/root/project/stor/ceph/xb/ceph/build/dev/osd0/new.json + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring osd new 848ae990-d167-487c-a341-0be1547a2f78 -i /root/project/stor/ceph/xb/ceph/build/dev/osd0/new.json
+0
++ rm /root/project/stor/ceph/xb/ceph/build/dev/osd0/new.json
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 0 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf --mkfs --key AQAWSyRk9M5/FRAAoeSm1aIBRzzO0JecYbmwkg== --osd-uuid 848ae990-d167-487c-a341-0be1547a2f78
++ tee /root/project/stor/ceph/xb/ceph/build/out/osd-mkfs.0.log
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 0 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf --mkfs --key AQAWSyRk9M5/FRAAoeSm1aIBRzzO0JecYbmwkg== --osd-uuid 848ae990-d167-487c-a341-0be1547a2f78
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 0 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf --mkfs --key AQAWSyRk9M5/FRAAoeSm1aIBRzzO0JecYbmwkg== --osd-uuid 848ae990-d167-487c-a341-0be1547a2f78
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph-osd '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph-osd + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ 0 =~   ]]
++ printf -- '0 '
+0 + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ --mkfs =~   ]]
++ printf -- '--mkfs '
+--mkfs + for s in "$@"
++ [[ --key =~   ]]
++ printf -- '--key '
+--key + for s in "$@"
++ [[ AQAWSyRk9M5/FRAAoeSm1aIBRzzO0JecYbmwkg== =~   ]]
++ printf -- 'AQAWSyRk9M5/FRAAoeSm1aIBRzzO0JecYbmwkg== '
+AQAWSyRk9M5/FRAAoeSm1aIBRzzO0JecYbmwkg== + for s in "$@"
++ [[ --osd-uuid =~   ]]
++ printf -- '--osd-uuid '
+--osd-uuid + for s in "$@"
++ [[ 848ae990-d167-487c-a341-0be1547a2f78 =~   ]]
++ printf -- '848ae990-d167-487c-a341-0be1547a2f78 '
+848ae990-d167-487c-a341-0be1547a2f78 + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 0 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf --mkfs --key AQAWSyRk9M5/FRAAoeSm1aIBRzzO0JecYbmwkg== --osd-uuid 848ae990-d167-487c-a341-0be1547a2f78
+2023-03-29T22:28:40.520+0800 7f323fba2700 -1 bluestore(/root/project/stor/ceph/xb/ceph/build/dev/osd0/block) _read_bdev_label failed to open /root/project/stor/ceph/xb/ceph/build/dev/osd0/block: (2) No such file or directory
+2023-03-29T22:28:40.520+0800 7f323fba2700 -1 bluestore(/root/project/stor/ceph/xb/ceph/build/dev/osd0/block) _read_bdev_label failed to open /root/project/stor/ceph/xb/ceph/build/dev/osd0/block: (2) No such file or directory
+2023-03-29T22:28:40.520+0800 7f323fba2700 -1 bluestore(/root/project/stor/ceph/xb/ceph/build/dev/osd0/block) _read_bdev_label failed to open /root/project/stor/ceph/xb/ceph/build/dev/osd0/block: (2) No such file or directory
+2023-03-29T22:28:40.960+0800 7f323fba2700 -1 bluestore(/root/project/stor/ceph/xb/ceph/build/dev/osd0) _read_fsid unparsable uuid 
++ local key_fn=/root/project/stor/ceph/xb/ceph/build/dev/osd0/keyring
++ cat
++ echo start osd.0
+start osd.0
++ local osd_pid
++ echo osd 0 /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 0 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
+osd 0 /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 0 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ osd_pid=47360
++ true
++ osds_wait=47360
++ for osd in `seq $start $end`
++ local extra_seastar_args
++ '[' ceph-osd == crimson-osd ']'
++ run osd 0 /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 0 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ '[' 1 -eq 1 -o 0 -gt 0 ']'
++ wconf
++ '[' 1 -eq 1 -o 0 -eq 1 ']'
++ type=osd
++ shift
++ cat
++ num=0
++ shift
++ eval 'valg=$valgrind_osd'
+++ valg=
++ '[' -z '' ']'
++ valg=
++ '[' -n '' ']'
++ '[' 0 -eq 0 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 0 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 0 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 0 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph-osd '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph-osd + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ 0 =~   ]]
++ printf -- '0 '
+0 + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 0 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ '[' 0 -eq 1 ']'
++ '[' 0 -eq 1 ']'
++ rm -rf /root/project/stor/ceph/xb/ceph/build/dev/osd1
++ command -v btrfs
++ '[' -n '' ']'
++ '[' -n '' ']'
++ mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/osd1
++ '[' -n '' ']'
++ '[' -n '' ']'
++ '[' bluestore == bluestore ']'
++ wconf
++ '[' 1 -eq 1 -o 0 -eq 1 ']'
++ cat
+++ uuidgen
++ local uuid=369f0943-0548-4253-a309-603e9fa28b9c
++ echo 'add osd1 369f0943-0548-4253-a309-603e9fa28b9c'
+add osd1 369f0943-0548-4253-a309-603e9fa28b9c
+++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --gen-print-key
++ OSD_SECRET=AQA8SyRkwRbpGRAAk3ZQRG21sptgMxQKSX0gXw==
++ echo '{"cephx_secret": "AQA8SyRkwRbpGRAAk3ZQRG21sptgMxQKSX0gXw=="}'
++ ceph_adm osd new 369f0943-0548-4253-a309-603e9fa28b9c -i /root/project/stor/ceph/xb/ceph/build/dev/osd1/new.json
++ '[' 1 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring osd new 369f0943-0548-4253-a309-603e9fa28b9c -i /root/project/stor/ceph/xb/ceph/build/dev/osd1/new.json
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring osd new 369f0943-0548-4253-a309-603e9fa28b9c -i /root/project/stor/ceph/xb/ceph/build/dev/osd1/new.json
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring osd new 369f0943-0548-4253-a309-603e9fa28b9c -i /root/project/stor/ceph/xb/ceph/build/dev/osd1/new.json
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -k =~   ]]
++ printf -- '-k '
+-k + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + for s in "$@"
++ [[ osd =~   ]]
++ printf -- 'osd '
+osd + for s in "$@"
++ [[ new =~   ]]
++ printf -- 'new '
+new + for s in "$@"
++ [[ 369f0943-0548-4253-a309-603e9fa28b9c =~   ]]
++ printf -- '369f0943-0548-4253-a309-603e9fa28b9c '
+369f0943-0548-4253-a309-603e9fa28b9c + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/dev/osd1/new.json =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/dev/osd1/new.json '
+/root/project/stor/ceph/xb/ceph/build/dev/osd1/new.json + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring osd new 369f0943-0548-4253-a309-603e9fa28b9c -i /root/project/stor/ceph/xb/ceph/build/dev/osd1/new.json
+2023-03-29T22:29:17.512+0800 7fb10e9a0700 -1 Falling back to public interface
+1
++ rm /root/project/stor/ceph/xb/ceph/build/dev/osd1/new.json
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 1 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf --mkfs --key AQA8SyRkwRbpGRAAk3ZQRG21sptgMxQKSX0gXw== --osd-uuid 369f0943-0548-4253-a309-603e9fa28b9c
++ tee /root/project/stor/ceph/xb/ceph/build/out/osd-mkfs.1.log
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 1 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf --mkfs --key AQA8SyRkwRbpGRAAk3ZQRG21sptgMxQKSX0gXw== --osd-uuid 369f0943-0548-4253-a309-603e9fa28b9c
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 1 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf --mkfs --key AQA8SyRkwRbpGRAAk3ZQRG21sptgMxQKSX0gXw== --osd-uuid 369f0943-0548-4253-a309-603e9fa28b9c
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph-osd '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph-osd + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ 1 =~   ]]
++ printf -- '1 '
+1 + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ --mkfs =~   ]]
++ printf -- '--mkfs '
+--mkfs + for s in "$@"
++ [[ --key =~   ]]
++ printf -- '--key '
+--key + for s in "$@"
++ [[ AQA8SyRkwRbpGRAAk3ZQRG21sptgMxQKSX0gXw== =~   ]]
++ printf -- 'AQA8SyRkwRbpGRAAk3ZQRG21sptgMxQKSX0gXw== '
+AQA8SyRkwRbpGRAAk3ZQRG21sptgMxQKSX0gXw== + for s in "$@"
++ [[ --osd-uuid =~   ]]
++ printf -- '--osd-uuid '
+--osd-uuid + for s in "$@"
++ [[ 369f0943-0548-4253-a309-603e9fa28b9c =~   ]]
++ printf -- '369f0943-0548-4253-a309-603e9fa28b9c '
+369f0943-0548-4253-a309-603e9fa28b9c + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 1 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf --mkfs --key AQA8SyRkwRbpGRAAk3ZQRG21sptgMxQKSX0gXw== --osd-uuid 369f0943-0548-4253-a309-603e9fa28b9c
+2023-03-29T22:29:19.536+0800 7f55f8d2d700 -1 bluestore(/root/project/stor/ceph/xb/ceph/build/dev/osd1/block) _read_bdev_label failed to open /root/project/stor/ceph/xb/ceph/build/dev/osd1/block: (2) No such file or directory
+2023-03-29T22:29:19.536+0800 7f55f8d2d700 -1 bluestore(/root/project/stor/ceph/xb/ceph/build/dev/osd1/block) _read_bdev_label failed to open /root/project/stor/ceph/xb/ceph/build/dev/osd1/block: (2) No such file or directory
+2023-03-29T22:29:19.536+0800 7f55f8d2d700 -1 bluestore(/root/project/stor/ceph/xb/ceph/build/dev/osd1/block) _read_bdev_label failed to open /root/project/stor/ceph/xb/ceph/build/dev/osd1/block: (2) No such file or directory
+2023-03-29T22:29:19.996+0800 7f55f8d2d700 -1 bluestore(/root/project/stor/ceph/xb/ceph/build/dev/osd1) _read_fsid unparsable uuid 
+2023-03-29T22:29:23.716+0800 7fb10e9a0700 -1 osd.0 0 log_to_monitors true
++ local key_fn=/root/project/stor/ceph/xb/ceph/build/dev/osd1/keyring
++ cat
++ echo start osd.1
+start osd.1
++ local osd_pid
++ echo osd 1 /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 1 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
+osd 1 /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 1 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ osd_pid=49023
++ true
++ osds_wait=49023
++ for osd in `seq $start $end`
++ local extra_seastar_args
++ '[' ceph-osd == crimson-osd ']'
++ '[' 1 -eq 1 -o 0 -gt 0 ']'
++ wconf
++ run osd 1 /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 1 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ '[' 1 -eq 1 -o 0 -eq 1 ']'
++ cat
++ type=osd
++ shift
++ num=1
++ shift
++ eval 'valg=$valgrind_osd'
+++ valg=
++ '[' -z '' ']'
++ valg=
++ '[' -n '' ']'
++ '[' 0 -eq 0 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 1 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 1 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 1 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph-osd '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph-osd + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ 1 =~   ]]
++ printf -- '1 '
+1 + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 1 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ '[' 0 -eq 1 ']'
++ '[' 0 -eq 1 ']'
++ rm -rf /root/project/stor/ceph/xb/ceph/build/dev/osd2
++ command -v btrfs
++ '[' -n '' ']'
++ '[' -n '' ']'
++ mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/osd2
++ '[' -n '' ']'
++ '[' -n '' ']'
++ '[' bluestore == bluestore ']'
++ wconf
++ '[' 1 -eq 1 -o 0 -eq 1 ']'
++ cat
+++ uuidgen
++ local uuid=ad0ebbbc-4a69-405e-9427-88d0cf5d3d8a
++ echo 'add osd2 ad0ebbbc-4a69-405e-9427-88d0cf5d3d8a'
+add osd2 ad0ebbbc-4a69-405e-9427-88d0cf5d3d8a
+++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --gen-print-key
++ OSD_SECRET=AQBoSyRk+JyAGxAAmKKu+PWymqbhItfjje5aOQ==
++ echo '{"cephx_secret": "AQBoSyRk+JyAGxAAmKKu+PWymqbhItfjje5aOQ=="}'
++ ceph_adm osd new ad0ebbbc-4a69-405e-9427-88d0cf5d3d8a -i /root/project/stor/ceph/xb/ceph/build/dev/osd2/new.json
++ '[' 1 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring osd new ad0ebbbc-4a69-405e-9427-88d0cf5d3d8a -i /root/project/stor/ceph/xb/ceph/build/dev/osd2/new.json
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring osd new ad0ebbbc-4a69-405e-9427-88d0cf5d3d8a -i /root/project/stor/ceph/xb/ceph/build/dev/osd2/new.json
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring osd new ad0ebbbc-4a69-405e-9427-88d0cf5d3d8a -i /root/project/stor/ceph/xb/ceph/build/dev/osd2/new.json
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -k =~   ]]
++ printf -- '-k '
+-k + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + for s in "$@"
++ [[ osd =~   ]]
++ printf -- 'osd '
+osd + for s in "$@"
++ [[ new =~   ]]
++ printf -- 'new '
+new + for s in "$@"
++ [[ ad0ebbbc-4a69-405e-9427-88d0cf5d3d8a =~   ]]
++ printf -- 'ad0ebbbc-4a69-405e-9427-88d0cf5d3d8a '
+ad0ebbbc-4a69-405e-9427-88d0cf5d3d8a + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/dev/osd2/new.json =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/dev/osd2/new.json '
+/root/project/stor/ceph/xb/ceph/build/dev/osd2/new.json + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring osd new ad0ebbbc-4a69-405e-9427-88d0cf5d3d8a -i /root/project/stor/ceph/xb/ceph/build/dev/osd2/new.json
+2023-03-29T22:30:01.740+0800 7fccf0f17700 -1 Falling back to public interface
+2
++ rm /root/project/stor/ceph/xb/ceph/build/dev/osd2/new.json
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 2 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf --mkfs --key AQBoSyRk+JyAGxAAmKKu+PWymqbhItfjje5aOQ== --osd-uuid ad0ebbbc-4a69-405e-9427-88d0cf5d3d8a
++ tee /root/project/stor/ceph/xb/ceph/build/out/osd-mkfs.2.log
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 2 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf --mkfs --key AQBoSyRk+JyAGxAAmKKu+PWymqbhItfjje5aOQ== --osd-uuid ad0ebbbc-4a69-405e-9427-88d0cf5d3d8a
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 2 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf --mkfs --key AQBoSyRk+JyAGxAAmKKu+PWymqbhItfjje5aOQ== --osd-uuid ad0ebbbc-4a69-405e-9427-88d0cf5d3d8a
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph-osd '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph-osd + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ 2 =~   ]]
++ printf -- '2 '
+2 + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ --mkfs =~   ]]
++ printf -- '--mkfs '
+--mkfs + for s in "$@"
++ [[ --key =~   ]]
++ printf -- '--key '
+--key + for s in "$@"
++ [[ AQBoSyRk+JyAGxAAmKKu+PWymqbhItfjje5aOQ== =~   ]]
++ printf -- 'AQBoSyRk+JyAGxAAmKKu+PWymqbhItfjje5aOQ== '
+AQBoSyRk+JyAGxAAmKKu+PWymqbhItfjje5aOQ== + for s in "$@"
++ [[ --osd-uuid =~   ]]
++ printf -- '--osd-uuid '
+--osd-uuid + for s in "$@"
++ [[ ad0ebbbc-4a69-405e-9427-88d0cf5d3d8a =~   ]]
++ printf -- 'ad0ebbbc-4a69-405e-9427-88d0cf5d3d8a '
+ad0ebbbc-4a69-405e-9427-88d0cf5d3d8a + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 2 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf --mkfs --key AQBoSyRk+JyAGxAAmKKu+PWymqbhItfjje5aOQ== --osd-uuid ad0ebbbc-4a69-405e-9427-88d0cf5d3d8a
+2023-03-29T22:30:02.592+0800 7f035c0f3640 -1 monclient(hunting): handle_auth_bad_method server allowed_methods [2] but i only support [2]
+2023-03-29T22:30:02.592+0800 7f035d0f5640 -1 monclient(hunting): handle_auth_bad_method server allowed_methods [2] but i only support [2]
+2023-03-29T22:30:02.692+0800 7f035e12f700 -1 bluestore(/root/project/stor/ceph/xb/ceph/build/dev/osd2/block) _read_bdev_label failed to open /root/project/stor/ceph/xb/ceph/build/dev/osd2/block: (2) No such file or directory
+2023-03-29T22:30:02.692+0800 7f035e12f700 -1 bluestore(/root/project/stor/ceph/xb/ceph/build/dev/osd2/block) _read_bdev_label failed to open /root/project/stor/ceph/xb/ceph/build/dev/osd2/block: (2) No such file or directory
+2023-03-29T22:30:02.692+0800 7f035e12f700 -1 bluestore(/root/project/stor/ceph/xb/ceph/build/dev/osd2/block) _read_bdev_label failed to open /root/project/stor/ceph/xb/ceph/build/dev/osd2/block: (2) No such file or directory
+2023-03-29T22:30:03.292+0800 7f035e12f700 -1 bluestore(/root/project/stor/ceph/xb/ceph/build/dev/osd2) _read_fsid unparsable uuid 
+2023-03-29T22:30:08.616+0800 7fccf0f17700 -1 osd.1 0 log_to_monitors true
++ local key_fn=/root/project/stor/ceph/xb/ceph/build/dev/osd2/keyring
++ cat
++ echo start osd.2
+start osd.2
++ local osd_pid
++ echo osd 2 /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 2 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
+osd 2 /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 2 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ osd_pid=50617
++ true
++ osds_wait=50617
++ true
++ for p in $osds_wait
++ wait 50617
++ run osd 2 /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 2 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ type=osd
++ shift
++ num=2
++ shift
++ eval 'valg=$valgrind_osd'
+++ valg=
++ '[' -z '' ']'
++ valg=
++ '[' -n '' ']'
++ '[' 0 -eq 0 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 2 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 2 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 2 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph-osd '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph-osd + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ 2 =~   ]]
++ printf -- '2 '
+2 + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-osd -i 2 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
+2023-03-29T22:31:05.904+0800 7f3fc354c700 -1 Falling back to public interface
+2023-03-29T22:31:13.072+0800 7f3fc354c700 -1 osd.2 0 log_to_monitors true
++ debug echo OSDs started
++ echo OSDs started
+OSDs started
++ '[' 0 -gt 0 ']'
++ '[' 0 -eq 1 ']'
++ '[' 3 -gt 0 ']'
++ start_mds
++ local mds=0
++ for name in a b c d e f g h i j k l m n o p
++ '[' 0 -eq 3 ']'
++ mds=1
++ '[' 1 -eq 1 ']'
++ prun mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mds.a
++ debug quoted_print mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mds.a
++ quoted_print mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mds.a
++ for s in "$@"
++ [[ mkdir =~   ]]
++ printf -- 'mkdir '
+mkdir + for s in "$@"
++ [[ -p =~   ]]
++ printf -- '-p '
+-p + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/dev/mds.a =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/dev/mds.a '
+/root/project/stor/ceph/xb/ceph/build/dev/mds.a + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mds.a
++ key_fn=/root/project/stor/ceph/xb/ceph/build/dev/mds.a/keyring
++ wconf
++ '[' 1 -eq 1 -o 0 -eq 1 ']'
++ cat
++ '[' 0 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --create-keyring --gen-key --name=mds.a /root/project/stor/ceph/xb/ceph/build/dev/mds.a/keyring
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --create-keyring --gen-key --name=mds.a /root/project/stor/ceph/xb/ceph/build/dev/mds.a/keyring
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --create-keyring --gen-key --name=mds.a /root/project/stor/ceph/xb/ceph/build/dev/mds.a/keyring
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool + for s in "$@"
++ [[ --create-keyring =~   ]]
++ printf -- '--create-keyring '
+--create-keyring + for s in "$@"
++ [[ --gen-key =~   ]]
++ printf -- '--gen-key '
+--gen-key + for s in "$@"
++ [[ --name=mds.a =~   ]]
++ printf -- '--name=mds.a '
+--name=mds.a + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/dev/mds.a/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/dev/mds.a/keyring '
+/root/project/stor/ceph/xb/ceph/build/dev/mds.a/keyring + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --create-keyring --gen-key --name=mds.a /root/project/stor/ceph/xb/ceph/build/dev/mds.a/keyring
+creating /root/project/stor/ceph/xb/ceph/build/dev/mds.a/keyring
++ ceph_adm -i /root/project/stor/ceph/xb/ceph/build/dev/mds.a/keyring auth add mds.a mon 'allow profile mds' osd 'allow rw tag cephfs *=*' mds allow mgr 'allow profile mds'
++ '[' 1 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring -i /root/project/stor/ceph/xb/ceph/build/dev/mds.a/keyring auth add mds.a mon 'allow profile mds' osd 'allow rw tag cephfs *=*' mds allow mgr 'allow profile mds'
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring -i /root/project/stor/ceph/xb/ceph/build/dev/mds.a/keyring auth add mds.a mon 'allow profile mds' osd 'allow rw tag cephfs *=*' mds allow mgr 'allow profile mds'
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring -i /root/project/stor/ceph/xb/ceph/build/dev/mds.a/keyring auth add mds.a mon 'allow profile mds' osd 'allow rw tag cephfs *=*' mds allow mgr 'allow profile mds'
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -k =~   ]]
++ printf -- '-k '
+-k + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/dev/mds.a/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/dev/mds.a/keyring '
+/root/project/stor/ceph/xb/ceph/build/dev/mds.a/keyring + for s in "$@"
++ [[ auth =~   ]]
++ printf -- 'auth '
+auth + for s in "$@"
++ [[ add =~   ]]
++ printf -- 'add '
+add + for s in "$@"
++ [[ mds.a =~   ]]
++ printf -- 'mds.a '
+mds.a + for s in "$@"
++ [[ mon =~   ]]
++ printf -- 'mon '
+mon + for s in "$@"
++ [[ allow profile mds =~   ]]
++ printf -- ''\''%s'\'' ' 'allow profile mds'
+'allow profile mds' + for s in "$@"
++ [[ osd =~   ]]
++ printf -- 'osd '
+osd + for s in "$@"
++ [[ allow rw tag cephfs *=* =~   ]]
++ printf -- ''\''%s'\'' ' 'allow rw tag cephfs *=*'
+'allow rw tag cephfs *=*' + for s in "$@"
++ [[ mds =~   ]]
++ printf -- 'mds '
+mds + for s in "$@"
++ [[ allow =~   ]]
++ printf -- 'allow '
+allow + for s in "$@"
++ [[ mgr =~   ]]
++ printf -- 'mgr '
+mgr + for s in "$@"
++ [[ allow profile mds =~   ]]
++ printf -- ''\''%s'\'' ' 'allow profile mds'
+'allow profile mds' + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring -i /root/project/stor/ceph/xb/ceph/build/dev/mds.a/keyring auth add mds.a mon 'allow profile mds' osd 'allow rw tag cephfs *=*' mds allow mgr 'allow profile mds'
+added key for mds.a
++ '[' 0 -eq 1 ']'
++ run mds a /root/project/stor/ceph/xb/ceph/build/bin/ceph-mds -i a -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ type=mds
++ shift
++ num=a
++ shift
++ eval 'valg=$valgrind_mds'
+++ valg=
++ '[' -z '' ']'
++ valg=
++ '[' -n '' ']'
++ '[' 0 -eq 0 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph-mds -i a -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-mds -i a -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-mds -i a -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph-mds =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph-mds '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph-mds + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ a =~   ]]
++ printf -- 'a '
+a + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-mds -i a -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
+starting mds.a at 
++ '[' 0 -eq 1 ']'
++ for name in a b c d e f g h i j k l m n o p
++ '[' 1 -eq 3 ']'
++ mds=2
++ '[' 1 -eq 1 ']'
++ prun mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mds.b
++ debug quoted_print mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mds.b
++ quoted_print mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mds.b
++ for s in "$@"
++ [[ mkdir =~   ]]
++ printf -- 'mkdir '
+mkdir + for s in "$@"
++ [[ -p =~   ]]
++ printf -- '-p '
+-p + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/dev/mds.b =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/dev/mds.b '
+/root/project/stor/ceph/xb/ceph/build/dev/mds.b + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mds.b
++ key_fn=/root/project/stor/ceph/xb/ceph/build/dev/mds.b/keyring
++ wconf
++ '[' 1 -eq 1 -o 0 -eq 1 ']'
++ cat
++ '[' 0 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --create-keyring --gen-key --name=mds.b /root/project/stor/ceph/xb/ceph/build/dev/mds.b/keyring
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --create-keyring --gen-key --name=mds.b /root/project/stor/ceph/xb/ceph/build/dev/mds.b/keyring
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --create-keyring --gen-key --name=mds.b /root/project/stor/ceph/xb/ceph/build/dev/mds.b/keyring
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool + for s in "$@"
++ [[ --create-keyring =~   ]]
++ printf -- '--create-keyring '
+--create-keyring + for s in "$@"
++ [[ --gen-key =~   ]]
++ printf -- '--gen-key '
+--gen-key + for s in "$@"
++ [[ --name=mds.b =~   ]]
++ printf -- '--name=mds.b '
+--name=mds.b + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/dev/mds.b/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/dev/mds.b/keyring '
+/root/project/stor/ceph/xb/ceph/build/dev/mds.b/keyring + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --create-keyring --gen-key --name=mds.b /root/project/stor/ceph/xb/ceph/build/dev/mds.b/keyring
+creating /root/project/stor/ceph/xb/ceph/build/dev/mds.b/keyring
++ ceph_adm -i /root/project/stor/ceph/xb/ceph/build/dev/mds.b/keyring auth add mds.b mon 'allow profile mds' osd 'allow rw tag cephfs *=*' mds allow mgr 'allow profile mds'
++ '[' 1 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring -i /root/project/stor/ceph/xb/ceph/build/dev/mds.b/keyring auth add mds.b mon 'allow profile mds' osd 'allow rw tag cephfs *=*' mds allow mgr 'allow profile mds'
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring -i /root/project/stor/ceph/xb/ceph/build/dev/mds.b/keyring auth add mds.b mon 'allow profile mds' osd 'allow rw tag cephfs *=*' mds allow mgr 'allow profile mds'
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring -i /root/project/stor/ceph/xb/ceph/build/dev/mds.b/keyring auth add mds.b mon 'allow profile mds' osd 'allow rw tag cephfs *=*' mds allow mgr 'allow profile mds'
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -k =~   ]]
++ printf -- '-k '
+-k + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/dev/mds.b/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/dev/mds.b/keyring '
+/root/project/stor/ceph/xb/ceph/build/dev/mds.b/keyring + for s in "$@"
++ [[ auth =~   ]]
++ printf -- 'auth '
+auth + for s in "$@"
++ [[ add =~   ]]
++ printf -- 'add '
+add + for s in "$@"
++ [[ mds.b =~   ]]
++ printf -- 'mds.b '
+mds.b + for s in "$@"
++ [[ mon =~   ]]
++ printf -- 'mon '
+mon + for s in "$@"
++ [[ allow profile mds =~   ]]
++ printf -- ''\''%s'\'' ' 'allow profile mds'
+'allow profile mds' + for s in "$@"
++ [[ osd =~   ]]
++ printf -- 'osd '
+osd + for s in "$@"
++ [[ allow rw tag cephfs *=* =~   ]]
++ printf -- ''\''%s'\'' ' 'allow rw tag cephfs *=*'
+'allow rw tag cephfs *=*' + for s in "$@"
++ [[ mds =~   ]]
++ printf -- 'mds '
+mds + for s in "$@"
++ [[ allow =~   ]]
++ printf -- 'allow '
+allow + for s in "$@"
++ [[ mgr =~   ]]
++ printf -- 'mgr '
+mgr + for s in "$@"
++ [[ allow profile mds =~   ]]
++ printf -- ''\''%s'\'' ' 'allow profile mds'
+'allow profile mds' + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring -i /root/project/stor/ceph/xb/ceph/build/dev/mds.b/keyring auth add mds.b mon 'allow profile mds' osd 'allow rw tag cephfs *=*' mds allow mgr 'allow profile mds'
+added key for mds.b
++ '[' 0 -eq 1 ']'
++ run mds b /root/project/stor/ceph/xb/ceph/build/bin/ceph-mds -i b -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ type=mds
++ shift
++ num=b
++ shift
++ eval 'valg=$valgrind_mds'
+++ valg=
++ '[' -z '' ']'
++ valg=
++ '[' -n '' ']'
++ '[' 0 -eq 0 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph-mds -i b -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-mds -i b -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-mds -i b -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph-mds =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph-mds '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph-mds + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ b =~   ]]
++ printf -- 'b '
+b + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-mds -i b -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
+starting mds.b at 
++ '[' 0 -eq 1 ']'
++ for name in a b c d e f g h i j k l m n o p
++ '[' 2 -eq 3 ']'
++ mds=3
++ '[' 1 -eq 1 ']'
++ prun mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mds.c
++ debug quoted_print mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mds.c
++ quoted_print mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mds.c
++ for s in "$@"
++ [[ mkdir =~   ]]
++ printf -- 'mkdir '
+mkdir + for s in "$@"
++ [[ -p =~   ]]
++ printf -- '-p '
+-p + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/dev/mds.c =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/dev/mds.c '
+/root/project/stor/ceph/xb/ceph/build/dev/mds.c + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ mkdir -p /root/project/stor/ceph/xb/ceph/build/dev/mds.c
++ key_fn=/root/project/stor/ceph/xb/ceph/build/dev/mds.c/keyring
++ wconf
++ '[' 1 -eq 1 -o 0 -eq 1 ']'
++ cat
++ '[' 0 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --create-keyring --gen-key --name=mds.c /root/project/stor/ceph/xb/ceph/build/dev/mds.c/keyring
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --create-keyring --gen-key --name=mds.c /root/project/stor/ceph/xb/ceph/build/dev/mds.c/keyring
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --create-keyring --gen-key --name=mds.c /root/project/stor/ceph/xb/ceph/build/dev/mds.c/keyring
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool + for s in "$@"
++ [[ --create-keyring =~   ]]
++ printf -- '--create-keyring '
+--create-keyring + for s in "$@"
++ [[ --gen-key =~   ]]
++ printf -- '--gen-key '
+--gen-key + for s in "$@"
++ [[ --name=mds.c =~   ]]
++ printf -- '--name=mds.c '
+--name=mds.c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/dev/mds.c/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/dev/mds.c/keyring '
+/root/project/stor/ceph/xb/ceph/build/dev/mds.c/keyring + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-authtool --create-keyring --gen-key --name=mds.c /root/project/stor/ceph/xb/ceph/build/dev/mds.c/keyring
+creating /root/project/stor/ceph/xb/ceph/build/dev/mds.c/keyring
++ ceph_adm -i /root/project/stor/ceph/xb/ceph/build/dev/mds.c/keyring auth add mds.c mon 'allow profile mds' osd 'allow rw tag cephfs *=*' mds allow mgr 'allow profile mds'
++ '[' 1 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring -i /root/project/stor/ceph/xb/ceph/build/dev/mds.c/keyring auth add mds.c mon 'allow profile mds' osd 'allow rw tag cephfs *=*' mds allow mgr 'allow profile mds'
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring -i /root/project/stor/ceph/xb/ceph/build/dev/mds.c/keyring auth add mds.c mon 'allow profile mds' osd 'allow rw tag cephfs *=*' mds allow mgr 'allow profile mds'
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring -i /root/project/stor/ceph/xb/ceph/build/dev/mds.c/keyring auth add mds.c mon 'allow profile mds' osd 'allow rw tag cephfs *=*' mds allow mgr 'allow profile mds'
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -k =~   ]]
++ printf -- '-k '
+-k + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/dev/mds.c/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/dev/mds.c/keyring '
+/root/project/stor/ceph/xb/ceph/build/dev/mds.c/keyring + for s in "$@"
++ [[ auth =~   ]]
++ printf -- 'auth '
+auth + for s in "$@"
++ [[ add =~   ]]
++ printf -- 'add '
+add + for s in "$@"
++ [[ mds.c =~   ]]
++ printf -- 'mds.c '
+mds.c + for s in "$@"
++ [[ mon =~   ]]
++ printf -- 'mon '
+mon + for s in "$@"
++ [[ allow profile mds =~   ]]
++ printf -- ''\''%s'\'' ' 'allow profile mds'
+'allow profile mds' + for s in "$@"
++ [[ osd =~   ]]
++ printf -- 'osd '
+osd + for s in "$@"
++ [[ allow rw tag cephfs *=* =~   ]]
++ printf -- ''\''%s'\'' ' 'allow rw tag cephfs *=*'
+'allow rw tag cephfs *=*' + for s in "$@"
++ [[ mds =~   ]]
++ printf -- 'mds '
+mds + for s in "$@"
++ [[ allow =~   ]]
++ printf -- 'allow '
+allow + for s in "$@"
++ [[ mgr =~   ]]
++ printf -- 'mgr '
+mgr + for s in "$@"
++ [[ allow profile mds =~   ]]
++ printf -- ''\''%s'\'' ' 'allow profile mds'
+'allow profile mds' + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring -i /root/project/stor/ceph/xb/ceph/build/dev/mds.c/keyring auth add mds.c mon 'allow profile mds' osd 'allow rw tag cephfs *=*' mds allow mgr 'allow profile mds'
+added key for mds.c
++ '[' 0 -eq 1 ']'
++ run mds c /root/project/stor/ceph/xb/ceph/build/bin/ceph-mds -i c -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ type=mds
++ shift
++ num=c
++ shift
++ eval 'valg=$valgrind_mds'
+++ valg=
++ '[' -z '' ']'
++ valg=
++ '[' -n '' ']'
++ '[' 0 -eq 0 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph-mds -i c -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-mds -i c -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph-mds -i c -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph-mds =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph-mds '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph-mds + for s in "$@"
++ [[ -i =~   ]]
++ printf -- '-i '
+-i + for s in "$@"
++ [[ c =~   ]]
++ printf -- 'c '
+c + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph-mds -i c -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
+starting mds.c at 
++ '[' 0 -eq 1 ']'
++ for name in a b c d e f g h i j k l m n o p
++ '[' 3 -eq 3 ']'
++ break
++ '[' 1 -eq 1 ']'
++ '[' 1 -gt 0 ']'
++ sleep 5
++ '[' 1 -gt 1 ']'
++ ceph_adm fs volume ls
++ '[' 1 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring fs volume ls
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring fs volume ls
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring fs volume ls
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -k =~   ]]
++ printf -- '-k '
+-k + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + for s in "$@"
++ [[ fs =~   ]]
++ printf -- 'fs '
+fs + for s in "$@"
++ [[ volume =~   ]]
++ printf -- 'volume '
+volume + for s in "$@"
++ [[ ls =~   ]]
++ printf -- 'ls '
+ls + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring fs volume ls
+[]
++ local fs=0
++ for name in a b c d e f g h i j k l m n o p
++ ceph_adm fs volume create a
++ '[' 1 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring fs volume create a
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring fs volume create a
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring fs volume create a
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -k =~   ]]
++ printf -- '-k '
+-k + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + for s in "$@"
++ [[ fs =~   ]]
++ printf -- 'fs '
+fs + for s in "$@"
++ [[ volume =~   ]]
++ printf -- 'volume '
+volume + for s in "$@"
++ [[ create =~   ]]
++ printf -- 'create '
+create + for s in "$@"
++ [[ a =~   ]]
++ printf -- 'a '
+a + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring fs volume create a
+Volume created successfully (no MDS daemons created)
++ ceph_adm fs authorize a client.fs_a / rwp
++ '[' 1 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring fs authorize a client.fs_a / rwp
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring fs authorize a client.fs_a / rwp
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring fs authorize a client.fs_a / rwp
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -k =~   ]]
++ printf -- '-k '
+-k + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + for s in "$@"
++ [[ fs =~   ]]
++ printf -- 'fs '
+fs + for s in "$@"
++ [[ authorize =~   ]]
++ printf -- 'authorize '
+authorize + for s in "$@"
++ [[ a =~   ]]
++ printf -- 'a '
+a + for s in "$@"
++ [[ client.fs_a =~   ]]
++ printf -- 'client.fs_a '
+client.fs_a + for s in "$@"
++ [[ / =~   ]]
++ printf -- '/ '
+/ + for s in "$@"
++ [[ rwp =~   ]]
++ printf -- 'rwp '
+rwp + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring fs authorize a client.fs_a / rwp
++ fs=1
++ '[' 1 -eq 1 ']'
++ break
++ ceph_adm fs authorize '*' client.fs / rwp
++ '[' 1 -eq 1 ']'
++ prun /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring fs authorize '*' client.fs / rwp
++ debug quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring fs authorize '*' client.fs / rwp
++ quoted_print /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring fs authorize '*' client.fs / rwp
++ for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/bin/ceph =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/bin/ceph '
+/root/project/stor/ceph/xb/ceph/build/bin/ceph + for s in "$@"
++ [[ -c =~   ]]
++ printf -- '-c '
+-c + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/ceph.conf =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/ceph.conf '
+/root/project/stor/ceph/xb/ceph/build/ceph.conf + for s in "$@"
++ [[ -k =~   ]]
++ printf -- '-k '
+-k + for s in "$@"
++ [[ /root/project/stor/ceph/xb/ceph/build/keyring =~   ]]
++ printf -- '/root/project/stor/ceph/xb/ceph/build/keyring '
+/root/project/stor/ceph/xb/ceph/build/keyring + for s in "$@"
++ [[ fs =~   ]]
++ printf -- 'fs '
+fs + for s in "$@"
++ [[ authorize =~   ]]
++ printf -- 'authorize '
+authorize + for s in "$@"
++ [[ * =~   ]]
++ printf -- '* '
+* + for s in "$@"
++ [[ client.fs =~   ]]
++ printf -- 'client.fs '
+client.fs + for s in "$@"
++ [[ / =~   ]]
++ printf -- '/ '
+/ + for s in "$@"
++ [[ rwp =~   ]]
++ printf -- 'rwp '
+rwp + printf '\n'
+
++ PATH=/root/project/stor/ceph/xb/ceph/build/bin:/root/project/stor/ceph/xb/ceph/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ /root/project/stor/ceph/xb/ceph/build/bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf -k /root/project/stor/ceph/xb/ceph/build/keyring fs authorize '*' client.fs / rwp
++ '[' 1 -gt 1 ']'
++ fs=0
++ for name in a b c d e f g h i j k l m n o p
++ '[' 0 -eq 1 ']'
++ fs=1
++ '[' 1 -gt 1 ']'
++ for name in a b c d e f g h i j k l m n o p
++ '[' 1 -eq 1 ']'
++ break
++ '[' 0 -eq 1 ']'
++ do_cache
++ '[' -n '' ']'
++ do_hitsets
++ '[' -n '' ']'
++ '[' 0 -gt 0 ']'
++ '[' 0 -gt 0 ']'
++ echo ''
+
++ '[' 0 -eq 1 ']'
++ debug echo 'vstart cluster complete. Use stop.sh to stop. See out/* (e.g. '\''tail -f out/????'\'') for debug output.'
++ echo 'vstart cluster complete. Use stop.sh to stop. See out/* (e.g. '\''tail -f out/????'\'') for debug output.'
+vstart cluster complete. Use stop.sh to stop. See out/* (e.g. 'tail -f out/????') for debug output.
++ echo ''
+
++ '[' 1 -eq 1 ']'
++ true
++ cat
+dashboard urls: https://10.132.33.30:41659
+  w/ user/pass: admin / admin
++ false
++ echo ''
+
++ echo '#'
++ echo '# source this file into your shell to set up the environment.'
++ echo '# For example:'
++ echo '# $ . /root/project/stor/ceph/xb/ceph/build/vstart_environment.sh'
++ echo '#'
++ echo 'export PYTHONPATH=/root/project/stor/ceph/xb/ceph/src/pybind:/root/project/stor/ceph/xb/ceph/build/lib/cython_modules/lib.3:/root/project/stor/ceph/xb/ceph/src/python-common:$PYTHONPATH'
++ echo 'export LD_LIBRARY_PATH=/root/project/stor/ceph/xb/ceph/build/lib:$LD_LIBRARY_PATH'
++ echo 'export PATH=/root/project/stor/ceph/xb/ceph/build/bin:$PATH'
++ '[' /root/project/stor/ceph/xb/ceph/build '!=' /root/project/stor/ceph/xb/ceph/build ']'
++ tee -a /root/project/stor/ceph/xb/ceph/build/vstart_environment.sh
++ '[' -n /root/project/stor/ceph/xb/ceph/src/tools/cephfs/shell/cephfs-shell ']'
++ echo 'alias cephfs-shell=/root/project/stor/ceph/xb/ceph/src/tools/cephfs/shell/cephfs-shell'
+export PYTHONPATH=/root/project/stor/ceph/xb/ceph/src/pybind:/root/project/stor/ceph/xb/ceph/build/lib/cython_modules/lib.3:/root/project/stor/ceph/xb/ceph/src/python-common:$PYTHONPATH
+export LD_LIBRARY_PATH=/root/project/stor/ceph/xb/ceph/build/lib:$LD_LIBRARY_PATH
+export PATH=/root/project/stor/ceph/xb/ceph/build/bin:$PATH
+alias cephfs-shell=/root/project/stor/ceph/xb/ceph/src/tools/cephfs/shell/cephfs-shell
++ echo CEPH_DEV=1
+CEPH_DEV=1
++ STRAY_CONF_PATH=/etc/ceph/ceph.conf
++ '[' -f /etc/ceph/ceph.conf -a -n /root/project/stor/ceph/xb/ceph/build/ceph.conf -a '!' /root/project/stor/ceph/xb/ceph/build/ceph.conf -ef /etc/ceph/ceph.conf ']'
++ init_logrotate
+++ pwd
++ logrotate_conf_path=/root/project/stor/ceph/xb/ceph/build/logrotate.conf
+++ pwd
++ logrotate_state_path=/root/project/stor/ceph/xb/ceph/build/logrotate.state
++ test -a /root/project/stor/ceph/xb/ceph/build/logrotate.conf
+root@ubuntu22:~/project/stor/ceph/xb/ceph/build# bash -x ../src/stop.sh 
++ test -d dev/osd0/.
++ test -e dev/sudo
++ '[' -e CMakeCache.txt ']'
++ '[' -z '' ']'
++ CEPH_BIN=bin
++ '[' -n '' ']'
++ CEPH_CONF_PATH=/root/project/stor/ceph/xb/ceph/build
++ conf_fn=/root/project/stor/ceph/xb/ceph/build/ceph.conf
++ '[' -z '' ']'
++ CEPHADM=bin/cephadm
+++ id -u
++ MYUID=0
+++ id -nu
++ MYNAME=root
++ usage='usage: ../src/stop.sh [all] [mon] [mds] [osd] [rgw] [nfs] [--crimson] [--cephadm]\n'
++ stop_all=1
++ stop_mon=0
++ stop_mds=0
++ stop_osd=0
++ stop_mgr=0
++ stop_rgw=0
++ stop_ganesha=0
++ ceph_osd=ceph-osd
++ stop_cephadm=0
++ '[' 0 -ge 1 ']'
++ '[' 1 -eq 1 ']'
++ bin/ceph -s --connect-timeout 1 -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ do_umountall
+++ bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf mon metadata
+++ jq -j '.[].addrs'
++ VSTART_IP_PORTS='[v2:10.132.33.30:40659/0,v1:10.132.33.30:40660/0][v2:10.132.33.30:40661/0,v1:10.132.33.30:40662/0][v2:10.132.33.30:40663/0,v1:10.132.33.30:40664/0]'
++ SRC_MNT_ARRAY=($(findmnt -t ceph -n --raw --output=source,target))
+++ findmnt -t ceph -n --raw --output=source,target
++ LEN_SRC_MNT_ARRAY=0
++ (( i=0 ))
++ (( i<0 ))
+++ ps -e
+++ grep ' ceph-mds$'
+++ wc -l
++ num_of_ceph_mdss=3
++ test 3 -ne 0
+++ bin/ceph -c /root/project/stor/ceph/xb/ceph/build/ceph.conf tell 'mds.*' client ls
+++ grep mount_point
+++ tr -d '",'
+++ awk '{print $2}'
++ CEPH_FUSE_MNTS=
++ '[' -n '' ']'
++ bin/rbd device list -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ bin/rbd device list -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
++ tail -n +2
++ read DEV
+2023-03-29T22:43:39.380+0800 7f985c088780 -1 WARNING: all dangerous and experimental features are enabled.
+2023-03-29T22:43:39.380+0800 7f985c088780 -1 WARNING: all dangerous and experimental features are enabled.
+++ bin/rbd device list -c /root/project/stor/ceph/xb/ceph/build/ceph.conf
+2023-03-29T22:43:39.444+0800 7f81ecc69780 -1 WARNING: all dangerous and experimental features are enabled.
+2023-03-29T22:43:39.444+0800 7f81ecc69780 -1 WARNING: all dangerous and experimental features are enabled.
++ '[' -n '' ']'
+++ sudo bin/cephadm ls
+
+
++ daemons='[]'
++ '[' 0 -eq 0 -a '[]' '!=' '[]' ']'
++ to_kill='ceph-osd ceph-mon ceph-mds ceph-mgr radosgw lt-radosgw apache2 ganesha.nfsd cephfs-top'
++ since_kill=0
++ for step in 0 1 1 2 3 5 8
++ sleep 0
++ since_kill=0
++ survivors=
++ for p in $to_kill
++ maybe_kill ceph-osd 0
++ local p=ceph-osd
++ shift
++ local step=0
++ shift
++ case $step in
++ pkill -SIGTERM -u 0 ceph-osd
++ return 1
++ survivors+=' ceph-osd'
++ for p in $to_kill
++ maybe_kill ceph-mon 0
++ local p=ceph-mon
++ shift
++ local step=0
++ shift
++ case $step in
++ pkill -SIGTERM -u 0 ceph-mon
++ return 1
++ survivors+=' ceph-mon'
++ for p in $to_kill
++ maybe_kill ceph-mds 0
++ local p=ceph-mds
++ shift
++ local step=0
++ shift
++ case $step in
++ pkill -SIGTERM -u 0 ceph-mds
++ return 1
++ survivors+=' ceph-mds'
++ for p in $to_kill
++ maybe_kill ceph-mgr 0
++ local p=ceph-mgr
++ shift
++ local step=0
++ shift
++ case $step in
++ pkill -SIGTERM -u 0 ceph-mgr
++ return 1
++ survivors+=' ceph-mgr'
++ for p in $to_kill
++ maybe_kill radosgw 0
++ local p=radosgw
++ shift
++ local step=0
++ shift
++ case $step in
++ pkill -SIGTERM -u 0 radosgw
++ return 1
++ survivors+=' radosgw'
++ for p in $to_kill
++ maybe_kill lt-radosgw 0
++ local p=lt-radosgw
++ shift
++ local step=0
++ shift
++ case $step in
++ pkill -SIGTERM -u 0 lt-radosgw
++ return 1
++ survivors+=' lt-radosgw'
++ for p in $to_kill
++ maybe_kill apache2 0
++ local p=apache2
++ shift
++ local step=0
++ shift
++ case $step in
++ pkill -SIGTERM -u 0 apache2
++ return 1
++ survivors+=' apache2'
++ for p in $to_kill
++ maybe_kill ganesha.nfsd 0
++ local p=ganesha.nfsd
++ shift
++ local step=0
++ shift
++ case $step in
++ pkill -SIGTERM -u 0 ganesha.nfsd
++ return 1
++ survivors+=' ganesha.nfsd'
++ for p in $to_kill
++ maybe_kill cephfs-top 0
++ local p=cephfs-top
++ shift
++ local step=0
++ shift
++ case $step in
++ pkill -SIGTERM -u 0 cephfs-top
++ return 1
++ survivors+=' cephfs-top'
++ '[' -z ' ceph-osd ceph-mon ceph-mds ceph-mgr radosgw lt-radosgw apache2 ganesha.nfsd cephfs-top' ']'
++ to_kill=' ceph-osd ceph-mon ceph-mds ceph-mgr radosgw lt-radosgw apache2 ganesha.nfsd cephfs-top'
++ '[' 0 -gt 0 ']'
++ for step in 0 1 1 2 3 5 8
++ sleep 1
++ since_kill=1
++ survivors=
++ for p in $to_kill
++ maybe_kill ceph-osd 1
++ local p=ceph-osd
++ shift
++ local step=1
++ shift
++ case $step in
++ pkill -0 -u 0 ceph-osd
++ return 1
++ survivors+=' ceph-osd'
++ for p in $to_kill
++ maybe_kill ceph-mon 1
++ local p=ceph-mon
++ shift
++ local step=1
++ shift
++ case $step in
++ pkill -0 -u 0 ceph-mon
++ for p in $to_kill
++ maybe_kill ceph-mds 1
++ local p=ceph-mds
++ shift
++ local step=1
++ shift
++ case $step in
++ pkill -0 -u 0 ceph-mds
++ return 1
++ survivors+=' ceph-mds'
++ for p in $to_kill
++ maybe_kill ceph-mgr 1
++ local p=ceph-mgr
++ shift
++ local step=1
++ shift
++ case $step in
++ pkill -0 -u 0 ceph-mgr
++ for p in $to_kill
++ maybe_kill radosgw 1
++ local p=radosgw
++ shift
++ local step=1
++ shift
++ case $step in
++ pkill -0 -u 0 radosgw
++ for p in $to_kill
++ maybe_kill lt-radosgw 1
++ local p=lt-radosgw
++ shift
++ local step=1
++ shift
++ case $step in
++ pkill -0 -u 0 lt-radosgw
++ for p in $to_kill
++ maybe_kill apache2 1
++ local p=apache2
++ shift
++ local step=1
++ shift
++ case $step in
++ pkill -0 -u 0 apache2
++ for p in $to_kill
++ maybe_kill ganesha.nfsd 1
++ local p=ganesha.nfsd
++ shift
++ local step=1
++ shift
++ case $step in
++ pkill -0 -u 0 ganesha.nfsd
++ for p in $to_kill
++ maybe_kill cephfs-top 1
++ local p=cephfs-top
++ shift
++ local step=1
++ shift
++ case $step in
++ pkill -0 -u 0 cephfs-top
++ '[' -z ' ceph-osd ceph-mds' ']'
++ to_kill=' ceph-osd ceph-mds'
++ '[' 1 -gt 0 ']'
++ echo 'WARNING:  ceph-osd ceph-mds still alive after 1 seconds'
+WARNING:  ceph-osd ceph-mds still alive after 1 seconds
++ for step in 0 1 1 2 3 5 8
++ sleep 1
++ since_kill=2
++ survivors=
++ for p in $to_kill
++ maybe_kill ceph-osd 1
++ local p=ceph-osd
++ shift
++ local step=1
++ shift
++ case $step in
++ pkill -0 -u 0 ceph-osd
++ return 1
++ survivors+=' ceph-osd'
++ for p in $to_kill
++ maybe_kill ceph-mds 1
++ local p=ceph-mds
++ shift
++ local step=1
++ shift
++ case $step in
++ pkill -0 -u 0 ceph-mds
++ return 1
++ survivors+=' ceph-mds'
++ '[' -z ' ceph-osd ceph-mds' ']'
++ to_kill=' ceph-osd ceph-mds'
++ '[' 2 -gt 0 ']'
++ echo 'WARNING:  ceph-osd ceph-mds still alive after 2 seconds'
+WARNING:  ceph-osd ceph-mds still alive after 2 seconds
++ for step in 0 1 1 2 3 5 8
++ sleep 2
++ since_kill=4
++ survivors=
++ for p in $to_kill
++ maybe_kill ceph-osd 2
++ local p=ceph-osd
++ shift
++ local step=2
++ shift
++ case $step in
++ pkill -0 -u 0 ceph-osd
++ return 1
++ survivors+=' ceph-osd'
++ for p in $to_kill
++ maybe_kill ceph-mds 2
++ local p=ceph-mds
++ shift
++ local step=2
++ shift
++ case $step in
++ pkill -0 -u 0 ceph-mds
++ return 1
++ survivors+=' ceph-mds'
++ '[' -z ' ceph-osd ceph-mds' ']'
++ to_kill=' ceph-osd ceph-mds'
++ '[' 4 -gt 0 ']'
++ echo 'WARNING:  ceph-osd ceph-mds still alive after 4 seconds'
+WARNING:  ceph-osd ceph-mds still alive after 4 seconds
++ for step in 0 1 1 2 3 5 8
++ sleep 3
++ since_kill=7
++ survivors=
++ for p in $to_kill
++ maybe_kill ceph-osd 3
++ local p=ceph-osd
++ shift
++ local step=3
++ shift
++ case $step in
++ pkill -0 -u 0 ceph-osd
++ for p in $to_kill
++ maybe_kill ceph-mds 3
++ local p=ceph-mds
++ shift
++ local step=3
++ shift
++ case $step in
++ pkill -0 -u 0 ceph-mds
++ '[' -z '' ']'
++ break
++ pkill -u 0 -f 'valgrind.bin.*ceph-mon'
++ pkill -u 0 -f 'valgrind.bin.*ceph-osd'
++ pkill -u 0 -f 'valgrind.bin.*ceph-mds'
++++ bin/ceph-conf -c /root/project/stor/ceph/xb/ceph/build/ceph.conf --show-config-value admin_socket
+++ dirname /root/project/stor/ceph/xb/ceph/build/asok/client.admin.56198.asok
++ asok_dir=/root/project/stor/ceph/xb/ceph/build/asok
++ rm -rf /root/project/stor/ceph/xb/ceph/build/asok
+root@ubuntu22:~/project/stor/ceph/xb/ceph/build# 

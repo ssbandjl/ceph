@@ -442,7 +442,7 @@ case $1 in
         shift
         ;;
     -x)
-        cephx=1 # this is on be default, flag exists for historical consistency
+        cephx=1 # this is on be default, flag exists for historical consistency 历史一致性
         ;;
     -X)
         cephx=0

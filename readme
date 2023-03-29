@@ -1,0 +1,23 @@
+基准测试:
+https://blog.csdn.net/bandaoyu/article/details/114292690
+使用命令patchelf   修改工具依赖的动态库位置。避免和项目正在使用的库冲突: https://blog.csdn.net/bandaoyu/article/details/113181179
+perf_msgr_client.cc -> ceph_perf_msgr_client
+perf_msgr_server.cc -> ceph_perf_msgr_server
+
+
+perf_msgr_client.cc -> main
+
+
+编译rdma:
+./do_cmake.sh -DCMAKE_INSTALL_PREFIX=/usr -DWITH_RDMA=ON
+
+
+qa:
+
+启动虚拟集群: https://docs.ceph.com/en/quincy/dev/dev_cluster_deployement/
+
+
+
+
+
+

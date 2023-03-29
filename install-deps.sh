@@ -330,6 +330,7 @@ else
     for_make_check=false
 fi
 
+# FreeBSD系统安装依赖包
 if [ x$(uname)x = xFreeBSDx ]; then
     if [ "$INSTALL_EXTRA_PACKAGES" ]; then
         echo "Installing extra packages not supported on FreeBSD" >&2
@@ -391,7 +392,7 @@ if [ x$(uname)x = xFreeBSDx ]; then
         pip install pecan
 
     exit
-else
+else #非FreeBSDx系统
     [ $WITH_SEASTAR ] && with_seastar=true || with_seastar=false
     [ $WITH_ZBD ] && with_zbd=true || with_zbd=false
     [ $WITH_PMEM ] && with_pmem=true || with_pmem=false
@@ -399,7 +400,7 @@ else
     source /etc/os-release
     case "$ID" in
     debian|ubuntu|devuan|elementary|softiron)
-        echo "Using apt-get to install dependencies"
+        echo "Using apt-get to install dependencies"  #ubuntu
         if [ "$INSTALL_EXTRA_PACKAGES" ]; then
             if ! $SUDO apt-get install -y $INSTALL_EXTRA_PACKAGES ; then
                 # try again. ported over from run-make.sh (orignally e278295)
