@@ -1,0 +1,2101 @@
+[root@7e5d7275e145 build]# ninja install
+[1/2] Install the project...
+-- Install configuration: "Debug"
+-- Installing: /usr/local/lib64/ceph/extblkdev/libceph_ebd_vdo.so
+-- Set runtime path of "/usr/local/lib64/ceph/extblkdev/libceph_ebd_vdo.so" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/lib64/ceph/libceph-common.so.2
+-- Set runtime path of "/usr/local/lib64/ceph/libceph-common.so.2" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/lib64/librados_tp.so.2.0.0
+-- Installing: /usr/local/lib64/librados_tp.so.2
+-- Installing: /usr/local/lib64/librados_tp.so
+-- Installing: /usr/local/lib64/libosd_tp.so.1.0.0
+-- Installing: /usr/local/lib64/libosd_tp.so.1
+-- Installing: /usr/local/lib64/libosd_tp.so
+-- Installing: /usr/local/lib64/libos_tp.so.1.0.0
+-- Installing: /usr/local/lib64/libos_tp.so.1
+-- Installing: /usr/local/lib64/libos_tp.so
+-- Installing: /usr/local/lib64/librgw_rados_tp.so.2.0.0
+-- Installing: /usr/local/lib64/librgw_rados_tp.so.2
+-- Installing: /usr/local/lib64/librgw_rados_tp.so
+-- Installing: /usr/local/lib64/librgw_op_tp.so.2.0.0
+-- Installing: /usr/local/lib64/librgw_op_tp.so.2
+-- Installing: /usr/local/lib64/librgw_op_tp.so
+-- Installing: /usr/local/lib64/librbd_tp.so.1.0.0
+-- Installing: /usr/local/lib64/librbd_tp.so.1
+-- Installing: /usr/local/lib64/librbd_tp.so
+-- Installing: /usr/local/lib64/rados-classes/libcls_sdk.so.1.0.0
+-- Installing: /usr/local/lib64/rados-classes/libcls_sdk.so.1
+-- Installing: /usr/local/lib64/rados-classes/libcls_sdk.so
+-- Installing: /usr/local/lib64/rados-classes/libcls_hello.so.1.0.0
+-- Installing: /usr/local/lib64/rados-classes/libcls_hello.so.1
+-- Installing: /usr/local/lib64/rados-classes/libcls_hello.so
+-- Installing: /usr/local/lib64/rados-classes/libcls_numops.so.1.0.0
+-- Installing: /usr/local/lib64/rados-classes/libcls_numops.so.1
+-- Installing: /usr/local/lib64/rados-classes/libcls_numops.so
+-- Installing: /usr/local/lib64/rados-classes/libcls_rbd.so.1.0.0
+-- Installing: /usr/local/lib64/rados-classes/libcls_rbd.so.1
+-- Installing: /usr/local/lib64/rados-classes/libcls_rbd.so
+-- Installing: /usr/local/lib64/rados-classes/libcls_lock.so.1.0.0
+-- Installing: /usr/local/lib64/rados-classes/libcls_lock.so.1
+-- Installing: /usr/local/lib64/rados-classes/libcls_lock.so
+-- Installing: /usr/local/lib64/rados-classes/libcls_otp.so.1.0.0
+-- Installing: /usr/local/lib64/rados-classes/libcls_otp.so.1
+-- Installing: /usr/local/lib64/rados-classes/libcls_otp.so
+-- Installing: /usr/local/lib64/rados-classes/libcls_refcount.so.1.0.0
+-- Installing: /usr/local/lib64/rados-classes/libcls_refcount.so.1
+-- Installing: /usr/local/lib64/rados-classes/libcls_refcount.so
+-- Installing: /usr/local/lib64/rados-classes/libcls_version.so.1.0.0
+-- Installing: /usr/local/lib64/rados-classes/libcls_version.so.1
+-- Installing: /usr/local/lib64/rados-classes/libcls_version.so
+-- Installing: /usr/local/lib64/rados-classes/libcls_log.so.1.0.0
+-- Installing: /usr/local/lib64/rados-classes/libcls_log.so.1
+-- Installing: /usr/local/lib64/rados-classes/libcls_log.so
+-- Installing: /usr/local/lib64/rados-classes/libcls_timeindex.so.1.0.0
+-- Installing: /usr/local/lib64/rados-classes/libcls_timeindex.so.1
+-- Installing: /usr/local/lib64/rados-classes/libcls_timeindex.so
+-- Installing: /usr/local/lib64/rados-classes/libcls_user.so.1.0.0
+-- Installing: /usr/local/lib64/rados-classes/libcls_user.so.1
+-- Installing: /usr/local/lib64/rados-classes/libcls_user.so
+-- Installing: /usr/local/lib64/rados-classes/libcls_journal.so.1.0.0
+-- Installing: /usr/local/lib64/rados-classes/libcls_journal.so.1
+-- Installing: /usr/local/lib64/rados-classes/libcls_journal.so
+-- Installing: /usr/local/lib64/rados-classes/libcls_rgw.so.1.0.0
+-- Installing: /usr/local/lib64/rados-classes/libcls_rgw.so.1
+-- Installing: /usr/local/lib64/rados-classes/libcls_rgw.so
+-- Installing: /usr/local/lib64/rados-classes/libcls_cephfs.so.1.0.0
+-- Installing: /usr/local/lib64/rados-classes/libcls_cephfs.so.1
+-- Installing: /usr/local/lib64/rados-classes/libcls_cephfs.so
+-- Installing: /usr/local/lib64/rados-classes/libcls_lua.so.1.0.0
+-- Installing: /usr/local/lib64/rados-classes/libcls_lua.so.1
+-- Installing: /usr/local/lib64/rados-classes/libcls_lua.so
+-- Installing: /usr/local/lib64/rados-classes/libcls_cas.so.1.0.0
+-- Installing: /usr/local/lib64/rados-classes/libcls_cas.so.1
+-- Installing: /usr/local/lib64/rados-classes/libcls_cas.so
+-- Installing: /usr/local/lib64/rados-classes/libcls_queue.so.1.0.0
+-- Installing: /usr/local/lib64/rados-classes/libcls_queue.so.1
+-- Installing: /usr/local/lib64/rados-classes/libcls_queue.so
+-- Installing: /usr/local/lib64/rados-classes/libcls_rgw_gc.so.1.0.0
+-- Installing: /usr/local/lib64/rados-classes/libcls_rgw_gc.so.1
+-- Installing: /usr/local/lib64/rados-classes/libcls_rgw_gc.so
+-- Installing: /usr/local/lib64/rados-classes/libcls_2pc_queue.so.1.0.0
+-- Installing: /usr/local/lib64/rados-classes/libcls_2pc_queue.so.1
+-- Installing: /usr/local/lib64/rados-classes/libcls_2pc_queue.so
+-- Installing: /usr/local/lib64/rados-classes/libcls_cmpomap.so.1.0.0
+-- Installing: /usr/local/lib64/rados-classes/libcls_cmpomap.so.1
+-- Installing: /usr/local/lib64/rados-classes/libcls_cmpomap.so
+-- Installing: /usr/local/lib64/rados-classes/libcls_fifo.so.1.0.0
+-- Installing: /usr/local/lib64/rados-classes/libcls_fifo.so.1
+-- Installing: /usr/local/lib64/rados-classes/libcls_fifo.so
+-- Installing: /usr/local/lib64/rados-classes/libcls_test_remote_reads.so.1.0.0
+-- Installing: /usr/local/lib64/rados-classes/libcls_test_remote_reads.so.1
+-- Installing: /usr/local/lib64/rados-classes/libcls_test_remote_reads.so
+-- Installing: /usr/local/include/libcephsqlite.h
+-- Installing: /usr/local/include/rados/librados.h
+-- Installing: /usr/local/include/rados/rados_types.h
+-- Installing: /usr/local/include/rados/rados_types.hpp
+-- Installing: /usr/local/include/rados/librados_fwd.hpp
+-- Installing: /usr/local/include/rados/librados.hpp
+-- Installing: /usr/local/include/rados/buffer.h
+-- Installing: /usr/local/include/rados/buffer_fwd.h
+-- Installing: /usr/local/include/rados/inline_memory.h
+-- Installing: /usr/local/include/rados/page.h
+-- Installing: /usr/local/include/rados/crc32c.h
+-- Installing: /usr/local/include/rados/objclass.h
+-- Installing: /usr/local/include/radosstriper/libradosstriper.h
+-- Installing: /usr/local/include/radosstriper/libradosstriper.hpp
+-- Installing: /usr/local/include/rbd/features.h
+-- Installing: /usr/local/include/rbd/librbd.h
+-- Installing: /usr/local/include/rbd/librbd.hpp
+-- Installing: /usr/local/include/rados/librgw.h
+-- Installing: /usr/local/include/rados/rgw_file.h
+-- Installing: /usr/local/include/cephfs/libcephfs.h
+-- Installing: /usr/local/include/cephfs/ceph_ll_client.h
+-- Installing: /usr/local/include/cephfs/types.h
+-- Installing: /usr/local/lib64/librados.so.2.0.0
+-- Installing: /usr/local/lib64/librados.so.2
+-- Set runtime path of "/usr/local/lib64/librados.so.2.0.0" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/lib64/librados.so
+-- Installing: /usr/local/lib64/libradosstriper.so.1.0.0
+-- Installing: /usr/local/lib64/libradosstriper.so.1
+-- Set runtime path of "/usr/local/lib64/libradosstriper.so.1.0.0" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/lib64/libradosstriper.so
+-- Installing: /usr/local/bin/ceph-mgr
+-- Set runtime path of "/usr/local/bin/ceph-mgr" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph-exporter
+-- Set runtime path of "/usr/local/bin/ceph-exporter" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/librados-config
+-- Set runtime path of "/usr/local/bin/librados-config" to "/usr/local/lib64/ceph"
+running build
+running build_ext
+cythoning rados.pyx to /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rados/pyrex/rados.c
+creating /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rados/pyrex
+running install
+running install_lib
+creating /usr/local/lib64/python3.6
+creating /usr/local/lib64/python3.6/site-packages
+copying /root/project/stor/ceph/xb/docker/ceph/build/lib/cython_modules/lib.3/rgw.cpython-36m-x86_64-linux-gnu.so -> /usr/local/lib64/python3.6/site-packages
+copying /root/project/stor/ceph/xb/docker/ceph/build/lib/cython_modules/lib.3/rados.cpython-36m-x86_64-linux-gnu.so -> /usr/local/lib64/python3.6/site-packages
+copying /root/project/stor/ceph/xb/docker/ceph/build/lib/cython_modules/lib.3/cephfs.cpython-36m-x86_64-linux-gnu.so -> /usr/local/lib64/python3.6/site-packages
+copying /root/project/stor/ceph/xb/docker/ceph/build/lib/cython_modules/lib.3/rbd.cpython-36m-x86_64-linux-gnu.so -> /usr/local/lib64/python3.6/site-packages
+running install_egg_info
+running egg_info
+creating /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rados/rados.egg-info
+writing /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rados/rados.egg-info/PKG-INFO
+writing dependency_links to /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rados/rados.egg-info/dependency_links.txt
+writing top-level names to /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rados/rados.egg-info/top_level.txt
+writing manifest file '/root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rados/rados.egg-info/SOURCES.txt'
+reading manifest file '/root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rados/rados.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+writing manifest file '/root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rados/rados.egg-info/SOURCES.txt'
+Copying /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rados/rados.egg-info to /usr/local/lib64/python3.6/site-packages/rados-2.0.0-py3.6.egg-info
+running install_scripts
+writing list of installed files to '/dev/null'
+
+Error compiling Cython file:
+------------------------------------------------------------
+...
+#
+# Shared object for librbdpy
+#
+# Copyright 2016 Mehdi Abaakouk <sileht@redhat.com>
+
+IF BUILD_DOC:
+  ^
+------------------------------------------------------------
+
+rados.pxd:7:3: Compile-time name 'BUILD_DOC' not defined
+
+
+Error compiling Cython file:
+------------------------------------------------------------
+...
+from cpython cimport PyObject, ref
+from cpython.pycapsule cimport *
+from libc cimport errno
+from libc.stdint cimport *
+from libc.stdlib cimport malloc, realloc, free
+IF BUILD_DOC:
+  ^
+------------------------------------------------------------
+
+rados.pyx:21:3: Compile-time name 'BUILD_DOC' not defined
+
+running build
+running build_ext
+cythoning rbd.pyx to /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rbd/pyrex/rbd.c
+creating /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rbd/pyrex
+running install
+running install_lib
+running install_egg_info
+running egg_info
+creating /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rbd/rbd.egg-info
+writing /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rbd/rbd.egg-info/PKG-INFO
+writing dependency_links to /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rbd/rbd.egg-info/dependency_links.txt
+writing top-level names to /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rbd/rbd.egg-info/top_level.txt
+writing manifest file '/root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rbd/rbd.egg-info/SOURCES.txt'
+reading manifest file '/root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rbd/rbd.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+writing manifest file '/root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rbd/rbd.egg-info/SOURCES.txt'
+Copying /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rbd/rbd.egg-info to /usr/local/lib64/python3.6/site-packages/rbd-2.0.0-py3.6.egg-info
+running install_scripts
+writing list of installed files to '/dev/null'
+
+Error compiling Cython file:
+------------------------------------------------------------
+...
+from datetime import datetime
+import errno
+from itertools import chain
+import time
+
+IF BUILD_DOC:
+  ^
+------------------------------------------------------------
+
+rbd.pyx:36:3: Compile-time name 'BUILD_DOC' not defined
+
+Error compiling Cython file:
+------------------------------------------------------------
+...
+        return exception_map[ret](msg, errno=ret)
+    else:
+        return OSError(msg, errno=ret)
+
+
+IF BUILD_DOC:
+  ^
+------------------------------------------------------------
+
+rbd.pyx:361:3: Compile-time name 'BUILD_DOC' not defined
+
+running build
+running build_ext
+cythoning cephfs.pyx to /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/cephfs/pyrex/cephfs.c
+creating /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/cephfs/pyrex
+running install
+running install_lib
+running install_egg_info
+running egg_info
+creating /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/cephfs/cephfs.egg-info
+writing /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/cephfs/cephfs.egg-info/PKG-INFO
+writing dependency_links to /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/cephfs/cephfs.egg-info/dependency_links.txt
+writing top-level names to /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/cephfs/cephfs.egg-info/top_level.txt
+writing manifest file '/root/project/stor/ceph/xb/docker/ceph/build/src/pybind/cephfs/cephfs.egg-info/SOURCES.txt'
+reading manifest file '/root/project/stor/ceph/xb/docker/ceph/build/src/pybind/cephfs/cephfs.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+writing manifest file '/root/project/stor/ceph/xb/docker/ceph/build/src/pybind/cephfs/cephfs.egg-info/SOURCES.txt'
+Copying /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/cephfs/cephfs.egg-info to /usr/local/lib64/python3.6/site-packages/cephfs-2.0.0-py3.6.egg-info
+running install_scripts
+writing list of installed files to '/dev/null'
+
+Error compiling Cython file:
+------------------------------------------------------------
+...
+from cpython cimport PyObject, ref, exc
+from libc.stdint cimport *
+from libc.stdlib cimport malloc, realloc, free
+
+from types cimport *
+IF BUILD_DOC:
+  ^
+------------------------------------------------------------
+
+cephfs.pyx:10:3: Compile-time name 'BUILD_DOC' not defined
+
+running build
+running build_ext
+cythoning rgw.pyx to /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rgw/pyrex/rgw.c
+creating /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rgw/pyrex
+running install
+running install_lib
+running install_egg_info
+running egg_info
+creating /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rgw/rgw.egg-info
+writing /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rgw/rgw.egg-info/PKG-INFO
+writing dependency_links to /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rgw/rgw.egg-info/dependency_links.txt
+writing top-level names to /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rgw/rgw.egg-info/top_level.txt
+writing manifest file '/root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rgw/rgw.egg-info/SOURCES.txt'
+reading manifest file '/root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rgw/rgw.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+writing manifest file '/root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rgw/rgw.egg-info/SOURCES.txt'
+Copying /root/project/stor/ceph/xb/docker/ceph/build/src/pybind/rgw/rgw.egg-info to /usr/local/lib64/python3.6/site-packages/rgw-2.0.0-py3.6.egg-info
+running install_scripts
+writing list of installed files to '/dev/null'
+
+Error compiling Cython file:
+------------------------------------------------------------
+...
+from cpython cimport PyObject, ref, exc, array
+from libc.stdint cimport *
+from libc.stdlib cimport malloc, realloc, free
+from cstat cimport stat
+
+IF BUILD_DOC:
+  ^
+------------------------------------------------------------
+
+rgw.pyx:11:3: Compile-time name 'BUILD_DOC' not defined
+
+-- Installing: /usr/local/lib/python3.6/site-packages/ceph_argparse.py
+-- Installing: /usr/local/lib/python3.6/site-packages/ceph_daemon.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard
+-- Installing: /usr/local/share/ceph/mgr/dashboard/HACKING.rst
+-- Installing: /usr/local/share/ceph/mgr/dashboard/tools.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/run-backend-api-tests.sh
+-- Installing: /usr/local/share/ceph/mgr/dashboard/exceptions.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/tests
+-- Installing: /usr/local/share/ceph/mgr/dashboard/module.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/dashboard/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/__pycache__/grafana.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/__pycache__/cherrypy_backports.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/__pycache__/security.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/__pycache__/exceptions.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/__pycache__/tools.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/__pycache__/rest_client.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/__pycache__/awsauth.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/__pycache__/settings.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/plugins
+-- Installing: /usr/local/share/ceph/mgr/dashboard/plugins/motd.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/plugins/interfaces.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/plugins/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/dashboard/plugins/__pycache__/ttl_cache.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/plugins/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/plugins/__pycache__/pluggy.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/plugins/__pycache__/motd.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/plugins/__pycache__/debug.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/plugins/__pycache__/feature_toggles.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/plugins/__pycache__/plugin.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/plugins/__pycache__/interfaces.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/plugins/pluggy.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/plugins/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/plugins/plugin.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/plugins/lru_cache.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/plugins/ttl_cache.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/plugins/feature_toggles.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/plugins/debug.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/model
+-- Installing: /usr/local/share/ceph/mgr/dashboard/model/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend
+-- Installing: /usr/local/share/ceph/mgr/dashboard/ci
+-- Installing: /usr/local/share/ceph/mgr/dashboard/ci/cephadm
+-- Installing: /usr/local/share/ceph/mgr/dashboard/ci/cephadm/start-cluster.sh
+-- Installing: /usr/local/share/ceph/mgr/dashboard/ci/cephadm/run-cephadm-e2e-tests.sh
+-- Installing: /usr/local/share/ceph/mgr/dashboard/ci/cephadm/bootstrap-cluster.sh
+-- Installing: /usr/local/share/ceph/mgr/dashboard/ci/cephadm/ceph_cluster.yml
+-- Installing: /usr/local/share/ceph/mgr/dashboard/ci/check_grafana_dashboards.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/run-backend-api-request.sh
+-- Installing: /usr/local/share/ceph/mgr/dashboard/awsauth.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/settings.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/run-frontend-e2e-tests.sh
+-- Installing: /usr/local/share/ceph/mgr/dashboard/grafana.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/openapi.yaml
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/cephfs.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/ceph_service.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/tcmu_service.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/osd.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/sso.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/rbd.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/__pycache__/orchestrator.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/__pycache__/ceph_service.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/__pycache__/sso.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/__pycache__/progress.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/__pycache__/rbd.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/__pycache__/cephfs.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/__pycache__/tcmu_service.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/__pycache__/rgw_client.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/__pycache__/access_control.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/__pycache__/exception.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/__pycache__/osd.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/__pycache__/auth.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/__pycache__/iscsi_client.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/__pycache__/iscsi_cli.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/__pycache__/iscsi_config.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/__pycache__/_paginate.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/__pycache__/cluster.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/iscsi_config.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/auth.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/access_control.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/rgw_client.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/iscsi_client.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/exception.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/progress.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/cluster.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/iscsi_cli.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/orchestrator.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/services/_paginate.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/run-frontend-unittests.sh
+-- Installing: /usr/local/share/ceph/mgr/dashboard/cherrypy_backports.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/rest_client.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/api
+-- Installing: /usr/local/share/ceph/mgr/dashboard/api/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/dashboard/api/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/api/__pycache__/doc.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/api/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/api/doc.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/README.rst
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/requests-2.28.2-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/pyfakefs-4.5.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/tomli-2.0.1-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/pip-23.0.1-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/astroid-2.5-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/docutils-0.19-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/chardet-5.1.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/xmlsec-1.3.13-cp310-cp310-linux_x86_64.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/pyflakes-2.3.1-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/isort-5.5.3-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/pyrsistent-0.19.3-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/jsonpatch-1.32-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/repoze.lru-0.7-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/jaraco.functools-3.6.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/pytest_instafail-0.4.2-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/flake8-3.9.0-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/cffi-1.15.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/pyproject_api-1.5.1-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/PyYAML-6.0-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/exceptiongroup-1.1.1-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/wcwidth-0.2.6-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/lxml-4.9.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/PyJWT-2.6.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/pytest_cov-4.0.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/colorama-0.4.6-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/ceph-1.0.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/lazy_object_proxy-1.9.0-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/toml-0.10.2-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/natsort-8.3.1-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/charset_normalizer-3.1.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/md5
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/python3_saml-1.15.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/CherryPy-13.1.0-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/autopep8-1.5.7-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/wheel-0.40.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/idna-3.4-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/tempora-5.2.1-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/distlib-0.3.6-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/pytz-2023.2-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/pluggy-1.0.0-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/platformdirs-3.2.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/cachetools-5.3.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/tox-4.4.8-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/setuptools-67.6.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/iniconfig-2.0.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/filelock-3.10.7-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/jsonschema-4.16.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/certifi-2022.12.7-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/Routes-2.5.1-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/urllib3-1.26.15-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/mccabe-0.6.1-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/rstcheck-3.3.1-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/attrs-22.2.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/pyOpenSSL-23.1.1-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/pylint-2.6.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/virtualenv-20.21.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/wrapt-1.12.1-cp310-cp310-linux_x86_64.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/flake8_colors-0.1.6-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/isodate-0.6.1-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/more_itertools-8.14.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/packaging-23.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/six-1.16.0-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/bcrypt-3.2.2-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/pycparser-2.21-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/pytest-7.2.2-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/coverage-7.2.2-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/cryptography-40.0.1-cp36-abi3-manylinux_2_28_x86_64.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/jsonpointer-2.3-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/cheroot-9.0.0-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/portend-3.1.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/pycodestyle-2.7.0-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/wheelhouse/prettytable-3.6.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/cephfs.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/_rest_controller.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/_permissions.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/_ui_router.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/osd.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/monitor.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/rbd.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/host.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/grafana.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/orchestrator.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/summary.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/_permissions.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/iscsi.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/rbd.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/telemetry.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/cephfs.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/_crud.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/docs.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/_version.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/health.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/mgr_modules.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/daemon.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/perf_counters.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/_task.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/service.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/logs.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/_endpoint.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/home.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/_ui_router.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/osd.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/auth.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/_auth.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/_api_router.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/frontend_logging.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/nfs.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/_helpers.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/feedback.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/_router.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/cluster_configuration.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/saml2.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/crush_rule.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/rgw.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/_rest_controller.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/user.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/rbd_mirroring.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/_base_controller.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/task.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/monitor.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/erasure_code_profile.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/role.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/cluster.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/ceph_users.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/prometheus.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/settings.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/_docs.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__pycache__/pool.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/rbd_mirroring.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/crush_rule.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/nfs.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/_docs.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/telemetry.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/rgw.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/logs.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/host.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/auth.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/_task.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/_helpers.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/settings.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/docs.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/_router.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/frontend_logging.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/daemon.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/_base_controller.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/prometheus.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/summary.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/task.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/grafana.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/cluster_configuration.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/perf_counters.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/erasure_code_profile.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/_auth.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/home.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/user.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/_crud.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/saml2.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/pool.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/mgr_modules.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/ceph_users.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/feedback.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/_api_router.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/iscsi.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/cluster.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/_version.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/role.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/service.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/health.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/orchestrator.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/_endpoint.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/controllers/_paginate.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/security.py
+-- Installing: /usr/local/share/ceph/mgr/dashboard/run-backend-rook-api-request.sh
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/polyfills.js
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/scripts.js
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/src_app_ceph_rgw_rgw_module_ts.js
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/default-src_app_ceph_block_block_module_ts.js.map
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/scripts.js.map
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/src_app_ceph_pool_pool_module_ts.js
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/forkawesome-webfont.eot
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/styles.css.map
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/default-src_app_ceph_block_block_module_ts.js
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/favicon.ico
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/ceph_background.gif
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/index.html
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/polyfills.js.map
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/vendor.js
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/forkawesome-webfont.woff
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/runtime.js
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/forkawesome-webfont.ttf
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/runtime.js.map
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/vendor.js.map
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/forkawesome-webfont.woff2
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/src_app_ceph_pool_pool_module_ts.js.map
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/src_app_ceph_rgw_rgw_module_ts.js.map
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/assets
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/assets/loading.gif
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/assets/ceph_background.gif
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/assets/logo-mini.png
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/assets/Ceph_Logo.svg
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/assets/Ceph_Ceph_Logo_with_text_red_white.svg
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/assets/Ceph_Ceph_Logo_with_text_white.svg
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/assets/prometheus_logo.svg
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/main.js.map
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/forkawesome-webfont.svg
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/Ceph_Logo.svg
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/styles.css
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/prometheus_logo.svg
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/dist/en-US/main.js
+-- Installing: /usr/local/share/ceph/mgr/dashboard/frontend/package.json
+-- Installing: /usr/local/share/ceph/mgr/rook
+-- Installing: /usr/local/share/ceph/mgr/rook/tests
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_cluster.py
+-- Installing: /usr/local/share/ceph/mgr/rook/module.py
+-- Installing: /usr/local/share/ceph/mgr/rook/generate_rook_ceph_client.sh
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_client
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_client/ceph
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_client/ceph/cephobjectstore.py
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_client/ceph/cephblockpool.py
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_client/ceph/cephobjectzone.py
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_client/ceph/objectbucketclaim.py
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_client/ceph/volumereplication.py
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_client/ceph/cephobjectstoreuser.py
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_client/ceph/cephnfs.py
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_client/ceph/cephfilesystem.py
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_client/ceph/cephobjectrealm.py
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_client/ceph/objectbucket.py
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_client/ceph/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_client/ceph/volume.py
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_client/ceph/cephcluster.py
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_client/ceph/cephfilesystemmirror.py
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_client/ceph/volumereplicationclass.py
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_client/ceph/cephclient.py
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_client/ceph/cephobjectzonegroup.py
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_client/ceph/cephrbdmirror.py
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_client/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/rook/rook_client/_helper.py
+-- Installing: /usr/local/share/ceph/mgr/rook/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/alerts
+-- Installing: /usr/local/share/ceph/mgr/alerts/module.py
+-- Installing: /usr/local/share/ceph/mgr/alerts/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/alerts/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/alerts/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/alerts/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/balancer
+-- Installing: /usr/local/share/ceph/mgr/balancer/module.py
+-- Installing: /usr/local/share/ceph/mgr/balancer/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/balancer/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/balancer/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/balancer/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm
+-- Installing: /usr/local/share/ceph/mgr/cephadm/ssh.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/HACKING.rst
+-- Installing: /usr/local/share/ceph/mgr/cephadm/configchecks.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/service_discovery.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/tests
+-- Installing: /usr/local/share/ceph/mgr/cephadm/module.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/cephadm/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/__pycache__/agent.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/__pycache__/autotune.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/__pycache__/migrations.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/__pycache__/utils.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/__pycache__/upgrade.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/__pycache__/service_discovery.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/__pycache__/registry.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/__pycache__/template.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/__pycache__/tuned_profiles.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/__pycache__/ssl_cert_utils.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/__pycache__/schedule.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/__pycache__/serve.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/__pycache__/configchecks.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/__pycache__/offline_watcher.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/__pycache__/ssh.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/__pycache__/http_server.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/__pycache__/inventory.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/ceph.repo
+-- Installing: /usr/local/share/ceph/mgr/cephadm/agent.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/inventory.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/utils.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/upgrade.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/vagrant.config.example.json
+-- Installing: /usr/local/share/ceph/mgr/cephadm/template.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/offline_watcher.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/services
+-- Installing: /usr/local/share/ceph/mgr/cephadm/services/osd.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/services/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/cephadm/services/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/services/__pycache__/iscsi.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/services/__pycache__/ingress.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/services/__pycache__/monitoring.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/services/__pycache__/cephadmservice.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/services/__pycache__/jaeger.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/services/__pycache__/osd.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/services/__pycache__/nfs.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/services/__pycache__/container.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/cephadm/services/nfs.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/services/jaeger.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/services/cephadmservice.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/services/monitoring.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/services/container.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/services/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/services/ingress.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/services/iscsi.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/Vagrantfile
+-- Installing: /usr/local/share/ceph/mgr/cephadm/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/serve.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/migrations.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/registry.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates/blink_device_light_cmd.j2
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates/services
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates/services/ingress
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates/services/ingress/keepalived.conf.j2
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates/services/ingress/haproxy.cfg.j2
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates/services/node-exporter
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates/services/node-exporter/web.yml.j2
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates/services/prometheus
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates/services/prometheus/prometheus.yml.j2
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates/services/prometheus/web.yml.j2
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates/services/nfs
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates/services/nfs/ganesha.conf.j2
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates/services/iscsi
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates/services/iscsi/iscsi-gateway.cfg.j2
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates/services/grafana
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates/services/grafana/ceph-dashboard.yml.j2
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates/services/grafana/grafana.ini.j2
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates/services/promtail.yml.j2
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates/services/loki.yml.j2
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates/services/alertmanager
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates/services/alertmanager/alertmanager.yml.j2
+-- Installing: /usr/local/share/ceph/mgr/cephadm/templates/services/alertmanager/web.yml.j2
+-- Installing: /usr/local/share/ceph/mgr/cephadm/schedule.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/tuned_profiles.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/autotune.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/http_server.py
+-- Installing: /usr/local/share/ceph/mgr/cephadm/ssl_cert_utils.py
+-- Installing: /usr/local/share/ceph/mgr/crash
+-- Installing: /usr/local/share/ceph/mgr/crash/module.py
+-- Installing: /usr/local/share/ceph/mgr/crash/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/crash/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/crash/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/crash/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/devicehealth
+-- Installing: /usr/local/share/ceph/mgr/devicehealth/module.py
+-- Installing: /usr/local/share/ceph/mgr/devicehealth/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/devicehealth/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/devicehealth/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/devicehealth/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/redhat
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/redhat/seagate_predictor.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/redhat/hgst_scaler.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/redhat/hgst_predictor.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/redhat/seagate_scaler.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/redhat/config.json
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_223.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_219.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_120.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_14.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_174.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_36.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_124.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_115.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_208.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_82.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_221.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_230.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_57.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_141.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_88.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_109.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_105.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_210.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_239.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_125.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_114.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_229.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_131.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_6.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_118.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_59.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_3.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_67.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_71.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_72.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_235.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_128.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_138.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_195.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_206.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_201.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_222.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_27.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_213.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_1.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_123.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_169.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_204.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_44.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_16.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_18.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_78.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_134.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_227.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_61.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_212.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_104.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_243.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_62.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_10.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_97.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_186.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_69.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_236.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_225.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/config.json
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_185.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_234.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_151.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_50.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_12.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_145.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_112.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_168.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_33.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_85.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_161.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_182.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_93.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_79.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/models/prophetstor/svm_119.pkl
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/module.py
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/__pycache__/predictor.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/predictor.py
+-- Installing: /usr/local/share/ceph/mgr/diskprediction_local/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/influx
+-- Installing: /usr/local/share/ceph/mgr/influx/module.py
+-- Installing: /usr/local/share/ceph/mgr/influx/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/influx/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/influx/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/influx/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/insights
+-- Installing: /usr/local/share/ceph/mgr/insights/tests
+-- Installing: /usr/local/share/ceph/mgr/insights/module.py
+-- Installing: /usr/local/share/ceph/mgr/insights/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/insights/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/insights/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/insights/__pycache__/health.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/insights/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/insights/health.py
+-- Installing: /usr/local/share/ceph/mgr/iostat
+-- Installing: /usr/local/share/ceph/mgr/iostat/module.py
+-- Installing: /usr/local/share/ceph/mgr/iostat/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/iostat/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/iostat/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/iostat/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/k8sevents
+-- Installing: /usr/local/share/ceph/mgr/k8sevents/README.md
+-- Installing: /usr/local/share/ceph/mgr/k8sevents/module.py
+-- Installing: /usr/local/share/ceph/mgr/k8sevents/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/k8sevents/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/k8sevents/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/k8sevents/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/k8sevents/rbac_sample.yaml
+-- Installing: /usr/local/share/ceph/mgr/localpool
+-- Installing: /usr/local/share/ceph/mgr/localpool/module.py
+-- Installing: /usr/local/share/ceph/mgr/localpool/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/localpool/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/localpool/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/localpool/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/mds_autoscaler
+-- Installing: /usr/local/share/ceph/mgr/mds_autoscaler/tests
+-- Installing: /usr/local/share/ceph/mgr/mds_autoscaler/module.py
+-- Installing: /usr/local/share/ceph/mgr/mds_autoscaler/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/mds_autoscaler/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/mds_autoscaler/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/mds_autoscaler/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/mirroring
+-- Installing: /usr/local/share/ceph/mgr/mirroring/module.py
+-- Installing: /usr/local/share/ceph/mgr/mirroring/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/mirroring/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/mirroring/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/mirroring/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/blocklist.py
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/__pycache__/blocklist.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/__pycache__/notify.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/__pycache__/utils.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/__pycache__/exception.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/__pycache__/snapshot_mirror.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/utils.py
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/exception.py
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/notify.py
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/snapshot_mirror.py
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/dir_map
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/dir_map/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/dir_map/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/dir_map/__pycache__/load.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/dir_map/__pycache__/state_transition.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/dir_map/__pycache__/policy.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/dir_map/__pycache__/update.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/dir_map/__pycache__/create.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/dir_map/create.py
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/dir_map/state_transition.py
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/dir_map/load.py
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/dir_map/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/dir_map/policy.py
+-- Installing: /usr/local/share/ceph/mgr/mirroring/fs/dir_map/update.py
+-- Installing: /usr/local/share/ceph/mgr/nfs
+-- Installing: /usr/local/share/ceph/mgr/nfs/tests
+-- Installing: /usr/local/share/ceph/mgr/nfs/module.py
+-- Installing: /usr/local/share/ceph/mgr/nfs/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/nfs/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/nfs/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/nfs/__pycache__/utils.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/nfs/__pycache__/ganesha_conf.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/nfs/__pycache__/exception.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/nfs/__pycache__/export.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/nfs/__pycache__/cluster.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/nfs/ganesha_conf.py
+-- Installing: /usr/local/share/ceph/mgr/nfs/export.py
+-- Installing: /usr/local/share/ceph/mgr/nfs/utils.py
+-- Installing: /usr/local/share/ceph/mgr/nfs/exception.py
+-- Installing: /usr/local/share/ceph/mgr/nfs/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/nfs/cluster.py
+-- Installing: /usr/local/share/ceph/mgr/orchestrator
+-- Installing: /usr/local/share/ceph/mgr/orchestrator/README.md
+-- Installing: /usr/local/share/ceph/mgr/orchestrator/tests
+-- Installing: /usr/local/share/ceph/mgr/orchestrator/module.py
+-- Installing: /usr/local/share/ceph/mgr/orchestrator/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/orchestrator/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/orchestrator/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/orchestrator/__pycache__/_interface.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/orchestrator/_interface.py
+-- Installing: /usr/local/share/ceph/mgr/orchestrator/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/osd_perf_query
+-- Installing: /usr/local/share/ceph/mgr/osd_perf_query/module.py
+-- Installing: /usr/local/share/ceph/mgr/osd_perf_query/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/osd_perf_query/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/osd_perf_query/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/osd_perf_query/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/osd_support
+-- Installing: /usr/local/share/ceph/mgr/osd_support/module.py
+-- Installing: /usr/local/share/ceph/mgr/osd_support/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/osd_support/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/osd_support/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/osd_support/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/pg_autoscaler
+-- Installing: /usr/local/share/ceph/mgr/pg_autoscaler/tests
+-- Installing: /usr/local/share/ceph/mgr/pg_autoscaler/module.py
+-- Installing: /usr/local/share/ceph/mgr/pg_autoscaler/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/pg_autoscaler/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/pg_autoscaler/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/pg_autoscaler/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/progress
+-- Installing: /usr/local/share/ceph/mgr/progress/module.py
+-- Installing: /usr/local/share/ceph/mgr/progress/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/progress/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/progress/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/progress/test_progress.py
+-- Installing: /usr/local/share/ceph/mgr/progress/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/prometheus
+-- Installing: /usr/local/share/ceph/mgr/prometheus/test_module.py
+-- Installing: /usr/local/share/ceph/mgr/prometheus/module.py
+-- Installing: /usr/local/share/ceph/mgr/prometheus/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/prometheus/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/prometheus/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/prometheus/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/rbd_support
+-- Installing: /usr/local/share/ceph/mgr/rbd_support/module.py
+-- Installing: /usr/local/share/ceph/mgr/rbd_support/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/rbd_support/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/rbd_support/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/rbd_support/__pycache__/mirror_snapshot_schedule.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/rbd_support/__pycache__/perf.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/rbd_support/__pycache__/common.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/rbd_support/__pycache__/schedule.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/rbd_support/__pycache__/task.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/rbd_support/__pycache__/trash_purge_schedule.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/rbd_support/common.py
+-- Installing: /usr/local/share/ceph/mgr/rbd_support/task.py
+-- Installing: /usr/local/share/ceph/mgr/rbd_support/mirror_snapshot_schedule.py
+-- Installing: /usr/local/share/ceph/mgr/rbd_support/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/rbd_support/perf.py
+-- Installing: /usr/local/share/ceph/mgr/rbd_support/schedule.py
+-- Installing: /usr/local/share/ceph/mgr/rbd_support/trash_purge_schedule.py
+-- Installing: /usr/local/share/ceph/mgr/restful
+-- Installing: /usr/local/share/ceph/mgr/restful/decorators.py
+-- Installing: /usr/local/share/ceph/mgr/restful/module.py
+-- Installing: /usr/local/share/ceph/mgr/restful/hooks.py
+-- Installing: /usr/local/share/ceph/mgr/restful/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/restful/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/restful/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/restful/__pycache__/common.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/restful/__pycache__/context.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/restful/__pycache__/hooks.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/restful/common.py
+-- Installing: /usr/local/share/ceph/mgr/restful/context.py
+-- Installing: /usr/local/share/ceph/mgr/restful/api
+-- Installing: /usr/local/share/ceph/mgr/restful/api/osd.py
+-- Installing: /usr/local/share/ceph/mgr/restful/api/mon.py
+-- Installing: /usr/local/share/ceph/mgr/restful/api/crush.py
+-- Installing: /usr/local/share/ceph/mgr/restful/api/server.py
+-- Installing: /usr/local/share/ceph/mgr/restful/api/config.py
+-- Installing: /usr/local/share/ceph/mgr/restful/api/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/restful/api/request.py
+-- Installing: /usr/local/share/ceph/mgr/restful/api/perf.py
+-- Installing: /usr/local/share/ceph/mgr/restful/api/pool.py
+-- Installing: /usr/local/share/ceph/mgr/restful/api/doc.py
+-- Installing: /usr/local/share/ceph/mgr/restful/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/rgw
+-- Installing: /usr/local/share/ceph/mgr/rgw/module.py
+-- Installing: /usr/local/share/ceph/mgr/rgw/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/rgw/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/rgw/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/rgw/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/selftest
+-- Installing: /usr/local/share/ceph/mgr/selftest/module.py
+-- Installing: /usr/local/share/ceph/mgr/selftest/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/selftest/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/selftest/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/selftest/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/tests
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/module.py
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/fs
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/fs/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/fs/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/fs/__pycache__/schedule_client.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/fs/__pycache__/schedule.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/fs/schedule_client.py
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/fs/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/fs/schedule.py
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/wheelhouse
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/wheelhouse/tomli-2.0.1-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/wheelhouse/pip-23.0.1-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/wheelhouse/chardet-5.1.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/wheelhouse/pyproject_api-1.5.1-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/wheelhouse/exceptiongroup-1.1.1-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/wheelhouse/colorama-0.4.6-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/wheelhouse/md5
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/wheelhouse/wheel-0.40.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/wheelhouse/distlib-0.3.6-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/wheelhouse/pluggy-1.0.0-py2.py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/wheelhouse/platformdirs-3.2.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/wheelhouse/cachetools-5.3.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/wheelhouse/tox-4.4.8-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/wheelhouse/setuptools-67.6.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/wheelhouse/iniconfig-2.0.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/wheelhouse/filelock-3.10.7-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/wheelhouse/attrs-22.2.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/wheelhouse/virtualenv-20.21.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/wheelhouse/packaging-23.0-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/snap_schedule/wheelhouse/pytest-7.2.2-py3-none-any.whl
+-- Installing: /usr/local/share/ceph/mgr/stats
+-- Installing: /usr/local/share/ceph/mgr/stats/module.py
+-- Installing: /usr/local/share/ceph/mgr/stats/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/stats/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/stats/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/stats/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/stats/fs
+-- Installing: /usr/local/share/ceph/mgr/stats/fs/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/stats/fs/__pycache__/perf_stats.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/stats/fs/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/stats/fs/perf_stats.py
+-- Installing: /usr/local/share/ceph/mgr/stats/fs/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/status
+-- Installing: /usr/local/share/ceph/mgr/status/module.py
+-- Installing: /usr/local/share/ceph/mgr/status/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/status/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/status/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/status/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/telegraf
+-- Installing: /usr/local/share/ceph/mgr/telegraf/protocol.py
+-- Installing: /usr/local/share/ceph/mgr/telegraf/module.py
+-- Installing: /usr/local/share/ceph/mgr/telegraf/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/telegraf/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/telegraf/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/telegraf/__pycache__/utils.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/telegraf/__pycache__/protocol.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/telegraf/__pycache__/basesocket.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/telegraf/utils.py
+-- Installing: /usr/local/share/ceph/mgr/telegraf/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/telegraf/basesocket.py
+-- Installing: /usr/local/share/ceph/mgr/telemetry
+-- Installing: /usr/local/share/ceph/mgr/telemetry/tests
+-- Installing: /usr/local/share/ceph/mgr/telemetry/module.py
+-- Installing: /usr/local/share/ceph/mgr/telemetry/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/telemetry/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/telemetry/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/telemetry/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/test_orchestrator
+-- Installing: /usr/local/share/ceph/mgr/test_orchestrator/README.md
+-- Installing: /usr/local/share/ceph/mgr/test_orchestrator/module.py
+-- Installing: /usr/local/share/ceph/mgr/test_orchestrator/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/test_orchestrator/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/test_orchestrator/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/test_orchestrator/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/test_orchestrator/dummy_data.json
+-- Installing: /usr/local/share/ceph/mgr/volumes
+-- Installing: /usr/local/share/ceph/mgr/volumes/module.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/volumes/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/async_cloner.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/fs_util.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/vol_spec.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/__pycache__/async_job.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/__pycache__/vol_spec.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/__pycache__/exception.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/__pycache__/volume.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/__pycache__/purge_queue.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/__pycache__/async_cloner.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/__pycache__/fs_util.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/async_job.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/purge_queue.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/exception.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/volume.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/__pycache__/resolver.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/__pycache__/snapshot_util.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/__pycache__/index.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/__pycache__/group.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/__pycache__/rankevicter.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/__pycache__/access.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/__pycache__/subvolume.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/__pycache__/pin_util.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/__pycache__/lock.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/__pycache__/trash.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/__pycache__/clone_index.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/__pycache__/volume.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/__pycache__/template.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/subvolume.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/template.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/clone_index.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/access.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/rankevicter.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/versions
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/versions/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/versions/__pycache__/auth_metadata.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/versions/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/versions/__pycache__/op_sm.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/versions/__pycache__/metadata_manager.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/versions/__pycache__/subvolume_attrs.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/versions/__pycache__/subvolume_base.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/versions/__pycache__/subvolume_v1.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/versions/__pycache__/subvolume_v2.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/versions/subvolume_attrs.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/versions/subvolume_v2.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/versions/subvolume_v1.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/versions/subvolume_base.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/versions/auth_metadata.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/versions/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/versions/metadata_manager.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/versions/op_sm.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/pin_util.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/volume.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/trash.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/group.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/snapshot_util.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/index.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/lock.py
+-- Installing: /usr/local/share/ceph/mgr/volumes/fs/operations/resolver.py
+-- Installing: /usr/local/share/ceph/mgr/zabbix
+-- Installing: /usr/local/share/ceph/mgr/zabbix/module.py
+-- Installing: /usr/local/share/ceph/mgr/zabbix/__pycache__
+-- Installing: /usr/local/share/ceph/mgr/zabbix/__pycache__/module.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/zabbix/__pycache__/__init__.cpython-310.pyc
+-- Installing: /usr/local/share/ceph/mgr/zabbix/__init__.py
+-- Installing: /usr/local/share/ceph/mgr/zabbix/zabbix_template.xml
+-- Installing: /usr/local/share/ceph/mgr/mgr_module.py
+-- Installing: /usr/local/share/ceph/mgr/mgr_util.py
+-- Installing: /usr/local/share/ceph/mgr/object_format.py
+running install
+running bdist_egg
+running egg_info
+creating ceph_volume.egg-info
+writing ceph_volume.egg-info/PKG-INFO
+writing dependency_links to ceph_volume.egg-info/dependency_links.txt
+writing entry points to ceph_volume.egg-info/entry_points.txt
+writing requirements to ceph_volume.egg-info/requires.txt
+writing top-level names to ceph_volume.egg-info/top_level.txt
+writing manifest file 'ceph_volume.egg-info/SOURCES.txt'
+reading manifest file 'ceph_volume.egg-info/SOURCES.txt'
+writing manifest file 'ceph_volume.egg-info/SOURCES.txt'
+installing library code to build/bdist.linux-x86_64/egg
+running install_lib
+running build_py
+creating build
+creating build/lib
+creating build/lib/ceph_volume
+copying ceph_volume/decorators.py -> build/lib/ceph_volume
+copying ceph_volume/exceptions.py -> build/lib/ceph_volume
+copying ceph_volume/main.py -> build/lib/ceph_volume
+copying ceph_volume/configuration.py -> build/lib/ceph_volume
+copying ceph_volume/__init__.py -> build/lib/ceph_volume
+copying ceph_volume/terminal.py -> build/lib/ceph_volume
+copying ceph_volume/log.py -> build/lib/ceph_volume
+copying ceph_volume/process.py -> build/lib/ceph_volume
+creating build/lib/ceph_volume/util
+copying ceph_volume/util/arg_validators.py -> build/lib/ceph_volume/util
+copying ceph_volume/util/disk.py -> build/lib/ceph_volume/util
+copying ceph_volume/util/templates.py -> build/lib/ceph_volume/util
+copying ceph_volume/util/lsmdisk.py -> build/lib/ceph_volume/util
+copying ceph_volume/util/system.py -> build/lib/ceph_volume/util
+copying ceph_volume/util/__init__.py -> build/lib/ceph_volume/util
+copying ceph_volume/util/device.py -> build/lib/ceph_volume/util
+copying ceph_volume/util/constants.py -> build/lib/ceph_volume/util
+copying ceph_volume/util/prepare.py -> build/lib/ceph_volume/util
+copying ceph_volume/util/encryption.py -> build/lib/ceph_volume/util
+creating build/lib/ceph_volume/tests
+copying ceph_volume/tests/test_process.py -> build/lib/ceph_volume/tests
+copying ceph_volume/tests/test_decorators.py -> build/lib/ceph_volume/tests
+copying ceph_volume/tests/test_configuration.py -> build/lib/ceph_volume/tests
+copying ceph_volume/tests/test_inventory.py -> build/lib/ceph_volume/tests
+copying ceph_volume/tests/__init__.py -> build/lib/ceph_volume/tests
+copying ceph_volume/tests/conftest.py -> build/lib/ceph_volume/tests
+copying ceph_volume/tests/test_main.py -> build/lib/ceph_volume/tests
+copying ceph_volume/tests/test_terminal.py -> build/lib/ceph_volume/tests
+creating build/lib/ceph_volume/systemd
+copying ceph_volume/systemd/main.py -> build/lib/ceph_volume/systemd
+copying ceph_volume/systemd/__init__.py -> build/lib/ceph_volume/systemd
+copying ceph_volume/systemd/systemctl.py -> build/lib/ceph_volume/systemd
+creating build/lib/ceph_volume/drive_group
+copying ceph_volume/drive_group/main.py -> build/lib/ceph_volume/drive_group
+copying ceph_volume/drive_group/__init__.py -> build/lib/ceph_volume/drive_group
+creating build/lib/ceph_volume/activate
+copying ceph_volume/activate/main.py -> build/lib/ceph_volume/activate
+copying ceph_volume/activate/__init__.py -> build/lib/ceph_volume/activate
+creating build/lib/ceph_volume/api
+copying ceph_volume/api/lvm.py -> build/lib/ceph_volume/api
+copying ceph_volume/api/__init__.py -> build/lib/ceph_volume/api
+creating build/lib/ceph_volume/devices
+copying ceph_volume/devices/__init__.py -> build/lib/ceph_volume/devices
+creating build/lib/ceph_volume/inventory
+copying ceph_volume/inventory/main.py -> build/lib/ceph_volume/inventory
+copying ceph_volume/inventory/__init__.py -> build/lib/ceph_volume/inventory
+creating build/lib/ceph_volume/tests/devices
+copying ceph_volume/tests/devices/test_zap.py -> build/lib/ceph_volume/tests/devices
+copying ceph_volume/tests/devices/__init__.py -> build/lib/ceph_volume/tests/devices
+creating build/lib/ceph_volume/tests/devices/lvm
+copying ceph_volume/tests/devices/lvm/test_zap.py -> build/lib/ceph_volume/tests/devices/lvm
+copying ceph_volume/tests/devices/lvm/test_create.py -> build/lib/ceph_volume/tests/devices/lvm
+copying ceph_volume/tests/devices/lvm/test_migrate.py -> build/lib/ceph_volume/tests/devices/lvm
+copying ceph_volume/tests/devices/lvm/test_batch.py -> build/lib/ceph_volume/tests/devices/lvm
+copying ceph_volume/tests/devices/lvm/__init__.py -> build/lib/ceph_volume/tests/devices/lvm
+copying ceph_volume/tests/devices/lvm/test_common.py -> build/lib/ceph_volume/tests/devices/lvm
+copying ceph_volume/tests/devices/lvm/test_trigger.py -> build/lib/ceph_volume/tests/devices/lvm
+copying ceph_volume/tests/devices/lvm/test_prepare.py -> build/lib/ceph_volume/tests/devices/lvm
+copying ceph_volume/tests/devices/lvm/test_listing.py -> build/lib/ceph_volume/tests/devices/lvm
+copying ceph_volume/tests/devices/lvm/test_activate.py -> build/lib/ceph_volume/tests/devices/lvm
+copying ceph_volume/tests/devices/lvm/test_deactivate.py -> build/lib/ceph_volume/tests/devices/lvm
+creating build/lib/ceph_volume/tests/devices/raw
+copying ceph_volume/tests/devices/raw/test_list.py -> build/lib/ceph_volume/tests/devices/raw
+copying ceph_volume/tests/devices/raw/__init__.py -> build/lib/ceph_volume/tests/devices/raw
+copying ceph_volume/tests/devices/raw/test_prepare.py -> build/lib/ceph_volume/tests/devices/raw
+creating build/lib/ceph_volume/devices/simple
+copying ceph_volume/devices/simple/main.py -> build/lib/ceph_volume/devices/simple
+copying ceph_volume/devices/simple/trigger.py -> build/lib/ceph_volume/devices/simple
+copying ceph_volume/devices/simple/__init__.py -> build/lib/ceph_volume/devices/simple
+copying ceph_volume/devices/simple/activate.py -> build/lib/ceph_volume/devices/simple
+copying ceph_volume/devices/simple/scan.py -> build/lib/ceph_volume/devices/simple
+creating build/lib/ceph_volume/devices/lvm
+copying ceph_volume/devices/lvm/batch.py -> build/lib/ceph_volume/devices/lvm
+copying ceph_volume/devices/lvm/create.py -> build/lib/ceph_volume/devices/lvm
+copying ceph_volume/devices/lvm/zap.py -> build/lib/ceph_volume/devices/lvm
+copying ceph_volume/devices/lvm/main.py -> build/lib/ceph_volume/devices/lvm
+copying ceph_volume/devices/lvm/common.py -> build/lib/ceph_volume/devices/lvm
+copying ceph_volume/devices/lvm/trigger.py -> build/lib/ceph_volume/devices/lvm
+copying ceph_volume/devices/lvm/__init__.py -> build/lib/ceph_volume/devices/lvm
+copying ceph_volume/devices/lvm/listing.py -> build/lib/ceph_volume/devices/lvm
+copying ceph_volume/devices/lvm/migrate.py -> build/lib/ceph_volume/devices/lvm
+copying ceph_volume/devices/lvm/activate.py -> build/lib/ceph_volume/devices/lvm
+copying ceph_volume/devices/lvm/deactivate.py -> build/lib/ceph_volume/devices/lvm
+copying ceph_volume/devices/lvm/prepare.py -> build/lib/ceph_volume/devices/lvm
+creating build/lib/ceph_volume/devices/raw
+copying ceph_volume/devices/raw/main.py -> build/lib/ceph_volume/devices/raw
+copying ceph_volume/devices/raw/common.py -> build/lib/ceph_volume/devices/raw
+copying ceph_volume/devices/raw/list.py -> build/lib/ceph_volume/devices/raw
+copying ceph_volume/devices/raw/__init__.py -> build/lib/ceph_volume/devices/raw
+copying ceph_volume/devices/raw/activate.py -> build/lib/ceph_volume/devices/raw
+copying ceph_volume/devices/raw/prepare.py -> build/lib/ceph_volume/devices/raw
+creating build/bdist.linux-x86_64
+creating build/bdist.linux-x86_64/egg
+creating build/bdist.linux-x86_64/egg/ceph_volume
+creating build/bdist.linux-x86_64/egg/ceph_volume/util
+copying build/lib/ceph_volume/util/arg_validators.py -> build/bdist.linux-x86_64/egg/ceph_volume/util
+copying build/lib/ceph_volume/util/disk.py -> build/bdist.linux-x86_64/egg/ceph_volume/util
+copying build/lib/ceph_volume/util/templates.py -> build/bdist.linux-x86_64/egg/ceph_volume/util
+copying build/lib/ceph_volume/util/lsmdisk.py -> build/bdist.linux-x86_64/egg/ceph_volume/util
+copying build/lib/ceph_volume/util/system.py -> build/bdist.linux-x86_64/egg/ceph_volume/util
+copying build/lib/ceph_volume/util/__init__.py -> build/bdist.linux-x86_64/egg/ceph_volume/util
+copying build/lib/ceph_volume/util/device.py -> build/bdist.linux-x86_64/egg/ceph_volume/util
+copying build/lib/ceph_volume/util/constants.py -> build/bdist.linux-x86_64/egg/ceph_volume/util
+copying build/lib/ceph_volume/util/prepare.py -> build/bdist.linux-x86_64/egg/ceph_volume/util
+copying build/lib/ceph_volume/util/encryption.py -> build/bdist.linux-x86_64/egg/ceph_volume/util
+copying build/lib/ceph_volume/decorators.py -> build/bdist.linux-x86_64/egg/ceph_volume
+copying build/lib/ceph_volume/exceptions.py -> build/bdist.linux-x86_64/egg/ceph_volume
+creating build/bdist.linux-x86_64/egg/ceph_volume/tests
+copying build/lib/ceph_volume/tests/test_process.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests
+copying build/lib/ceph_volume/tests/test_decorators.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests
+copying build/lib/ceph_volume/tests/test_configuration.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests
+copying build/lib/ceph_volume/tests/test_inventory.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests
+copying build/lib/ceph_volume/tests/__init__.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests
+creating build/bdist.linux-x86_64/egg/ceph_volume/tests/devices
+copying build/lib/ceph_volume/tests/devices/test_zap.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests/devices
+copying build/lib/ceph_volume/tests/devices/__init__.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests/devices
+creating build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm
+copying build/lib/ceph_volume/tests/devices/lvm/test_zap.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm
+copying build/lib/ceph_volume/tests/devices/lvm/test_create.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm
+copying build/lib/ceph_volume/tests/devices/lvm/test_migrate.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm
+copying build/lib/ceph_volume/tests/devices/lvm/test_batch.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm
+copying build/lib/ceph_volume/tests/devices/lvm/__init__.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm
+copying build/lib/ceph_volume/tests/devices/lvm/test_common.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm
+copying build/lib/ceph_volume/tests/devices/lvm/test_trigger.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm
+copying build/lib/ceph_volume/tests/devices/lvm/test_prepare.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm
+copying build/lib/ceph_volume/tests/devices/lvm/test_listing.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm
+copying build/lib/ceph_volume/tests/devices/lvm/test_activate.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm
+copying build/lib/ceph_volume/tests/devices/lvm/test_deactivate.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm
+creating build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/raw
+copying build/lib/ceph_volume/tests/devices/raw/test_list.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/raw
+copying build/lib/ceph_volume/tests/devices/raw/__init__.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/raw
+copying build/lib/ceph_volume/tests/devices/raw/test_prepare.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/raw
+copying build/lib/ceph_volume/tests/conftest.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests
+copying build/lib/ceph_volume/tests/test_main.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests
+copying build/lib/ceph_volume/tests/test_terminal.py -> build/bdist.linux-x86_64/egg/ceph_volume/tests
+creating build/bdist.linux-x86_64/egg/ceph_volume/systemd
+copying build/lib/ceph_volume/systemd/main.py -> build/bdist.linux-x86_64/egg/ceph_volume/systemd
+copying build/lib/ceph_volume/systemd/__init__.py -> build/bdist.linux-x86_64/egg/ceph_volume/systemd
+copying build/lib/ceph_volume/systemd/systemctl.py -> build/bdist.linux-x86_64/egg/ceph_volume/systemd
+creating build/bdist.linux-x86_64/egg/ceph_volume/drive_group
+copying build/lib/ceph_volume/drive_group/main.py -> build/bdist.linux-x86_64/egg/ceph_volume/drive_group
+copying build/lib/ceph_volume/drive_group/__init__.py -> build/bdist.linux-x86_64/egg/ceph_volume/drive_group
+copying build/lib/ceph_volume/main.py -> build/bdist.linux-x86_64/egg/ceph_volume
+creating build/bdist.linux-x86_64/egg/ceph_volume/activate
+copying build/lib/ceph_volume/activate/main.py -> build/bdist.linux-x86_64/egg/ceph_volume/activate
+copying build/lib/ceph_volume/activate/__init__.py -> build/bdist.linux-x86_64/egg/ceph_volume/activate
+copying build/lib/ceph_volume/configuration.py -> build/bdist.linux-x86_64/egg/ceph_volume
+creating build/bdist.linux-x86_64/egg/ceph_volume/api
+copying build/lib/ceph_volume/api/lvm.py -> build/bdist.linux-x86_64/egg/ceph_volume/api
+copying build/lib/ceph_volume/api/__init__.py -> build/bdist.linux-x86_64/egg/ceph_volume/api
+copying build/lib/ceph_volume/__init__.py -> build/bdist.linux-x86_64/egg/ceph_volume
+copying build/lib/ceph_volume/terminal.py -> build/bdist.linux-x86_64/egg/ceph_volume
+creating build/bdist.linux-x86_64/egg/ceph_volume/devices
+copying build/lib/ceph_volume/devices/__init__.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices
+creating build/bdist.linux-x86_64/egg/ceph_volume/devices/simple
+copying build/lib/ceph_volume/devices/simple/main.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/simple
+copying build/lib/ceph_volume/devices/simple/trigger.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/simple
+copying build/lib/ceph_volume/devices/simple/__init__.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/simple
+copying build/lib/ceph_volume/devices/simple/activate.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/simple
+copying build/lib/ceph_volume/devices/simple/scan.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/simple
+creating build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm
+copying build/lib/ceph_volume/devices/lvm/batch.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm
+copying build/lib/ceph_volume/devices/lvm/create.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm
+copying build/lib/ceph_volume/devices/lvm/zap.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm
+copying build/lib/ceph_volume/devices/lvm/main.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm
+copying build/lib/ceph_volume/devices/lvm/common.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm
+copying build/lib/ceph_volume/devices/lvm/trigger.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm
+copying build/lib/ceph_volume/devices/lvm/__init__.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm
+copying build/lib/ceph_volume/devices/lvm/listing.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm
+copying build/lib/ceph_volume/devices/lvm/migrate.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm
+copying build/lib/ceph_volume/devices/lvm/activate.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm
+copying build/lib/ceph_volume/devices/lvm/deactivate.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm
+copying build/lib/ceph_volume/devices/lvm/prepare.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm
+creating build/bdist.linux-x86_64/egg/ceph_volume/devices/raw
+copying build/lib/ceph_volume/devices/raw/main.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/raw
+copying build/lib/ceph_volume/devices/raw/common.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/raw
+copying build/lib/ceph_volume/devices/raw/list.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/raw
+copying build/lib/ceph_volume/devices/raw/__init__.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/raw
+copying build/lib/ceph_volume/devices/raw/activate.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/raw
+copying build/lib/ceph_volume/devices/raw/prepare.py -> build/bdist.linux-x86_64/egg/ceph_volume/devices/raw
+copying build/lib/ceph_volume/log.py -> build/bdist.linux-x86_64/egg/ceph_volume
+copying build/lib/ceph_volume/process.py -> build/bdist.linux-x86_64/egg/ceph_volume
+creating build/bdist.linux-x86_64/egg/ceph_volume/inventory
+copying build/lib/ceph_volume/inventory/main.py -> build/bdist.linux-x86_64/egg/ceph_volume/inventory
+copying build/lib/ceph_volume/inventory/__init__.py -> build/bdist.linux-x86_64/egg/ceph_volume/inventory
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/util/arg_validators.py to arg_validators.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/util/disk.py to disk.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/util/templates.py to templates.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/util/lsmdisk.py to lsmdisk.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/util/system.py to system.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/util/__init__.py to __init__.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/util/device.py to device.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/util/constants.py to constants.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/util/prepare.py to prepare.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/util/encryption.py to encryption.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/decorators.py to decorators.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/exceptions.py to exceptions.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/test_process.py to test_process.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/test_decorators.py to test_decorators.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/test_configuration.py to test_configuration.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/test_inventory.py to test_inventory.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/__init__.py to __init__.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/test_zap.py to test_zap.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/__init__.py to __init__.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm/test_zap.py to test_zap.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm/test_create.py to test_create.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm/test_migrate.py to test_migrate.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm/test_batch.py to test_batch.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm/__init__.py to __init__.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm/test_common.py to test_common.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm/test_trigger.py to test_trigger.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm/test_prepare.py to test_prepare.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm/test_listing.py to test_listing.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm/test_activate.py to test_activate.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/lvm/test_deactivate.py to test_deactivate.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/raw/test_list.py to test_list.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/raw/__init__.py to __init__.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/devices/raw/test_prepare.py to test_prepare.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/conftest.py to conftest.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/test_main.py to test_main.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/tests/test_terminal.py to test_terminal.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/systemd/main.py to main.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/systemd/__init__.py to __init__.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/systemd/systemctl.py to systemctl.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/drive_group/main.py to main.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/drive_group/__init__.py to __init__.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/main.py to main.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/activate/main.py to main.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/activate/__init__.py to __init__.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/configuration.py to configuration.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/api/lvm.py to lvm.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/api/__init__.py to __init__.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/__init__.py to __init__.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/terminal.py to terminal.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/__init__.py to __init__.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/simple/main.py to main.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/simple/trigger.py to trigger.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/simple/__init__.py to __init__.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/simple/activate.py to activate.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/simple/scan.py to scan.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm/batch.py to batch.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm/create.py to create.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm/zap.py to zap.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm/main.py to main.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm/common.py to common.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm/trigger.py to trigger.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm/__init__.py to __init__.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm/listing.py to listing.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm/migrate.py to migrate.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm/activate.py to activate.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm/deactivate.py to deactivate.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/lvm/prepare.py to prepare.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/raw/main.py to main.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/raw/common.py to common.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/raw/list.py to list.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/raw/__init__.py to __init__.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/raw/activate.py to activate.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/devices/raw/prepare.py to prepare.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/log.py to log.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/process.py to process.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/inventory/main.py to main.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph_volume/inventory/__init__.py to __init__.cpython-36.pyc
+creating build/bdist.linux-x86_64/egg/EGG-INFO
+copying ceph_volume.egg-info/PKG-INFO -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying ceph_volume.egg-info/SOURCES.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying ceph_volume.egg-info/dependency_links.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying ceph_volume.egg-info/entry_points.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying ceph_volume.egg-info/not-zip-safe -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying ceph_volume.egg-info/requires.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying ceph_volume.egg-info/top_level.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+creating dist
+creating 'dist/ceph_volume-1.0.0-py3.6.egg' and adding 'build/bdist.linux-x86_64/egg' to it
+removing 'build/bdist.linux-x86_64/egg' (and everything under it)
+Processing ceph_volume-1.0.0-py3.6.egg
+creating /usr/local/lib/python3.6/site-packages/ceph_volume-1.0.0-py3.6.egg
+Extracting ceph_volume-1.0.0-py3.6.egg to /usr/local/lib/python3.6/site-packages
+Adding ceph-volume 1.0.0 to easy-install.pth file
+Installing ceph-volume script to /usr/local/sbin
+Installing ceph-volume-systemd script to /usr/local/sbin
+
+Installed /usr/local/lib/python3.6/site-packages/ceph_volume-1.0.0-py3.6.egg
+Processing dependencies for ceph-volume==1.0.0
+Searching for ceph
+Best match: ceph 1.0.0
+Processing python-common
+Writing /root/project/stor/ceph/xb/docker/ceph/build/src/python-common/setup.cfg
+Running setup.py -q bdist_egg --dist-dir /root/project/stor/ceph/xb/docker/ceph/build/src/python-common/egg-dist-tmp-r46jdr1x
+creating /usr/local/lib/python3.6/site-packages/ceph-1.0.0-py3.6.egg
+Extracting ceph-1.0.0-py3.6.egg to /usr/local/lib/python3.6/site-packages
+Adding ceph 1.0.0 to easy-install.pth file
+
+Installed /usr/local/lib/python3.6/site-packages/ceph-1.0.0-py3.6.egg
+Searching for PyYAML==3.12
+Best match: PyYAML 3.12
+Adding PyYAML 3.12 to easy-install.pth file
+
+Using /usr/lib64/python3.6/site-packages
+Finished processing dependencies for ceph-volume==1.0.0
+running install
+running bdist_egg
+running egg_info
+writing ceph.egg-info/PKG-INFO
+writing dependency_links to ceph.egg-info/dependency_links.txt
+writing requirements to ceph.egg-info/requires.txt
+writing top-level names to ceph.egg-info/top_level.txt
+reading manifest file 'ceph.egg-info/SOURCES.txt'
+writing manifest file 'ceph.egg-info/SOURCES.txt'
+installing library code to build/bdist.linux-x86_64/egg
+running install_lib
+running build_py
+creating build/bdist.linux-x86_64/egg
+creating build/bdist.linux-x86_64/egg/ceph
+creating build/bdist.linux-x86_64/egg/ceph/tests
+copying build/lib/ceph/tests/factories.py -> build/bdist.linux-x86_64/egg/ceph/tests
+copying build/lib/ceph/tests/test_drive_group.py -> build/bdist.linux-x86_64/egg/ceph/tests
+copying build/lib/ceph/tests/utils.py -> build/bdist.linux-x86_64/egg/ceph/tests
+copying build/lib/ceph/tests/test_inventory.py -> build/bdist.linux-x86_64/egg/ceph/tests
+copying build/lib/ceph/tests/test_hostspec.py -> build/bdist.linux-x86_64/egg/ceph/tests
+copying build/lib/ceph/tests/__init__.py -> build/bdist.linux-x86_64/egg/ceph/tests
+copying build/lib/ceph/tests/test_disk_selector.py -> build/bdist.linux-x86_64/egg/ceph/tests
+copying build/lib/ceph/tests/test_service_spec.py -> build/bdist.linux-x86_64/egg/ceph/tests
+copying build/lib/ceph/tests/test_utils.py -> build/bdist.linux-x86_64/egg/ceph/tests
+copying build/lib/ceph/tests/test_datetime.py -> build/bdist.linux-x86_64/egg/ceph/tests
+copying build/lib/ceph/utils.py -> build/bdist.linux-x86_64/egg/ceph
+copying build/lib/ceph/__init__.py -> build/bdist.linux-x86_64/egg/ceph
+creating build/bdist.linux-x86_64/egg/ceph/rgw
+copying build/lib/ceph/rgw/types.py -> build/bdist.linux-x86_64/egg/ceph/rgw
+copying build/lib/ceph/rgw/rgwam_core.py -> build/bdist.linux-x86_64/egg/ceph/rgw
+copying build/lib/ceph/rgw/diff.py -> build/bdist.linux-x86_64/egg/ceph/rgw
+copying build/lib/ceph/rgw/__init__.py -> build/bdist.linux-x86_64/egg/ceph/rgw
+creating build/bdist.linux-x86_64/egg/ceph/deployment
+creating build/bdist.linux-x86_64/egg/ceph/deployment/drive_selection
+copying build/lib/ceph/deployment/drive_selection/matchers.py -> build/bdist.linux-x86_64/egg/ceph/deployment/drive_selection
+copying build/lib/ceph/deployment/drive_selection/selector.py -> build/bdist.linux-x86_64/egg/ceph/deployment/drive_selection
+copying build/lib/ceph/deployment/drive_selection/__init__.py -> build/bdist.linux-x86_64/egg/ceph/deployment/drive_selection
+copying build/lib/ceph/deployment/drive_selection/filter.py -> build/bdist.linux-x86_64/egg/ceph/deployment/drive_selection
+copying build/lib/ceph/deployment/drive_group.py -> build/bdist.linux-x86_64/egg/ceph/deployment
+copying build/lib/ceph/deployment/translate.py -> build/bdist.linux-x86_64/egg/ceph/deployment
+copying build/lib/ceph/deployment/inventory.py -> build/bdist.linux-x86_64/egg/ceph/deployment
+copying build/lib/ceph/deployment/utils.py -> build/bdist.linux-x86_64/egg/ceph/deployment
+copying build/lib/ceph/deployment/hostspec.py -> build/bdist.linux-x86_64/egg/ceph/deployment
+copying build/lib/ceph/deployment/__init__.py -> build/bdist.linux-x86_64/egg/ceph/deployment
+copying build/lib/ceph/deployment/service_spec.py -> build/bdist.linux-x86_64/egg/ceph/deployment
+byte-compiling build/bdist.linux-x86_64/egg/ceph/tests/factories.py to factories.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/tests/test_drive_group.py to test_drive_group.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/tests/utils.py to utils.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/tests/test_inventory.py to test_inventory.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/tests/test_hostspec.py to test_hostspec.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/tests/__init__.py to __init__.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/tests/test_disk_selector.py to test_disk_selector.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/tests/test_service_spec.py to test_service_spec.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/tests/test_utils.py to test_utils.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/tests/test_datetime.py to test_datetime.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/utils.py to utils.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/__init__.py to __init__.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/rgw/types.py to types.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/rgw/rgwam_core.py to rgwam_core.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/rgw/diff.py to diff.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/rgw/__init__.py to __init__.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/deployment/drive_selection/matchers.py to matchers.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/deployment/drive_selection/selector.py to selector.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/deployment/drive_selection/__init__.py to __init__.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/deployment/drive_selection/filter.py to filter.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/deployment/drive_group.py to drive_group.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/deployment/translate.py to translate.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/deployment/inventory.py to inventory.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/deployment/utils.py to utils.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/deployment/hostspec.py to hostspec.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/deployment/__init__.py to __init__.cpython-36.pyc
+byte-compiling build/bdist.linux-x86_64/egg/ceph/deployment/service_spec.py to service_spec.cpython-36.pyc
+creating build/bdist.linux-x86_64/egg/EGG-INFO
+copying ceph.egg-info/PKG-INFO -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying ceph.egg-info/SOURCES.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying ceph.egg-info/dependency_links.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying ceph.egg-info/not-zip-safe -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying ceph.egg-info/requires.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying ceph.egg-info/top_level.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+creating dist
+creating 'dist/ceph-1.0.0-py3.6.egg' and adding 'build/bdist.linux-x86_64/egg' to it
+removing 'build/bdist.linux-x86_64/egg' (and everything under it)
+Processing ceph-1.0.0-py3.6.egg
+removing '/usr/local/lib/python3.6/site-packages/ceph-1.0.0-py3.6.egg' (and everything under it)
+creating /usr/local/lib/python3.6/site-packages/ceph-1.0.0-py3.6.egg
+Extracting ceph-1.0.0-py3.6.egg to /usr/local/lib/python3.6/site-packages
+ceph 1.0.0 is already the active version in easy-install.pth
+
+Installed /usr/local/lib/python3.6/site-packages/ceph-1.0.0-py3.6.egg
+Processing dependencies for ceph==1.0.0
+Searching for PyYAML==3.12
+Best match: PyYAML 3.12
+Adding PyYAML 3.12 to easy-install.pth file
+
+Using /usr/lib64/python3.6/site-packages
+Finished processing dependencies for ceph==1.0.0
+-- Installing: /usr/local/sbin/cephadm
+-- Installing: /usr/local/bin/ceph-mon
+-- Set runtime path of "/usr/local/bin/ceph-mon" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph-bluestore-tool
+-- Set runtime path of "/usr/local/bin/ceph-bluestore-tool" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph-osd
+-- Installing: /usr/local/bin/ceph-mds
+-- Set runtime path of "/usr/local/bin/ceph-mds" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/lib64/ceph/erasure-code/libec_jerasure.so
+-- Installing: /usr/local/lib64/ceph/erasure-code/libec_jerasure_generic.so
+-- Installing: /usr/local/lib64/ceph/erasure-code/libec_jerasure_sse3.so
+-- Installing: /usr/local/lib64/ceph/erasure-code/libec_jerasure_sse4.so
+-- Installing: /usr/local/lib64/ceph/erasure-code/libec_lrc.so
+-- Installing: /usr/local/lib64/ceph/erasure-code/libec_shec.so
+-- Installing: /usr/local/lib64/ceph/erasure-code/libec_shec_generic.so
+-- Installing: /usr/local/lib64/ceph/erasure-code/libec_shec_sse3.so
+-- Installing: /usr/local/lib64/ceph/erasure-code/libec_shec_sse4.so
+-- Installing: /usr/local/lib64/ceph/erasure-code/libec_clay.so
+-- Installing: /usr/local/lib64/ceph/erasure-code/libec_isa.so
+-- Installing: /usr/local/lib64/ceph/compressor/libceph_snappy.so.2.0.0
+-- Installing: /usr/local/lib64/ceph/compressor/libceph_snappy.so.2
+-- Installing: /usr/local/lib64/ceph/compressor/libceph_snappy.so
+-- Installing: /usr/local/lib64/ceph/compressor/libceph_zlib.so.2.0.0
+-- Installing: /usr/local/lib64/ceph/compressor/libceph_zlib.so.2
+-- Installing: /usr/local/lib64/ceph/compressor/libceph_zlib.so
+-- Installing: /usr/local/lib64/ceph/compressor/libceph_zstd.so.2.0.0
+-- Installing: /usr/local/lib64/ceph/compressor/libceph_zstd.so.2
+-- Installing: /usr/local/lib64/ceph/compressor/libceph_zstd.so
+-- Installing: /usr/local/lib64/ceph/compressor/libceph_lz4.so.2.0.0
+-- Installing: /usr/local/lib64/ceph/compressor/libceph_lz4.so.2
+-- Installing: /usr/local/lib64/ceph/compressor/libceph_lz4.so
+-- Installing: /usr/local/bin/rados
+-- Set runtime path of "/usr/local/bin/rados" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_scratchtool
+-- Set runtime path of "/usr/local/bin/ceph_scratchtool" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_scratchtoolpp
+-- Set runtime path of "/usr/local/bin/ceph_scratchtoolpp" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_radosacl
+-- Set runtime path of "/usr/local/bin/ceph_radosacl" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/lib64/ceph/ceph-monstore-update-crush.sh
+-- Installing: /usr/local/bin/ceph-osdomap-tool
+-- Set runtime path of "/usr/local/bin/ceph-osdomap-tool" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph-monstore-tool
+-- Set runtime path of "/usr/local/bin/ceph-monstore-tool" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph-objectstore-tool
+-- Set runtime path of "/usr/local/bin/ceph-objectstore-tool" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph-client-debug
+-- Set runtime path of "/usr/local/bin/ceph-client-debug" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph-kvstore-tool
+-- Set runtime path of "/usr/local/bin/ceph-kvstore-tool" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph-conf
+-- Set runtime path of "/usr/local/bin/ceph-conf" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/crushtool
+-- Set runtime path of "/usr/local/bin/crushtool" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/monmaptool
+-- Set runtime path of "/usr/local/bin/monmaptool" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/osdmaptool
+-- Set runtime path of "/usr/local/bin/osdmaptool" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/crushdiff
+-- Installing: /usr/local/bin/ceph-diff-sorted
+-- Installing: /usr/local/bin/ceph_psim
+-- Set runtime path of "/usr/local/bin/ceph_psim" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph-authtool
+-- Set runtime path of "/usr/local/bin/ceph-authtool" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph-dedup-tool
+-- Set runtime path of "/usr/local/bin/ceph-dedup-tool" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/cephfs-journal-tool
+-- Set runtime path of "/usr/local/bin/cephfs-journal-tool" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/cephfs-table-tool
+-- Set runtime path of "/usr/local/bin/cephfs-table-tool" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/cephfs-data-scan
+-- Set runtime path of "/usr/local/bin/cephfs-data-scan" to "/usr/local/lib64/ceph"
+running install
+running bdist_egg
+running egg_info
+creating cephfs_top.egg-info
+writing cephfs_top.egg-info/PKG-INFO
+writing dependency_links to cephfs_top.egg-info/dependency_links.txt
+writing requirements to cephfs_top.egg-info/requires.txt
+writing top-level names to cephfs_top.egg-info/top_level.txt
+writing manifest file 'cephfs_top.egg-info/SOURCES.txt'
+reading manifest file 'cephfs_top.egg-info/SOURCES.txt'
+writing manifest file 'cephfs_top.egg-info/SOURCES.txt'
+installing library code to build/bdist.linux-x86_64/egg
+running install_lib
+warning: install_lib: 'build/lib' does not exist -- no Python modules to install
+
+creating build
+creating build/bdist.linux-x86_64
+creating build/bdist.linux-x86_64/egg
+creating build/bdist.linux-x86_64/egg/EGG-INFO
+installing scripts to build/bdist.linux-x86_64/egg/EGG-INFO/scripts
+running install_scripts
+running build_scripts
+creating build/scripts-3.6
+copying and adjusting cephfs-top -> build/scripts-3.6
+changing mode of build/scripts-3.6/cephfs-top from 644 to 755
+creating build/bdist.linux-x86_64/egg/EGG-INFO/scripts
+copying build/scripts-3.6/cephfs-top -> build/bdist.linux-x86_64/egg/EGG-INFO/scripts
+changing mode of build/bdist.linux-x86_64/egg/EGG-INFO/scripts/cephfs-top to 755
+copying cephfs_top.egg-info/PKG-INFO -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying cephfs_top.egg-info/SOURCES.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying cephfs_top.egg-info/dependency_links.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying cephfs_top.egg-info/requires.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying cephfs_top.egg-info/top_level.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+zip_safe flag not set; analyzing archive contents...
+creating dist
+creating 'dist/cephfs_top-0.0.1-py3.6.egg' and adding 'build/bdist.linux-x86_64/egg' to it
+removing 'build/bdist.linux-x86_64/egg' (and everything under it)
+Processing cephfs_top-0.0.1-py3.6.egg
+Copying cephfs_top-0.0.1-py3.6.egg to /usr/local/lib/python3.6/site-packages
+Adding cephfs-top 0.0.1 to easy-install.pth file
+Installing cephfs-top script to /usr/local/bin
+
+Installed /usr/local/lib/python3.6/site-packages/cephfs_top-0.0.1-py3.6.egg
+Processing dependencies for cephfs-top==0.0.1
+Searching for rados==2.0.0
+Best match: rados 2.0.0
+Adding rados 2.0.0 to easy-install.pth file
+
+Using /usr/local/lib64/python3.6/site-packages
+Finished processing dependencies for cephfs-top==0.0.1
+-- Installing: /usr/local/bin/cephfs-mirror
+-- Set runtime path of "/usr/local/bin/cephfs-mirror" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/rbd
+-- Set runtime path of "/usr/local/bin/rbd" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/rbd-mirror
+-- Set runtime path of "/usr/local/bin/rbd-mirror" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/rbd-nbd
+-- Set runtime path of "/usr/local/bin/rbd-nbd" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph-immutable-object-cache
+-- Set runtime path of "/usr/local/bin/ceph-immutable-object-cache" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/lib64/ceph/denc/denc-mod-common.so
+-- Set runtime path of "/usr/local/lib64/ceph/denc/denc-mod-common.so" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/lib64/ceph/denc/denc-mod-osd.so
+-- Set runtime path of "/usr/local/lib64/ceph/denc/denc-mod-osd.so" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/lib64/ceph/denc/denc-mod-rgw.so
+-- Set runtime path of "/usr/local/lib64/ceph/denc/denc-mod-rgw.so" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/lib64/ceph/denc/denc-mod-rbd.so
+-- Set runtime path of "/usr/local/lib64/ceph/denc/denc-mod-rbd.so" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/lib64/ceph/denc/denc-mod-cephfs.so
+-- Set runtime path of "/usr/local/lib64/ceph/denc/denc-mod-cephfs.so" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph-dencoder
+-- Set runtime path of "/usr/local/bin/ceph-dencoder" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph-erasure-code-tool
+-- Set runtime path of "/usr/local/bin/ceph-erasure-code-tool" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_aio
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_aio" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_aio_pp
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_aio_pp" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_asio
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_asio" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_c_read_operations
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_c_read_operations" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_c_write_operations
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_c_write_operations" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_cmd
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_cmd" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_cmd_pp
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_cmd_pp" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_io
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_io" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_io_pp
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_io_pp" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_list
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_list" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_lock
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_lock" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_lock_pp
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_lock_pp" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_misc
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_misc" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_misc_pp
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_misc_pp" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_pool
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_pool" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_service
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_service" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_service_pp
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_service_pp" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_snapshots
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_snapshots" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_snapshots_pp
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_snapshots_pp" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_stat
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_stat" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_stat_pp
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_stat_pp" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_tier_pp
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_tier_pp" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_watch_notify
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_watch_notify" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_watch_notify_pp
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_watch_notify_pp" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_api_cls_remote_reads
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_api_cls_remote_reads" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_striper_api_striping
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_striper_api_striping" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_striper_api_io
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_striper_api_io" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_striper_api_aio
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_striper_api_aio" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_librbd_fsx
+-- Set runtime path of "/usr/local/bin/ceph_test_librbd_fsx" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_librbd
+-- Set runtime path of "/usr/local/bin/ceph_test_librbd" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_libcephfs
+-- Set runtime path of "/usr/local/bin/ceph_test_libcephfs" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_libcephfs_newops
+-- Set runtime path of "/usr/local/bin/ceph_test_libcephfs_newops" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_libcephfs_reclaim
+-- Set runtime path of "/usr/local/bin/ceph_test_libcephfs_reclaim" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_libcephfs_lazyio
+-- Set runtime path of "/usr/local/bin/ceph_test_libcephfs_lazyio" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_libcephfs_access
+-- Set runtime path of "/usr/local/bin/ceph_test_libcephfs_access" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_cls_hello
+-- Set runtime path of "/usr/local/bin/ceph_test_cls_hello" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_cls_cas
+-- Set runtime path of "/usr/local/bin/ceph_test_cls_cas" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_cls_lock
+-- Set runtime path of "/usr/local/bin/ceph_test_cls_lock" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_cls_log
+-- Set runtime path of "/usr/local/bin/ceph_test_cls_log" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_cls_numops
+-- Set runtime path of "/usr/local/bin/ceph_test_cls_numops" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_cls_sdk
+-- Set runtime path of "/usr/local/bin/ceph_test_cls_sdk" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_cls_journal
+-- Set runtime path of "/usr/local/bin/ceph_test_cls_journal" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_cls_rbd
+-- Set runtime path of "/usr/local/bin/ceph_test_cls_rbd" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_cls_refcount
+-- Set runtime path of "/usr/local/bin/ceph_test_cls_refcount" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_cls_rgw
+-- Set runtime path of "/usr/local/bin/ceph_test_cls_rgw" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_cls_rgw_stats
+-- Set runtime path of "/usr/local/bin/ceph_test_cls_rgw_stats" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_cls_lua
+-- Set runtime path of "/usr/local/bin/ceph_test_cls_lua" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_cls_rgw_gc
+-- Set runtime path of "/usr/local/bin/ceph_test_cls_rgw_gc" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_cls_queue
+-- Set runtime path of "/usr/local/bin/ceph_test_cls_queue" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_cls_2pc_queue
+-- Set runtime path of "/usr/local/bin/ceph_test_cls_2pc_queue" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_cls_cmpomap
+-- Set runtime path of "/usr/local/bin/ceph_test_cls_cmpomap" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_erasure_code_benchmark
+-- Set runtime path of "/usr/local/bin/ceph_erasure_code_benchmark" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_trim_caps
+-- Set runtime path of "/usr/local/bin/ceph_test_trim_caps" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_ino_release_cb
+-- Set runtime path of "/usr/local/bin/ceph_test_ino_release_cb" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_libcephsqlite
+-- Set runtime path of "/usr/local/bin/ceph_test_libcephsqlite" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_client
+-- Set runtime path of "/usr/local/bin/ceph_test_client" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_mon_workloadgen
+-- Set runtime path of "/usr/local/bin/ceph_test_mon_workloadgen" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_mon_memory_target
+-- Installing: /usr/local/bin/ceph_test_log_rss_usage
+-- Installing: /usr/local/bin/ceph_test_mon_rss_usage
+-- Installing: /usr/local/bin/ceph_test_async_driver
+-- Set runtime path of "/usr/local/bin/ceph_test_async_driver" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_msgr
+-- Set runtime path of "/usr/local/bin/ceph_test_msgr" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_async_networkstack
+-- Set runtime path of "/usr/local/bin/ceph_test_async_networkstack" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_perf_msgr_server
+-- Set runtime path of "/usr/local/bin/ceph_perf_msgr_server" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_perf_msgr_client
+-- Set runtime path of "/usr/local/bin/ceph_perf_msgr_client" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_perf_objectstore
+-- Set runtime path of "/usr/local/bin/ceph_perf_objectstore" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_objectstore
+-- Set runtime path of "/usr/local/bin/ceph_test_objectstore" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_keyvaluedb
+-- Set runtime path of "/usr/local/bin/ceph_test_keyvaluedb" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_alloc_replay
+-- Set runtime path of "/usr/local/bin/ceph_test_alloc_replay" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados
+-- Set runtime path of "/usr/local/bin/ceph_test_rados" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_osd_stale_read
+-- Set runtime path of "/usr/local/bin/ceph_test_osd_stale_read" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_objectcacher_stress
+-- Set runtime path of "/usr/local/bin/ceph_test_objectcacher_stress" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_immutable_obj_cache
+-- Set runtime path of "/usr/local/bin/ceph_test_immutable_obj_cache" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rgw_obj
+-- Set runtime path of "/usr/local/bin/ceph_test_rgw_obj" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rgw_gc_log
+-- Set runtime path of "/usr/local/bin/ceph_test_rgw_gc_log" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rbd_mirror
+-- Set runtime path of "/usr/local/bin/ceph_test_rbd_mirror" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rbd_mirror_random_write
+-- Set runtime path of "/usr/local/bin/ceph_test_rbd_mirror_random_write" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_delete_pools_parallel
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_delete_pools_parallel" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_list_parallel
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_list_parallel" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_rados_open_pools_parallel
+-- Set runtime path of "/usr/local/bin/ceph_test_rados_open_pools_parallel" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_lazy_omap_stats
+-- Set runtime path of "/usr/local/bin/ceph_test_lazy_omap_stats" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_cls_rgw_meta
+-- Set runtime path of "/usr/local/bin/ceph_test_cls_rgw_meta" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_librgw_file
+-- Set runtime path of "/usr/local/bin/ceph_test_librgw_file" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_librgw_file_cd
+-- Set runtime path of "/usr/local/bin/ceph_test_librgw_file_cd" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_librgw_file_gp
+-- Set runtime path of "/usr/local/bin/ceph_test_librgw_file_gp" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_librgw_file_nfsns
+-- Set runtime path of "/usr/local/bin/ceph_test_librgw_file_nfsns" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_librgw_file_aw
+-- Set runtime path of "/usr/local/bin/ceph_test_librgw_file_aw" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_librgw_file_marker
+-- Set runtime path of "/usr/local/bin/ceph_test_librgw_file_marker" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_bench_log
+-- Set runtime path of "/usr/local/bin/ceph_bench_log" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_multi_stress_watch
+-- Set runtime path of "/usr/local/bin/ceph_multi_stress_watch" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_omapbench
+-- Set runtime path of "/usr/local/bin/ceph_omapbench" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_objectstore_bench
+-- Set runtime path of "/usr/local/bin/ceph_objectstore_bench" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_perf_local
+-- Set runtime path of "/usr/local/bin/ceph_perf_local" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_stress_watch
+-- Set runtime path of "/usr/local/bin/ceph_test_stress_watch" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_c2c
+-- Set runtime path of "/usr/local/bin/ceph_test_c2c" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_test_admin_socket_output
+-- Set runtime path of "/usr/local/bin/ceph_test_admin_socket_output" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/lib64/ceph/crypto/libceph_crypto_openssl.so
+-- Installing: /usr/local/lib64/ceph/crypto/libceph_crypto_isal.so.1.0.0
+-- Installing: /usr/local/lib64/ceph/crypto/libceph_crypto_isal.so.1
+-- Installing: /usr/local/lib64/ceph/crypto/libceph_crypto_isal.so
+-- Installing: /usr/local/bin/ceph-debugpack
+-- Installing: /usr/local/bin/ceph-coverage
+-- Installing: /usr/local/bin/ceph
+-- Installing: /usr/local/bin/ceph-post-file
+-- Installing: /usr/local/bin/ceph-crash
+-- Installing: /usr/local/bin/ceph-run
+-- Installing: /usr/local/bin/ceph-clsinfo
+-- Installing: /usr/local/etc/init.d/ceph
+-- Installing: /usr/local/share/ceph/id_rsa_drop.ceph.com
+-- Installing: /usr/local/share/ceph/id_rsa_drop.ceph.com.pub
+-- Installing: /usr/local/share/ceph/known_hosts_drop.ceph.com
+-- Installing: /usr/local/libexec/ceph/ceph_common.sh
+-- Installing: /usr/local/libexec/ceph/ceph-osd-prestart.sh
+-- Installing: /usr/local/sbin/ceph-create-keys
+-- Installing: /usr/local/etc/bash_completion.d/ceph
+-- Installing: /usr/local/etc/bash_completion.d/rados
+-- Installing: /usr/local/etc/bash_completion.d/rbd
+-- Installing: /usr/local/etc/bash_completion.d/radosgw-admin
+-- Installing: /usr/local/lib64/libcephfs.so.2.0.0
+-- Installing: /usr/local/lib64/libcephfs.so.2
+-- Set runtime path of "/usr/local/lib64/libcephfs.so.2.0.0" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/lib64/libcephfs.so
+-- Up-to-date: /usr/local/include/cephfs
+-- Up-to-date: /usr/local/include/cephfs/ceph_ll_client.h
+-- Up-to-date: /usr/local/include/cephfs/types.h
+-- Installing: /usr/local/include/cephfs/metrics
+-- Installing: /usr/local/include/cephfs/metrics/Types.h
+-- Up-to-date: /usr/local/include/cephfs/libcephfs.h
+-- Installing: /usr/local/bin/ceph-syn
+-- Set runtime path of "/usr/local/bin/ceph-syn" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/sbin/mount.ceph
+-- Set runtime path of "/usr/local/sbin/mount.ceph" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/lib64/libcephsqlite.so
+-- Set runtime path of "/usr/local/lib64/libcephsqlite.so" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph-fuse
+-- Set runtime path of "/usr/local/bin/ceph-fuse" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/sbin/mount.fuse.ceph
+-- Installing: /usr/local/lib64/ceph/librbd/libceph_librbd_parent_cache.so.1.0.0
+-- Installing: /usr/local/lib64/ceph/librbd/libceph_librbd_parent_cache.so.1
+-- Set runtime path of "/usr/local/lib64/ceph/librbd/libceph_librbd_parent_cache.so.1.0.0" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/lib64/ceph/librbd/libceph_librbd_parent_cache.so
+-- Installing: /usr/local/lib64/librbd.so.1.18.0
+-- Installing: /usr/local/lib64/librbd.so.1
+-- Set runtime path of "/usr/local/lib64/librbd.so.1.18.0" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/lib64/librbd.so
+-- Installing: /usr/local/bin/rbd-fuse
+-- Set runtime path of "/usr/local/bin/rbd-fuse" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph-rbdnamer
+-- Installing: /usr/local/bin/rbd-replay-many
+-- Installing: /usr/local/bin/rbdmap
+-- Installing: /usr/local/bin/rbd-replay
+-- Set runtime path of "/usr/local/bin/rbd-replay" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/rbd-replay-prep
+-- Set runtime path of "/usr/local/bin/rbd-replay-prep" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/radosgw
+-- Set runtime path of "/usr/local/bin/radosgw" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/radosgw-admin
+-- Set runtime path of "/usr/local/bin/radosgw-admin" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/radosgw-es
+-- Set runtime path of "/usr/local/bin/radosgw-es" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/radosgw-token
+-- Set runtime path of "/usr/local/bin/radosgw-token" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/radosgw-object-expirer
+-- Set runtime path of "/usr/local/bin/radosgw-object-expirer" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/rgw-policy-check
+-- Set runtime path of "/usr/local/bin/rgw-policy-check" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/lib64/librgw.so.2.0.0
+-- Installing: /usr/local/lib64/librgw.so.2
+-- Set runtime path of "/usr/local/lib64/librgw.so.2.0.0" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/lib64/librgw.so
+-- Installing: /usr/local/bin/ceph_rgw_jsonparser
+-- Set runtime path of "/usr/local/bin/ceph_rgw_jsonparser" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/ceph_rgw_multiparser
+-- Set runtime path of "/usr/local/bin/ceph_rgw_multiparser" to "/usr/local/lib64/ceph"
+-- Installing: /usr/local/bin/rgw-gap-list
+-- Installing: /usr/local/bin/rgw-gap-list-comparator
+-- Installing: /usr/local/bin/rgw-orphan-list
+-- Installing: /usr/local/bin/rgw-restore-bucket-index
+-- Installing: /usr/local/share/doc/ceph/sample.ceph.conf
+-- Installing: /usr/local/share/man/man8/ceph-syn.8
+-- Installing: /usr/local/share/man/man8/ceph-conf.8
+-- Installing: /usr/local/share/man/man8/ceph.8
+-- Installing: /usr/local/share/man/man8/ceph-authtool.8
+-- Installing: /usr/local/share/man/man8/ceph-kvstore-tool.8
+-- Installing: /usr/local/share/man/man8/rados.8
+-- Installing: /usr/local/share/man/man8/ceph-post-file.8
+-- Installing: /usr/local/share/man/man8/ceph-dencoder.8
+-- Installing: /usr/local/share/man/man8/crushtool.8
+-- Installing: /usr/local/share/man/man8/ceph-run.8
+-- Installing: /usr/local/share/man/man8/mount.ceph.8
+-- Installing: /usr/local/share/man/man8/mount.fuse.ceph.8
+-- Installing: /usr/local/share/man/man8/ceph-create-keys.8
+-- Installing: /usr/local/share/man/man8/ceph-debugpack.8
+-- Installing: /usr/local/share/man/man8/ceph-clsinfo.8
+-- Installing: /usr/local/share/man/man8/ceph-volume.8
+-- Installing: /usr/local/share/man/man8/ceph-volume-systemd.8
+-- Installing: /usr/local/share/man/man8/ceph-osd.8
+-- Installing: /usr/local/share/man/man8/crushdiff.8
+-- Installing: /usr/local/share/man/man8/osdmaptool.8
+-- Installing: /usr/local/share/man/man8/ceph-bluestore-tool.8
+-- Installing: /usr/local/share/man/man8/ceph-mon.8
+-- Installing: /usr/local/share/man/man8/monmaptool.8
+-- Installing: /usr/local/share/man/man8/ceph-mds.8
+-- Installing: /usr/local/share/man/man8/cephfs-top.8
+-- Installing: /usr/local/share/man/man8/librados-config.8
+-- Installing: /usr/local/share/man/man8/cephadm.8
+-- Installing: /usr/local/share/man/man8/cephfs-mirror.8
+-- Installing: /usr/local/share/man/man8/ceph-fuse.8
+-- Installing: /usr/local/share/man/man8/rbd-fuse.8
+-- Installing: /usr/local/share/man/man8/radosgw.8
+-- Installing: /usr/local/share/man/man8/radosgw-admin.8
+-- Installing: /usr/local/share/man/man8/rgw-orphan-list.8
+-- Installing: /usr/local/share/man/man8/rgw-policy-check.8
+-- Installing: /usr/local/share/man/man8/ceph-diff-sorted.8
+-- Installing: /usr/local/share/man/man8/ceph-rbdnamer.8
+-- Installing: /usr/local/share/man/man8/rbd-mirror.8
+-- Installing: /usr/local/share/man/man8/rbd-replay-many.8
+-- Installing: /usr/local/share/man/man8/rbd-replay-prep.8
+-- Installing: /usr/local/share/man/man8/rbd-replay.8
+-- Installing: /usr/local/share/man/man8/rbdmap.8
+-- Installing: /usr/local/share/man/man8/rbd.8
+-- Installing: /usr/local/share/man/man8/rbd-nbd.8
+-- Installing: /usr/local/share/man/man8/ceph-immutable-object-cache.8
+-- Installing: /usr/lib/systemd/system/ceph-crash.service
+-- Installing: /usr/lib/systemd/system/ceph-fuse@.service
+-- Installing: /usr/lib/systemd/system/ceph-mds@.service
+-- Installing: /usr/lib/systemd/system/ceph-mgr@.service
+-- Installing: /usr/lib/systemd/system/ceph-mon@.service
+-- Installing: /usr/lib/systemd/system/ceph-osd@.service
+-- Installing: /usr/lib/systemd/system/ceph-radosgw@.service
+-- Installing: /usr/lib/systemd/system/ceph-rbd-mirror@.service
+-- Installing: /usr/lib/systemd/system/ceph-immutable-object-cache@.service
+-- Installing: /usr/lib/systemd/system/cephfs-mirror@.service
+-- Installing: /usr/lib/systemd/system/rbdmap.service
+-- Installing: /usr/lib/systemd/system/ceph.target
+-- Installing: /usr/lib/systemd/system/ceph-fuse.target
+-- Installing: /usr/lib/systemd/system/ceph-osd.target
+-- Installing: /usr/lib/systemd/system/ceph-mgr.target
+-- Installing: /usr/lib/systemd/system/ceph-mon.target
+-- Installing: /usr/lib/systemd/system/ceph-mds.target
+-- Installing: /usr/lib/systemd/system/ceph-radosgw.target
+-- Installing: /usr/lib/systemd/system/ceph-rbd-mirror.target
+-- Installing: /usr/lib/systemd/system/ceph-immutable-object-cache.target
+-- Installing: /usr/lib/systemd/system/ceph-volume@.service
+-- Installing: /usr/lib/systemd/system/cephfs-mirror.target
+[root@7e5d7275e145 build]#
