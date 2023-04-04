@@ -46,3 +46,45 @@ git tag -d v15.2.17
 git push origin v15.2.17
 
 
+ceph 15.2.17
+
+build:
+close mrg,dashboard in build/CMakeCache.txt
+
+
+基准测试:
+https://blog.csdn.net/bandaoyu/article/details/114292690
+使用命令patchelf   修改工具依赖的动态库位置。避免和项目正在使用的库冲突: https://blog.csdn.net/bandaoyu/article/details/113181179
+doc/dev/messenger.rst
+perf_msgr_client.cc -> ceph_perf_msgr_client
+perf_msgr_server.cc -> ceph_perf_msgr_server
+
+
+perf_msgr_client.cc -> main
+
+
+编译rdma:
+./do_cmake.sh -DCMAKE_INSTALL_PREFIX=/usr -DWITH_RDMA=ON
+cd build
+cmake ..
+CMakeLists.txt
+  
+
+
+qa:
+
+启动虚拟集群: https://docs.ceph.com/en/quincy/dev/dev_cluster_deployement/
+
+CMakeCache.txt
+ON/OFF
+address sanitizer
+
+docker run -it -d --privileged --cap-add=ALL --name centos7  -p 22223:22 -p 6666:6666 -v /home/xb/project/stor/ceph/xb/docker/ceph:/home/xb/project/stor/ceph/xb/docker/ceph ceph_centos7:v15.2.17
+docker exec -u root -it centos7 bash -c 'cd /home/xb/project/stor/ceph/xb/docker/ceph;exec "${SHELL:-sh}"'
+
+
+gdb:
+cd /home/xb/project/stor/ceph/xb/docker/ceph/build/bin
+bash gdb_s.sh
+b main
+r

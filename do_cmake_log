@@ -1,0 +1,708 @@
+[root@e55c6c0bfdaa ceph]# ./do_cmake.sh 
++ git submodule update --init --recursive
++ : build
++ : ..
++ '[' -e build ']'
++ PYBUILD=2
++ '[' -r /etc/os-release ']'
++ source /etc/os-release
+++ NAME='CentOS Linux'
+++ VERSION='7 (Core)'
+++ ID=centos
+++ ID_LIKE='rhel fedora'
+++ VERSION_ID=7
+++ PRETTY_NAME='CentOS Linux 7 (Core)'
+++ ANSI_COLOR='0;31'
+++ CPE_NAME=cpe:/o:centos:centos:7
+++ HOME_URL=https://www.centos.org/
+++ BUG_REPORT_URL=https://bugs.centos.org/
+++ CENTOS_MANTISBT_PROJECT=CentOS-7
+++ CENTOS_MANTISBT_PROJECT_VERSION=7
+++ REDHAT_SUPPORT_PRODUCT=centos
+++ REDHAT_SUPPORT_PRODUCT_VERSION=7
++ case "$ID" in
+++ echo 7
+++ sed -e 's/\..*$//'
++ MAJOR_VER=7
++ '[' 7 -ge 8 ']'
++ [[ 2 =~ ^3(\..*)?$ ]]
++ type ccache
++ mkdir build
++ cd build
++ type cmake3
++ CMAKE=cmake
++ cmake ..
+-- The CXX compiler identification is GNU 11.2.1
+-- The C compiler identification is GNU 11.2.1
+-- The ASM compiler identification is GNU
+-- Found assembler: /usr/bin/cc
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - found
+-- Found Threads: TRUE  
+-- Looking for fallocate
+-- Looking for fallocate - found
+-- Looking for posix_fadvise
+-- Looking for posix_fadvise - found
+-- Looking for posix_fallocate
+-- Looking for posix_fallocate - found
+-- Looking for syncfs
+-- Looking for syncfs - found
+-- Looking for sync_file_range
+-- Looking for sync_file_range - found
+-- Looking for pwritev
+-- Looking for pwritev - found
+-- Looking for splice
+-- Looking for splice - found
+-- Looking for getgrouplist
+-- Looking for getgrouplist - found
+-- Looking for fdatasync
+-- Looking for fdatasync - found
+-- Looking for strerror_r
+-- Looking for strerror_r - found
+-- Looking for name_to_handle_at
+-- Looking for name_to_handle_at - found
+-- Looking for pipe2
+-- Looking for pipe2 - found
+-- Looking for accept4
+-- Looking for accept4 - found
+-- Looking for sigdescr_np
+-- Looking for sigdescr_np - not found
+-- Looking for pthread_spin_init
+-- Looking for pthread_spin_init - found
+-- Looking for pthread_set_name_np
+-- Looking for pthread_set_name_np - not found
+-- Looking for pthread_get_name_np
+-- Looking for pthread_get_name_np - not found
+-- Looking for pthread_setname_np
+-- Looking for pthread_setname_np - found
+-- Looking for pthread_getname_np
+-- Looking for pthread_getname_np - found
+-- Looking for pthread_rwlockattr_setkind_np
+-- Looking for pthread_rwlockattr_setkind_np - found
+-- Looking for eventfd
+-- Looking for eventfd - found
+-- Looking for getprogname
+-- Looking for getprogname - not found
+-- Looking for gettid
+-- Looking for gettid - not found
+-- Looking for include file linux/types.h
+-- Looking for include file linux/types.h - found
+-- Looking for include file linux/version.h
+-- Looking for include file linux/version.h - found
+-- Looking for include file arpa/nameser_compat.h
+-- Looking for include file arpa/nameser_compat.h - found
+-- Looking for include file sys/mount.h
+-- Looking for include file sys/mount.h - found
+-- Looking for include file sys/param.h
+-- Looking for include file sys/param.h - found
+-- Looking for include file sys/types.h
+-- Looking for include file sys/types.h - found
+-- Looking for include file sys/vfs.h
+-- Looking for include file sys/vfs.h - found
+-- Looking for include file sys/prctl.h
+-- Looking for include file sys/prctl.h - found
+-- Looking for include file execinfo.h
+-- Looking for include file execinfo.h - found
+-- Looking for include file sched.h
+-- Looking for include file sched.h - found
+-- Looking for include file valgrind/helgrind.h
+-- Looking for include file valgrind/helgrind.h - not found
+-- Looking for stdint.h
+-- Looking for stdint.h - found
+-- Looking for stddef.h
+-- Looking for stddef.h - found
+-- Check size of __u8
+-- Check size of __u8 - done
+-- Check size of __u16
+-- Check size of __u16 - done
+-- Check size of __u32
+-- Check size of __u32 - done
+-- Check size of __u64
+-- Check size of __u64 - done
+-- Check size of __s8
+-- Check size of __s8 - done
+-- Check size of __s16
+-- Check size of __s16 - done
+-- Check size of __s32
+-- Check size of __s32 - done
+-- Check size of __s64
+-- Check size of __s64 - done
+-- Looking for _POSIX_TIMERS
+-- Looking for _POSIX_TIMERS - found
+-- Looking for res_nquery
+-- Looking for res_nquery - found
+-- Looking for F_SETPIPE_SZ
+-- Looking for F_SETPIPE_SZ - found
+-- Looking for __func__
+-- Looking for __func__ - found
+-- Looking for __PRETTY_FUNCTION__
+-- Looking for __PRETTY_FUNCTION__ - found
+-- Looking for getentropy
+-- Looking for getentropy - not found
+-- Performing Test STRERROR_R_CHAR_P
+-- Performing Test STRERROR_R_CHAR_P - Success
+-- Performing Test HAVE_STAT_ST_MTIM_TV_NSEC
+-- Performing Test HAVE_STAT_ST_MTIM_TV_NSEC - Success
+-- Performing Test HAVE_STAT_ST_MTIMESPEC_TV_NSEC
+-- Performing Test HAVE_STAT_ST_MTIMESPEC_TV_NSEC - Failed
+-- Performing Test HAVE_UNALIGNED_ACCESS
+-- Performing Test HAVE_UNALIGNED_ACCESS - Success
+-- Performing Test HAVE_CXX11_ATOMIC
+-- Performing Test HAVE_CXX11_ATOMIC - Success
+-- Found verbs: /usr/lib64/libibverbs.so  
+-- Performing Test HAVE_IBV_EXP
+-- Performing Test HAVE_IBV_EXP - Failed
+-- Found rdmacm: /usr/lib64/librdmacm.so  
+-- Looking for backtrace
+-- Looking for backtrace - found
+-- backtrace facility detected in default set of libraries
+-- Found Backtrace: /usr/include  
+-- Found udev: /usr/lib64/libudev.so  
+-- Found blkid: /usr/lib64/libblkid.so  
+-- Found keyutils: /usr/lib64/libkeyutils.so  
+-- Found OpenLdap: /usr/include  
+-- Found FUSE: /usr/lib64/libfuse.so (found version "2.9") 
+-- Could NOT find xfs (missing: XFS_LIBRARIES XFS_INCLUDE_DIR) 
+-- Found aio: /lib64/libaio.so  
+CMake Warning (dev) at /usr/local/share/cmake-3.26/Modules/CMakeDependentOption.cmake:89 (message):
+  Policy CMP0127 is not set: cmake_dependent_option() supports full Condition
+  Syntax.  Run "cmake --help-policy CMP0127" for policy details.  Use the
+  cmake_policy command to set the policy and suppress this warning.
+Call Stack (most recent call first):
+  CMakeLists.txt:208 (CMAKE_DEPENDENT_OPTION)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found leveldb: /lib64/libleveldb.so  
+-- Found snappy: /lib64/libsnappy.so  
+-- Found LZ4: /usr/lib64/liblz4.so (found suitable version "1.8.3", minimum required is "1.7") 
+-- Could NOT find gperftools (missing: GPERFTOOLS_INCLUDE_DIR) 
+-- Could NOT find JeMalloc (missing: JEMALLOC_LIBRARIES JEMALLOC_INCLUDE_DIR) 
+CMake Warning at CMakeLists.txt:307 (message):
+  tcmalloc and jemalloc not found, falling back to libc
+
+
+-- Found CURL: /usr/lib64/libcurl.so (found version "7.29.0")  
+-- Looking for curl_multi_wait
+-- Looking for curl_multi_wait - found
+-- Found OpenSSL: /usr/lib64/libcrypto.so (found version "1.0.2k")  
+-- Found EXPAT: /usr/lib64/libexpat.so (found version "2.1.0") 
+-- Found OATH: /usr/lib64/liboath.so  
+-- ssl soname: libssl.so.10
+-- crypto soname: libcrypto.so.10
+-- Found Python3: /usr/bin/python3.6 (found suitable version "3.6.8", minimum required is "3") found components: Interpreter Development 
+-- Found ZLIB: /usr/lib64/libz.so (found version "1.2.7")  
+-- Found LTTngUST: /usr/lib64/liblttng-ust.so;dl (found version "2.4.1") 
+-- Found babeltrace: /usr/include  
+-- BUILDING Boost Libraries at j 1
+-- boost will be downloaded...
+CMake Warning (dev) at /usr/local/share/cmake-3.26/Modules/ExternalProject.cmake:3091 (message):
+  The DOWNLOAD_EXTRACT_TIMESTAMP option was not given and policy CMP0135 is
+  not set.  The policy's OLD behavior will be used.  When using a URL
+  download, the timestamps of extracted files should preferably be that of
+  the time of extraction, otherwise code that depends on the extracted
+  contents might not be rebuilt if the URL changes.  The OLD behavior
+  preserves the timestamps from the archive instead, but this is usually not
+  what you want.  Update your project to the NEW behavior or specify the
+  DOWNLOAD_EXTRACT_TIMESTAMP option with a value of true to avoid this
+  robustness issue.
+Call Stack (most recent call first):
+  /usr/local/share/cmake-3.26/Modules/ExternalProject.cmake:4208 (_ep_add_download_command)
+  cmake/modules/BuildBoost.cmake:169 (ExternalProject_Add)
+  cmake/modules/BuildBoost.cmake:185 (do_build_boost)
+  CMakeLists.txt:596 (build_boost)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found Boost: /home/xb/project/stor/ceph/xb/docker/ceph/build/boost/include  
+-- Found StdFilesystem: stdc++fs  
+-- Performing Test COMPILER_SUPPORTS_PESSIMIZING_MOVE
+-- Performing Test COMPILER_SUPPORTS_PESSIMIZING_MOVE - Success
+-- Performing Test COMPILER_SUPPORTS_REDUNDANT_MOVE
+-- Performing Test COMPILER_SUPPORTS_REDUNDANT_MOVE - Success
+-- Performing Test HAS_FORTIFY_SOURCE
+-- Performing Test HAS_FORTIFY_SOURCE - Success
+-- Performing Test HAS_STACK_PROTECT
+-- Performing Test HAS_STACK_PROTECT - Success
+-- Performing Test HAS_GLIBCXX_ASSERTIONS
+-- Performing Test HAS_GLIBCXX_ASSERTIONS - Success
+-- Performing Test HAVE_INTEL_SSE
+-- Performing Test HAVE_INTEL_SSE - Success
+-- Performing Test HAVE_INTEL_SSE2
+-- Performing Test HAVE_INTEL_SSE2 - Success
+-- Performing Test HAVE_INTEL_SSE3
+-- Performing Test HAVE_INTEL_SSE3 - Success
+-- Performing Test HAVE_INTEL_SSSE3
+-- Performing Test HAVE_INTEL_SSSE3 - Success
+-- Performing Test HAVE_INTEL_PCLMUL
+-- Performing Test HAVE_INTEL_PCLMUL - Success
+-- Performing Test HAVE_INTEL_SSE4_1
+-- Performing Test HAVE_INTEL_SSE4_1 - Success
+-- Performing Test HAVE_INTEL_SSE4_2
+-- Performing Test HAVE_INTEL_SSE4_2 - Success
+-- Could NOT find Yasm
+-- Performing Test HAVE_STDLIB_MAP_SPLICING
+-- Performing Test HAVE_STDLIB_MAP_SPLICING - Success
+-- Performing Test COMPILER_SUPPORTS_DIAGNOSTICS_COLOR
+-- Performing Test COMPILER_SUPPORTS_DIAGNOSTICS_COLOR - Success
+-- Could not find fmt, will build it
+-- Version: 5.3.1
+-- Build type: Debug
+-- CXX_STANDARD: 17
+-- Performing Test has_std_17_flag
+-- Performing Test has_std_17_flag - Success
+-- Performing Test has_std_1z_flag
+-- Performing Test has_std_1z_flag - Success
+-- Performing Test SUPPORTS_VARIADIC_TEMPLATES
+-- Performing Test SUPPORTS_VARIADIC_TEMPLATES - Success
+-- Performing Test SUPPORTS_INITIALIZER_LIST
+-- Performing Test SUPPORTS_INITIALIZER_LIST - Success
+-- Performing Test SUPPORTS_ENUM_BASE
+-- Performing Test SUPPORTS_ENUM_BASE - Success
+-- Performing Test SUPPORTS_TYPE_TRAITS
+-- Performing Test SUPPORTS_TYPE_TRAITS - Success
+-- Performing Test SUPPORTS_USER_DEFINED_LITERALS
+-- Performing Test SUPPORTS_USER_DEFINED_LITERALS - Success
+-- Looking for open
+-- Looking for open - found
+-- Performing Test HAS_VTA
+-- Performing Test HAS_VTA - Success
+CMake Deprecation Warning at src/lua/CMakeLists.txt:8 (cmake_minimum_required):
+  Compatibility with CMake < 2.8.12 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+-- Found Cython: 0.28  
+bash: jq: command not found
+-- Performing Test HAS_WARNING_STRINGOP_TRUNCATION
+-- Performing Test HAS_WARNING_STRINGOP_TRUNCATION - Success
+-- Performing Test HAS_WARNING_DEPRECATED_COPY
+-- Performing Test HAS_WARNING_DEPRECATED_COPY - Success
+-- Performing Test HAS_WARNING_PESSIMIZING_MOVE
+-- Performing Test HAS_WARNING_PESSIMIZING_MOVE - Success
+-- Found Python: /usr/bin/python3.6 (found version "3.6.8") found components: Interpreter 
+-- Looking for wsyncup in /usr/lib64/libcurses.so
+-- Looking for wsyncup in /usr/lib64/libcurses.so - found
+-- Looking for cbreak in /usr/lib64/libncurses.so
+-- Looking for cbreak in /usr/lib64/libncurses.so - found
+-- Looking for nodelay in /usr/lib64/libncurses.so
+-- Looking for nodelay in /usr/lib64/libncurses.so - found
+-- Found Curses: /usr/lib64/libncurses.so  
+-- Found nl: /usr/lib64/libnl-3.so  
+-- Checking for module 'libcap-ng'
+--   Found libcap-ng, version 0.7.5
+-- Found RabbitMQ: /usr/include  
+-- Checking for one of the modules 'rdkafka'
+-- Found RDKafka: /usr/include (found suitable version "0.11.5", minimum required is "0.9.2") 
+-- exclude following files under src: *.js;*.css;civetweb;erasure-code/jerasure/jerasure;erasure-code/jerasure/gf-complete;rocksdb;googletest;spdk;xxHash;isa-l;lua;zstd;crypto/isa-l/isa-l_crypto;blkin;rapidjson;dmclock;seastar;fmt;c-ares;spawn;pybind/mgr/rook/rook-client-python
+-- Configuring done (10.7s)
+CMake Warning (dev) at cmake/modules/BuildBoost.cmake:270 (_add_library):
+  Policy CMP0115 is not set: Source file extensions must be explicit.  Run
+  "cmake --help-policy CMP0115" for policy details.  Use the cmake_policy
+  command to set the policy and suppress this warning.
+
+  File:
+
+    /home/xb/project/stor/ceph/xb/docker/ceph/src/rgw/rgw_oidc_provider.cc
+Call Stack (most recent call first):
+  src/rgw/CMakeLists.txt:163 (add_library)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Generating done (1.8s)
+-- Build files have been written to: /home/xb/project/stor/ceph/xb/docker/ceph/build
++ set +x
+done.
+
+****
+WARNING: do_cmake.sh now creates debug builds by default. Performance
+may be severely affected. Please use -DCMAKE_BUILD_TYPE=RelWithDebInfo
+if a performance sensitive build is required.
+****
+
+
+
+
+
+
+
+
+[root@e55c6c0bfdaa ceph]# cd build
+[root@e55c6c0bfdaa build]# make -j 4
+[  0%] Creating directories for 'Boost'
+[  0%] generating /home/xb/project/stor/ceph/xb/docker/ceph/build/include/tracing/oprequest.h
+[  0%] Building C object src/common/CMakeFiles/common_utf8.dir/utf8.c.o
+[  1%] Building C object src/common/CMakeFiles/common_mountcephfs_objs.dir/armor.c.o
+[  1%] Performing download step (download, verify and extract) for 'Boost'
+-- Downloading...
+   dst='/home/xb/project/stor/ceph/xb/docker/ceph/build/boost/src/boost_1_72_0.tar.bz2'
+   timeout='none'
+   inactivity timeout='none'
+-- Using src='https://boostorg.jfrog.io/artifactory/main/release/1.72.0/source/boost_1_72_0.tar.bz2'
+[  1%] Built target oprequest-tp
+[  1%] generating /home/xb/project/stor/ceph/xb/docker/ceph/build/include/tracing/librados.h
+[  1%] Building C object src/common/CMakeFiles/common_mountcephfs_objs.dir/safe_io.c.o
+[  1%] Linking C static library ../../lib/libcommon_utf8.a
+[  1%] Built target librados-tp
+[  1%] Building C object src/erasure-code/jerasure/CMakeFiles/gf-complete_objs.dir/gf-complete/src/gf_cpu.c.o
+[  1%] Built target common_utf8
+[  1%] Creating directories for 'rocksdb_ext'
+[  1%] No download step for 'rocksdb_ext'
+[  1%] No update step for 'rocksdb_ext'
+[  1%] Building C object src/erasure-code/jerasure/CMakeFiles/gf-complete_objs.dir/gf-complete/src/gf_wgen.c.o
+[  1%] Building C object src/common/CMakeFiles/common_mountcephfs_objs.dir/module.c.o
+[  1%] No patch step for 'rocksdb_ext'
+[  1%] Performing configure step for 'rocksdb_ext'
+[  1%] Building C object src/common/CMakeFiles/common_mountcephfs_objs.dir/addr_parsing.c.o
+-- The C compiler identification is GNU 11.2.1
+[  1%] Built target common_mountcephfs_objs
+[  1%] Building C object src/erasure-code/jerasure/CMakeFiles/gf-complete_objs.dir/gf-complete/src/gf_w16.c.o
+[  1%] generating /home/xb/project/stor/ceph/xb/docker/ceph/build/include/tracing/bluestore.h
+[  1%] Built target bluestore-tp
+[  1%] Building C object src/erasure-code/jerasure/CMakeFiles/gf-complete_objs.dir/gf-complete/src/gf.c.o
+-- The CXX compiler identification is GNU 11.2.1
+-- Detecting C compiler ABI info
+[  1%] generating /home/xb/project/stor/ceph/xb/docker/ceph/build/include/tracing/objectstore.h
+[  1%] Built target objectstore-tp
+[  1%] Creating directories for 'zstd_ext'
+[  1%] No download step for 'zstd_ext'
+[  2%] No update step for 'zstd_ext'
+-- Detecting C compiler ABI info - done
+[  2%] No patch step for 'zstd_ext'
+[  2%] Performing configure step for 'zstd_ext'
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+CMake Deprecation Warning at CMakeLists.txt:10 (cmake_minimum_required):
+  Compatibility with CMake < 2.8.12 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+[  2%] Building C object src/erasure-code/jerasure/CMakeFiles/gf-complete_objs.dir/gf-complete/src/gf_w32.c.o
+-- Detecting CXX compiler ABI info
+-- The C compiler identification is GNU 11.2.1
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- The ASM compiler identification is GNU
+-- Found assembler: /usr/bin/cc
+-- Found snappy: /lib64/libsnappy.so  
+-- The CXX compiler identification is GNU 11.2.1
+-- Detecting C compiler ABI info
+-- Found ZLIB: /usr/lib64/libz.so (found version "1.2.7")  
+-- Found lz4: /usr/lib64/liblz4.so  
+-- Found Git: /usr/bin/git (found version "1.8.3.1") 
+Unknown option: -C
+usage: git [--version] [--help] [-c name=value]
+           [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]
+           [-p|--paginate|--no-pager] [--no-replace-objects] [--bare]
+           [--git-dir=<path>] [--work-tree=<path>] [--namespace=<name>]
+           <command> [<args>]
+-- Performing Test HAVE_SSE42
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Performing Test HAVE_SSE42 - Success
+-- Performing Test HAVE_THREAD_LOCAL
+-- Detecting CXX compiler ABI info - done
+[  2%] Building C object src/erasure-code/jerasure/CMakeFiles/gf-complete_objs.dir/gf-complete/src/gf_w64.c.o
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- ZSTD VERSION: 1.4.0
+-- Setting build type to 'Release' as none was specified.
+-- Performing Test CXX_FLAG_STD_CPLUSPLUS11
+-- Performing Test HAVE_THREAD_LOCAL - Success
+-- Enabling RTTI
+-- Performing Test HAVE_FALLOCATE
+-- Performing Test CXX_FLAG_STD_CPLUSPLUS11 - Success
+-- Performing Test C_FLAG_STD_C99
+-- Performing Test HAVE_FALLOCATE - Success
+-- Performing Test HAVE_SYNC_FILE_RANGE_WRITE
+-- Performing Test C_FLAG_STD_C99 - Success
+-- Performing Test C_FLAG_WALL
+-- Performing Test C_FLAG_WALL - Success
+-- Performing Test CXX_FLAG_WALL
+-- Performing Test HAVE_SYNC_FILE_RANGE_WRITE - Success
+-- Performing Test HAVE_PTHREAD_MUTEX_ADAPTIVE_NP
+[  2%] Building C object src/erasure-code/jerasure/CMakeFiles/gf-complete_objs.dir/gf-complete/src/gf_w128.c.o
+-- Performing Test CXX_FLAG_WALL - Success
+-- Performing Test C_FLAG_WEXTRA
+-- Performing Test HAVE_PTHREAD_MUTEX_ADAPTIVE_NP - Success
+-- Looking for malloc_usable_size
+-- Performing Test C_FLAG_WEXTRA - Success
+-- Performing Test CXX_FLAG_WEXTRA
+-- Looking for malloc_usable_size - found
+-- Looking for sched_getcpu
+-- Performing Test CXX_FLAG_WEXTRA - Success
+-- Performing Test C_FLAG_WUNDEF
+[  2%] Building C object src/erasure-code/jerasure/CMakeFiles/gf-complete_objs.dir/gf-complete/src/gf_general.c.o
+-- Performing Test C_FLAG_WUNDEF - Success
+-- Performing Test CXX_FLAG_WUNDEF
+-- Looking for sched_getcpu - found
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+[  2%] Building C object src/erasure-code/jerasure/CMakeFiles/gf-complete_objs.dir/gf-complete/src/gf_w4.c.o
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Performing Test CXX_FLAG_WUNDEF - Success
+-- Performing Test C_FLAG_WSHADOW
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Performing Test C_FLAG_WSHADOW - Success
+-- Performing Test CXX_FLAG_WSHADOW
+-- Looking for pthread_create in pthread - found
+-- Found Threads: TRUE  
+-- JNI library is disabled
+-- Performing Test CXX_FLAG_WSHADOW - Success
+-- Performing Test C_FLAG_WCAST_ALIGN
+-- Configuring done (1.3s)
+-- Performing Test C_FLAG_WCAST_ALIGN - Success
+-- Performing Test CXX_FLAG_WCAST_ALIGN
+[  2%] Building C object src/erasure-code/jerasure/CMakeFiles/gf-complete_objs.dir/gf-complete/src/gf_rand.c.o
+[  2%] Building C object src/erasure-code/jerasure/CMakeFiles/gf-complete_objs.dir/gf-complete/src/gf_w8.c.o
+-- Performing Test CXX_FLAG_WCAST_ALIGN - Success
+-- Performing Test C_FLAG_WCAST_QUAL
+-- Performing Test C_FLAG_WCAST_QUAL - Success
+-- Performing Test CXX_FLAG_WCAST_QUAL
+-- Performing Test CXX_FLAG_WCAST_QUAL - Success
+-- Performing Test C_FLAG_WSTRICT_PROTOTYPES
+[  2%] Built target gf-complete_objs
+-- Performing Test C_FLAG_WSTRICT_PROTOTYPES - Success
+-- CMAKE_INSTALL_PREFIX: /usr/local
+-- CMAKE_INSTALL_LIBDIR: lib64
+-- ZSTD_LEGACY_SUPPORT not defined!
+-- ZSTD_MULTITHREAD_SUPPORT is enabled
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+[  3%] generating /home/xb/project/stor/ceph/xb/docker/ceph/build/include/tracing/osd.h
+[  3%] Built target osd-tp
+[  3%] generating /home/xb/project/stor/ceph/xb/docker/ceph/build/include/tracing/pg.h
+[  3%] Built target pg-tp
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Check if compiler accepts -pthread
+[  3%] Building C object src/lua/CMakeFiles/liblua.dir/src/lapi.c.o
+-- Generating done (0.4s)
+-- Check if compiler accepts -pthread - yes
+-- Found Threads: TRUE  
+-- Build files have been written to: /home/xb/project/stor/ceph/xb/docker/ceph/build/src/rocksdb
+-- Configuring done (1.4s)
+[  3%] Performing build step for 'rocksdb_ext'
+-- Generating done (0.0s)
+-- Build files have been written to: /home/xb/project/stor/ceph/xb/docker/ceph/build/src/compressor/zstd/libzstd
+[  3%] Performing build step for 'zstd_ext'
+gmake[3]: warning: jobserver unavailable: using -j1.  Add `+' to parent make rule.
+[  3%] Building C object src/lua/CMakeFiles/liblua.dir/src/lcode.c.o
+[  3%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/common/entropy_common.c.o
+[  0%] Building CXX object CMakeFiles/build_version.dir/build_version.cc.o
+[  0%] Built target build_version
+[  0%] Building CXX object CMakeFiles/rocksdb.dir/cache/clock_cache.cc.o
+[  6%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/common/fse_decompress.c.o
+[  3%] Building C object src/lua/CMakeFiles/liblua.dir/src/lctype.c.o
+[  3%] Building C object src/lua/CMakeFiles/liblua.dir/src/ldebug.c.o
+[  3%] Building C object src/lua/CMakeFiles/liblua.dir/src/ldo.c.o
+[ 10%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/common/threading.c.o
+[  3%] Building C object src/lua/CMakeFiles/liblua.dir/src/ldump.c.o
+[ 13%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/common/pool.c.o
+[  3%] Building C object src/lua/CMakeFiles/liblua.dir/src/lfunc.c.o
+[  3%] Building C object src/lua/CMakeFiles/liblua.dir/src/lgc.c.o
+[ 17%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/common/zstd_common.c.o
+[  0%] Building CXX object CMakeFiles/rocksdb.dir/cache/lru_cache.cc.o
+[ 20%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/common/error_private.c.o
+[ 24%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/common/xxhash.c.o
+[  3%] Building C object src/lua/CMakeFiles/liblua.dir/src/llex.c.o
+[  3%] Building C object src/lua/CMakeFiles/liblua.dir/src/lmem.c.o
+[  3%] Building C object src/lua/CMakeFiles/liblua.dir/src/lobject.c.o
+[ 27%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/compress/hist.c.o
+[  3%] Building C object src/lua/CMakeFiles/liblua.dir/src/lopcodes.c.o
+[  3%] Building C object src/lua/CMakeFiles/liblua.dir/src/lparser.c.o
+[ 31%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/compress/fse_compress.c.o
+[  3%] Building C object src/lua/CMakeFiles/liblua.dir/src/lstate.c.o
+[  4%] Building C object src/lua/CMakeFiles/liblua.dir/src/lstring.c.o
+[  4%] Building C object src/lua/CMakeFiles/liblua.dir/src/ltable.c.o
+[  4%] Building C object src/lua/CMakeFiles/liblua.dir/src/ltm.c.o
+[ 34%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/compress/huf_compress.c.o
+[  4%] Building C object src/lua/CMakeFiles/liblua.dir/src/lundump.c.o
+[  0%] Building CXX object CMakeFiles/rocksdb.dir/cache/sharded_cache.cc.o
+[  4%] Building C object src/lua/CMakeFiles/liblua.dir/src/lvm.c.o
+[  4%] Building C object src/lua/CMakeFiles/liblua.dir/src/lzio.c.o
+[  4%] Building C object src/lua/CMakeFiles/liblua.dir/src/lauxlib.c.o
+[  4%] Building C object src/lua/CMakeFiles/liblua.dir/src/lbaselib.c.o
+[ 37%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/compress/zstd_compress.c.o
+[  0%] Building CXX object CMakeFiles/rocksdb.dir/db/builder.cc.o
+[  4%] Building C object src/lua/CMakeFiles/liblua.dir/src/lbitlib.c.o
+[  4%] Building C object src/lua/CMakeFiles/liblua.dir/src/lcorolib.c.o
+[  4%] Building C object src/lua/CMakeFiles/liblua.dir/src/ldblib.c.o
+[  4%] Building C object src/lua/CMakeFiles/liblua.dir/src/liolib.c.o
+[  4%] Building C object src/lua/CMakeFiles/liblua.dir/src/lmathlib.c.o
+[  4%] Building C object src/lua/CMakeFiles/liblua.dir/src/loslib.c.o
+[  4%] Building C object src/lua/CMakeFiles/liblua.dir/src/lstrlib.c.o
+[  4%] Building C object src/lua/CMakeFiles/liblua.dir/src/ltablib.c.o
+[  4%] Building C object src/lua/CMakeFiles/liblua.dir/src/linit.c.o
+[  4%] Building C object src/lua/CMakeFiles/liblua.dir/src/lutf8lib.c.o
+[  4%] Building C object src/lua/CMakeFiles/liblua.dir/src/loadlib_rel.c.o
+[  4%] Linking C static library ../../lib/liblua.a
+[  4%] Built target liblua
+[  4%] Building C object src/common/CMakeFiles/parse_secret_objs.dir/secret.c.o
+/home/xb/project/stor/ceph/xb/docker/ceph/src/common/secret.c: In function ‘set_kernel_secret’:
+/home/xb/project/stor/ceph/xb/docker/ceph/src/common/secret.c:65:9: warning: ‘<unknown>’ may be used uninitialized [-Wmaybe-uninitialized]
+   65 |   ret = ceph_unarmor(payload, payload+sizeof(payload), secret, secret+secret_len);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /home/xb/project/stor/ceph/xb/docker/ceph/src/common/secret.c:23:
+/home/xb/project/stor/ceph/xb/docker/ceph/src/common/armor.h:14:5: note: by argument 2 of type ‘const char *’ to ‘ceph_unarmor’ declared here
+   14 | int ceph_unarmor(char *dst, const char *dst_end,
+      |     ^~~~~~~~~~~~
+[  4%] Built target parse_secret_objs
+[  4%] Building C object src/CMakeFiles/civetweb_common_objs.dir/civetweb/src/civetweb.c.o
+/home/xb/project/stor/ceph/xb/docker/ceph/src/civetweb/src/civetweb.c: In function ‘mg_get_system_info_impl’:
+/home/xb/project/stor/ceph/xb/docker/ceph/src/civetweb/src/civetweb.c:17261:32: warning: ‘-Werror’ is not an option that controls warnings [-Wpragmas]
+17261 | #pragma GCC diagnostic ignored "-Werror"
+      |                                ^~~~~~~~~
+[ 41%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/compress/zstdmt_compress.c.o
+[  4%] Built target civetweb_common_objs
+[  4%] Building C object src/tracing/CMakeFiles/osd_tp.dir/oprequest.c.o
+[  4%] Building C object src/tracing/CMakeFiles/osd_tp.dir/osd.c.o
+[ 44%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/compress/zstd_fast.c.o
+[  4%] Building C object src/tracing/CMakeFiles/osd_tp.dir/pg.c.o
+[  4%] Linking C shared library ../../lib/libosd_tp.so
+[  4%] Built target osd_tp
+[  4%] Building C object src/tracing/CMakeFiles/rados_tp.dir/librados.c.o
+[ 48%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/compress/zstd_double_fast.c.o
+[  0%] Building CXX object CMakeFiles/rocksdb.dir/db/c.cc.o
+[ 51%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/compress/zstd_lazy.c.o
+[  0%] Building CXX object CMakeFiles/rocksdb.dir/db/column_family.cc.o
+[  4%] Linking C shared library ../../lib/librados_tp.so
+[  4%] Built target rados_tp
+[  4%] Building C object src/tracing/CMakeFiles/os_tp.dir/objectstore.c.o
+[  4%] Linking C shared library ../../lib/libos_tp.so
+[  4%] Built target os_tp
+[  4%] Building C object src/tracing/CMakeFiles/bluestore_tp.dir/bluestore.c.o
+[  4%] Linking C shared library ../../lib/libbluestore_tp.so
+[  4%] Built target bluestore_tp
+[  4%] generating /home/xb/project/stor/ceph/xb/docker/ceph/build/include/tracing/rgw_op.h
+[  4%] Building C object src/tracing/CMakeFiles/rgw_op_tp.dir/rgw_op.c.o
+[  4%] Linking C shared library ../../lib/librgw_op_tp.so
+[  4%] Built target rgw_op_tp
+[  4%] generating /home/xb/project/stor/ceph/xb/docker/ceph/build/include/tracing/rgw_rados.h
+[  4%] Building C object src/tracing/CMakeFiles/rgw_rados_tp.dir/rgw_rados.c.o
+[  5%] Linking C shared library ../../lib/librgw_rados_tp.so
+[ 55%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/compress/zstd_opt.c.o
+[  5%] Built target rgw_rados_tp
+[  0%] Building CXX object CMakeFiles/rocksdb.dir/db/compacted_db_impl.cc.o
+[  5%] generating /home/xb/project/stor/ceph/xb/docker/ceph/build/include/tracing/librbd.h
+[  5%] Building C object src/tracing/CMakeFiles/rbd_tp.dir/librbd.c.o
+[  3%] Building CXX object CMakeFiles/rocksdb.dir/db/compaction.cc.o
+[  5%] Linking C shared library ../../lib/librbd_tp.so
+[  5%] Built target rbd_tp
+[  5%] generating mgr/rook/rook_client
++++ readlink -f ./generate_rook_ceph_client.sh
+++ dirname /home/xb/project/stor/ceph/xb/docker/ceph/src/pybind/mgr/rook/generate_rook_ceph_client.sh
++ script_location=/home/xb/project/stor/ceph/xb/docker/ceph/src/pybind/mgr/rook
++ cd /home/xb/project/stor/ceph/xb/docker/ceph/src/pybind/mgr/rook
++ rm -rf rook_client
++ cp -r ./rook-client-python/rook_client .
++ rm -rf rook_client/cassandra
++ rm -rf rook_client/edgefs
++ rm -rf rook_client/tests
+[  5%] Built target mgr-rook-client
+[  5%] keep civetweb.h up-to-date
+[  5%] Built target civetweb_h
+[  5%] Built target rgw_op-tp
+[  5%] Built target rgw_rados-tp
+[  5%] Built target librbd-tp
+[  5%] dashboard nodeenv is being installed
+/home/xb/project/stor/ceph/xb/docker/ceph/src/tools/setup-virtualenv.sh: line 60: virtualenv: command not found
+/home/xb/project/stor/ceph/xb/docker/ceph/src/tools/setup-virtualenv.sh: line 61: /home/xb/project/stor/ceph/xb/docker/ceph/build/src/pybind/mgr/dashboard/node-env/bin/activate: No such file or directory
+[  3%] Building CXX object CMakeFiles/rocksdb.dir/db/compaction_iterator.cc.o
+Collecting pip>=6.1
+[ 58%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/compress/zstd_ldm.c.o
+  Using cached https://files.pythonhosted.org/packages/6b/8b/0b16094553ecc680e43ded8f920c3873b01b1da79a54274c98f08cb29fca/pip-23.0.1.tar.gz
+[ 62%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/decompress/huf_decompress.c.o
+Command "python setup.py egg_info" failed with error code 1 in /tmp/pip-build-CJVUci/pip/
+Collecting tox>=2.9.1
+  Url 'file:///home/xb/project/stor/ceph/xb/docker/ceph/build/src/pybind/mgr/dashboard/wheelhouse' is ignored: it is neither a file nor a directory.
+[  3%] Building CXX object CMakeFiles/rocksdb.dir/db/compaction_job.cc.o
+[ 65%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/decompress/zstd_decompress.c.o
+  Using cached https://files.pythonhosted.org/packages/fc/d3/14e1c4605a38653848aa4c817067d0b70d17c9905d2f4c6455e97fb57a67/tox-4.4.8.tar.gz
+Command "python setup.py egg_info" failed with error code 1 in /tmp/pip-build-llx_EK/tox/
+/bin/sh: /home/xb/project/stor/ceph/xb/docker/ceph/build/src/pybind/mgr/dashboard/node-env/bin/pip: No such file or directory
+make[2]: *** [src/pybind/mgr/dashboard/node-env/bin/npm] Error 127
+make[1]: *** [src/pybind/mgr/dashboard/CMakeFiles/mgr-dashboard-nodeenv.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+[  3%] Building CXX object CMakeFiles/rocksdb.dir/db/compaction_picker.cc.o
+[ 68%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/decompress/zstd_decompress_block.c.o
+[ 72%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/decompress/zstd_ddict.c.o
+[ 75%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/dictBuilder/cover.c.o
+[ 79%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/dictBuilder/fastcover.c.o
+[ 82%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/dictBuilder/divsufsort.c.o
+[ 86%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/dictBuilder/zdict.c.o
+[  3%] Building CXX object CMakeFiles/rocksdb.dir/db/compaction_picker_fifo.cc.o
+[ 89%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/deprecated/zbuff_common.c.o
+[ 93%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/deprecated/zbuff_compress.c.o
+[ 96%] Building C object lib/CMakeFiles/libzstd_static.dir/home/xb/project/stor/ceph/xb/docker/ceph/src/zstd/lib/deprecated/zbuff_decompress.c.o
+[100%] Linking C static library libzstd.a
+[100%] Built target libzstd_static
+[  5%] Performing install step for 'zstd_ext'
+[  5%] Completed 'zstd_ext'
+[  5%] Built target zstd_ext
+[  3%] Building CXX object CMakeFiles/rocksdb.dir/db/compaction_picker_universal.cc.o
+[  3%] Building CXX object CMakeFiles/rocksdb.dir/db/convenience.cc.o
+[  6%] Building CXX object CMakeFiles/rocksdb.dir/db/db_filesnapshot.cc.o
+[  6%] Building CXX object CMakeFiles/rocksdb.dir/db/db_impl.cc.o
+[  6%] Building CXX object CMakeFiles/rocksdb.dir/db/db_impl_write.cc.o
+[  6%] Building CXX object CMakeFiles/rocksdb.dir/db/db_impl_compaction_flush.cc.o
+/home/xb/project/stor/ceph/xb/docker/ceph/src/rocksdb/db/db_impl_compaction_flush.cc: In member function ‘rocksdb::Status rocksdb::DBImpl::CompactFilesImpl(const rocksdb::CompactionOptions&, rocksdb::ColumnFamilyData*, rocksdb::Version*, const std::vector<std::basic_string<char> >&, std::vector<std::basic_string<char> >*, int, int, rocksdb::JobContext*, rocksdb::LogBuffer*, rocksdb::CompactionJobInfo*)’:
+/home/xb/project/stor/ceph/xb/docker/ceph/src/rocksdb/db/db_impl_compaction_flush.cc:1018:21: warning: loop variable ‘newf’ creates a copy from type ‘const std::pair<int, rocksdb::FileMetaData>’ [-Wrange-loop-construct]
+ 1018 |     for (const auto newf : c->edit()->GetNewFiles()) {
+      |                     ^~~~
+/home/xb/project/stor/ceph/xb/docker/ceph/src/rocksdb/db/db_impl_compaction_flush.cc:1018:21: note: use reference type to prevent copying
+ 1018 |     for (const auto newf : c->edit()->GetNewFiles()) {
+      |                     ^~~~
+      |                     &
+/home/xb/project/stor/ceph/xb/docker/ceph/src/rocksdb/db/db_impl_compaction_flush.cc: In member function ‘void rocksdb::DBImpl::NotifyOnCompactionBegin(rocksdb::ColumnFamilyData*, rocksdb::Compaction*, const rocksdb::Status&, const rocksdb::CompactionJobStats&, int)’:
+/home/xb/project/stor/ceph/xb/docker/ceph/src/rocksdb/db/db_impl_compaction_flush.cc:1110:21: warning: loop variable ‘newf’ creates a copy from type ‘const std::pair<int, rocksdb::FileMetaData>’ [-Wrange-loop-construct]
+ 1110 |     for (const auto newf : c->edit()->GetNewFiles()) {
+      |                     ^~~~
+/home/xb/project/stor/ceph/xb/docker/ceph/src/rocksdb/db/db_impl_compaction_flush.cc:1110:21: note: use reference type to prevent copying
+ 1110 |     for (const auto newf : c->edit()->GetNewFiles()) {
+      |                     ^~~~
+      |                     &
+[  6%] Building CXX object CMakeFiles/rocksdb.dir/db/db_impl_files.cc.o
+[  6%] Building CXX object CMakeFiles/rocksdb.dir/db/db_impl_open.cc.o
+[  6%] Building CXX object CMakeFiles/rocksdb.dir/db/db_impl_debug.cc.o
+[  6%] Building CXX object CMakeFiles/rocksdb.dir/db/db_impl_experimental.cc.o
+[ 10%] Building CXX object CMakeFiles/rocksdb.dir/db/db_impl_readonly.cc.o
+[ 10%] Building CXX object CMakeFiles/rocksdb.dir/db/db_impl_secondary.cc.o
+[ 10%] Building CXX object CMakeFiles/rocksdb.dir/db/db_info_dumper.cc.o
+[ 10%] Building CXX object CMakeFiles/rocksdb.dir/db/db_iter.cc.o
+^Cmake[6]: *** [CMakeFiles/rocksdb.dir/db/db_impl_readonly.cc.o] Interrupt
+make[6]: *** [CMakeFiles/rocksdb.dir/db/db_impl_secondary.cc.o] Interrupt
+make[6]: *** [CMakeFiles/rocksdb.dir/db/db_iter.cc.o] Interrupt
+make[5]: *** [CMakeFiles/rocksdb.dir/all] Interrupt
+make[4]: *** [CMakeFiles/rocksdb.dir/rule] Interrupt
+make[3]: *** [rocksdb] Interrupt
+make[2]: *** [boost/src/Boost-stamp/Boost-download] Interrupt
+make[1]: *** [CMakeFiles/Boost.dir/all] Interrupt
+make[2]: *** [src/rocksdb_ext-prefix/src/rocksdb_ext-stamp/rocksdb_ext-build] Interrupt
+make[1]: *** [src/CMakeFiles/rocksdb_ext.dir/all] Interrupt
+make: *** [all] Interrupt
+
+[root@e55c6c0bfdaa build]# 
