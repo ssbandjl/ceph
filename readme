@@ -1,4 +1,5 @@
-ceph 15.2.17
+https://github.com/ssbandjl/ceph/tree/v15.2.17
+https://github.com/ssbandjl/ceph/tree/main
 
 build:
 close mrg,dashboard in build/CMakeCache.txt
