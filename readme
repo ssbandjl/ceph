@@ -27,3 +27,21 @@ qa:
 启动虚拟集群: https://docs.ceph.com/en/quincy/dev/dev_cluster_deployement/
 
 docker:
+
+
+
+git
+git remote add upstream https://github.com/Foo/repos.git
+git pull upstream v15.2.17
+git remote remove upstream
+git remote add upstream https://github.com/Foo/repos.git
+git remote set-url upstream https://github.com/Foo/repos.git
+
+git push origin ：refs/tags/3.0 这就是明确告诉服务器删除的tag的分支,删除branch分支
+git push origin :refs/heads/3.0
+git branch -D testtag
+删除tag分支的方法：
+git tag -d v15.2.17
+git push origin v15.2.17
+
+
