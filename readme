@@ -82,6 +82,7 @@ prctl(PR_GET_NAME, buf)
 创建线程:
 pthread_create(&thread_id, thread_attr, _entry_func, (void*)this)
 
+
 打开日志文件: m_fd = ::open(m_log_file.c_str(), O_CREAT|O_WRONLY|O_APPEND|O_CLOEXEC, 0644)
 默认配置: Option("ms_type"
 默认开启RDMA: .set_default("async+rdma")
@@ -161,7 +162,3 @@ iwarp或ib(默认)
 
 连接后: worker->center.create_file_event(tcp_fd, EVENT_READABLE | EVENT_WRITABLE , established_handler)
 发送cm元数据: int Infiniband::QueuePair::send_cm_meta
-
-
-
-
