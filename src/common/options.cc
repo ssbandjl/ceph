@@ -871,7 +871,7 @@ std::vector<Option> get_global_options() {
 
     Option("ms_type", Option::TYPE_STR, Option::LEVEL_ADVANCED)
     .set_flag(Option::FLAG_STARTUP)
-    .set_default("async+posix")
+    .set_default("async+rdma")
     .set_description("Messenger implementation to use for network communication"),
 
     Option("ms_public_type", Option::TYPE_STR, Option::LEVEL_ADVANCED)

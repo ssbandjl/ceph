@@ -170,7 +170,7 @@ global_init(const std::map<std::string,std::string> *defaults,
   // Ensure we're not calling the global init functions multiple times.
   static bool first_run = true;
   if (run_pre_init) {
-    // We will run pre_init from here (default).
+    // We will run pre_init from here (default). 上下文为空且第一次执行
     ceph_assert(!g_ceph_context && first_run);
     global_pre_init(defaults, args, module_type, code_env, flags);
   } else {
