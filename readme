@@ -4,17 +4,12 @@ https://github.com/ssbandjl/ceph/tree/main
 build:
 close mrg,dashboard in build/CMakeCache.txt
 
-
-
-
 基准测试, 文档: messenger.rst
 https://blog.csdn.net/bandaoyu/article/details/114292690
 使用命令patchelf   修改工具依赖的动态库位置。避免和项目正在使用的库冲突: https://blog.csdn.net/bandaoyu/article/details/113181179
 doc/dev/messenger.rst
 perf_msgr_client.cc -> ceph_perf_msgr_client
 perf_msgr_server.cc -> ceph_perf_msgr_server
-
-
 
 perf_msgr_client.cc -> main
 
@@ -24,12 +19,9 @@ perf_msgr_client.cc -> main
 
 
 qa:
-
 启动虚拟集群: https://docs.ceph.com/en/quincy/dev/dev_cluster_deployement/
 
 docker:
-
-
 
 git
 git remote add upstream https://github.com/Foo/repos.git
@@ -44,9 +36,8 @@ git branch -D testtag
 删除tag分支的方法：
 git tag -d v15.2.17
 git push origin v15.2.17
+git config --global credential.helper "cache --timeout=604800"
 
-
-ceph 15.2.17
 
 build:
 close mrg,dashboard in build/CMakeCache.txt
@@ -69,10 +60,6 @@ cd build
 cmake ..
 CMakeLists.txt
   
-
-
-qa:
-
 启动虚拟集群: https://docs.ceph.com/en/quincy/dev/dev_cluster_deployement/
 
 CMakeCache.txt
@@ -82,9 +69,99 @@ address sanitizer
 docker run -it -d --privileged --cap-add=ALL --name centos7  -p 22223:22 -p 6666:6666 -v /home/xb/project/stor/ceph/xb/docker/ceph:/home/xb/project/stor/ceph/xb/docker/ceph ceph_centos7:v15.2.17
 docker exec -u root -it centos7 bash -c 'cd /home/xb/project/stor/ceph/xb/docker/ceph;exec "${SHELL:-sh}"'
 
-
 gdb:
 cd /home/xb/project/stor/ceph/xb/docker/ceph/build/bin
 bash gdb_s.sh
 b main
 r
+
+常用:
+获取线程名:
+prctl(PR_GET_NAME, buf)
+
+创建线程:
+pthread_create(&thread_id, thread_attr, _entry_func, (void*)this)
+
+打开日志文件: m_fd = ::open(m_log_file.c_str(), O_CREAT|O_WRONLY|O_APPEND|O_CLOEXEC, 0644)
+默认配置: Option("ms_type"
+默认开启RDMA: .set_default("async+rdma")
+配置文件: https://docs.ceph.com/en/latest/rados/configuration/ceph-conf/
+rdma堆栈:
+#0  NetworkStack::create (c=0x555555641870, t="rdma") at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/async/Stack.cc:67
+#1  0x00007fffeda53354 in StackSingleton::ready (this=0x5555556c6020, type="rdma") at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/async/AsyncMessenger.cc:257
+#2  0x00007fffeda4922a in AsyncMessenger::AsyncMessenger (this=0x5555556c3ef0, cct=0x555555641870, name=..., type="async+rdma", mname="server", _nonce=0)
+    at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/async/AsyncMessenger.cc:294
+#3  0x00007fffeda2ef0d in Messenger::create (cct=0x555555641870, type="async+rdma", name=..., lname="", nonce=0, cflags=0)
+    at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/Messenger.cc:46
+#4  0x00005555555a48ce in MessengerServer::MessengerServer (this=0x7fffffffdb50, t="async+rdma", addr="175.16.53.61:10001", threads=1, delay=0)
+    at /home/xb/project/stor/ceph/xb/docker/ceph/src/test/msgr/perf_msgr_server.cc:119
+#5  0x000055555559e8ce in main (argc=4, argv=0x7fffffffdfa8) at /home/xb/project/stor/ceph/xb/docker/ceph/src/test/msgr/perf_msgr_server.cc:173
+
+客户端流程:
+#0  AsyncMessenger::connect_to (this=0x5555556d87b0, type=4, addrs=..., anon=false, not_local_dest=false)
+    at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/async/AsyncMessenger.cc:719
+#1  0x00005555555abf60 in Messenger::connect_to_osd (this=0x5555556d87b0, dest=..., anon=false, not_local_dest=false)
+    at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/Messenger.h:548
+#2  0x00005555555b08d5 in MessengerClient::ready (this=0x7fffffffdc80, c=1, jobs=1, ops=1, msg_len=4096)
+    at /home/xb/project/stor/ceph/xb/docker/ceph/src/test/msgr/perf_msgr_client.cc:144
+#3  0x00005555555a7c43 in main (argc=7, argv=0x7fffffffdf48) at /home/xb/project/stor/ceph/xb/docker/ceph/src/test/msgr/perf_msgr_client.cc:212
+
+
+返回自动变量auto:  const auto& _lookup_conn
+要求(断言)已上锁: ceph_assert(ceph_mutex_is_locked(lock))
+
+建连接:
+(gdb) bt
+#0  AsyncConnection::connect (this=0x555555768760, addrs=..., type=4, target=...) at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/async/AsyncConnection.cc:478
+#1  0x00007fffeda4ca38 in AsyncMessenger::create_connect (this=0x5555556d87b0, addrs=..., type=4, anon=false)
+    at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/async/AsyncMessenger.cc:612
+#2  0x00007fffeda4da7d in AsyncMessenger::connect_to (this=0x5555556d87b0, type=4, addrs=..., anon=false, not_local_dest=false)
+    at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/async/AsyncMessenger.cc:723
+#3  0x00005555555abf60 in Messenger::connect_to_osd (this=0x5555556d87b0, dest=..., anon=false, not_local_dest=false)
+    at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/Messenger.h:548
+#4  0x00005555555b08d5 in MessengerClient::ready (this=0x7fffffffdc80, c=1, jobs=1, ops=1, msg_len=4096)
+    at /home/xb/project/stor/ceph/xb/docker/ceph/src/test/msgr/perf_msgr_client.cc:144
+#5  0x00005555555a7c43 in main (argc=7, argv=0x7fffffffdf48) at /home/xb/project/stor/ceph/xb/docker/ceph/src/test/msgr/perf_msgr_client.cc:212
+
+rdma ib初始化: ib->init() -> void Infiniband::init()
+gdb 打印ib设备: (gdb) p **((ibv_device **) 0x7fffd4000c30)
+cm建连: if (cct->_conf->ms_async_rdma_cm), https://github.com/ssbandjl/ceph/commit/2d4890580f3acdd6387bcdde15f78eba35237589
+检查rdma配置和修复逻辑错误: https://github.com/ceph/ceph/pull/28344
+check rdma configuration is under hardware limitation.
+fix ibv_port_attr object memory leak by using the object instead of allocating in the heap.
+fix logic between RDMAV_HUGEPAGES_SAFE and ibv_fork_init.
+fix error argument to get right qp state
+separate Device construction when rdma_cm is used.
+refine/simplify some function implementation.
+decouple RDMAWorker & RDMAStack, RDMADispatcher & RDMAStack
+remove redundant code.
+rename var to improve readability.
+cm讨论: https://lists.ceph.io/hyperkitty/list/dev@ceph.io/thread/YUX4DTCFXKLOBCQNSNBEBZGOBBQSYIS4/
+您是说 1) 首先创建 RDMA 内存区域 (MR) 2) 在中使用 MR bufferlist 3）将bufferlist作为工作请求发布到RDMA发送队列中直接发送 不使用 tx_copy_chunk？
+https://github.com/ceph/ceph/pull/28344/files
+使用ceph块设备, rgw, fs: https://www.cnblogs.com/cyh00001/p/16759266.html
+https://lists.ceph.io/hyperkitty/search?mlist=dev%40ceph.io&q=rdma
+https://lists.ceph.io/hyperkitty/list/dev@ceph.io/message/EHRT7TOSUP7PBJXQOBMQVUBA7JUQZNGF/ 给豪迈的rdma建议
+导出实时消息状态数据: sudo ceph daemon osd.0 perf dump AsyncMessenger::RDMAWorker-1
+配置文件: ms_async_rdma_device_name = mlx5_0
+查询gid; ibv_query_gid(ctxt, port_num, gid_idx, &gid)
+roce: https://docs.nvidia.com/networking/pages/viewpage.action?pageId=12013422
+支持共享接收队列: https://github.com/ssbandjl/ceph/commit/9fc9f08371d36d0cc38cbe8cbb235fa07ae0a6c0
+为 beacon(灯塔) 保留额外的一个 WR，以指示所有 WCE 已被消耗
+内存管理: memory_manager = new MemoryManager(cct, device, pd);
+提升接收缓存区(内存管理)性能: https://github.com/ssbandjl/ceph/commit/720d044db13886ac9926d689e970381cdf78f8eb
+注册内存: int Infiniband::MemoryManager::Cluster::fill(uint32_t num) -> malloc -> ibv_reg_mr
+poll 处理接收事件: void RDMADispatcher::handle_rx_event(ibv_wc *cqe, int rx_number)
+iwarp或ib(默认)
+  if (cct->_conf->ms_async_rdma_type == "iwarp") {
+    p = new RDMAIWARPConnectedSocketImpl(cct, ib, dispatcher, this);
+  } else {
+    p = new RDMAConnectedSocketImpl(cct, ib, dispatcher, this);
+  }
+
+连接后: worker->center.create_file_event(tcp_fd, EVENT_READABLE | EVENT_WRITABLE , established_handler)
+发送cm元数据: int Infiniband::QueuePair::send_cm_meta
+
+
+
+

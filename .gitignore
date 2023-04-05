@@ -79,3 +79,5 @@ GTAGS
 # mypy cache
 .mypy_cache/
 
+# rook-client-python
+# src/pybind/mgr/rook/
