@@ -127,16 +127,18 @@ rdma堆栈:
 rdma ib初始化: ib->init() -> void Infiniband::init()
 gdb 打印ib设备: (gdb) p **((ibv_device **) 0x7fffd4000c30)
 cm建连: if (cct->_conf->ms_async_rdma_cm), https://github.com/ssbandjl/ceph/commit/2d4890580f3acdd6387bcdde15f78eba35237589
-检查rdma配置和修复逻辑错误: https://github.com/ceph/ceph/pull/28344
-check rdma configuration is under hardware limitation.
-fix ibv_port_attr object memory leak by using the object instead of allocating in the heap.
-fix logic between RDMAV_HUGEPAGES_SAFE and ibv_fork_init.
-fix error argument to get right qp state
-separate Device construction when rdma_cm is used.
-refine/simplify some function implementation.
-decouple RDMAWorker & RDMAStack, RDMADispatcher & RDMAStack
-remove redundant code.
-rename var to improve readability.
+
+社区优化, 检查rdma配置和修复逻辑错误: https://github.com/ceph/ceph/pull/28344
+1. check rdma configuration is under hardware limitation.
+2. fix ibv_port_attr object memory leak by using the object instead of allocating in the heap.
+3. fix logic between RDMAV_HUGEPAGES_SAFE and ibv_fork_init.
+4. fix error argument to get right qp state
+5. separate Device construction when rdma_cm is used.
+6. refine/simplify some function implementation.
+7. decouple RDMAWorker & RDMAStack, RDMADispatcher & RDMAStack
+8. remove redundant code.
+9. rename var to improve readability.
+
 cm讨论: https://lists.ceph.io/hyperkitty/list/dev@ceph.io/thread/YUX4DTCFXKLOBCQNSNBEBZGOBBQSYIS4/
 您是说 1) 首先创建 RDMA 内存区域 (MR) 2) 在中使用 MR bufferlist 3）将bufferlist作为工作请求发布到RDMA发送队列中直接发送 不使用 tx_copy_chunk？
 https://github.com/ceph/ceph/pull/28344/files
@@ -162,3 +164,13 @@ iwarp或ib(默认)
 
 连接后: worker->center.create_file_event(tcp_fd, EVENT_READABLE | EVENT_WRITABLE , established_handler)
 发送cm元数据: int Infiniband::QueuePair::send_cm_meta
+
+h3c tag: Aug 29, 2017, v12.2.0 https://github.com/ceph/ceph/commit/32ce2a3ae5239ee33d6150705cdb24d43bab910c
+社区:
+commit b661348f156f148d764b998b65b90451f096cb27 (tag: v12.1.2)
+Author: Jenkins <jenkins@ceph.com>
+Date:   Tue Aug 1 17:55:40 2017 +0000
+12.1.2
+
+
+
