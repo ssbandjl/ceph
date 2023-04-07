@@ -130,6 +130,7 @@ class MessengerClient {
       msgrs[i]->wait();
     }
   }
+  /* connect_to_osd -> connect_to -> create_connect -> connect ... */
   void ready(int c, int jobs, int ops, int msg_len) {
     entity_addr_t addr;
     addr.parse(serveraddr.c_str());
@@ -177,6 +178,7 @@ void usage(const string &name) {
 
 int main(int argc, char **argv)
 {
+  cerr << __func__ << " " << __FL__ << " start" << std::endl;
   vector<const char*> args;
   argv_to_vec(argc, (const char **)argv, args);
 
@@ -193,8 +195,10 @@ int main(int argc, char **argv)
 
   int numjobs = atoi(args[1]);
   int concurrent = atoi(args[2]);
+  /* 每个线程最大并发飞行消息数 */
   int ios = atoi(args[3]);
   int think_time = atoi(args[4]);
+  /* 消息负载字节长度(数据) */
   int len = atoi(args[5]);
 
   std::string public_msgr_type = g_ceph_context->_conf->ms_public_type.empty() ? g_ceph_context->_conf.get_val<std::string>("ms_type") : g_ceph_context->_conf->ms_public_type;
@@ -214,7 +218,20 @@ int main(int argc, char **argv)
   uint64_t start = Cycles::rdtsc();
   client.start();
   uint64_t stop = Cycles::rdtsc();
-  cerr << " Total op " << ios << " run time " << Cycles::to_microseconds(stop - start) << "us." << std::endl;
+  uint64_t us = Cycles::to_microseconds(stop - start);
+  uint64_t ms = us / 1000.0;
+  double s = double(ms / 1000.0);
+  // cerr << "total op: " << ios << ", "
+  //   << "run_time: " << us << " us, "
+  //   << ms << " ms, "
+  //   << s << " s, "
+  //   << "iops: " << ios / s << ", "
+  //   << "total: " << double_t(len * ios) / 1024 / 1024 << " MB, "
+  //   << "rate(MBps): " << double_t(len * ios) / 1024 / 1024 / s
+  //   << std::endl;
+  printf("total op: %d, run_time: %lu us, %lu ms, %.2f s, iops: %.2f, total: %llu MB, rate: %.2f MBps\n",
+      ios, us, ms, s, double(ios) / s, (unsigned long long)(static_cast<uint64_t>(len) * ios / 1024 / 1024),  (double)((unsigned long long)(len * double(ios) / 1024 / 1024 / s)));
+
 
   return 0;
 }

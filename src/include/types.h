@@ -62,6 +62,12 @@ extern "C" {
 
 #include "assert.h"
 
+#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+#define STRX(x) #x
+#define STR(x) STRX(x)
+#define __FL__ __FILE__ ":" STR(__LINE__)
+// #define __FFL__ STR(__func__) " " STR(__FILENAME__) ":" STR(__LINE__)
+
 // DARWIN compatibility
 #ifdef __APPLE__
 typedef long long loff_t;

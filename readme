@@ -82,12 +82,15 @@ prctl(PR_GET_NAME, buf)
 创建线程:
 pthread_create(&thread_id, thread_attr, _entry_func, (void*)this)
 
-
+设置日志文件: set_log_file
 打开日志文件: m_fd = ::open(m_log_file.c_str(), O_CREAT|O_WRONLY|O_APPEND|O_CLOEXEC, 0644)
+打印日志: cerr << __func__ << " " << __FL__ << " server accept client connect" << std::endl;
+
 默认配置: Option("ms_type"
 默认开启RDMA: .set_default("async+rdma")
 配置文件: https://docs.ceph.com/en/latest/rados/configuration/ceph-conf/
-rdma堆栈:
+
+服务端, rdma堆栈:
 #0  NetworkStack::create (c=0x555555641870, t="rdma") at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/async/Stack.cc:67
 #1  0x00007fffeda53354 in StackSingleton::ready (this=0x5555556c6020, type="rdma") at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/async/AsyncMessenger.cc:257
 #2  0x00007fffeda4922a in AsyncMessenger::AsyncMessenger (this=0x5555556c3ef0, cct=0x555555641870, name=..., type="async+rdma", mname="server", _nonce=0)
@@ -111,7 +114,7 @@ rdma堆栈:
 返回自动变量auto:  const auto& _lookup_conn
 要求(断言)已上锁: ceph_assert(ceph_mutex_is_locked(lock))
 
-建连接:
+客户端, 建连接:
 (gdb) bt
 #0  AsyncConnection::connect (this=0x555555768760, addrs=..., type=4, target=...) at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/async/AsyncConnection.cc:478
 #1  0x00007fffeda4ca38 in AsyncMessenger::create_connect (this=0x5555556d87b0, addrs=..., type=4, anon=false)
@@ -172,5 +175,50 @@ Author: Jenkins <jenkins@ceph.com>
 Date:   Tue Aug 1 17:55:40 2017 +0000
 12.1.2
 
+rsync_to_h3c_win11(同步二进制到win10):
+cd /c/Users/s30893/Downloads/ceph/ceph_perf_msgr
+rsync -urpv root@ubuntu22:/root/project/stor/ceph/xb/docker/ceph/build/bin/ceph_perf_msgr_server .
+rsync -urpv root@ubuntu22:/root/project/stor/ceph/xb/docker/ceph/build/bin/ceph_perf_msgr_client .
+rsync -urpv root@ubuntu22:/root/project/stor/ceph/xb/docker/ceph/build/lib/libceph-common.so.2 .
+
+客户端建连接
+conn->connect
+
+编译ceph_msgr_perf工具:
+cmake -DWITH_TESTS=1 ../CMakeList.txt
+cd build
+make common, ceph-common, ceph_perf_msgr_client, ceph_perf_msgr_server,  
+make help 查看帮助
+
+高级用法 
+修改依赖的库
+可以使用命令patchelf   修改工具依赖的动态库位置。避免和项目正在使用的库冲突，修改方法见：https://blog.csdn.net/bandaoyu/article/details/113181179
+
+修改依赖的配置文件
+修改依赖的配置文件，避免与正在运行的项目共用配置文件造成相互影响
+
+ceph进程搜索配置文件的路径顺序
+
+Ceph相关进程在读取配置时, 遵循以下的查找顺序
+
+$CEPH_CONF 环境变量所指定的配置
+-c path/path 参数所指定的配置
+/etc/ceph/ceph.conf
+~/.ceph/config (HOME目录下.ceph目录的config文件)
+./ceph.conf (当前目录下的ceph.conf)
+
+git:
+git diff v12.2.0 main -- src/msg > git_diff_v12_2_0_main_src_msg
+git diff v12.2.0 v15.2.17 -- src/msg > git_diff_v12_2_0_15_2_17_src_msg
+git diff v15.2.17 main -- src/msg > git_diff_v15_2_17__main_src_msg
+
+sync.sh
+hosts='c51 c52'
+for host in $hosts;do
+	echo -e  "\n\033[32m`date +'%Y/%m/%d %H:%M:%S'` send to $host\033[0m"
+	scp libceph-common.so.2 root@${host}:/home/xb/project/stor/ceph/xb/docker/ceph/build/lib/libceph-common.so.2
+	scp ceph_perf_msgr_server root@${host}:/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph_perf_msgr_server
+	scp ceph_perf_msgr_client root@${host}:/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph_perf_msgr_client
+done
 
 

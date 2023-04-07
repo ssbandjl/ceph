@@ -189,6 +189,7 @@ void Processor::accept()
 	w = msgr->get_stack()->get_worker();
       else
 	++w->references;
+      // cerr << __func__ << " " << __FL__ << " server accept client connect" << std::endl;
       int r = listen_socket.accept(&cli_socket, opts, &addr, w);
       if (r == 0) {
 	ldout(msgr->cct, 10) << __func__ << " accepted incoming on sd "
@@ -720,6 +721,7 @@ ConnectionRef AsyncMessenger::connect_to(int type,
   if (conn) {
     ldout(cct, 10) << __func__ << " " << av << " existing " << conn << dendl;
   } else {
+    // 
     conn = create_connect(av, type, false);
     ldout(cct, 10) << __func__ << " " << av << " new " << conn << dendl;
   }

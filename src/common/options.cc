@@ -569,7 +569,7 @@ std::vector<Option> get_global_options() {
 
     // logging
     Option("log_file", Option::TYPE_STR, Option::LEVEL_BASIC)
-    .set_default("")
+    .set_default("/var/log/ceph/perf_$cluster-$name.log")
     .set_daemon_default("/var/log/ceph/$cluster-$name.log")
     .set_description("path to log file")
     .add_see_also({"log_to_file",

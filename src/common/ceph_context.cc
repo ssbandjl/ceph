@@ -308,12 +308,11 @@ public:
     }
 
     // file
-    if (changed.count("log_file") ||
-	changed.count("log_to_file")) {
+    if (changed.count("log_file") || changed.count("log_to_file")) {
       if (conf->log_to_file) {
-	log->set_log_file(conf->log_file);
+	      log->set_log_file(conf->log_file);
       } else {
-	log->set_log_file({});
+        log->set_log_file({});
       }
       log->reopen_log_file();
     }
