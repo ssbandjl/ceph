@@ -231,7 +231,5 @@ int main(int argc, char **argv)
   //   << std::endl;
   printf("total op: %d, run_time: %lu us, %lu ms, %.2f s, iops: %.2f, total: %llu MB, rate: %.2f MBps\n",
       ios, us, ms, s, double(ios) / s, (unsigned long long)(static_cast<uint64_t>(len) * ios / 1024 / 1024),  (double)((unsigned long long)(len * double(ios) / 1024 / 1024 / s)));
-
-
   return 0;
 }

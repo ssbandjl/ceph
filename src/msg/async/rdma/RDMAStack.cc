@@ -686,7 +686,7 @@ void RDMAWorker::initialize()
 int RDMAWorker::listen(entity_addr_t &sa, unsigned addr_slot,
 		       const SocketOptions &opt,ServerSocket *sock)
 {
-  cerr << __func__ << " " << __FL__ << " server ib init" << std::endl;
+  cerr << __func__ << " " << __FFL__ << " server ib init" << std::endl;
   ib->init();
   dispatcher->polling_start();
 
@@ -708,7 +708,7 @@ int RDMAWorker::listen(entity_addr_t &sa, unsigned addr_slot,
 
 int RDMAWorker::connect(const entity_addr_t &addr, const SocketOptions &opts, ConnectedSocket *socket)
 {
-  cerr << __func__ << " " << __FL__ << " client ib init" << std::endl;
+  cerr << __func__ << " " << __FFL__ << " client ib init" << std::endl;
   ib->init();
   dispatcher->polling_start();
 
@@ -718,7 +718,7 @@ int RDMAWorker::connect(const entity_addr_t &addr, const SocketOptions &opts, Co
   } else {
     p = new RDMAConnectedSocketImpl(cct, ib, dispatcher, this);
   }
-  cerr << __func__ << " " << __FL__ << " client connect -> server" << std::endl;
+  cerr << __func__ << " " << __FFL__ << " client connect -> server" << std::endl;
   int r = p->try_connect(addr, opts);
 
   if (r < 0) {

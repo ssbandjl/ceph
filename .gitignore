@@ -81,3 +81,5 @@ GTAGS
 
 # rook-client-python
 # src/pybind/mgr/rook/
+
+*.out

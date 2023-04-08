@@ -66,7 +66,7 @@ extern "C" {
 #define STRX(x) #x
 #define STR(x) STRX(x)
 #define __FL__ __FILE__ ":" STR(__LINE__)
-// #define __FFL__ STR(__func__) " " STR(__FILENAME__) ":" STR(__LINE__)
+#define __FFL__ __func__ << " " << __FILE__ << ":" << __LINE__
 
 // DARWIN compatibility
 #ifdef __APPLE__
