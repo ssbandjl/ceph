@@ -221,4 +221,4 @@ for host in $hosts;do
 	scp ceph_perf_msgr_client root@${host}:/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph_perf_msgr_client
 done
 
-
+set_nonce: 设置随机值
