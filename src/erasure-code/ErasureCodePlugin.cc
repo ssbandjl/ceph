@@ -110,7 +110,7 @@ int ErasureCodePluginRegistry::factory(const std::string &plugin_name,
   if (r)
     return r;
   if (profile != (*erasure_code)->get_profile()) {
-    *ss << __func__ << " profile " << profile << " != get_profile() "
+    *ss << __FFL__ << " profile " << profile << " != get_profile() "
 	<< (*erasure_code)->get_profile() << std::endl;
     return -EINVAL;
   }
@@ -176,7 +176,7 @@ int ErasureCodePluginRegistry::load(const std::string &plugin_name,
 
   (*plugin)->library = library;
 
-  *ss << __func__ << ": " << plugin_name << " ";
+  *ss << __FFL__ << ": " << plugin_name << " ";
 
   return 0;
 }

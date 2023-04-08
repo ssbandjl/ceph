@@ -11,7 +11,7 @@
 #define dout_subsys ceph_subsys_rbd
 #undef dout_prefix
 #define dout_prefix *_dout << "rbd::ggate::Server: " << this \
-                           << " " << __func__ << ": "
+                           << " " << __FFL__ << ": "
 
 namespace rbd {
 namespace ggate {

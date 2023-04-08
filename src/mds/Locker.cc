@@ -139,7 +139,7 @@ void Locker::send_lock_message(SimpleLock *lock, int msg, const bufferlist &data
 bool Locker::try_rdlock_snap_layout(CInode *in, MDRequestRef& mdr,
 				    int n, bool want_layout)
 {
-  dout(10) << __func__ << " " << *mdr << " " << *in << dendl;
+  dout(10) << __FFL__ << " " << *mdr << " " << *in << dendl;
   // rdlock ancestor snaps
   inodeno_t root;
   int depth = -1;
@@ -194,7 +194,7 @@ bool Locker::try_rdlock_snap_layout(CInode *in, MDRequestRef& mdr,
   return true;
 
 failed:
-  dout(10) << __func__ << " failed" << dendl;
+  dout(10) << __FFL__ << " failed" << dendl;
 
   drop_locks(mdr.get(), nullptr);
   mdr->drop_local_auth_pins();
@@ -1676,7 +1676,7 @@ bool Locker::rdlock_try_set(MutationImpl::LockOpVec& lov, MDRequestRef& mdr)
 
   return true;
 failed:
-  dout(10) << __func__ << " failed" << dendl;
+  dout(10) << __FFL__ << " failed" << dendl;
   drop_locks(mdr.get(), nullptr);
   mdr->drop_local_auth_pins();
   return false;
@@ -2442,7 +2442,7 @@ void Locker::issue_truncate(CInode *in)
 
 void Locker::revoke_stale_cap(CInode *in, client_t client)
 {
-  dout(7) << __func__ << " client." << client << " on " << *in << dendl;
+  dout(7) << __FFL__ << " client." << client << " on " << *in << dendl;
   Capability *cap = in->get_client_cap(client);
   if (!cap)
     return;
@@ -3154,7 +3154,7 @@ void Locker::handle_client_caps(const cref_t<MClientCaps> &m)
 	   << session->get_num_completed_flushes()
 	   << " completed flushes recorded in session";
 	mds->clog->warn() << ss.str();
-	dout(20) << __func__ << " " << ss.str() << dendl;
+	dout(20) << __FFL__ << " " << ss.str() << dendl;
       }
     }
   }
@@ -3416,14 +3416,14 @@ void Locker::process_request_cap_release(MDRequestRef& mdr, client_t client, con
       if (dn) {
 	ClientLease *l = dn->get_client_lease(client);
 	if (l) {
-	  dout(10) << __func__ << " removing lease on " << *dn << dendl;
+	  dout(10) << __FFL__ << " removing lease on " << *dn << dendl;
 	  dn->remove_client_lease(l, this);
 	} else {
-	  dout(7) << __func__ << " client." << client
+	  dout(7) << __FFL__ << " client." << client
 		  << " doesn't have lease on " << *dn << dendl;
 	}
       } else {
-	dout(7) << __func__ << " client." << client << " released lease on dn "
+	dout(7) << __FFL__ << " client." << client << " released lease on dn "
 		<< dir->dirfrag() << "/" << dname << " which dne" << dendl;
       }
     }
@@ -3433,7 +3433,7 @@ void Locker::process_request_cap_release(MDRequestRef& mdr, client_t client, con
   if (!cap)
     return;
 
-  dout(10) << __func__ << " client." << client << " " << ccap_string(caps) << " on " << *in
+  dout(10) << __FFL__ << " client." << client << " " << ccap_string(caps) << " on " << *in
 	   << (mdr ? "" : " (DEFERRED, no mdr)")
 	   << dendl;
     
@@ -4086,7 +4086,7 @@ void Locker::caps_tick()
     }
   }
 
-  dout(20) << __func__ << " " << revoking_caps.size() << " revoking caps" << dendl;
+  dout(20) << __FFL__ << " " << revoking_caps.size() << " revoking caps" << dendl;
 
   now = ceph_clock_now();
   int n = 0;
@@ -4094,14 +4094,14 @@ void Locker::caps_tick()
     Capability *cap = *p;
 
     utime_t age = now - cap->get_last_revoke_stamp();
-    dout(20) << __func__ << " age = " << age << " client." << cap->get_client() << "." << cap->get_inode()->ino() << dendl;
+    dout(20) << __FFL__ << " age = " << age << " client." << cap->get_client() << "." << cap->get_inode()->ino() << dendl;
     if (age <= mds->mdsmap->get_session_timeout()) {
-      dout(20) << __func__ << " age below timeout " << mds->mdsmap->get_session_timeout() << dendl;
+      dout(20) << __FFL__ << " age below timeout " << mds->mdsmap->get_session_timeout() << dendl;
       break;
     } else {
       ++n;
       if (n > MAX_WARN_CAPS) {
-        dout(1) << __func__ << " more than " << MAX_WARN_CAPS << " caps are late"
+        dout(1) << __FFL__ << " more than " << MAX_WARN_CAPS << " caps are late"
           << "revoking, ignoring subsequent caps" << dendl;
         break;
       }
@@ -4114,9 +4114,9 @@ void Locker::caps_tick()
 	 << cap->get_inode()->ino() << " pending " << ccap_string(cap->pending())
 	 << " issued " << ccap_string(cap->issued()) << ", sent " << age << " seconds ago";
       mds->clog->warn() << ss.str();
-      dout(20) << __func__ << " " << ss.str() << dendl;
+      dout(20) << __FFL__ << " " << ss.str() << dendl;
     } else {
-      dout(20) << __func__ << " silencing log message (backoff) for " << "client." << cap->get_client() << "." << cap->get_inode()->ino() << dendl;
+      dout(20) << __FFL__ << " silencing log message (backoff) for " << "client." << cap->get_client() << "." << cap->get_inode()->ino() << dendl;
     }
   }
 }

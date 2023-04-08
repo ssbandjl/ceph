@@ -53,7 +53,7 @@ protected:
   }
 
   void start_tick() {
-    generic_dout(10) << __func__ << dendl;
+    generic_dout(10) << __FFL__ << dendl;
 
     cancel_tick();
     if (tick_period <= 0)

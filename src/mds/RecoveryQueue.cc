@@ -23,7 +23,7 @@
 #define dout_context g_ceph_context
 #define dout_subsys ceph_subsys_mds
 #undef dout_prefix
-#define dout_prefix *_dout << "mds." << mds->get_nodeid() << " RecoveryQueue::" << __func__ << " "
+#define dout_prefix *_dout << "mds." << mds->get_nodeid() << " RecoveryQueue::" << __FFL__ << " "
 
 class C_MDC_Recover : public MDSIOContextBase {
 public:

@@ -676,12 +676,12 @@ int RGWSystemMetaObj::write(bool exclusive)
 {
   int ret = store_info(exclusive);
   if (ret < 0) {
-    ldout(cct, 20) << __func__ << "(): store_info() returned ret=" << ret << dendl;
+    ldout(cct, 20) << __FFL__ << "(): store_info() returned ret=" << ret << dendl;
     return ret;
   }
   ret = store_name(exclusive);
   if (ret < 0) {
-    ldout(cct, 20) << __func__ << "(): store_name() returned ret=" << ret << dendl;
+    ldout(cct, 20) << __FFL__ << "(): store_name() returned ret=" << ret << dendl;
     return ret;
   }
   return 0;
@@ -1250,7 +1250,7 @@ int RGWPeriod::add_zonegroup(const RGWZoneGroup& zonegroup)
 int RGWPeriod::update()
 {
   auto zone_svc = sysobj_svc->get_zone_svc();
-  ldout(cct, 20) << __func__ << " realm " << realm_id << " period " << get_id() << dendl;
+  ldout(cct, 20) << __FFL__ << " realm " << realm_id << " period " << get_id() << dendl;
   list<string> zonegroups;
   int ret = zone_svc->list_zonegroups(zonegroups);
   if (ret < 0) {
@@ -1337,7 +1337,7 @@ int RGWPeriod::reflect()
 
 void RGWPeriod::fork()
 {
-  ldout(cct, 20) << __func__ << " realm " << realm_id << " period " << id << dendl;
+  ldout(cct, 20) << __FFL__ << " realm " << realm_id << " period " << id << dendl;
   predecessor_uuid = id;
   id = get_staging_id(realm_id);
   period_map.reset();
@@ -1412,7 +1412,7 @@ int RGWPeriod::commit(rgw::sal::RGWRadosStore *store,
                       std::ostream& error_stream, bool force_if_stale)
 {
   auto zone_svc = sysobj_svc->get_zone_svc();
-  ldout(cct, 20) << __func__ << " realm " << realm.get_id() << " period " << current_period.get_id() << dendl;
+  ldout(cct, 20) << __FFL__ << " realm " << realm.get_id() << " period " << current_period.get_id() << dendl;
   // gateway must be in the master zone to commit
   if (master_zone != zone_svc->get_zone_params().get_id()) {
     error_stream << "Cannot commit period on zone "

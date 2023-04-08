@@ -35,7 +35,7 @@
 #define dout_context g_ceph_context
 #define dout_subsys ceph_subsys_mgr
 #undef dout_prefix
-#define dout_prefix *_dout << "mgr " << __func__ << " "
+#define dout_prefix *_dout << "mgr " << __FFL__ << " "
 
 ActivePyModules::ActivePyModules(PyModuleConfig &module_config_,
           std::map<std::string, std::string> store_data,
@@ -511,7 +511,7 @@ void ActivePyModules::notify_all(const std::string &notify_type,
 {
   std::lock_guard l(lock);
 
-  dout(10) << __func__ << ": notify_all " << notify_type << dendl;
+  dout(10) << __FFL__ << ": notify_all " << notify_type << dendl;
   for (auto& [name, module] : modules) {
     // Send all python calls down a Finisher to avoid blocking
     // C++ code, and avoid any potential lock cycles.
@@ -528,7 +528,7 @@ void ActivePyModules::notify_all(const LogEntry &log_entry)
 {
   std::lock_guard l(lock);
 
-  dout(10) << __func__ << ": notify_all (clog)" << dendl;
+  dout(10) << __FFL__ << ": notify_all (clog)" << dendl;
   for (auto& [name, module] : modules) {
     // Send all python calls down a Finisher to avoid blocking
     // C++ code, and avoid any potential lock cycles.
@@ -554,7 +554,7 @@ bool ActivePyModules::get_store(const std::string &module_name,
   const std::string global_key = PyModule::config_prefix
     + module_name + "/" + key;
 
-  dout(4) << __func__ << " key: " << global_key << dendl;
+  dout(4) << __FFL__ << " key: " << global_key << dendl;
 
   auto i = store_cache.find(global_key);
   if (i != store_cache.end()) {
@@ -623,8 +623,8 @@ PyObject *ActivePyModules::get_typed_config(
     }
     // removing value to hide sensitive data going into mgr logs
     // leaving this for debugging purposes
-    // dout(10) << __func__ << " " << final_key << " found: " << value << dendl;
-    dout(10) << __func__ << " " << final_key << " found" << dendl;
+    // dout(10) << __FFL__ << " " << final_key << " found: " << value << dendl;
+    dout(10) << __FFL__ << " " << final_key << " found" << dendl;
     return module->get_typed_option_value(key, value);
   }
   PyEval_RestoreThread(tstate);
@@ -648,7 +648,7 @@ PyObject *ActivePyModules::get_store_prefix(const std::string &module_name,
   const std::string base_prefix = PyModule::config_prefix
                                     + module_name + "/";
   const std::string global_prefix = base_prefix + prefix;
-  dout(4) << __func__ << " prefix: " << global_prefix << dendl;
+  dout(4) << __FFL__ << " prefix: " << global_prefix << dendl;
 
   PyFormatter f;
 
@@ -862,7 +862,7 @@ PyObject* ActivePyModules::get_perf_schema_python(
       f.close_section();
     }
   } else {
-    dout(4) << __func__ << ": No daemon state found for "
+    dout(4) << __FFL__ << ": No daemon state found for "
               << svc_type << "." << svc_id << ")" << dendl;
   }
   return f.get();

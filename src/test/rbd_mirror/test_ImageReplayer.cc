@@ -335,7 +335,7 @@ public:
 
     std::set<cls::journal::Client>::const_iterator c;
     for (c = registered_clients.begin(); c != registered_clients.end(); ++c) {
-      std::cout << __func__ << ": client: " << *c << std::endl;
+      std::cout << __FFL__ << ": client: " << *c << std::endl;
       if (c->state != cls::journal::CLIENT_STATE_CONNECTED) {
 	continue;
       }

@@ -155,7 +155,7 @@ struct C_InvokeAsyncRequest : public Context {
     }
 
     CephContext *cct = image_ctx.cct;
-    ldout(cct, 20) << __func__ << dendl;
+    ldout(cct, 20) << __FFL__ << dendl;
 
     Context *ctx = util::create_context_callback<
       C_InvokeAsyncRequest<I>,
@@ -165,7 +165,7 @@ struct C_InvokeAsyncRequest : public Context {
 
   void handle_refresh_image(int r) {
     CephContext *cct = image_ctx.cct;
-    ldout(cct, 20) << __func__ << ": r=" << r << dendl;
+    ldout(cct, 20) << __FFL__ << ": r=" << r << dendl;
 
     if (r < 0) {
       lderr(cct) << "failed to refresh image: " << cpp_strerror(r) << dendl;
@@ -208,7 +208,7 @@ struct C_InvokeAsyncRequest : public Context {
     }
 
     CephContext *cct = image_ctx.cct;
-    ldout(cct, 20) << __func__ << dendl;
+    ldout(cct, 20) << __FFL__ << dendl;
 
     Context *ctx = util::create_async_context_callback(
       image_ctx, util::create_context_callback<
@@ -229,7 +229,7 @@ struct C_InvokeAsyncRequest : public Context {
 
   void handle_acquire_exclusive_lock(int r) {
     CephContext *cct = image_ctx.cct;
-    ldout(cct, 20) << __func__ << ": r=" << r << dendl;
+    ldout(cct, 20) << __FFL__ << ": r=" << r << dendl;
 
     if (r < 0) {
       complete(r == -EBLACKLISTED ? -EBLACKLISTED : -EROFS);
@@ -254,7 +254,7 @@ struct C_InvokeAsyncRequest : public Context {
     ceph_assert(ceph_mutex_is_locked(image_ctx.owner_lock));
 
     CephContext *cct = image_ctx.cct;
-    ldout(cct, 20) << __func__ << dendl;
+    ldout(cct, 20) << __FFL__ << dendl;
 
     Context *ctx = util::create_async_context_callback(
       image_ctx, util::create_context_callback<
@@ -265,7 +265,7 @@ struct C_InvokeAsyncRequest : public Context {
 
   void handle_remote_request(int r) {
     CephContext *cct = image_ctx.cct;
-    ldout(cct, 20) << __func__ << ": r=" << r << dendl;
+    ldout(cct, 20) << __FFL__ << ": r=" << r << dendl;
 
     if (r == -EOPNOTSUPP) {
       ldout(cct, 5) << name << " not supported by current lock owner" << dendl;
@@ -287,7 +287,7 @@ struct C_InvokeAsyncRequest : public Context {
     ceph_assert(ceph_mutex_is_locked(image_ctx.owner_lock));
 
     CephContext *cct = image_ctx.cct;
-    ldout(cct, 20) << __func__ << dendl;
+    ldout(cct, 20) << __FFL__ << dendl;
 
     Context *ctx = util::create_async_context_callback(
       image_ctx, util::create_context_callback<
@@ -298,7 +298,7 @@ struct C_InvokeAsyncRequest : public Context {
 
   void handle_local_request(int r) {
     CephContext *cct = image_ctx.cct;
-    ldout(cct, 20) << __func__ << ": r=" << r << dendl;
+    ldout(cct, 20) << __FFL__ << ": r=" << r << dendl;
 
     if (r == -ERESTART) {
       send_refresh_image();
@@ -456,7 +456,7 @@ void Operations<I>::execute_rebuild_object_map(ProgressContext &prog_ctx,
               m_image_ctx.exclusive_lock->is_lock_owner());
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
 
   if (m_image_ctx.read_only || m_image_ctx.operations_disabled) {
     on_finish->complete(-EROFS);
@@ -478,7 +478,7 @@ void Operations<I>::execute_rebuild_object_map(ProgressContext &prog_ctx,
 template <typename I>
 int Operations<I>::check_object_map(ProgressContext &prog_ctx) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
   int r = m_image_ctx.state->refresh_if_required();
   if (r < 0) {
     return r;
@@ -523,7 +523,7 @@ void Operations<I>::check_object_map(ProgressContext &prog_ctx,
 template <typename I>
 int Operations<I>::rename(const char *dstname) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": dest_name=" << dstname
+  ldout(cct, 5) << this << " " << __FFL__ << ": dest_name=" << dstname
                 << dendl;
 
   int r = librbd::detect_format(m_image_ctx.md_ctx, dstname, NULL, NULL);
@@ -568,7 +568,7 @@ void Operations<I>::execute_rename(const std::string &dest_name,
   }
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": dest_name=" << dest_name
+  ldout(cct, 5) << this << " " << __FFL__ << ": dest_name=" << dest_name
                 << dendl;
 
   if (m_image_ctx.old_format) {
@@ -607,7 +607,7 @@ int Operations<I>::resize(uint64_t size, bool allow_shrink, ProgressContext& pro
   CephContext *cct = m_image_ctx.cct;
 
   m_image_ctx.image_lock.lock_shared();
-  ldout(cct, 5) << this << " " << __func__ << ": "
+  ldout(cct, 5) << this << " " << __FFL__ << ": "
                 << "size=" << m_image_ctx.size << ", "
                 << "new_size=" << size << dendl;
   m_image_ctx.image_lock.unlock_shared();
@@ -648,7 +648,7 @@ void Operations<I>::execute_resize(uint64_t size, bool allow_shrink, ProgressCon
 
   CephContext *cct = m_image_ctx.cct;
   m_image_ctx.image_lock.lock_shared();
-  ldout(cct, 5) << this << " " << __func__ << ": "
+  ldout(cct, 5) << this << " " << __FFL__ << ": "
                 << "size=" << m_image_ctx.size << ", "
                 << "new_size=" << size << dendl;
 
@@ -701,7 +701,7 @@ void Operations<I>::snap_create(const cls::rbd::SnapshotNamespace &snap_namespac
 				const std::string& snap_name,
 				Context *on_finish) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": snap_name=" << snap_name
+  ldout(cct, 5) << this << " " << __FFL__ << ": snap_name=" << snap_name
                 << dendl;
 
   if (m_image_ctx.read_only) {
@@ -739,7 +739,7 @@ void Operations<I>::execute_snap_create(const cls::rbd::SnapshotNamespace &snap_
               m_image_ctx.exclusive_lock->is_lock_owner());
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": snap_name=" << snap_name
+  ldout(cct, 5) << this << " " << __FFL__ << ": snap_name=" << snap_name
                 << dendl;
 
   if (m_image_ctx.operations_disabled) {
@@ -767,7 +767,7 @@ int Operations<I>::snap_rollback(const cls::rbd::SnapshotNamespace& snap_namespa
 				 const std::string& snap_name,
                                  ProgressContext& prog_ctx) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": snap_name=" << snap_name
+  ldout(cct, 5) << this << " " << __FFL__ << ": snap_name=" << snap_name
                 << dendl;
 
   int r = m_image_ctx.state->refresh_if_required();
@@ -820,7 +820,7 @@ void Operations<I>::execute_snap_rollback(const cls::rbd::SnapshotNamespace& sna
                                           Context *on_finish) {
   ceph_assert(ceph_mutex_is_locked(m_image_ctx.owner_lock));
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": snap_name=" << snap_name
+  ldout(cct, 5) << this << " " << __FFL__ << ": snap_name=" << snap_name
                 << dendl;
 
   if (m_image_ctx.operations_disabled) {
@@ -877,7 +877,7 @@ void Operations<I>::snap_remove(const cls::rbd::SnapshotNamespace& snap_namespac
 				const std::string& snap_name,
 				Context *on_finish) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": snap_name=" << snap_name
+  ldout(cct, 5) << this << " " << __FFL__ << ": snap_name=" << snap_name
                 << dendl;
 
   if (m_image_ctx.read_only) {
@@ -929,7 +929,7 @@ void Operations<I>::execute_snap_remove(const cls::rbd::SnapshotNamespace& snap_
   }
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": snap_name=" << snap_name
+  ldout(cct, 5) << this << " " << __FFL__ << ": snap_name=" << snap_name
                 << dendl;
 
   if (m_image_ctx.operations_disabled) {
@@ -970,7 +970,7 @@ void Operations<I>::execute_snap_remove(const cls::rbd::SnapshotNamespace& snap_
 template <typename I>
 int Operations<I>::snap_rename(const char *srcname, const char *dstname) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": "
+  ldout(cct, 5) << this << " " << __FFL__ << ": "
                 << "snap_name=" << srcname << ", "
                 << "new_snap_name=" << dstname << dendl;
 
@@ -1049,7 +1049,7 @@ void Operations<I>::execute_snap_rename(const uint64_t src_snap_id,
   m_image_ctx.image_lock.unlock_shared();
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": "
+  ldout(cct, 5) << this << " " << __FFL__ << ": "
                 << "snap_id=" << src_snap_id << ", "
                 << "new_snap_name=" << dest_snap_name << dendl;
 
@@ -1064,7 +1064,7 @@ template <typename I>
 int Operations<I>::snap_protect(const cls::rbd::SnapshotNamespace& snap_namespace,
 				const std::string& snap_name) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": snap_name=" << snap_name
+  ldout(cct, 5) << this << " " << __FFL__ << ": snap_name=" << snap_name
                 << dendl;
 
   if (m_image_ctx.read_only) {
@@ -1153,7 +1153,7 @@ void Operations<I>::execute_snap_protect(const cls::rbd::SnapshotNamespace& snap
   m_image_ctx.image_lock.unlock_shared();
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": snap_name=" << snap_name
+  ldout(cct, 5) << this << " " << __FFL__ << ": snap_name=" << snap_name
                 << dendl;
 
   operation::SnapshotProtectRequest<I> *request =
@@ -1166,7 +1166,7 @@ template <typename I>
 int Operations<I>::snap_unprotect(const cls::rbd::SnapshotNamespace& snap_namespace,
 				  const std::string& snap_name) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": snap_name=" << snap_name
+  ldout(cct, 5) << this << " " << __FFL__ << ": snap_name=" << snap_name
                 << dendl;
 
   if (m_image_ctx.read_only) {
@@ -1250,7 +1250,7 @@ void Operations<I>::execute_snap_unprotect(const cls::rbd::SnapshotNamespace& sn
   m_image_ctx.image_lock.unlock_shared();
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": snap_name=" << snap_name
+  ldout(cct, 5) << this << " " << __FFL__ << ": snap_name=" << snap_name
                 << dendl;
 
   operation::SnapshotUnprotectRequest<I> *request =
@@ -1262,7 +1262,7 @@ void Operations<I>::execute_snap_unprotect(const cls::rbd::SnapshotNamespace& sn
 template <typename I>
 int Operations<I>::snap_set_limit(uint64_t limit) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": limit=" << limit << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << ": limit=" << limit << dendl;
 
   if (m_image_ctx.read_only) {
     return -EROFS;
@@ -1295,7 +1295,7 @@ void Operations<I>::execute_snap_set_limit(const uint64_t limit,
   ceph_assert(ceph_mutex_is_locked(m_image_ctx.owner_lock));
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": limit=" << limit
+  ldout(cct, 5) << this << " " << __FFL__ << ": limit=" << limit
                 << dendl;
 
   operation::SnapshotLimitRequest<I> *request =
@@ -1306,7 +1306,7 @@ void Operations<I>::execute_snap_set_limit(const uint64_t limit,
 template <typename I>
 int Operations<I>::update_features(uint64_t features, bool enabled) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": features=" << features
+  ldout(cct, 5) << this << " " << __FFL__ << ": features=" << features
                 << ", enabled=" << enabled << dendl;
 
   int r = m_image_ctx.state->refresh_if_required();
@@ -1415,7 +1415,7 @@ void Operations<I>::execute_update_features(uint64_t features, bool enabled,
               m_image_ctx.exclusive_lock->is_lock_owner());
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": features=" << features
+  ldout(cct, 5) << this << " " << __FFL__ << ": features=" << features
                 << ", enabled=" << enabled << dendl;
 
   if (m_image_ctx.operations_disabled) {
@@ -1440,7 +1440,7 @@ template <typename I>
 int Operations<I>::metadata_set(const std::string &key,
                                 const std::string &value) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": key=" << key << ", value="
+  ldout(cct, 5) << this << " " << __FFL__ << ": key=" << key << ", value="
                 << value << dendl;
 
   std::string config_key;
@@ -1495,7 +1495,7 @@ void Operations<I>::execute_metadata_set(const std::string &key,
   ceph_assert(ceph_mutex_is_locked(m_image_ctx.owner_lock));
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": key=" << key << ", value="
+  ldout(cct, 5) << this << " " << __FFL__ << ": key=" << key << ", value="
                 << value << dendl;
 
   if (m_image_ctx.operations_disabled) {
@@ -1513,7 +1513,7 @@ void Operations<I>::execute_metadata_set(const std::string &key,
 template <typename I>
 int Operations<I>::metadata_remove(const std::string &key) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": key=" << key << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << ": key=" << key << dendl;
 
   int r = m_image_ctx.state->refresh_if_required();
   if (r < 0) {
@@ -1558,7 +1558,7 @@ void Operations<I>::execute_metadata_remove(const std::string &key,
   ceph_assert(ceph_mutex_is_locked(m_image_ctx.owner_lock));
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": key=" << key << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << ": key=" << key << dendl;
 
   if (m_image_ctx.operations_disabled) {
     on_finish->complete(-EROFS);

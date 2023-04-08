@@ -141,7 +141,7 @@ int CephxServiceHandler::handle_request(
   try {
     decode(cephx_header, indata);
   } catch (buffer::error& e) {
-    ldout(cct, 0) << __func__ << " failed to decode CephXRequestHeader: "
+    ldout(cct, 0) << __FFL__ << " failed to decode CephXRequestHeader: "
 		  << e.what() << dendl;
     return -EPERM;
   }
@@ -156,7 +156,7 @@ int CephxServiceHandler::handle_request(
       try {
 	decode(req, indata);
       } catch (buffer::error& e) {
-	ldout(cct, 0) << __func__ << " failed to decode CephXAuthenticate: "
+	ldout(cct, 0) << __FFL__ << " failed to decode CephXAuthenticate: "
 		      << e.what() << dendl;
 	ret = -EPERM;
 	break;
@@ -269,7 +269,7 @@ int CephxServiceHandler::handle_request(
 	    std::string err;
 	    if (encode_encrypt(cct, *pconnection_secret, session_key, cbl,
 			       err)) {
-	      lderr(cct) << __func__ << " failed to encrypt connection secret, "
+	      lderr(cct) << __FFL__ << " failed to encrypt connection secret, "
 			 << err << dendl;
 	      ret = -EACCES;
 	      break;
@@ -365,7 +365,7 @@ int CephxServiceHandler::handle_request(
         }
       }
       if (!found_services && service_err) {
-	ldout(cct, 10) << __func__ << " did not find any service keys" << dendl;
+	ldout(cct, 10) << __FFL__ << " did not find any service keys" << dendl;
 	ret = service_err;
       }
       CryptoKey no_key;

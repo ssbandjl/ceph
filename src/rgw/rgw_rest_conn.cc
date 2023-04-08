@@ -338,7 +338,7 @@ int RGWRESTConn::get_resource(const string& resource,
 
   ret = req.send_request(&key, headers, resource, mgr, send_data);
   if (ret < 0) {
-    ldout(cct, 5) << __func__ << ": send_request() resource=" << resource << " returned ret=" << ret << dendl;
+    ldout(cct, 5) << __FFL__ << ": send_request() resource=" << resource << " returned ret=" << ret << dendl;
     return ret;
   }
 
@@ -383,7 +383,7 @@ int RGWRESTReadResource::read()
 {
   int ret = req.send_request(&conn->get_key(), headers, resource, mgr);
   if (ret < 0) {
-    ldout(cct, 5) << __func__ << ": send_request() resource=" << resource << " returned ret=" << ret << dendl;
+    ldout(cct, 5) << __FFL__ << ": send_request() resource=" << resource << " returned ret=" << ret << dendl;
     return ret;
   }
 
@@ -394,7 +394,7 @@ int RGWRESTReadResource::aio_read()
 {
   int ret = req.send_request(&conn->get_key(), headers, resource, mgr);
   if (ret < 0) {
-    ldout(cct, 5) << __func__ << ": send_request() resource=" << resource << " returned ret=" << ret << dendl;
+    ldout(cct, 5) << __FFL__ << ": send_request() resource=" << resource << " returned ret=" << ret << dendl;
     return ret;
   }
 
@@ -444,7 +444,7 @@ int RGWRESTSendResource::send(bufferlist& outbl)
 
   int ret = req.send_request(&conn->get_key(), headers, resource, mgr);
   if (ret < 0) {
-    ldout(cct, 5) << __func__ << ": send_request() resource=" << resource << " returned ret=" << ret << dendl;
+    ldout(cct, 5) << __FFL__ << ": send_request() resource=" << resource << " returned ret=" << ret << dendl;
     return ret;
   }
 
@@ -458,7 +458,7 @@ int RGWRESTSendResource::aio_send(bufferlist& outbl)
 
   int ret = req.send_request(&conn->get_key(), headers, resource, mgr);
   if (ret < 0) {
-    ldout(cct, 5) << __func__ << ": send_request() resource=" << resource << " returned ret=" << ret << dendl;
+    ldout(cct, 5) << __FFL__ << ": send_request() resource=" << resource << " returned ret=" << ret << dendl;
     return ret;
   }
 

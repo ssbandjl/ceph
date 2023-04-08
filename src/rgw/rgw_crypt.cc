@@ -33,12 +33,12 @@ CryptoAccelRef get_crypto_accel(CephContext *cct)
 
   CryptoPlugin *factory = dynamic_cast<CryptoPlugin*>(reg->get_with_load("crypto", crypto_accel_type));
   if (factory == nullptr) {
-    lderr(cct) << __func__ << " cannot load crypto accelerator of type " << crypto_accel_type << dendl;
+    lderr(cct) << __FFL__ << " cannot load crypto accelerator of type " << crypto_accel_type << dendl;
     return nullptr;
   }
   int err = factory->factory(&ca_impl, &ss);
   if (err) {
-    lderr(cct) << __func__ << " factory return error " << err <<
+    lderr(cct) << __FFL__ << " factory return error " << err <<
         " with description: " << ss.str() << dendl;
   }
   return ca_impl;

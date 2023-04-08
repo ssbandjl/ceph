@@ -567,7 +567,7 @@ int ErasureCodeLrc::_minimum_to_decode(const set<int> &want_to_read,
 				       const set<int> &available_chunks,
 				       set<int> *minimum)
 {
-  dout(20) << __func__ << " want_to_read " << want_to_read
+  dout(20) << __FFL__ << " want_to_read " << want_to_read
 	   << " available_chunks " << available_chunks << dendl;
   {
     set<int> erasures_total;
@@ -590,7 +590,7 @@ int ErasureCodeLrc::_minimum_to_decode(const set<int> &want_to_read,
     //
     if (erasures_want.empty()) {
       *minimum = want_to_read;
-      dout(20) << __func__ << " minimum == want_to_read == "
+      dout(20) << __FFL__ << " minimum == want_to_read == "
 	       << want_to_read << dendl;
       return 0;
     }
@@ -669,7 +669,7 @@ int ErasureCodeLrc::_minimum_to_decode(const set<int> &want_to_read,
 	if (minimum->count(*i))
 	  minimum->erase(*i);
       }
-      dout(20) << __func__ << " minimum = " << *minimum << dendl;
+      dout(20) << __FFL__ << " minimum = " << *minimum << dendl;
       return 0;
     }
   }
@@ -723,13 +723,13 @@ int ErasureCodeLrc::_minimum_to_decode(const set<int> &want_to_read,
       // recover, use all available chunks.
       //
       *minimum = available_chunks;
-      dout(20) << __func__ << " minimum == available_chunks == "
+      dout(20) << __FFL__ << " minimum == available_chunks == "
 	       << available_chunks << dendl;
       return 0;
     }
   }
 
-  derr << __func__ << " not enough chunks in " << available_chunks
+  derr << __FFL__ << " not enough chunks in " << available_chunks
        << " to read " << want_to_read << dendl;
   return -EIO;
 }
@@ -765,7 +765,7 @@ int ErasureCodeLrc::encode_chunks(const set<int> &want_to_encode,
       std::swap(layer_encoded[j++], (*encoded)[c]);
     }
     if (err) {
-      derr << __func__ << " layer " << layer.chunks_map
+      derr << __FFL__ << " layer " << layer.chunks_map
 	   << " failed with " << err << " trying to encode "
 	   << layer_want_to_encode << dendl;
       return err;
@@ -827,7 +827,7 @@ int ErasureCodeLrc::decode_chunks(const set<int> &want_to_read,
 						   layer_chunks,
 						   &layer_decoded);
       if (err) {
-	derr << __func__ << " layer " << layer->chunks_map
+	derr << __FFL__ << " layer " << layer->chunks_map
 	     << " failed with " << err << " trying to decode "
 	     << layer_want_to_read << " with " << available_chunks << dendl;
 	return err;
@@ -850,7 +850,7 @@ int ErasureCodeLrc::decode_chunks(const set<int> &want_to_read,
   }
 
   if (want_to_read_erasures.size() > 0) {
-    derr << __func__ << " want to read " << want_to_read
+    derr << __FFL__ << " want to read " << want_to_read
 	 << " with available_chunks = " << available_chunks
 	 << " end up being unable to read " << want_to_read_erasures << dendl;
     return -EIO;

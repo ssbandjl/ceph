@@ -35,7 +35,7 @@
 #define dout_context g_ceph_context
 #define dout_subsys ceph_subsys_mgr
 #undef dout_prefix
-#define dout_prefix *_dout << "mgr " << __func__ << " "
+#define dout_prefix *_dout << "mgr " << __FFL__ << " "
 
 
 Mgr::Mgr(MonClient *monc_, const MgrMap& mgrmap,
@@ -204,7 +204,7 @@ std::map<std::string, std::string> Mgr::load_store()
 	  string val = get_cmd.outbl.to_str();
 	  int r = get_json_str_map(val, ss, &meta, false);
 	  if (r < 0) {
-	    derr << __func__ << " failed to parse " << val << ": " << ss.str()
+	    derr << __FFL__ << " failed to parse " << val << ": " << ss.str()
 		 << dendl;
 	  } else {
 	    daemon_state.with_device_create(
@@ -524,7 +524,7 @@ void Mgr::handle_service_map(ref_t<MServiceMap> m)
 
 void Mgr::handle_mon_map()
 {
-  dout(20) << __func__ << dendl;
+  dout(20) << __FFL__ << dendl;
   assert(ceph_mutex_is_locked_by_me(lock));
   std::set<std::string> names_exist;
   cluster_state.with_monmap([&] (auto &monmap) {

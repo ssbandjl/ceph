@@ -185,10 +185,10 @@ void PGLog::trim(
   bool transaction_applied,
   bool async)
 {
-  dout(10) << __func__ << " proposed trim_to = " << trim_to << dendl;
+  dout(10) << __FFL__ << " proposed trim_to = " << trim_to << dendl;
   // trim?
   if (trim_to > log.tail) {
-    dout(10) << __func__ << " missing = " << missing.num_missing() << dendl;
+    dout(10) << __FFL__ << " missing = " << missing.num_missing() << dendl;
     // Don't assert for async_recovery_targets or backfill_targets
     // or whenever there are missing items
     if (transaction_applied && !async && (missing.num_missing() == 0))
@@ -212,12 +212,12 @@ void PGLog::proc_replica_log(
 	   << oinfo << " " << olog << " " << omissing << dendl;
 
   if (olog.head < log.tail) {
-    dout(10) << __func__ << ": osd." << from << " does not overlap, not looking "
+    dout(10) << __FFL__ << ": osd." << from << " does not overlap, not looking "
 	     << "for divergent objects" << dendl;
     return;
   }
   if (olog.head == log.head) {
-    dout(10) << __func__ << ": osd." << from << " same log head, not looking "
+    dout(10) << __FFL__ << ": osd." << from << " same log head, not looking "
 	     << "for divergent objects" << dendl;
     return;
   }
@@ -328,7 +328,7 @@ void PGLog::rewind_divergent_log(eversion_t newhead,
   // Later, in merge_object_divergent_entries(), we use it to check whether we can rollback
   // a divergent entry or not.
   eversion_t original_crt = log.get_can_rollback_to();
-  dout(20) << __func__ << " original_crt = " << original_crt << dendl;
+  dout(20) << __FFL__ << " original_crt = " << original_crt << dendl;
   if (info.last_complete > newhead)
     info.last_complete = newhead;
 
@@ -447,7 +447,7 @@ void PGLog::merge_log(pg_info_t &oinfo, pg_log_t &olog, pg_shard_t fromosd,
     // Later, in merge_object_divergent_entries(), we use it to check whether we can rollback
     // a divergent entry or not.
     eversion_t original_crt = log.get_can_rollback_to();
-    dout(20) << __func__ << " original_crt = " << original_crt << dendl;
+    dout(20) << __FFL__ << " original_crt = " << original_crt << dendl;
     auto divergent = log.rewind_from_head(lower_bound);
     // move aside divergent items
     for (auto &&oe: divergent) {
@@ -968,7 +968,7 @@ void PGLog::rebuild_missing_set_with_deletes(
   map<hobject_t, pg_missing_item> extra_missing;
   for (const auto& p : missing.get_items()) {
     if (!log.logged_object(p.first)) {
-      dout(20) << __func__ << " extra missing entry: " << p.first
+      dout(20) << __FFL__ << " extra missing entry: " << p.first
 	       << " " << p.second << dendl;
       extra_missing[p.first] = p.second;
     }
@@ -996,11 +996,11 @@ void PGLog::rebuild_missing_set_with_deletes(
 	ghobject_t(i->soid, ghobject_t::NO_GEN, info.pgid.shard),
 	OI_ATTR,
 	bv);
-    dout(20) << __func__ << " check for log entry: " << *i << " = " << r << dendl;
+    dout(20) << __FFL__ << " check for log entry: " << *i << " = " << r << dendl;
 
     if (r >= 0) {
       object_info_t oi(bv);
-      dout(20) << __func__ << " store version = " << oi.version << dendl;
+      dout(20) << __FFL__ << " store version = " << oi.version << dendl;
       if (oi.version < i->version) {
 	missing.add(i->soid, i->version, oi.version, i->is_delete());
       }

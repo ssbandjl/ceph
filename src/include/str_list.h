@@ -4,8 +4,12 @@
 #include <list>
 #include <set>
 #include <string>
+#include <string.h>
 #include <string_view>
 #include <vector>
+
+#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+#define __FFL__ __func__ << " " << __FILENAME__ << ":" << __LINE__
 
 namespace ceph {
 

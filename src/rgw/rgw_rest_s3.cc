@@ -2419,7 +2419,7 @@ int RGWPutObj_ObjStore_S3::get_params()
                                  copy_source_bucket_info,
                                  NULL, s->yield, &src_attrs);
     if (ret < 0) {
-      ldpp_dout(this, 5) << __func__ << "(): get_bucket_info() returned ret=" << ret << dendl;
+      ldpp_dout(this, 5) << __FFL__ << "(): get_bucket_info() returned ret=" << ret << dendl;
       return ret;
     }
 
@@ -3469,7 +3469,7 @@ void RGWGetLC_ObjStore_S3::execute()
   try {
       config.decode(iter);
     } catch (const buffer::error& e) {
-      ldpp_dout(this, 0) << __func__ <<  "decode life cycle config failed" << dendl;
+      ldpp_dout(this, 0) << __FFL__ <<  "decode life cycle config failed" << dendl;
       op_ret = -EIO;
       return;
     }
@@ -4389,7 +4389,7 @@ RGWOp *RGWHandler_REST_Bucket_S3::get_obj_op(bool get_data) const
       case 2:
         return new RGWListBucket_ObjStore_S3v2;
       default:
-        ldpp_dout(s, 5) << __func__ << ": unsupported list-type " << list_type << dendl;
+        ldpp_dout(s, 5) << __FFL__ << ": unsupported list-type " << list_type << dendl;
         return new RGWListBucket_ObjStore_S3;
     }
   } else {
@@ -4940,7 +4940,7 @@ RGWHandler_REST* RGWRESTMgr_S3::get_handler(struct req_state* const s,
     }
   }
 
-  ldpp_dout(s, 20) << __func__ << " handler=" << typeid(*handler).name()
+  ldpp_dout(s, 20) << __FFL__ << " handler=" << typeid(*handler).name()
 		    << dendl;
   return handler;
 }
@@ -4983,7 +4983,7 @@ int RGWHandler_REST_S3Website::init(rgw::sal::RGWRadosStore *store, req_state *s
 
 int RGWHandler_REST_S3Website::retarget(RGWOp* op, RGWOp** new_op) {
   *new_op = op;
-  ldpp_dout(s, 10) << __func__ << " Starting retarget" << dendl;
+  ldpp_dout(s, 10) << __FFL__ << " Starting retarget" << dendl;
 
   if (!(s->prot_flags & RGW_REST_WEBSITE))
     return 0;

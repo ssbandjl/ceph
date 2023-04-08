@@ -62,6 +62,9 @@
 
 #include "inline_memory.h"
 
+#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+#define __FFL__ __func__ << " " << __FILENAME__ << ":" << __LINE__
+
 #define CEPH_BUFFER_API
 
 #ifdef HAVE_SEASTAR

@@ -14,7 +14,7 @@
 
 #define dout_subsys ceph_subsys_rados
 #undef dout_prefix
-#define dout_prefix *_dout << "TestWatchNotify::" << __func__ << ": "
+#define dout_prefix *_dout << "TestWatchNotify::" << __FFL__ << ": "
 
 namespace librados {
 

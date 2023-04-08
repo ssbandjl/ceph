@@ -58,7 +58,7 @@ bool AuthMonitor::check_rotate()
   rot_inc.op = KeyServerData::AUTH_INC_SET_ROTATING;
   if (!mon->key_server.updated_rotating(rot_inc.rotating_bl, last_rotating_ver))
     return false;
-  dout(10) << __func__ << " updated rotating" << dendl;
+  dout(10) << __FFL__ << " updated rotating" << dendl;
   push_cephx_inc(rot_inc);
   return true;
 }
@@ -85,7 +85,7 @@ void AuthMonitor::tick()
       increase_max_global_id();
       propose = true;
     } else {
-      dout(10) << __func__ << "requesting more ids from leader" << dendl;
+      dout(10) << __FFL__ << "requesting more ids from leader" << dendl;
       int leader = mon->get_leader();
       MMonGlobalID *req = new MMonGlobalID();
       req->old_max_id = max_global_id;
@@ -134,7 +134,7 @@ bufferlist _encode_cap(const string& cap)
 
 void AuthMonitor::get_initial_keyring(KeyRing *keyring)
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   ceph_assert(keyring != nullptr);
 
   bufferlist bl;
@@ -194,7 +194,7 @@ void _generate_bootstrap_keys(
 
 void AuthMonitor::create_initial_keys(KeyRing *keyring)
 {
-  dout(10) << __func__ << " with keyring" << dendl;
+  dout(10) << __FFL__ << " with keyring" << dendl;
   ceph_assert(keyring != nullptr);
 
   list<pair<EntityName,EntityAuth> > auth_lst;
@@ -240,7 +240,7 @@ void AuthMonitor::create_initial()
 
 void AuthMonitor::update_from_paxos(bool *need_bootstrap)
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   load_health();
 
   version_t version = get_last_committed();
@@ -251,7 +251,7 @@ void AuthMonitor::update_from_paxos(bool *need_bootstrap)
 
   version_t latest_full = get_version_latest_full();
 
-  dout(10) << __func__ << " version " << version << " keys ver " << keys_ver
+  dout(10) << __FFL__ << " version " << version << " keys ver " << keys_ver
            << " latest " << latest_full << dendl;
 
   if ((latest_full > 0) && (latest_full > keys_ver)) {
@@ -259,8 +259,8 @@ void AuthMonitor::update_from_paxos(bool *need_bootstrap)
     int err = get_version_full(latest_full, latest_bl);
     ceph_assert(err == 0);
     ceph_assert(latest_bl.length() != 0);
-    dout(7) << __func__ << " loading summary e " << latest_full << dendl;
-    dout(7) << __func__ << " latest length " << latest_bl.length() << dendl;
+    dout(7) << __FFL__ << " loading summary e " << latest_full << dendl;
+    dout(7) << __FFL__ << " latest length " << latest_bl.length() << dendl;
     auto p = latest_bl.cbegin();
     __u8 struct_v;
     decode(struct_v, p);
@@ -270,7 +270,7 @@ void AuthMonitor::update_from_paxos(bool *need_bootstrap)
     keys_ver = latest_full;
   }
 
-  dout(10) << __func__ << " key server version " << mon->key_server.get_ver() << dendl;
+  dout(10) << __FFL__ << " key server version " << mon->key_server.get_ver() << dendl;
 
   // walk through incrementals
   while (version > keys_ver) {
@@ -285,7 +285,7 @@ void AuthMonitor::update_from_paxos(bool *need_bootstrap)
     if (keys_ver == 0)
       mon->key_server.clear_secrets();
 
-    dout(20) << __func__ << " walking through version " << (keys_ver+1)
+    dout(20) << __FFL__ << " walking through version " << (keys_ver+1)
              << " len " << bl.length() << dendl;
 
     auto p = bl.cbegin();
@@ -324,12 +324,12 @@ void AuthMonitor::update_from_paxos(bool *need_bootstrap)
     std::lock_guard l(mon->auth_lock);
     if (last_allocated_id == 0) {
       last_allocated_id = max_global_id;
-      dout(10) << __func__ << " last_allocated_id initialized to "
+      dout(10) << __FFL__ << " last_allocated_id initialized to "
 	       << max_global_id << dendl;
     }
   }
 
-  dout(10) << __func__ << " max_global_id=" << max_global_id
+  dout(10) << __FFL__ << " max_global_id=" << max_global_id
 	   << " format_version " << format_version
 	   << dendl;
 }
@@ -369,7 +369,7 @@ void AuthMonitor::create_pending()
 
 void AuthMonitor::encode_pending(MonitorDBStore::TransactionRef t)
 {
-  dout(10) << __func__ << " v " << (get_last_committed() + 1) << dendl;
+  dout(10) << __FFL__ << " v " << (get_last_committed() + 1) << dendl;
 
   bufferlist bl;
 
@@ -438,12 +438,12 @@ void AuthMonitor::encode_full(MonitorDBStore::TransactionRef t)
   if (version == 0)
     return;
 
-  dout(10) << __func__ << " auth v " << version << dendl;
+  dout(10) << __FFL__ << " auth v " << version << dendl;
   ceph_assert(get_last_committed() == version);
 
   bufferlist full_bl;
   std::scoped_lock l{mon->key_server.get_lock()};
-  dout(20) << __func__ << " key server has "
+  dout(20) << __FFL__ << " key server has "
            << (mon->key_server.has_secrets() ? "" : "no ")
            << "secrets!" << dendl;
   __u8 v = 1;
@@ -515,7 +515,7 @@ bool AuthMonitor::prepare_update(MonOpRequestRef op)
 
 void AuthMonitor::_set_mon_num_rank(int num, int rank)
 {
-  dout(10) << __func__ << " num " << num << " rank " << rank << dendl;
+  dout(10) << __FFL__ << " num " << num << " rank " << rank << dendl;
   ceph_assert(ceph_mutex_is_locked(mon->auth_lock));
   mon_num = num;
   mon_rank = rank;
@@ -525,12 +525,12 @@ uint64_t AuthMonitor::_assign_global_id()
 {
   ceph_assert(ceph_mutex_is_locked(mon->auth_lock));
   if (mon_num < 1 || mon_rank < 0) {
-    dout(10) << __func__ << " inactive (num_mon " << mon_num
+    dout(10) << __FFL__ << " inactive (num_mon " << mon_num
 	     << " rank " << mon_rank << ")" << dendl;
     return 0;
   }
   if (!last_allocated_id) {
-    dout(10) << __func__ << " last_allocated_id == 0" << dendl;
+    dout(10) << __FFL__ << " last_allocated_id == 0" << dendl;
     return 0;
   }
 
@@ -542,12 +542,12 @@ uint64_t AuthMonitor::_assign_global_id()
   id += remainder + mon_rank;
 
   if (id >= max_global_id) {
-    dout(10) << __func__ << " failed (max " << max_global_id << ")" << dendl;
+    dout(10) << __FFL__ << " failed (max " << max_global_id << ")" << dendl;
     return 0;
   }
 
   last_allocated_id = id;
-  dout(10) << __func__ << " " << id << " (max " << max_global_id << ")"
+  dout(10) << __FFL__ << " " << id << " (max " << max_global_id << ")"
 	   << dendl;
   return id;
 }
@@ -896,7 +896,7 @@ void AuthMonitor::export_keyring(KeyRing& keyring)
 
 int AuthMonitor::import_keyring(KeyRing& keyring)
 {
-  dout(10) << __func__ << " " << keyring.size() << " keys" << dendl;
+  dout(10) << __FFL__ << " " << keyring.size() << " keys" << dendl;
 
   for (map<EntityName, EntityAuth>::iterator p = keyring.get_keys().begin();
        p != keyring.get_keys().end();
@@ -913,7 +913,7 @@ int AuthMonitor::import_keyring(KeyRing& keyring)
 
 int AuthMonitor::remove_entity(const EntityName &entity)
 {
-  dout(10) << __func__ << " " << entity << dendl;
+  dout(10) << __FFL__ << " " << entity << dendl;
   if (!mon->key_server.contains(entity))
     return -ENOENT;
 
@@ -959,7 +959,7 @@ int AuthMonitor::exists_and_matches_entity(
     stringstream& ss)
 {
 
-  dout(20) << __func__ << " entity " << name << " auth " << auth
+  dout(20) << __FFL__ << " entity " << name << " auth " << auth
            << " caps " << caps << " has_secret " << has_secret << dendl;
 
   EntityAuth existing_auth;
@@ -1019,20 +1019,20 @@ int AuthMonitor::validate_osd_destroy(
 {
   ceph_assert(paxos->is_plugged());
 
-  dout(10) << __func__ << " id " << id << " uuid " << uuid << dendl;
+  dout(10) << __FFL__ << " id " << id << " uuid " << uuid << dendl;
 
   string cephx_str = "osd." + stringify(id);
   string lockbox_str = "client.osd-lockbox." + stringify(uuid);
 
   if (!cephx_entity.from_str(cephx_str)) {
-    dout(10) << __func__ << " invalid cephx entity '"
+    dout(10) << __FFL__ << " invalid cephx entity '"
              << cephx_str << "'" << dendl;
     ss << "invalid cephx key entity '" << cephx_str << "'";
     return -EINVAL;
   }
 
   if (!lockbox_entity.from_str(lockbox_str)) {
-    dout(10) << __func__ << " invalid lockbox entity '"
+    dout(10) << __FFL__ << " invalid lockbox entity '"
              << lockbox_str << "'" << dendl;
     ss << "invalid lockbox key entity '" << lockbox_str << "'";
     return -EINVAL;
@@ -1052,27 +1052,27 @@ int AuthMonitor::do_osd_destroy(
 {
   ceph_assert(paxos->is_plugged());
 
-  dout(10) << __func__ << " cephx " << cephx_entity
+  dout(10) << __FFL__ << " cephx " << cephx_entity
                        << " lockbox " << lockbox_entity << dendl;
 
   bool removed = false;
 
   int err = remove_entity(cephx_entity);
   if (err == -ENOENT) {
-    dout(10) << __func__ << " " << cephx_entity << " does not exist" << dendl;
+    dout(10) << __FFL__ << " " << cephx_entity << " does not exist" << dendl;
   } else {
     removed = true;
   }
 
   err = remove_entity(lockbox_entity);
   if (err == -ENOENT) {
-    dout(10) << __func__ << " " << lockbox_entity << " does not exist" << dendl;
+    dout(10) << __FFL__ << " " << lockbox_entity << " does not exist" << dendl;
   } else {
     removed = true;
   }
 
   if (!removed) {
-    dout(10) << __func__ << " entities do not exist -- no-op." << dendl;
+    dout(10) << __FFL__ << " entities do not exist -- no-op." << dendl;
     return 0;
   }
 
@@ -1109,7 +1109,7 @@ int AuthMonitor::validate_osd_new(
     stringstream& ss)
 {
 
-  dout(10) << __func__ << " osd." << id << " uuid " << uuid << dendl;
+  dout(10) << __FFL__ << " osd." << id << " uuid " << uuid << dendl;
 
   map<string,bufferlist> cephx_caps = {
     { "osd", _encode_cap("allow *") },
@@ -1129,7 +1129,7 @@ int AuthMonitor::validate_osd_new(
   string lockbox_name = "client.osd-lockbox." + stringify(uuid);
 
   if (!cephx_entity.name.from_str(cephx_name)) {
-    dout(10) << __func__ << " invalid cephx entity '"
+    dout(10) << __FFL__ << " invalid cephx entity '"
              << cephx_name << "'" << dendl;
     ss << "invalid cephx key entity '" << cephx_name << "'";
     return -EINVAL;
@@ -1137,7 +1137,7 @@ int AuthMonitor::validate_osd_new(
 
   if (has_lockbox) {
     if (!lockbox_entity.name.from_str(lockbox_name)) {
-      dout(10) << __func__ << " invalid cephx lockbox entity '"
+      dout(10) << __FFL__ << " invalid cephx lockbox entity '"
                << lockbox_name << "'" << dendl;
       ss << "invalid cephx lockbox entity '" << lockbox_name << "'";
       return -EINVAL;
@@ -1207,7 +1207,7 @@ int AuthMonitor::do_osd_new(
 {
   ceph_assert(paxos->is_plugged());
 
-  dout(10) << __func__ << " cephx " << cephx_entity.name
+  dout(10) << __FFL__ << " cephx " << cephx_entity.name
            << " lockbox ";
   if (has_lockbox) {
     *_dout << lockbox_entity.name;
@@ -1747,7 +1747,7 @@ bool AuthMonitor::prepare_global_id(MonOpRequestRef op)
 
 bool AuthMonitor::_upgrade_format_to_dumpling()
 {
-  dout(1) << __func__ << " upgrading from format 0 to 1" << dendl;
+  dout(1) << __FFL__ << " upgrading from format 0 to 1" << dendl;
   ceph_assert(format_version == 0);
 
   bool changed = false;
@@ -1764,7 +1764,7 @@ bool AuthMonitor::_upgrade_format_to_dumpling()
       decode(mon_caps, it);
     }
     catch (const buffer::error&) {
-      dout(10) << __func__ << " unable to parse mon cap for "
+      dout(10) << __FFL__ << " unable to parse mon cap for "
 	       << p->first << dendl;
       continue;
     }
@@ -1787,7 +1787,7 @@ bool AuthMonitor::_upgrade_format_to_dumpling()
     }
 
     if (new_caps.length() > 0) {
-      dout(5) << __func__ << " updating " << p->first << " mon cap from "
+      dout(5) << __FFL__ << " updating " << p->first << " mon cap from "
 	      << mon_caps << " to " << new_caps << dendl;
 
       bufferlist bl;
@@ -1807,7 +1807,7 @@ bool AuthMonitor::_upgrade_format_to_dumpling()
 
 bool AuthMonitor::_upgrade_format_to_luminous()
 {
-  dout(1) << __func__ << " upgrading from format 1 to 2" << dendl;
+  dout(1) << __FFL__ << " upgrading from format 1 to 2" << dendl;
   ceph_assert(format_version == 1);
 
   bool changed = false;
@@ -1884,7 +1884,7 @@ bool AuthMonitor::_upgrade_format_to_luminous()
 
 bool AuthMonitor::_upgrade_format_to_mimic()
 {
-  dout(1) << __func__ << " upgrading from format 2 to 3" << dendl;
+  dout(1) << __FFL__ << " upgrading from format 2 to 3" << dendl;
   ceph_assert(format_version == 2);
 
   list<pair<EntityName,EntityAuth> > auth_lst;
@@ -1927,7 +1927,7 @@ void AuthMonitor::upgrade_format()
     current = FORMAT_LUMINOUS;
   }
   if (format_version >= current) {
-    dout(20) << __func__ << " format " << format_version
+    dout(20) << __FFL__ << " format " << format_version
 	     << " is current" << dendl;
     return;
   }
@@ -1949,7 +1949,7 @@ void AuthMonitor::upgrade_format()
 
   if (changed) {
     // note new format
-    dout(10) << __func__ << " proposing update from format " << format_version
+    dout(10) << __FFL__ << " proposing update from format " << format_version
 	     << " -> " << current << dendl;
     format_version = current;
     propose_pending();

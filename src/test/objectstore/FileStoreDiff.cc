@@ -74,7 +74,7 @@ static bool diff_omap(std::map<std::string,bufferlist>& b,
   std::map<std::string, bufferlist>::iterator a_it = a.begin();
   for (; b_it != b.end(); ++b_it, ++a_it) {
     if (a_it == a.end()) {
-      cout << __func__ << " a reached end before b, a missing " << b_it->first
+      cout << __FFL__ << " a reached end before b, a missing " << b_it->first
 	   << std::endl;
       ret = true;
       break;

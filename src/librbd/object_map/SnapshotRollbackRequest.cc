@@ -45,7 +45,7 @@ void SnapshotRollbackRequest::send() {
 
 bool SnapshotRollbackRequest::should_complete(int r) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": state=" << m_state << ", "
+  ldout(cct, 5) << this << " " << __FFL__ << ": state=" << m_state << ", "
                 << "r=" << r << dendl;
   if (r < 0 && m_ret_val == 0) {
     m_ret_val = r;
@@ -79,7 +79,7 @@ void SnapshotRollbackRequest::send_read_map() {
   std::string snap_oid(ObjectMap<>::object_map_name(m_image_ctx.id, m_snap_id));
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": snap_oid=" << snap_oid
+  ldout(cct, 5) << this << " " << __FFL__ << ": snap_oid=" << snap_oid
                 << dendl;
   m_state = STATE_READ_MAP;
 
@@ -99,7 +99,7 @@ void SnapshotRollbackRequest::send_write_map() {
   CephContext *cct = m_image_ctx.cct;
   std::string snap_oid(ObjectMap<>::object_map_name(m_image_ctx.id,
                                                     CEPH_NOSNAP));
-  ldout(cct, 5) << this << " " << __func__ << ": snap_oid=" << snap_oid
+  ldout(cct, 5) << this << " " << __FFL__ << ": snap_oid=" << snap_oid
                 << dendl;
   m_state = STATE_WRITE_MAP;
 
@@ -118,7 +118,7 @@ void SnapshotRollbackRequest::send_invalidate_map() {
   std::unique_lock image_locker{m_image_ctx.image_lock};
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
   m_state = STATE_INVALIDATE_MAP;
 
   InvalidateRequest<> *req = new InvalidateRequest<>(m_image_ctx, m_snap_id,

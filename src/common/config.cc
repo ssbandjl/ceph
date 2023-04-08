@@ -269,20 +269,20 @@ int md_config_t::set_mon_vals(CephContext *cct,
   ignored_mon_values.clear();
 
   if (!config_cb) {
-    ldout(cct, 4) << __func__ << " no callback set" << dendl;
+    ldout(cct, 4) << __FFL__ << " no callback set" << dendl;
   }
 
   for (auto& i : kv) {
     if (config_cb) {
       if (config_cb(i.first, i.second)) {
-	ldout(cct, 4) << __func__ << " callback consumed " << i.first << dendl;
+	ldout(cct, 4) << __FFL__ << " callback consumed " << i.first << dendl;
 	continue;
       }
-      ldout(cct, 4) << __func__ << " callback ignored " << i.first << dendl;
+      ldout(cct, 4) << __FFL__ << " callback ignored " << i.first << dendl;
     }
     const Option *o = find_option(i.first);
     if (!o) {
-      ldout(cct,10) << __func__ << " " << i.first << " = " << i.second
+      ldout(cct,10) << __FFL__ << " " << i.first << " = " << i.second
 		    << " (unrecognized option)" << dendl;
       continue;
     }
@@ -293,15 +293,15 @@ int md_config_t::set_mon_vals(CephContext *cct,
     std::string err;
     int r = _set_val(values, tracker, i.second, *o, CONF_MON, &err);
     if (r < 0) {
-      ldout(cct, 4) << __func__ << " failed to set " << i.first << " = "
+      ldout(cct, 4) << __FFL__ << " failed to set " << i.first << " = "
 		    << i.second << ": " << err << dendl;
       ignored_mon_values.emplace(i);
     } else if (r == ConfigValues::SET_NO_CHANGE ||
 	       r == ConfigValues::SET_NO_EFFECT) {
-      ldout(cct,20) << __func__ << " " << i.first << " = " << i.second
+      ldout(cct,20) << __FFL__ << " " << i.first << " = " << i.second
 		    << " (no change)" << dendl;
     } else if (r == ConfigValues::SET_HAVE_EFFECT) {
-      ldout(cct,10) << __func__ << " " << i.first << " = " << i.second << dendl;
+      ldout(cct,10) << __FFL__ << " " << i.first << " = " << i.second << dendl;
     } else {
       ceph_abort();
     }
@@ -314,7 +314,7 @@ int md_config_t::set_mon_vals(CephContext *cct,
     if (kv.find(name) != kv.end()) {
       return;
     }
-    ldout(cct,10) << __func__ << " " << name
+    ldout(cct,10) << __FFL__ << " " << name
 		  << " cleared (was " << Option::to_str(config->second) << ")"
 		  << dendl;
     values.rm_val(name, CONF_MON);
@@ -1126,7 +1126,7 @@ Option::value_t md_config_t::_expand_meta(
   expand_stack_t *stack,
   std::ostream *err) const
 {
-  //cout << __func__ << " in '" << in << "' stack " << stack << std::endl;
+  //cout << __FFL__ << " in '" << in << "' stack " << stack << std::endl;
   if (!stack) {
     return in;
   }

@@ -3723,13 +3723,13 @@ bool MDCache::expire_recursive(CInode *in, expiremap &expiremap)
 {
   ceph_assert(!in->is_auth());
 
-  dout(10) << __func__ << ":" << *in << dendl;
+  dout(10) << __FFL__ << ":" << *in << dendl;
 
   // Recurse into any dirfrags beneath this inode
   auto&& ls = in->get_dirfrags();
   for (const auto& subdir : ls) {
     if (!in->is_mdsdir() && subdir->is_subtree_root()) {
-      dout(10) << __func__ << ": stray still has subtree " << *in << dendl;
+      dout(10) << __FFL__ << ": stray still has subtree " << *in << dendl;
       return true;
     }
 
@@ -3744,7 +3744,7 @@ bool MDCache::expire_recursive(CInode *in, expiremap &expiremap)
          * expired, because they may be the target of
          * a rename() as the owning MDS shuts down */
         if (!tin->is_stray() && tin->inode.nlink) {
-          dout(10) << __func__ << ": stray still has linkage " << *tin << dendl;
+          dout(10) << __FFL__ << ": stray still has linkage " << *tin << dendl;
           return true;
         }
 
@@ -3756,7 +3756,7 @@ bool MDCache::expire_recursive(CInode *in, expiremap &expiremap)
       if (dn->lru_is_expireable()) {
         trim_dentry(dn, expiremap);
       } else {
-        dout(10) << __func__ << ": stray dn is not expireable " << *dn << dendl;
+        dout(10) << __FFL__ << ": stray dn is not expireable " << *dn << dendl;
         return true;
       }
     }
@@ -5354,7 +5354,7 @@ void MDCache::rejoin_prefetch_ino_finish(inodeno_t ino, int ret)
 {
   auto p = cap_imports.find(ino);
   if (p != cap_imports.end()) {
-    dout(10) << __func__ << " ino " << ino << " ret " << ret << dendl;
+    dout(10) << __FFL__ << " ino " << ino << " ret " << ret << dendl;
     if (ret < 0) {
       cap_imports_missing.insert(ino);
     } else if (ret != mds->get_nodeid()) {
@@ -6655,7 +6655,7 @@ void MDCache::purge_inodes(const interval_set<inodeno_t>& inos, LogSegment *ls)
       mds->mdlog->flush();
     });
   
-  dout(10) << __func__ << " start purge data : " << inos << dendl;
+  dout(10) << __FFL__ << " start purge data : " << inos << dendl;
   C_GatherBuilder gather(g_ceph_context,
 			  new C_OnFinisher( new MDSIOContextWrapper(mds, cb), mds->finisher));
   SnapContext nullsnapc;
@@ -6670,7 +6670,7 @@ void MDCache::purge_inodes(const interval_set<inodeno_t>& inos, LogSegment *ls)
 	     << " seq : " << ls->seq << dendl;
     
     for (_inodeno_t i = 0; i < p.get_len(); i++){
-      dout(20) << __func__ << " : " << p.get_start() + i << dendl;
+      dout(20) << __FFL__ << " : " << p.get_start() + i << dendl;
       filer.purge_range(p.get_start() + i,
 			&default_file_layout,
 			nullsnapc,
@@ -6845,11 +6845,11 @@ std::pair<bool, uint64_t> MDCache::trim(uint64_t count)
       em.first->second = make_message<MCacheExpire>(mds->get_nodeid());
     }
 
-    dout(20) << __func__ << ": try expiring " << *mdsdir_in << " for stopping mds." << mds <<  dendl;
+    dout(20) << __FFL__ << ": try expiring " << *mdsdir_in << " for stopping mds." << mds <<  dendl;
 
     const bool aborted = expire_recursive(mdsdir_in, expiremap);
     if (!aborted) {
-      dout(20) << __func__ << ": successfully expired mdsdir" << dendl;
+      dout(20) << __FFL__ << ": successfully expired mdsdir" << dendl;
       auto&& ls = mdsdir_in->get_dirfrags();
       for (auto dir : ls) {
 	if (dir->get_num_ref() == 1) {  // subtree pin
@@ -6862,7 +6862,7 @@ std::pair<bool, uint64_t> MDCache::trim(uint64_t count)
         ++trimmed;
       }
     } else {
-      dout(20) << __func__ << ": some unexpirable contents in mdsdir" << dendl;
+      dout(20) << __FFL__ << ": some unexpirable contents in mdsdir" << dendl;
     }
   }
 
@@ -6874,7 +6874,7 @@ std::pair<bool, uint64_t> MDCache::trim(uint64_t count)
       ++p;
       if (MDS_INO_IS_MDSDIR(base_in->ino()) &&
 	  MDS_INO_MDSDIR_OWNER(base_in->ino()) != mds->get_nodeid()) {
-        dout(20) << __func__ << ": maybe trimming base: " << *base_in << dendl;
+        dout(20) << __FFL__ << ": maybe trimming base: " << *base_in << dendl;
         if (base_in->get_num_ref() == 0) {
           trim_inode(NULL, base_in, NULL, expiremap);
           ++trimmed;
@@ -7514,7 +7514,7 @@ void MDCache::handle_cache_expire(const cref_t<MCacheExpire> &m)
 	ceph_assert(in);
       }        
       ceph_assert(in->is_auth());
-      dout(20) << __func__ << ": expiring inode " << *in << dendl;
+      dout(20) << __FFL__ << ": expiring inode " << *in << dendl;
       
       // check nonce
       if (nonce == in->get_replica_nonce(from)) {
@@ -7566,7 +7566,7 @@ void MDCache::handle_cache_expire(const cref_t<MCacheExpire> &m)
 		<< ", don't have it" << dendl;
 	ceph_assert(dir);
       }
-      dout(20) << __func__ << ": expiring dirfrag " << *dir << dendl;
+      dout(20) << __FFL__ << ": expiring dirfrag " << *dir << dendl;
 
       ceph_assert(dir->is_auth());
 
@@ -8922,7 +8922,7 @@ void MDCache::_open_ino_parent_opened(inodeno_t ino, int ret)
 
 void MDCache::_open_ino_traverse_dir(inodeno_t ino, open_ino_info_t& info, int ret)
 {
-  dout(10) << __func__ << ": ino " << ino << " ret " << ret << dendl;
+  dout(10) << __FFL__ << ": ino " << ino << " ret " << ret << dendl;
 
   CInode *in = get_inode(ino);
   if (in) {
@@ -9908,7 +9908,7 @@ void MDCache::do_realm_invalidate_and_update_notify(CInode *in, int snapop, bool
 
 void MDCache::send_snap_update(CInode *in, version_t stid, int snap_op)
 {
-  dout(10) << __func__ << " " << *in << " stid " << stid << dendl;
+  dout(10) << __FFL__ << " " << *in << " stid " << stid << dendl;
   ceph_assert(in->is_auth());
 
   set<mds_rank_t> mds_set;
@@ -9937,7 +9937,7 @@ void MDCache::send_snap_update(CInode *in, version_t stid, int snap_op)
 void MDCache::handle_snap_update(const cref_t<MMDSSnapUpdate> &m)
 {
   mds_rank_t from = mds_rank_t(m->get_source().num());
-  dout(10) << __func__ << " " << *m << " from mds." << from << dendl;
+  dout(10) << __FFL__ << " " << *m << " from mds." << from << dendl;
 
   if (mds->get_state() < MDSMap::STATE_RESOLVE &&
       mds->get_want_state() != CEPH_MDS_STATE_RESOLVE) {
@@ -10745,11 +10745,11 @@ void MDCache::decode_replica_dir(CDir *&dir, bufferlist::const_iterator& p, CIno
     decode(nonce, p);
     dir->set_replica_nonce(nonce);
     dir->_decode_base(p);
-    dout(7) << __func__ << " had " << *dir << " nonce " << dir->replica_nonce << dendl;
+    dout(7) << __FFL__ << " had " << *dir << " nonce " << dir->replica_nonce << dendl;
   } else {
     // force frag to leaf in the diri tree
     if (!diri->dirfragtree.is_leaf(df.frag)) {
-      dout(7) << __func__ << " forcing frag " << df.frag << " to leaf in the fragtree "
+      dout(7) << __FFL__ << " forcing frag " << df.frag << " to leaf in the fragtree "
 	      << diri->dirfragtree << dendl;
       diri->dirfragtree.force_to_leaf(g_ceph_context, df.frag);
     }
@@ -10765,7 +10765,7 @@ void MDCache::decode_replica_dir(CDir *&dir, bufferlist::const_iterator& p, CIno
 	diri->is_base())
       adjust_subtree_auth(dir, from);
     
-    dout(7) << __func__ << " added " << *dir << " nonce " << dir->replica_nonce << dendl;
+    dout(7) << __FFL__ << " added " << *dir << " nonce " << dir->replica_nonce << dendl;
     // get waiters
     diri->take_dir_waiting(df.frag, finished);
   }
@@ -10786,11 +10786,11 @@ void MDCache::decode_replica_dentry(CDentry *&dn, bufferlist::const_iterator& p,
   bool is_new = false;
   if (dn) {
     is_new = false;
-    dout(7) << __func__ << " had " << *dn << dendl;
+    dout(7) << __FFL__ << " had " << *dn << dendl;
   } else {
     is_new = true;
     dn = dir->add_null_dentry(name, 1 /* this will get updated below */, last);
-    dout(7) << __func__ << " added " << *dn << dendl;
+    dout(7) << __FFL__ << " added " << *dn << dendl;
   }
   
   __u32 nonce;
@@ -10838,7 +10838,7 @@ void MDCache::decode_replica_inode(CInode *&in, bufferlist::const_iterator& p, C
       in->inode_auth.first = 0;
     else if (in->is_mdsdir())
       in->inode_auth.first = in->ino() - MDS_INO_MDSDIR_OFFSET;
-    dout(10) << __func__ << " added " << *in << dendl;
+    dout(10) << __FFL__ << " added " << *in << dendl;
     if (dn) {
       ceph_assert(dn->get_linkage()->is_null());
       dn->dir->link_primary_inode(dn, in);
@@ -10847,12 +10847,12 @@ void MDCache::decode_replica_inode(CInode *&in, bufferlist::const_iterator& p, C
     in->set_replica_nonce(nonce);
     in->_decode_base(p);
     in->_decode_locks_state_for_replica(p, false);
-    dout(10) << __func__ << " had " << *in << dendl;
+    dout(10) << __FFL__ << " had " << *in << dendl;
   }
 
   if (dn) {
     if (!dn->get_linkage()->is_primary() || dn->get_linkage()->get_inode() != in)
-      dout(10) << __func__ << " different linkage in dentry " << *dn << dendl;
+      dout(10) << __FFL__ << " different linkage in dentry " << *dn << dendl;
   }
 
   if (struct_v >= 2) {
@@ -11008,14 +11008,14 @@ void MDCache::decode_remote_dentry_link(CDir *dir, CDentry *dn, bufferlist::cons
   __u8 d_type;
   decode(ino, p);
   decode(d_type, p);
-  dout(10) << __func__ << "  remote " << ino << " " << d_type << dendl;
+  dout(10) << __FFL__ << "  remote " << ino << " " << d_type << dendl;
   dir->link_remote_inode(dn, ino, d_type);
   DECODE_FINISH(p);
 }
 
 void MDCache::send_dentry_link(CDentry *dn, MDRequestRef& mdr)
 {
-  dout(7) << __func__ << " " << *dn << dendl;
+  dout(7) << __FFL__ << " " << *dn << dendl;
 
   CDir *subtree = get_subtree_root(dn->get_dir());
   for (const auto &p : dn->get_replicas()) {
@@ -11029,7 +11029,7 @@ void MDCache::send_dentry_link(CDentry *dn, MDRequestRef& mdr)
     CDentry::linkage_t *dnl = dn->get_linkage();
     auto m = make_message<MDentryLink>(subtree->dirfrag(), dn->get_dir()->dirfrag(), dn->get_name(), dnl->is_primary());
     if (dnl->is_primary()) {
-      dout(10) << __func__ << "  primary " << *dnl->get_inode() << dendl;
+      dout(10) << __FFL__ << "  primary " << *dnl->get_inode() << dendl;
       encode_replica_inode(dnl->get_inode(), p.first, m->bl,
 		      mds->mdsmap->get_up_features());
     } else if (dnl->is_remote()) {
@@ -11045,13 +11045,13 @@ void MDCache::handle_dentry_link(const cref_t<MDentryLink> &m)
   CDentry *dn = NULL;
   CDir *dir = get_dirfrag(m->get_dirfrag());
   if (!dir) {
-    dout(7) << __func__ << " don't have dirfrag " << m->get_dirfrag() << dendl;
+    dout(7) << __FFL__ << " don't have dirfrag " << m->get_dirfrag() << dendl;
   } else {
     dn = dir->lookup(m->get_dn());
     if (!dn) {
-      dout(7) << __func__ << " don't have dentry " << *dir << " dn " << m->get_dn() << dendl;
+      dout(7) << __FFL__ << " don't have dentry " << *dir << " dn " << m->get_dn() << dendl;
     } else {
-      dout(7) << __func__ << " on " << *dn << dendl;
+      dout(7) << __FFL__ << " on " << *dn << dendl;
       CDentry::linkage_t *dnl = dn->get_linkage();
 
       ceph_assert(!dn->is_auth());
@@ -11085,7 +11085,7 @@ void MDCache::handle_dentry_link(const cref_t<MDentryLink> &m)
 
 void MDCache::send_dentry_unlink(CDentry *dn, CDentry *straydn, MDRequestRef& mdr)
 {
-  dout(10) << __func__ << " " << *dn << dendl;
+  dout(10) << __FFL__ << " " << *dn << dendl;
   // share unlink news with replicas
   set<mds_rank_t> replicas;
   dn->list_replicas(replicas);
@@ -11125,13 +11125,13 @@ void MDCache::handle_dentry_unlink(const cref_t<MDentryUnlink> &m)
 
   CDir *dir = get_dirfrag(m->get_dirfrag());
   if (!dir) {
-    dout(7) << __func__ << " don't have dirfrag " << m->get_dirfrag() << dendl;
+    dout(7) << __FFL__ << " don't have dirfrag " << m->get_dirfrag() << dendl;
   } else {
     CDentry *dn = dir->lookup(m->get_dn());
     if (!dn) {
-      dout(7) << __func__ << " don't have dentry " << *dir << " dn " << m->get_dn() << dendl;
+      dout(7) << __FFL__ << " don't have dentry " << *dir << " dn " << m->get_dn() << dendl;
     } else {
-      dout(7) << __func__ << " on " << *dn << dendl;
+      dout(7) << __FFL__ << " on " << *dn << dendl;
       CDentry::linkage_t *dnl = dn->get_linkage();
 
       // open inode?
@@ -11460,7 +11460,7 @@ bool MDCache::can_fragment(CInode *diri, const std::vector<CDir*>& dirs)
 
 void MDCache::split_dir(CDir *dir, int bits)
 {
-  dout(7) << __func__ << " " << *dir << " bits " << bits << dendl;
+  dout(7) << __FFL__ << " " << *dir << " bits " << bits << dendl;
   ceph_assert(dir->is_auth());
   CInode *diri = dir->inode;
 
@@ -11468,12 +11468,12 @@ void MDCache::split_dir(CDir *dir, int bits)
   dirs.push_back(dir);
 
   if (!can_fragment(diri, dirs)) {
-    dout(7) << __func__ << " cannot fragment right now, dropping" << dendl;
+    dout(7) << __FFL__ << " cannot fragment right now, dropping" << dendl;
     return;
   }
 
   if (dir->frag.bits() + bits > 24) {
-    dout(7) << __func__ << " frag bits > 24, dropping" << dendl;
+    dout(7) << __FFL__ << " frag bits > 24, dropping" << dendl;
     return;
   }
 
@@ -12770,7 +12770,7 @@ void MDCache::enqueue_scrub(
     bool force, bool recursive, bool repair,
     Formatter *f, Context *fin)
 {
-  dout(10) << __func__ << " " << path << dendl;
+  dout(10) << __FFL__ << " " << path << dendl;
   MDRequestRef mdr = request_start_internal(CEPH_MDS_OP_ENQUEUE_SCRUB);
   if (path == "~mdsdir") {
     filepath fp(MDS_INO_MDSDIR(mds->get_nodeid()));
@@ -12913,7 +12913,7 @@ void MDCache::repair_dirfrag_stats(CDir *dir)
 void MDCache::repair_dirfrag_stats_work(MDRequestRef& mdr)
 {
   CDir *dir = static_cast<CDir*>(mdr->internal_op_private);
-  dout(10) << __func__ << " " << *dir << dendl;
+  dout(10) << __FFL__ << " " << *dir << dendl;
 
   if (!dir->is_auth()) {
     mds->server->respond_to_request(mdr, -ESTALE);
@@ -12967,7 +12967,7 @@ void MDCache::repair_dirfrag_stats_work(MDRequestRef& mdr)
   bool good_fragstat = frag_info.same_sums(pf->fragstat);
   bool good_rstat = nest_info.same_sums(pf->rstat);
   if (good_fragstat && good_rstat) {
-    dout(10) << __func__ << " no corruption found" << dendl;
+    dout(10) << __FFL__ << " no corruption found" << dendl;
     mds->server->respond_to_request(mdr, 0);
     return;
   }
@@ -13018,7 +13018,7 @@ void MDCache::repair_inode_stats(CInode *diri)
 void MDCache::repair_inode_stats_work(MDRequestRef& mdr)
 {
   CInode *diri = static_cast<CInode*>(mdr->internal_op_private);
-  dout(10) << __func__ << " " << *diri << dendl;
+  dout(10) << __FFL__ << " " << *diri << dendl;
 
   if (!diri->is_auth()) {
     mds->server->respond_to_request(mdr, -ESTALE);
@@ -13099,7 +13099,7 @@ do_rdlocks:
 
   if (!dir_info.same_sums(diri->inode.dirstat) ||
       !nest_info.same_sums(diri->inode.rstat)) {
-    dout(10) << __func__ << " failed to fix fragstat/rstat on "
+    dout(10) << __FFL__ << " failed to fix fragstat/rstat on "
 	     << *diri << dendl;
   }
 
@@ -13118,7 +13118,7 @@ void MDCache::upgrade_inode_snaprealm(CInode *in)
 void MDCache::upgrade_inode_snaprealm_work(MDRequestRef& mdr)
 {
   CInode *in = static_cast<CInode*>(mdr->internal_op_private);
-  dout(10) << __func__ << " " << *in << dendl;
+  dout(10) << __FFL__ << " " << *in << dendl;
 
   if (!in->is_auth()) {
     mds->server->respond_to_request(mdr, -ESTALE);
@@ -13153,7 +13153,7 @@ void MDCache::upgrade_inode_snaprealm_work(MDRequestRef& mdr)
 void MDCache::flush_dentry(std::string_view path, Context *fin)
 {
   if (is_readonly()) {
-    dout(10) << __func__ << ": read-only FS" << dendl;
+    dout(10) << __FFL__ << ": read-only FS" << dendl;
     fin->complete(-EROFS);
     return;
   }
@@ -13283,7 +13283,7 @@ void MDCache::maybe_eval_stray(CInode *in, bool delay) {
 }
 
 void MDCache::clear_dirty_bits_for_stray(CInode* diri) {
-  dout(10) << __func__ << " " << *diri << dendl;
+  dout(10) << __FFL__ << " " << *diri << dendl;
   ceph_assert(diri->get_projected_parent_dir()->inode->is_stray());
   auto&& ls = diri->get_dirfrags();
   for (auto &p : ls) {

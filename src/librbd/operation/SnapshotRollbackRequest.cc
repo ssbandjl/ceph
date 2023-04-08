@@ -43,7 +43,7 @@ public:
   int send() override {
     I &image_ctx = this->m_image_ctx;
     CephContext *cct = image_ctx.cct;
-    ldout(cct, 20) << "C_RollbackObject: " << __func__ << ": object_num="
+    ldout(cct, 20) << "C_RollbackObject: " << __FFL__ << ": object_num="
                    << m_object_num << dendl;
 
     {
@@ -116,7 +116,7 @@ template <typename I>
 void SnapshotRollbackRequest<I>::send_block_writes() {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
 
   m_blocking_writes = true;
   image_ctx.io_work_queue->block_writes(create_context_callback<
@@ -128,7 +128,7 @@ template <typename I>
 Context *SnapshotRollbackRequest<I>::handle_block_writes(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to block writes: " << cpp_strerror(*result) << dendl;
@@ -158,7 +158,7 @@ void SnapshotRollbackRequest<I>::send_resize_image() {
   }
 
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
 
   std::shared_lock owner_locker{image_ctx.owner_lock};
   Context *ctx = create_context_callback<
@@ -173,7 +173,7 @@ template <typename I>
 Context *SnapshotRollbackRequest<I>::handle_resize_image(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to resize image for rollback: "
@@ -211,7 +211,7 @@ void SnapshotRollbackRequest<I>::send_get_snap_object_map() {
     return;
   }
 
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
 
   m_snap_object_map = image_ctx.create_object_map(m_snap_id);
 
@@ -226,10 +226,10 @@ template <typename I>
 Context *SnapshotRollbackRequest<I>::handle_get_snap_object_map(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
-    lderr(cct) << this << " " << __func__ << ": failed to open object map: "
+    lderr(cct) << this << " " << __FFL__ << ": failed to open object map: "
                << cpp_strerror(*result) << dendl;
     m_snap_object_map->put();
     m_snap_object_map = nullptr;
@@ -248,7 +248,7 @@ void SnapshotRollbackRequest<I>::send_rollback_object_map() {
     std::shared_lock image_locker{image_ctx.image_lock};
     if (image_ctx.object_map != nullptr) {
       CephContext *cct = image_ctx.cct;
-      ldout(cct, 5) << this << " " << __func__ << dendl;
+      ldout(cct, 5) << this << " " << __FFL__ << dendl;
 
       Context *ctx = create_context_callback<
         SnapshotRollbackRequest<I>,
@@ -265,10 +265,10 @@ template <typename I>
 Context *SnapshotRollbackRequest<I>::handle_rollback_object_map(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
-    lderr(cct) << this << " " << __func__ << ": failed to roll back object "
+    lderr(cct) << this << " " << __FFL__ << ": failed to roll back object "
                << "map: " << cpp_strerror(*result) << dendl;
 
     ceph_assert(m_object_map == nullptr);
@@ -284,7 +284,7 @@ template <typename I>
 void SnapshotRollbackRequest<I>::send_rollback_objects() {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
 
   std::shared_lock owner_locker{image_ctx.owner_lock};
   uint64_t num_objects;
@@ -311,7 +311,7 @@ template <typename I>
 Context *SnapshotRollbackRequest<I>::handle_rollback_objects(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result == -ERESTART) {
     ldout(cct, 5) << "snapshot rollback operation interrupted" << dendl;
@@ -340,7 +340,7 @@ Context *SnapshotRollbackRequest<I>::send_refresh_object_map() {
   }
 
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
 
   m_object_map = image_ctx.create_object_map(CEPH_NOSNAP);
 
@@ -355,10 +355,10 @@ template <typename I>
 Context *SnapshotRollbackRequest<I>::handle_refresh_object_map(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
-    lderr(cct) << this << " " << __func__ << ": failed to open object map: "
+    lderr(cct) << this << " " << __FFL__ << ": failed to open object map: "
                << cpp_strerror(*result) << dendl;
     m_object_map->put();
     m_object_map = nullptr;
@@ -377,7 +377,7 @@ Context *SnapshotRollbackRequest<I>::send_invalidate_cache() {
   apply();
 
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
 
   std::shared_lock owner_lock{image_ctx.owner_lock};
   if(m_object_map != nullptr) {
@@ -399,7 +399,7 @@ template <typename I>
 Context *SnapshotRollbackRequest<I>::handle_invalidate_cache(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to invalidate cache: " << cpp_strerror(*result)

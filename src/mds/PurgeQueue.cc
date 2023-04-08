@@ -24,7 +24,7 @@
 #define dout_context cct
 #define dout_subsys ceph_subsys_mds
 #undef dout_prefix
-#define dout_prefix _prefix(_dout, rank) << __func__ << ": "
+#define dout_prefix _prefix(_dout, rank) << __FFL__ << ": "
 static ostream& _prefix(std::ostream *_dout, mds_rank_t rank) {
   return *_dout << "mds." << rank << ".purge_queue ";
 }

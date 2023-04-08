@@ -987,7 +987,7 @@ int DBObjectMap::clone(const ghobject_t &oid,
 
 int DBObjectMap::upgrade_to_v2()
 {
-  dout(1) << __func__ << " start" << dendl;
+  dout(1) << __FFL__ << " start" << dendl;
   KeyValueDB::Iterator iter = db->get_iterator(HOBJECT_TO_SEQ);
   iter->seek_to_first();
   while (iter->valid()) {
@@ -998,14 +998,14 @@ int DBObjectMap::upgrade_to_v2()
     for (;
         iter->valid() && count < 300;
         iter->next()) {
-      dout(20) << __func__ << " key is " << iter->key() << dendl;
+      dout(20) << __FFL__ << " key is " << iter->key() << dendl;
       int r = is_buggy_ghobject_key_v1(cct, iter->key());
       if (r < 0) {
-	derr << __func__ << " bad key '" << iter->key() << "'" << dendl;
+	derr << __FFL__ << " bad key '" << iter->key() << "'" << dendl;
 	return r;
       }
       if (!r) {
-	dout(20) << __func__ << " " << iter->key() << " ok" << dendl;
+	dout(20) << __FFL__ << " " << iter->key() << " ok" << dendl;
 	continue;
       }
 
@@ -1016,14 +1016,14 @@ int DBObjectMap::upgrade_to_v2()
       hdr.decode(bliter);
 
       string newkey(ghobject_key(hdr.oid));
-      dout(20) << __func__ << " " << iter->key() << " -> " << newkey << dendl;
+      dout(20) << __FFL__ << " " << iter->key() << " -> " << newkey << dendl;
       add[newkey] = iter->value();
       remove.insert(iter->key());
       ++count;
     }
 
     if (!remove.empty()) {
-      dout(20) << __func__ << " updating " << remove.size() << " keys" << dendl;
+      dout(20) << __FFL__ << " updating " << remove.size() << " keys" << dendl;
       t->rmkeys(HOBJECT_TO_SEQ, remove);
       t->set(HOBJECT_TO_SEQ, add);
       int r = db->submit_transaction(t);
@@ -1045,7 +1045,7 @@ void DBObjectMap::set_state()
   write_state(t);
   int ret = db->submit_transaction_sync(t);
   ceph_assert(ret == 0);
-  dout(1) << __func__ << " done" << dendl;
+  dout(1) << __FFL__ << " done" << dendl;
   return;
 }
 

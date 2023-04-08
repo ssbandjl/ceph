@@ -137,7 +137,7 @@ std::ostream &operator<<(std::ostream &os,
 
 template <typename T>
 void C_WriteRequest<T>::blockguard_acquired(GuardedRequestFunctionContext &guard_ctx) {
-  ldout(rwl.get_context(), 20) << __func__ << " write_req=" << this << " cell=" << guard_ctx.cell << dendl;
+  ldout(rwl.get_context(), 20) << __FFL__ << " write_req=" << this << " cell=" << guard_ctx.cell << dendl;
 
   ceph_assert(guard_ctx.cell);
   this->detained = guard_ctx.state.detained; /* overlapped */

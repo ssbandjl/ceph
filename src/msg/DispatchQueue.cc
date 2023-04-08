@@ -135,7 +135,7 @@ void DispatchQueue::run_local_delivery()
 void DispatchQueue::dispatch_throttle_release(uint64_t msize)
 {
   if (msize) {
-    ldout(cct,10) << __func__ << " " << msize << " to dispatch throttler "
+    ldout(cct,10) << __FFL__ << " " << msize << " to dispatch throttler "
 	    << dispatch_throttler.get_current() << "/"
 	    << dispatch_throttler.get_max() << dendl;
     dispatch_throttler.put(msize);

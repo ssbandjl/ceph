@@ -327,7 +327,7 @@ void CInode::print(ostream& out)
 
 void CInode::add_need_snapflush(CInode *snapin, snapid_t snapid, client_t client)
 {
-  dout(10) << __func__ << " client." << client << " snapid " << snapid << " on " << snapin << dendl;
+  dout(10) << __FFL__ << " client." << client << " snapid " << snapid << " on " << snapin << dendl;
 
   if (client_need_snapflush.empty()) {
     get(CInode::PIN_NEEDSNAPFLUSH);
@@ -346,7 +346,7 @@ void CInode::add_need_snapflush(CInode *snapin, snapid_t snapid, client_t client
 
 void CInode::remove_need_snapflush(CInode *snapin, snapid_t snapid, client_t client)
 {
-  dout(10) << __func__ << " client." << client << " snapid " << snapid << " on " << snapin << dendl;
+  dout(10) << __FFL__ << " client." << client << " snapid " << snapid << " on " << snapin << dendl;
   auto it = client_need_snapflush.find(snapid);
   if (it == client_need_snapflush.end()) {
     dout(10) << " snapid not found" << dendl;
@@ -370,7 +370,7 @@ void CInode::remove_need_snapflush(CInode *snapin, snapid_t snapid, client_t cli
 
 pair<bool,bool> CInode::split_need_snapflush(CInode *cowin, CInode *in)
 {
-  dout(10) << __func__ << " [" << cowin->first << "," << cowin->last << "] for " << *cowin << dendl;
+  dout(10) << __FFL__ << " [" << cowin->first << "," << cowin->last << "] for " << *cowin << dendl;
   bool cowin_need_flush = false;
   bool orig_need_flush = false;
   auto it = client_need_snapflush.lower_bound(cowin->first);
@@ -395,7 +395,7 @@ pair<bool,bool> CInode::split_need_snapflush(CInode *cowin, CInode *in)
 void CInode::mark_dirty_rstat()
 {
   if (!state_test(STATE_DIRTYRSTAT)) {
-    dout(10) << __func__ << dendl;
+    dout(10) << __FFL__ << dendl;
     state_set(STATE_DIRTYRSTAT);
     get(PIN_DIRTYRSTAT);
     CDentry *pdn = get_projected_parent_dn();
@@ -413,7 +413,7 @@ void CInode::mark_dirty_rstat()
 void CInode::clear_dirty_rstat()
 {
   if (state_test(STATE_DIRTYRSTAT)) {
-    dout(10) << __func__ << dendl;
+    dout(10) << __FFL__ << dendl;
     state_clear(STATE_DIRTYRSTAT);
     put(PIN_DIRTYRSTAT);
     dirty_rstat_item.remove_myself();
@@ -442,7 +442,7 @@ CInode::projected_inode &CInode::project_inode(bool xattr, bool snap)
     project_snaprealm();
   }
 
-  dout(15) << __func__ << " " << pi.inode.ino << dendl;
+  dout(15) << __FFL__ << " " << pi.inode.ino << dendl;
   return pi;
 }
 
@@ -451,7 +451,7 @@ void CInode::pop_and_dirty_projected_inode(LogSegment *ls)
   ceph_assert(!projected_nodes.empty());
   auto& front = projected_nodes.front();
 
-  dout(15) << __func__ << " " << front.inode.ino
+  dout(15) << __FFL__ << " " << front.inode.ino
 	   << " v" << front.inode.version << dendl;
 
   int64_t old_pool = inode.layout.pool_id;
@@ -551,7 +551,7 @@ const sr_t *CInode::get_projected_srnode() const {
 
 void CInode::project_snaprealm(sr_t *new_srnode)
 {
-  dout(10) << __func__ << " " << new_srnode << dendl;
+  dout(10) << __FFL__ << " " << new_srnode << dendl;
   ceph_assert(projected_nodes.back().snapnode == projected_inode::UNDEF_SRNODE);
   projected_nodes.back().snapnode = new_srnode;
   ++num_projected_srnodes;
@@ -652,7 +652,7 @@ void CInode::early_pop_projected_snaprealm()
 void CInode::pop_projected_snaprealm(sr_t *next_snaprealm, bool early)
 {
   if (next_snaprealm) {
-    dout(10) << __func__ << (early ? " (early) " : " ")
+    dout(10) << __FFL__ << (early ? " (early) " : " ")
 	     << next_snaprealm << " seq " << next_snaprealm->seq << dendl;
     bool invalidate_cached_snaps = false;
     if (!snaprealm) {
@@ -684,7 +684,7 @@ void CInode::pop_projected_snaprealm(sr_t *next_snaprealm, bool early)
     if (snaprealm->parent)
       dout(10) << " realm " << *snaprealm << " parent " << *snaprealm->parent << dendl;
   } else {
-    dout(10) << __func__ << (early ? " (early) null" : " null") << dendl;
+    dout(10) << __FFL__ << (early ? " (early) null" : " null") << dendl;
     ceph_assert(snaprealm);
     snaprealm->merge_to(NULL);
   }
@@ -844,7 +844,7 @@ CDir *CInode::add_dirfrag(CDir *dir)
 
 void CInode::close_dirfrag(frag_t fg)
 {
-  dout(14) << __func__ << " " << fg << dendl;
+  dout(14) << __FFL__ << " " << fg << dendl;
   ceph_assert(dirfrags.count(fg));
   
   CDir *dir = dirfrags[fg];
@@ -864,7 +864,7 @@ void CInode::close_dirfrag(frag_t fg)
   
   // dump any remaining dentries, for debugging purposes
   for (const auto &p : dir->items)
-    dout(14) << __func__ << " LEFTOVER dn " << *p.second << dendl;
+    dout(14) << __FFL__ << " LEFTOVER dn " << *p.second << dendl;
 
   ceph_assert(dir->get_num_ref() == 0);
   delete dir;
@@ -1101,7 +1101,7 @@ void CInode::_mark_dirty(LogSegment *ls)
 
 void CInode::mark_dirty(version_t pv, LogSegment *ls) {
   
-  dout(10) << __func__ << " " << *this << dendl;
+  dout(10) << __FFL__ << " " << *this << dendl;
 
   /*
     NOTE: I may already be dirty, but this fn _still_ needs to be called so that
@@ -1126,7 +1126,7 @@ void CInode::mark_dirty(version_t pv, LogSegment *ls) {
 
 void CInode::mark_clean()
 {
-  dout(10) << __func__ << " " << *this << dendl;
+  dout(10) << __FFL__ << " " << *this << dendl;
   if (state_test(STATE_DIRTY)) {
     state_clear(STATE_DIRTY);
     put(PIN_DIRTY);
@@ -1164,7 +1164,7 @@ object_t InodeStoreBase::get_object_name(inodeno_t ino, frag_t fg, std::string_v
 
 void CInode::store(MDSContext *fin)
 {
-  dout(10) << __func__ << " " << get_version() << dendl;
+  dout(10) << __FFL__ << " " << get_version() << dendl;
   ceph_assert(is_base());
 
   if (snaprealm)
@@ -1204,7 +1204,7 @@ void CInode::_stored(int r, version_t v, Context *fin)
     return;
   }
 
-  dout(10) << __func__ << " " << v << " on " << *this << dendl;
+  dout(10) << __FFL__ << " " << v << " on " << *this << dendl;
   if (v == get_projected_version())
     mark_clean();
 
@@ -1213,7 +1213,7 @@ void CInode::_stored(int r, version_t v, Context *fin)
 
 void CInode::flush(MDSContext *fin)
 {
-  dout(10) << __func__ << " " << *this << dendl;
+  dout(10) << __FFL__ << " " << *this << dendl;
   ceph_assert(is_auth() && can_auth_pin());
 
   MDSGatherBuilder gather(g_ceph_context);
@@ -1274,7 +1274,7 @@ void CInode::fetch(MDSContext *fin)
 
 void CInode::_fetched(bufferlist& bl, bufferlist& bl2, Context *fin)
 {
-  dout(10) << __func__ << " got " << bl.length() << " and " << bl2.length() << dendl;
+  dout(10) << __FFL__ << " got " << bl.length() << " and " << bl2.length() << dendl;
   bufferlist::const_iterator p;
   if (bl2.length()) {
     p = bl2.cbegin();
@@ -1344,7 +1344,7 @@ struct C_IO_Inode_StoredBacktrace : public CInodeIOContext {
 
 void CInode::store_backtrace(MDSContext *fin, int op_prio)
 {
-  dout(10) << __func__ << " on " << *this << dendl;
+  dout(10) << __FFL__ << " on " << *this << dendl;
   ceph_assert(is_dirty_parent());
 
   if (op_prio < 0)
@@ -1376,7 +1376,7 @@ void CInode::store_backtrace(MDSContext *fin, int op_prio)
     mdcache->mds->finisher);
 
   if (!state_test(STATE_DIRTYPOOL) || inode.old_pools.empty()) {
-    dout(20) << __func__ << ": no dirtypool or no old pools" << dendl;
+    dout(20) << __FFL__ << ": no dirtypool or no old pools" << dendl;
     mdcache->mds->objecter->mutate(oid, oloc, op, snapc,
 				   ceph::real_clock::now(),
 				   0, fin2);
@@ -1395,7 +1395,7 @@ void CInode::store_backtrace(MDSContext *fin, int op_prio)
     if (p == pool)
       continue;
 
-    dout(20) << __func__ << ": updating old pool " << p << dendl;
+    dout(20) << __FFL__ << ": updating old pool " << p << dendl;
 
     ObjectOperation op;
     op.priority = op_prio;
@@ -1423,7 +1423,7 @@ void CInode::_stored_backtrace(int r, version_t v, Context *fin)
     // out from under us), so the backtrace can never be written, so pretend
     // to succeed so that the user can proceed to e.g. delete the file.
     if (!exists) {
-      dout(4) << __func__ << " got ENOENT: a data pool was deleted "
+      dout(4) << __FFL__ << " got ENOENT: a data pool was deleted "
                  "beneath us!" << dendl;
       r = 0;
     }
@@ -1441,7 +1441,7 @@ void CInode::_stored_backtrace(int r, version_t v, Context *fin)
     return;
   }
 
-  dout(10) << __func__ << " v " << v <<  dendl;
+  dout(10) << __FFL__ << " v " << v <<  dendl;
 
   auth_unpin(this);
   if (v == inode.backtrace_version)
@@ -1458,7 +1458,7 @@ void CInode::fetch_backtrace(Context *fin, bufferlist *backtrace)
 void CInode::mark_dirty_parent(LogSegment *ls, bool dirty_pool)
 {
   if (!state_test(STATE_DIRTYPARENT)) {
-    dout(10) << __func__ << dendl;
+    dout(10) << __FFL__ << dendl;
     state_set(STATE_DIRTYPARENT);
     get(PIN_DIRTYPARENT);
     ceph_assert(ls);
@@ -1472,7 +1472,7 @@ void CInode::mark_dirty_parent(LogSegment *ls, bool dirty_pool)
 void CInode::clear_dirty_parent()
 {
   if (state_test(STATE_DIRTYPARENT)) {
-    dout(10) << __func__ << dendl;
+    dout(10) << __FFL__ << dendl;
     state_clear(STATE_DIRTYPARENT);
     state_clear(STATE_DIRTYPOOL);
     put(PIN_DIRTYPARENT);
@@ -1485,7 +1485,7 @@ void CInode::verify_diri_backtrace(bufferlist &bl, int err)
   if (is_base() || is_dirty_parent() || !is_auth())
     return;
 
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
 
   if (err == 0) {
     inode_backtrace_t backtrace;
@@ -1703,7 +1703,7 @@ void CInode::decode_lock_idft(bufferlist::const_iterator& p)
     bool replica_dirty;
     decode(replica_dirty, p);
     if (replica_dirty) {
-      dout(10) << __func__ << " setting dftlock dirty flag" << dendl;
+      dout(10) << __FFL__ << " setting dftlock dirty flag" << dendl;
       dirfragtreelock.mark_dirty();  // ok bc we're auth and caller will handle
     }
   } else {
@@ -1766,7 +1766,7 @@ void CInode::encode_lock_ifile(bufferlist& bl)
     bool dirty = filelock.is_dirty_or_flushing();
     encode(dirty, bl); 
   }    
-  dout(15) << __func__ << " inode.dirstat is " << inode.dirstat << dendl;
+  dout(15) << __FFL__ << " inode.dirstat is " << inode.dirstat << dendl;
   encode(inode.dirstat, bl);  // only meaningful if i am auth.
   bufferlist tmp;
   __u32 n = 0;
@@ -1813,7 +1813,7 @@ void CInode::decode_lock_ifile(bufferlist::const_iterator& p)
     bool replica_dirty;
     decode(replica_dirty, p);
     if (replica_dirty) {
-      dout(10) << __func__ << " setting filelock dirty flag" << dendl;
+      dout(10) << __FFL__ << " setting filelock dirty flag" << dendl;
       filelock.mark_dirty();  // ok bc we're auth and caller will handle
     }
   }
@@ -1876,7 +1876,7 @@ void CInode::encode_lock_inest(bufferlist& bl)
     bool dirty = nestlock.is_dirty_or_flushing();
     encode(dirty, bl);
   }
-  dout(15) << __func__ << " inode.rstat is " << inode.rstat << dendl;
+  dout(15) << __FFL__ << " inode.rstat is " << inode.rstat << dendl;
   encode(inode.rstat, bl);  // only meaningful if i am auth.
   bufferlist tmp;
   __u32 n = 0;
@@ -1885,10 +1885,10 @@ void CInode::encode_lock_inest(bufferlist& bl)
     CDir *dir = p.second;
     if (is_auth() || dir->is_auth()) {
       fnode_t *pf = dir->get_projected_fnode();
-      dout(10) << __func__ << " " << fg << " dir " << *dir << dendl;
-      dout(10) << __func__ << " " << fg << " rstat " << pf->rstat << dendl;
-      dout(10) << __func__ << " " << fg << " accounted_rstat " << pf->rstat << dendl;
-      dout(10) << __func__ << " " << fg << " dirty_old_rstat " << dir->dirty_old_rstat << dendl;
+      dout(10) << __FFL__ << " " << fg << " dir " << *dir << dendl;
+      dout(10) << __FFL__ << " " << fg << " rstat " << pf->rstat << dendl;
+      dout(10) << __FFL__ << " " << fg << " accounted_rstat " << pf->rstat << dendl;
+      dout(10) << __FFL__ << " " << fg << " dirty_old_rstat " << dir->dirty_old_rstat << dendl;
       encode(fg, tmp);
       encode(dir->first, tmp);
       encode(pf->rstat, tmp);
@@ -1909,7 +1909,7 @@ void CInode::decode_lock_inest(bufferlist::const_iterator& p)
     bool replica_dirty;
     decode(replica_dirty, p);
     if (replica_dirty) {
-      dout(10) << __func__ << " setting nestlock dirty flag" << dendl;
+      dout(10) << __FFL__ << " setting nestlock dirty flag" << dendl;
       nestlock.mark_dirty();  // ok bc we're auth and caller will handle
     }
   } else {
@@ -1918,7 +1918,7 @@ void CInode::decode_lock_inest(bufferlist::const_iterator& p)
   nest_info_t rstat;
   decode(rstat, p);
   if (!is_auth()) {
-    dout(10) << __func__ << " taking inode rstat " << rstat << " for " << *this << dendl;
+    dout(10) << __FFL__ << " taking inode rstat " << rstat << " for " << *this << dendl;
     inode.rstat = rstat;    // take inode summation if replica
   }
   __u32 n;
@@ -1934,10 +1934,10 @@ void CInode::decode_lock_inest(bufferlist::const_iterator& p)
     decode(rstat, p);
     decode(accounted_rstat, p);
     decode(dirty_old_rstat, p);
-    dout(10) << __func__ << " " << fg << " [" << fgfirst << ",head]" << dendl;
-    dout(10) << __func__ << " " << fg << " rstat " << rstat << dendl;
-    dout(10) << __func__ << " " << fg << " accounted_rstat " << accounted_rstat << dendl;
-    dout(10) << __func__ << " " << fg << " dirty_old_rstat " << dirty_old_rstat << dendl;
+    dout(10) << __FFL__ << " " << fg << " [" << fgfirst << ",head]" << dendl;
+    dout(10) << __FFL__ << " " << fg << " rstat " << rstat << dendl;
+    dout(10) << __FFL__ << " " << fg << " accounted_rstat " << accounted_rstat << dendl;
+    dout(10) << __FFL__ << " " << fg << " dirty_old_rstat " << dirty_old_rstat << dendl;
     CDir *dir = get_dirfrag(fg);
     if (is_auth()) {
       ceph_assert(dir);                // i am auth; i had better have this dir open
@@ -2126,13 +2126,13 @@ void CInode::decode_lock_state(int type, const bufferlist& bl)
   using ceph::decode;
   decode(newfirst, p);
   if (!is_auth() && newfirst != first) {
-    dout(10) << __func__ << " first " << first << " -> " << newfirst << dendl;
+    dout(10) << __FFL__ << " first " << first << " -> " << newfirst << dendl;
     first = newfirst;
   }
   if (!is_base()) {
     decode(newfirst, p);
     if (!parent->is_auth() && newfirst != parent->first) {
-      dout(10) << __func__ << " parent first " << first << " -> " << newfirst << dendl;
+      dout(10) << __FFL__ << " parent first " << first << " -> " << newfirst << dendl;
       parent->first = newfirst;
     }
   }
@@ -2198,7 +2198,7 @@ void CInode::clear_scatter_dirty()
 
 void CInode::clear_dirty_scattered(int type)
 {
-  dout(10) << __func__ << " " << type << " on " << *this << dendl;
+  dout(10) << __FFL__ << " " << type << " on " << *this << dendl;
   ceph_assert(is_dir());
   switch (type) {
   case CEPH_LOCK_IFILE:
@@ -2226,7 +2226,7 @@ void CInode::clear_dirty_scattered(int type)
 /* for more info on scatterlocks, see comments by Locker::scatter_writebehind */
 void CInode::start_scatter(ScatterLock *lock)
 {
-  dout(10) << __func__ << " " << *lock << " on " << *this << dendl;
+  dout(10) << __FFL__ << " " << *lock << " on " << *this << dendl;
   ceph_assert(is_auth());
   mempool_inode *pi = get_projected_inode();
 
@@ -2277,12 +2277,12 @@ void CInode::finish_scatter_update(ScatterLock *lock, CDir *dir,
   ceph_assert(dir->is_auth());
 
   if (dir->is_frozen()) {
-    dout(10) << __func__ << " " << fg << " frozen, marking " << *lock << " stale " << *dir << dendl;
+    dout(10) << __FFL__ << " " << fg << " frozen, marking " << *lock << " stale " << *dir << dendl;
   } else if (dir->get_version() == 0) {
-    dout(10) << __func__ << " " << fg << " not loaded, marking " << *lock << " stale " << *dir << dendl;
+    dout(10) << __FFL__ << " " << fg << " not loaded, marking " << *lock << " stale " << *dir << dendl;
   } else {
     if (dir_accounted_version != inode_version) {
-      dout(10) << __func__ << " " << fg << " journaling accounted scatterstat update v" << inode_version << dendl;
+      dout(10) << __FFL__ << " " << fg << " journaling accounted scatterstat update v" << inode_version << dendl;
 
       MDLog *mdlog = mdcache->mds->mdlog;
       MutationRef mut(new MutationImpl());
@@ -2304,7 +2304,7 @@ void CInode::finish_scatter_update(ScatterLock *lock, CDir *dir,
 	ename = "lock inest accounted scatter stat update";
 
 	if (!is_auth() && lock->get_state() == LOCK_MIX) {
-	  dout(10) << __func__ << " try to assimilate dirty rstat on " 
+	  dout(10) << __FFL__ << " try to assimilate dirty rstat on " 
 	    << *dir << dendl; 
 	  dir->assimilate_dirty_rstat_inodes();
        }
@@ -2327,7 +2327,7 @@ void CInode::finish_scatter_update(ScatterLock *lock, CDir *dir,
 
       if (lock->get_type() == CEPH_LOCK_INEST && 
 	  !is_auth() && lock->get_state() == LOCK_MIX) {
-        dout(10) << __func__ << " finish assimilating dirty rstat on " 
+        dout(10) << __FFL__ << " finish assimilating dirty rstat on " 
           << *dir << dendl; 
         dir->assimilate_dirty_rstat_inodes_finish(mut, &le->metablob);
 
@@ -2343,7 +2343,7 @@ void CInode::finish_scatter_update(ScatterLock *lock, CDir *dir,
       
       mdlog->submit_entry(le, new C_Inode_FragUpdate(this, dir, mut));
     } else {
-      dout(10) << __func__ << " " << fg << " accounted " << *lock
+      dout(10) << __FFL__ << " " << fg << " accounted " << *lock
 	       << " scatter stat unchanged at v" << dir_accounted_version << dendl;
     }
   }
@@ -2351,7 +2351,7 @@ void CInode::finish_scatter_update(ScatterLock *lock, CDir *dir,
 
 void CInode::_finish_frag_update(CDir *dir, MutationRef& mut)
 {
-  dout(10) << __func__ << " on " << *dir << dendl;
+  dout(10) << __FFL__ << " on " << *dir << dendl;
   mut->apply();
   mdcache->mds->locker->drop_locks(mut.get());
   mut->cleanup();
@@ -2380,7 +2380,7 @@ void CInode::finish_scatter_gather_update(int type)
 {
   LogChannelRef clog = mdcache->mds->clog;
 
-  dout(10) << __func__ << " " << type << " on " << *this << dendl;
+  dout(10) << __FFL__ << " " << type << " on " << *this << dendl;
   ceph_assert(is_auth());
 
   switch (type) {
@@ -2601,7 +2601,7 @@ void CInode::finish_scatter_gather_update(int type)
 
 void CInode::finish_scatter_gather_update_accounted(int type, MutationRef& mut, EMetaBlob *metablob)
 {
-  dout(10) << __func__ << " " << type << " on " << *this << dendl;
+  dout(10) << __FFL__ << " " << type << " on " << *this << dendl;
   ceph_assert(is_auth());
 
   for (const auto &p : dirfrags) {
@@ -2652,7 +2652,7 @@ void CInode::add_dir_waiter(frag_t fg, MDSContext *c)
   if (waiting_on_dir.empty())
     get(PIN_DIRWAITER);
   waiting_on_dir[fg].push_back(c);
-  dout(10) << __func__ << " frag " << fg << " " << c << " on " << *this << dendl;
+  dout(10) << __FFL__ << " frag " << fg << " " << c << " on " << *this << dendl;
 }
 
 void CInode::take_dir_waiting(frag_t fg, MDSContext::vec& ls)
@@ -2662,7 +2662,7 @@ void CInode::take_dir_waiting(frag_t fg, MDSContext::vec& ls)
 
   auto it = waiting_on_dir.find(fg);
   if (it != waiting_on_dir.end()) {
-    dout(10) << __func__ << " frag " << fg << " on " << *this << dendl;
+    dout(10) << __FFL__ << " frag " << fg << " on " << *this << dendl;
     auto& waiting = it->second;
     ls.insert(ls.end(), waiting.begin(), waiting.end());
     waiting_on_dir.erase(it);
@@ -2674,7 +2674,7 @@ void CInode::take_dir_waiting(frag_t fg, MDSContext::vec& ls)
 
 void CInode::add_waiter(uint64_t tag, MDSContext *c) 
 {
-  dout(10) << __func__ << " tag " << std::hex << tag << std::dec << " " << c
+  dout(10) << __FFL__ << " tag " << std::hex << tag << std::dec << " " << c
 	   << " !ambig " << !state_test(STATE_AMBIGUOUSAUTH)
 	   << " !frozen " << !is_frozen_inode()
 	   << " !freezing " << !is_freezing_inode()
@@ -2698,7 +2698,7 @@ void CInode::take_waiting(uint64_t mask, MDSContext::vec& ls)
     // take all dentry waiters
     while (!waiting_on_dir.empty()) {
       auto it = waiting_on_dir.begin();
-      dout(10) << __func__ << " dirfrag " << it->first << " on " << *this << dendl;
+      dout(10) << __FFL__ << " dirfrag " << it->first << " on " << *this << dendl;
       auto& waiting = it->second;
       ls.insert(ls.end(), waiting.begin(), waiting.end());
       waiting_on_dir.erase(it);
@@ -2772,7 +2772,7 @@ bool CInode::freeze_inode(int auth_pin_allowance)
 
 void CInode::unfreeze_inode(MDSContext::vec& finished) 
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   if (state_test(STATE_FREEZING)) {
     state_clear(STATE_FREEZING);
     put(PIN_FREEZING);
@@ -2939,7 +2939,7 @@ CInode::mempool_old_inode& CInode::cow_old_inode(snapid_t follows, bool cow_head
   
   first = follows+1;
 
-  dout(10) << __func__ << " " << (cow_head ? "head" : "previous_head" )
+  dout(10) << __FFL__ << " " << (cow_head ? "head" : "previous_head" )
 	   << " to [" << old.first << "," << follows << "] on "
 	   << *this << dendl;
 
@@ -2955,7 +2955,7 @@ void CInode::split_old_inode(snapid_t snap)
   old = it->second;
 
   it->second.first = snap;
-  dout(10) << __func__ << " " << "[" << old.first << "," << it->first
+  dout(10) << __FFL__ << " " << "[" << old.first << "," << it->first
 	   << "] to [" << snap << "," << it->first << "] on " << *this << dendl;
 }
 
@@ -2986,7 +2986,7 @@ bool CInode::has_snap_data(snapid_t snapid)
 
 void CInode::purge_stale_snap_data(const set<snapid_t>& snaps)
 {
-  dout(10) << __func__ << " " << snaps << dendl;
+  dout(10) << __FFL__ << " " << snaps << dendl;
 
   for (auto it = old_inodes.begin(); it != old_inodes.end(); ) {
     const snapid_t &id = it->first;
@@ -3007,10 +3007,10 @@ CInode::mempool_old_inode * CInode::pick_old_inode(snapid_t snap)
 {
   auto it = old_inodes.lower_bound(snap);  // p is first key >= to snap
   if (it != old_inodes.end() && it->second.first <= snap) {
-    dout(10) << __func__ << " snap " << snap << " -> [" << it->second.first << "," << it->first << "]" << dendl;
+    dout(10) << __FFL__ << " snap " << snap << " -> [" << it->second.first << "," << it->first << "]" << dendl;
     return &it->second;
   }
-  dout(10) << __func__ << " snap " << snap << " -> nothing" << dendl;
+  dout(10) << __FFL__ << " snap " << snap << " -> nothing" << dendl;
   return NULL;
 }
 
@@ -3020,7 +3020,7 @@ void CInode::open_snaprealm(bool nosplit)
     SnapRealm *parent = find_snaprealm();
     snaprealm = new SnapRealm(mdcache, this);
     if (parent) {
-      dout(10) << __func__ << " " << snaprealm
+      dout(10) << __FFL__ << " " << snaprealm
 	       << " parent is " << parent
 	       << dendl;
       dout(30) << " siblings are " << parent->open_children << dendl;
@@ -3034,7 +3034,7 @@ void CInode::open_snaprealm(bool nosplit)
 void CInode::close_snaprealm(bool nojoin)
 {
   if (snaprealm) {
-    dout(15) << __func__ << " " << *snaprealm << dendl;
+    dout(15) << __FFL__ << " " << *snaprealm << dendl;
     snaprealm->close_parents();
     if (snaprealm->parent) {
       snaprealm->parent->open_children.erase(snaprealm);
@@ -3063,7 +3063,7 @@ void CInode::encode_snap_blob(bufferlist &snapbl)
   if (snaprealm) {
     using ceph::encode;
     encode(snaprealm->srnode, snapbl);
-    dout(20) << __func__ << " " << *snaprealm << dendl;
+    dout(20) << __FFL__ << " " << *snaprealm << dendl;
   }
 }
 void CInode::decode_snap_blob(const bufferlist& snapbl)
@@ -3083,7 +3083,7 @@ void CInode::decode_snap_blob(const bufferlist& snapbl)
 	snaprealm->adjust_parent();
       }
     }
-    dout(20) << __func__ << " " << *snaprealm << dendl;
+    dout(20) << __FFL__ << " " << *snaprealm << dendl;
   } else if (snaprealm &&
 	     !is_root() && !is_mdsdir()) { // see https://tracker.ceph.com/issues/42675
     ceph_assert(mdcache->mds->is_any_replay());
@@ -3294,7 +3294,7 @@ Capability *CInode::add_client_cap(client_t client, Session *session,
     else
       containing_realm = find_snaprealm();
     containing_realm->inodes_with_caps.push_back(&item_caps);
-    dout(10) << __func__ << " first cap, joining realm " << *containing_realm << dendl;
+    dout(10) << __FFL__ << " first cap, joining realm " << *containing_realm << dendl;
 
     mdcache->num_inodes_with_caps++;
     if (parent)
@@ -3332,7 +3332,7 @@ void CInode::remove_client_cap(client_t client)
 
   client_caps.erase(it);
   if (client_caps.empty()) {
-    dout(10) << __func__ << " last cap, leaving realm " << *containing_realm << dendl;
+    dout(10) << __FFL__ << " last cap, leaving realm " << *containing_realm << dendl;
     put(PIN_CAPS);
     item_caps.remove_myself();
     containing_realm = NULL;
@@ -3353,7 +3353,7 @@ void CInode::remove_client_cap(client_t client)
 
 void CInode::move_to_realm(SnapRealm *realm)
 {
-  dout(10) << __func__ << " joining realm " << *realm
+  dout(10) << __FFL__ << " joining realm " << *realm
 	   << ", leaving realm " << *containing_realm << dendl;
   for (auto& p : client_caps) {
     containing_realm->remove_cap(p.first, &p.second);
@@ -3630,7 +3630,7 @@ int CInode::encode_inodestat(bufferlist& bl, Session *session,
 	    --it;
 	}
 	if (it->second.first <= snapid && snapid <= it->first) {
-	  dout(15) << __func__ << " snapid " << snapid
+	  dout(15) << __FFL__ << " snapid " << snapid
 		   << " to old_inode [" << it->second.first << "," << it->first << "]"
 		   << " " << it->second.inode.rstat
 		   << dendl;
@@ -3639,13 +3639,13 @@ int CInode::encode_inodestat(bufferlist& bl, Session *session,
 	  pxattrs = &p.xattrs;
 	} else {
 	  // snapshoted remote dentry can result this
-	  dout(0) << __func__ << " old_inode for snapid " << snapid
+	  dout(0) << __FFL__ << " old_inode for snapid " << snapid
 		  << " not found" << dendl;
 	}
       }
     } else if (snapid < first || snapid > last) {
       // snapshoted remote dentry can result this
-      dout(0) << __func__ << " [" << first << "," << last << "]"
+      dout(0) << __FFL__ << " [" << first << "," << last << "]"
 	      << " not match snapid " << snapid << dendl;
     }
   }
@@ -3672,7 +3672,7 @@ int CInode::encode_inodestat(bufferlist& bl, Session *session,
 		 is_frozen() ||
 		 state_test(CInode::STATE_EXPORTINGCAPS);
   if (no_caps)
-    dout(20) << __func__ << " no caps"
+    dout(20) << __FFL__ << " no caps"
 	     << (!valid?", !valid":"")
 	     << (session->is_stale()?", session stale ":"")
 	     << ((dir_realm && realm != dir_realm)?", snaprealm differs ":"")
@@ -4040,7 +4040,7 @@ void CInode::encode_cap_message(const ref_t<MClientCaps> &m, Capability *cap)
   mempool_inode *pi = get_projected_inode();
   mempool_inode *i = (pfile|pauth|plink|pxattr) ? pi : oi;
 
-  dout(20) << __func__ << " pfile " << pfile
+  dout(20) << __FFL__ << " pfile " << pfile
 	   << " pauth " << pauth << " plink " << plink << " pxattr " << pxattr
 	   << " ctime " << i->ctime << dendl;
 
@@ -5014,7 +5014,7 @@ void CInode::dump(Formatter *f, int flags) const
 /****** Scrub Stuff *****/
 void CInode::scrub_info_create() const
 {
-  dout(25) << __func__ << dendl;
+  dout(25) << __FFL__ << dendl;
   ceph_assert(!scrub_infop);
 
   // break out of const-land to set up implicit initial state
@@ -5042,9 +5042,9 @@ void CInode::scrub_initialize(CDentry *scrub_parent,
 			      ScrubHeaderRef& header,
 			      MDSContext *f)
 {
-  dout(20) << __func__ << " with scrub_version " << get_version() << dendl;
+  dout(20) << __FFL__ << " with scrub_version " << get_version() << dendl;
   if (scrub_is_in_progress()) {
-    dout(20) << __func__ << " inode moved during scrub, reinitializing "
+    dout(20) << __FFL__ << " inode moved during scrub, reinitializing "
 	     << dendl;
     ceph_assert(scrub_infop->scrub_parent);
     CDentry *dn = scrub_infop->scrub_parent;
@@ -5085,7 +5085,7 @@ void CInode::scrub_initialize(CDentry *scrub_parent,
 
 int CInode::scrub_dirfrag_next(frag_t* out_dirfrag)
 {
-  dout(20) << __func__ << dendl;
+  dout(20) << __FFL__ << dendl;
   ceph_assert(scrub_is_in_progress());
 
   if (!is_dir()) {
@@ -5133,7 +5133,7 @@ void CInode::scrub_dirfrags_scrubbing(frag_vec_t* out_dirfrags)
 
 void CInode::scrub_dirfrag_finished(frag_t dirfrag)
 {
-  dout(20) << __func__ << " on frag " << dirfrag << dendl;
+  dout(20) << __FFL__ << " on frag " << dirfrag << dendl;
   ceph_assert(scrub_is_in_progress());
 
   std::map<frag_t, scrub_stamp_info_t>::iterator i =
@@ -5146,7 +5146,7 @@ void CInode::scrub_dirfrag_finished(frag_t dirfrag)
 }
 
 void CInode::scrub_aborted(MDSContext **c) {
-  dout(20) << __func__ << dendl;
+  dout(20) << __FFL__ << dendl;
   ceph_assert(scrub_is_in_progress());
 
   *c = nullptr;
@@ -5164,7 +5164,7 @@ void CInode::scrub_aborted(MDSContext **c) {
 }
 
 void CInode::scrub_finished(MDSContext **c) {
-  dout(20) << __func__ << dendl;
+  dout(20) << __FFL__ << dendl;
   ceph_assert(scrub_is_in_progress());
   for (std::map<frag_t, scrub_stamp_info_t>::iterator i =
       scrub_infop->dirfrag_stamps.begin();
@@ -5251,7 +5251,7 @@ void CInode::maybe_export_pin(bool update)
   if (!is_dir() || !is_normal())
     return;
 
-  dout(15) << __func__ << " update=" << update << " " << *this << dendl;
+  dout(15) << __FFL__ << " update=" << update << " " << *this << dendl;
 
   mds_rank_t export_pin = get_export_pin(false, false);
   if (export_pin == MDS_RANK_NONE && !update) {
@@ -5287,24 +5287,24 @@ void CInode::set_ephemeral_dist(bool yes)
 void CInode::maybe_ephemeral_dist(bool update)
 {
   if (!mdcache->get_export_ephemeral_distributed_config()) {
-    dout(15) << __func__ << " config false: cannot ephemeral distributed pin " << *this << dendl;
+    dout(15) << __FFL__ << " config false: cannot ephemeral distributed pin " << *this << dendl;
     set_ephemeral_dist(false);
     return;
   } else if (!is_dir() || !is_normal()) {
-    dout(15) << __func__ << " !dir or !normal: cannot ephemeral distributed pin " << *this << dendl;
+    dout(15) << __FFL__ << " !dir or !normal: cannot ephemeral distributed pin " << *this << dendl;
     set_ephemeral_dist(false);
     return;
   } else if (get_inode().nlink == 0) {
-    dout(15) << __func__ << " unlinked directory: cannot ephemeral distributed pin " << *this << dendl;
+    dout(15) << __FFL__ << " unlinked directory: cannot ephemeral distributed pin " << *this << dendl;
     set_ephemeral_dist(false);
     return;
   } else if (!update && state_test(CInode::STATE_DISTEPHEMERALPIN)) {
-    dout(15) << __func__ << " requeueing already pinned " << *this << dendl;
+    dout(15) << __FFL__ << " requeueing already pinned " << *this << dendl;
     queue_export_pin(mdcache->hash_into_rank_bucket(ino()));
     return;
   }
 
-  dout(15) << __func__ << " update=" << update << " " << *this << dendl;
+  dout(15) << __FFL__ << " update=" << update << " " << *this << dendl;
 
   auto dir = get_parent_dir();
   if (!dir) {
@@ -5313,7 +5313,7 @@ void CInode::maybe_ephemeral_dist(bool update)
 
   bool pin = dir->get_inode()->get_inode().export_ephemeral_distributed_pin;
   if (pin) {
-    dout(10) << __func__ << "  ephemeral distributed pinning " << *this << dendl;
+    dout(10) << __FFL__ << "  ephemeral distributed pinning " << *this << dendl;
     set_ephemeral_dist(true);
     queue_export_pin(mdcache->hash_into_rank_bucket(ino()));
   } else if (update) {
@@ -5325,13 +5325,13 @@ void CInode::maybe_ephemeral_dist(bool update)
 void CInode::maybe_ephemeral_dist_children(bool update)
 {
   if (!mdcache->get_export_ephemeral_distributed_config()) {
-    dout(15) << __func__ << " config false: cannot ephemeral distributed pin " << *this << dendl;
+    dout(15) << __FFL__ << " config false: cannot ephemeral distributed pin " << *this << dendl;
     return;
   } else if (!is_dir() || !is_normal()) {
-    dout(15) << __func__ << " !dir or !normal: cannot ephemeral distributed pin " << *this << dendl;
+    dout(15) << __FFL__ << " !dir or !normal: cannot ephemeral distributed pin " << *this << dendl;
     return;
   } else if (get_inode().nlink == 0) {
-    dout(15) << __func__ << " unlinked directory: cannot ephemeral distributed pin " << *this << dendl;
+    dout(15) << __FFL__ << " unlinked directory: cannot ephemeral distributed pin " << *this << dendl;
     return;
   }
 
@@ -5341,7 +5341,7 @@ void CInode::maybe_ephemeral_dist_children(bool update)
     return;
   }
 
-  dout(10) << __func__ << " maybe ephemerally pinning children of " << *this << dendl;
+  dout(10) << __FFL__ << " maybe ephemerally pinning children of " << *this << dendl;
   for (auto& p : dirfrags) {
     auto& dir = p.second;
     for (auto& q : *dir) {
@@ -5376,19 +5376,19 @@ void CInode::set_ephemeral_rand(bool yes)
 void CInode::maybe_ephemeral_rand(bool fresh, double threshold)
 {
   if (!mdcache->get_export_ephemeral_random_config()) {
-    dout(15) << __func__ << " config false: cannot ephemeral random pin " << *this << dendl;
+    dout(15) << __FFL__ << " config false: cannot ephemeral random pin " << *this << dendl;
     set_ephemeral_rand(false);
     return;
   } else if (!is_dir() || !is_normal()) {
-    dout(15) << __func__ << " !dir or !normal: cannot ephemeral random pin " << *this << dendl;
+    dout(15) << __FFL__ << " !dir or !normal: cannot ephemeral random pin " << *this << dendl;
     set_ephemeral_rand(false);
     return;
   } else if (get_inode().nlink == 0) {
-    dout(15) << __func__ << " unlinked directory: cannot ephemeral random pin " << *this << dendl;
+    dout(15) << __FFL__ << " unlinked directory: cannot ephemeral random pin " << *this << dendl;
     set_ephemeral_rand(false);
     return;
   } else if (state_test(CInode::STATE_RANDEPHEMERALPIN)) {
-    dout(10) << __func__ << " already ephemeral random pinned: requeueing " << *this << dendl;
+    dout(10) << __FFL__ << " already ephemeral random pinned: requeueing " << *this << dendl;
     queue_export_pin(mdcache->hash_into_rank_bucket(ino()));
     return;
   } else if (!fresh) {
@@ -5404,11 +5404,11 @@ void CInode::maybe_ephemeral_rand(bool fresh, double threshold)
   }
   double n = ceph::util::generate_random_number(0.0, 1.0);
 
-  dout(15) << __func__ << " rand " << n << " <?= " << threshold
+  dout(15) << __FFL__ << " rand " << n << " <?= " << threshold
            << " " << *this << dendl;
 
   if (n <= threshold) {
-    dout(10) << __func__ << " randomly export pinning " << *this << dendl;
+    dout(10) << __FFL__ << " randomly export pinning " << *this << dendl;
     set_ephemeral_rand(true);
     queue_export_pin(mdcache->hash_into_rank_bucket(ino()));
   }

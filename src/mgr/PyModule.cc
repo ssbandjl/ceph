@@ -698,14 +698,14 @@ int PyModule::load_subclass_of(const char* base_class, PyObject** py_class)
     }
     auto class_name = PyUnicode_AsUTF8(key);
     if (*py_class) {
-      derr << __func__ << ": ignoring '"
+      derr << __FFL__ << ": ignoring '"
 	   << module_name << "." << class_name << "'"
 	   << ": only one '" << base_class
 	   << "' class is loaded from each plugin" << dendl;
       continue;
     }
     *py_class = value;
-    dout(4) << __func__ << ": found class: '"
+    dout(4) << __FFL__ << ": found class: '"
 	    << module_name << "." << class_name << "'" << dendl;
   }
   Py_DECREF(mgr_module_type);

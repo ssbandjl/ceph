@@ -164,7 +164,7 @@ void rgw_sync_group_pipe_map::init(CephContext *cct,
   /* only look at pipes that touch the specific zone and bucket */
   for (auto& pipe : group.pipes) {
     if (pipe.contains_zone_bucket(zone, bucket)) {
-      ldout(cct, 20) << __func__ << "(): pipe_map (zone=" << zone << " bucket=" << bucket_key << "): adding potential pipe: " << pipe << dendl;
+      ldout(cct, 20) << __FFL__ << "(): pipe_map (zone=" << zone << " bucket=" << bucket_key << "): adding potential pipe: " << pipe << dendl;
       zone_pipes.push_back(pipe);
     }
   }
@@ -581,7 +581,7 @@ void RGWBucketSyncFlowManager::reflect(std::optional<rgw_bucket> effective_bucke
       pipe.source.apply_bucket(effective_bucket);
       pipe.dest.apply_bucket(effective_bucket);
 
-      ldout(cct, 20) << __func__ << "(): flow manager (bucket=" << effective_bucket_key << "): adding source pipe: " << pipe << dendl;
+      ldout(cct, 20) << __FFL__ << "(): flow manager (bucket=" << effective_bucket_key << "): adding source pipe: " << pipe << dendl;
       source_pipes->insert(pipe);
     }
 
@@ -595,7 +595,7 @@ void RGWBucketSyncFlowManager::reflect(std::optional<rgw_bucket> effective_bucke
       pipe.source.apply_bucket(effective_bucket);
       pipe.dest.apply_bucket(effective_bucket);
 
-      ldout(cct, 20) << __func__ << "(): flow manager (bucket=" << effective_bucket_key << "): adding dest pipe: " << pipe << dendl;
+      ldout(cct, 20) << __FFL__ << "(): flow manager (bucket=" << effective_bucket_key << "): adding dest pipe: " << pipe << dendl;
       dest_pipes->insert(pipe);
     }
   }

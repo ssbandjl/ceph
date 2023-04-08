@@ -230,10 +230,10 @@ void PeeringState::update_history(const pg_history_t& new_history)
   auto mnow = pl->get_mnow();
   info.history.refresh_prior_readable_until_ub(mnow, prior_readable_until_ub);
   if (info.history.merge(new_history)) {
-    psdout(20) << __func__ << " advanced history from " << new_history << dendl;
+    psdout(20) << __FFL__ << " advanced history from " << new_history << dendl;
     dirty_info = true;
     if (info.history.last_epoch_clean >= info.history.same_interval_since) {
-      psdout(20) << __func__ << " clearing past_intervals" << dendl;
+      psdout(20) << __FFL__ << " clearing past_intervals" << dendl;
       past_intervals.clear();
       dirty_big_info = true;
     }
@@ -440,17 +440,17 @@ void PeeringState::advance_map(
 
 void PeeringState::activate_map(PeeringCtx &rctx)
 {
-  psdout(10) << __func__ << dendl;
+  psdout(10) << __FFL__ << dendl;
   ActMap evt;
   handle_event(evt, &rctx);
   if (osdmap_ref->get_epoch() - last_persisted_osdmap >
     cct->_conf->osd_pg_epoch_persisted_max_stale) {
-    psdout(20) << __func__ << ": Dirtying info: last_persisted is "
+    psdout(20) << __FFL__ << ": Dirtying info: last_persisted is "
 	      << last_persisted_osdmap
 	      << " while current is " << osdmap_ref->get_epoch() << dendl;
     dirty_info = true;
   } else {
-    psdout(20) << __func__ << ": Not dirtying info: last_persisted is "
+    psdout(20) << __FFL__ << ": Not dirtying info: last_persisted is "
 	      << last_persisted_osdmap
 	      << " while current is " << osdmap_ref->get_epoch() << dendl;
   }
@@ -530,7 +530,7 @@ bool PeeringState::should_restart_peering(
     return true;
   }
   if (!lastmap->is_up(pg_whoami.osd) && osdmap->is_up(pg_whoami.osd)) {
-    psdout(10) << __func__ << " osd transitioned from down -> up"
+    psdout(10) << __FFL__ << " osd transitioned from down -> up"
 	       << dendl;
     return true;
   }
@@ -616,7 +616,7 @@ void PeeringState::start_peering_interval(
       missing_loc.get_recoverable_predicate(),
       &past_intervals,
       &debug);
-    psdout(10) << __func__ << ": check_new_interval output: "
+    psdout(10) << __FFL__ << ": check_new_interval output: "
 	       << debug.str() << dendl;
     if (new_interval) {
       if (osdmap->get_epoch() == pl->oldest_stored_osdmap() &&
@@ -652,7 +652,7 @@ void PeeringState::start_peering_interval(
   on_new_interval();
   pl->on_info_history_change();
 
-  psdout(1) << __func__ << " up " << oldup << " -> " << up
+  psdout(1) << __FFL__ << " up " << oldup << " -> " << up
 	    << ", acting " << oldacting << " -> " << acting
 	    << ", acting_primary " << old_acting_primary << " -> "
 	    << new_acting_primary
@@ -725,7 +725,7 @@ void PeeringState::start_peering_interval(
 
 void PeeringState::on_new_interval()
 {
-  dout(20) << __func__ << dendl;
+  dout(20) << __FFL__ << dendl;
   const OSDMapRef osdmap = get_osdmap();
 
   // initialize features
@@ -743,11 +743,11 @@ void PeeringState::on_new_interval()
       continue;
     upacting_features &= osdmap->get_xinfo(*p).features;
   }
-  psdout(20) << __func__ << " upacting_features 0x" << std::hex
+  psdout(20) << __FFL__ << " upacting_features 0x" << std::hex
 	     << upacting_features << std::dec
 	     << " from " << acting << "+" << up << dendl;
 
-  psdout(20) << __func__ << " checking missing set deletes flag. missing = "
+  psdout(20) << __FFL__ << " checking missing set deletes flag. missing = "
 	     << get_pg_log().get_missing() << dendl;
 
   if (!pg_log.get_missing().may_include_deletes &&
@@ -766,7 +766,7 @@ void PeeringState::on_new_interval()
 				     readable_until_ub);
   prior_readable_until_ub = info.history.refresh_prior_readable_until_ub(
     mnow, prior_readable_until_ub);
-  psdout(10) << __func__ << " prior_readable_until_ub "
+  psdout(10) << __FFL__ << " prior_readable_until_ub "
 	     << prior_readable_until_ub << " (mnow " << mnow << " + "
 	     << info.history.prior_readable_until_ub << ")" << dendl;
   prior_readable_down_osds.clear(); // we populate this when we build the priorset
@@ -853,7 +853,7 @@ void PeeringState::init_hb_stamps()
   } else {
     hb_stamps.clear();
   }
-  dout(10) << __func__ << " now " << hb_stamps << dendl;
+  dout(10) << __FFL__ << " now " << hb_stamps << dendl;
 }
 
 
@@ -1005,7 +1005,7 @@ unsigned PeeringState::get_recovery_priority()
 
     ret = clamp_recovery_priority(ret, pool_recovery_priority, max_prio_map[base]);
   }
-  psdout(20) << __func__ << " recovery priority is " << ret << dendl;
+  psdout(20) << __FFL__ << " recovery priority is " << ret << dendl;
   return static_cast<unsigned>(ret);
 }
 
@@ -1041,7 +1041,7 @@ unsigned PeeringState::get_backfill_priority()
     ret = clamp_recovery_priority(ret, pool_recovery_priority, max_prio_map[base]);
   }
 
-  psdout(20) << __func__ << " backfill priority is " << ret << dendl;
+  psdout(20) << __FFL__ << " backfill priority is " << ret << dendl;
   return static_cast<unsigned>(ret);
 }
 
@@ -1066,19 +1066,19 @@ bool PeeringState::set_force_recovery(bool b)
 	(state & (PG_STATE_DEGRADED |
 		  PG_STATE_RECOVERY_WAIT |
 		  PG_STATE_RECOVERING))) {
-      psdout(20) << __func__ << " set" << dendl;
+      psdout(20) << __FFL__ << " set" << dendl;
       state_set(PG_STATE_FORCED_RECOVERY);
       pl->publish_stats_to_osd();
       did = true;
     }
   } else if (state & PG_STATE_FORCED_RECOVERY) {
-    psdout(20) << __func__ << " clear" << dendl;
+    psdout(20) << __FFL__ << " clear" << dendl;
     state_clear(PG_STATE_FORCED_RECOVERY);
     pl->publish_stats_to_osd();
     did = true;
   }
   if (did) {
-    psdout(20) << __func__ << " state " << get_current_state()
+    psdout(20) << __FFL__ << " state " << get_current_state()
 	     << dendl;
     pl->update_local_background_io_priority(get_recovery_priority());
   }
@@ -1093,19 +1093,19 @@ bool PeeringState::set_force_backfill(bool b)
 	(state & (PG_STATE_DEGRADED |
 		  PG_STATE_BACKFILL_WAIT |
 		  PG_STATE_BACKFILLING))) {
-      psdout(10) << __func__ << " set" << dendl;
+      psdout(10) << __FFL__ << " set" << dendl;
       state_set(PG_STATE_FORCED_BACKFILL);
       pl->publish_stats_to_osd();
       did = true;
     }
   } else if (state & PG_STATE_FORCED_BACKFILL) {
-    psdout(10) << __func__ << " clear" << dendl;
+    psdout(10) << __FFL__ << " clear" << dendl;
     state_clear(PG_STATE_FORCED_BACKFILL);
     pl->publish_stats_to_osd();
     did = true;
   }
   if (did) {
-    psdout(20) << __func__ << " state " << get_current_state()
+    psdout(20) << __FFL__ << " state " << get_current_state()
 	     << dendl;
     pl->update_local_background_io_priority(get_backfill_priority());
   }
@@ -1138,16 +1138,16 @@ void PeeringState::send_lease()
 void PeeringState::proc_lease(const pg_lease_t& l)
 {
   if (!HAVE_FEATURE(upacting_features, SERVER_OCTOPUS)) {
-    psdout(20) << __func__ << " no-op, upacting_features 0x" << std::hex
+    psdout(20) << __FFL__ << " no-op, upacting_features 0x" << std::hex
 	       << upacting_features << std::dec
 	       << " does not include SERVER_OCTOPUS" << dendl;
     return;
   }
   if (!is_nonprimary()) {
-    psdout(20) << __func__ << " no-op, !nonprimary" << dendl;
+    psdout(20) << __FFL__ << " no-op, !nonprimary" << dendl;
     return;
   }
-  psdout(10) << __func__ << " " << l << dendl;
+  psdout(10) << __FFL__ << " " << l << dendl;
   if (l.readable_until_ub > readable_until_ub_from_primary) {
     readable_until_ub_from_primary = l.readable_until_ub;
   }
@@ -1161,7 +1161,7 @@ void PeeringState::proc_lease(const pg_lease_t& l)
   }
   if (ru > readable_until) {
     readable_until = ru;
-    psdout(20) << __func__ << " readable_until now " << readable_until << dendl;
+    psdout(20) << __FFL__ << " readable_until now " << readable_until << dendl;
     // NOTE: if we ever decide to block/queue ops on the replica,
     // we'll need to wake them up here.
   }
@@ -1177,7 +1177,7 @@ void PeeringState::proc_lease(const pg_lease_t& l)
   }
   if (ruub > readable_until_ub) {
     readable_until_ub = ruub;
-    psdout(20) << __func__ << " readable_until_ub now " << readable_until_ub
+    psdout(20) << __FFL__ << " readable_until_ub now " << readable_until_ub
 	       << dendl;
   }
 }
@@ -1228,7 +1228,7 @@ void PeeringState::recalc_readable_until()
     if (acting[i] == pg_whoami.osd || acting[i] == CRUSH_ITEM_NONE) {
       continue;
     }
-    dout(20) << __func__ << " peer osd." << acting[i]
+    dout(20) << __FFL__ << " peer osd." << acting[i]
 	     << " ruub " << acting_readable_until_ub[i] << dendl;
     if (acting_readable_until_ub[i] < min) {
       min = acting_readable_until_ub[i];
@@ -1236,7 +1236,7 @@ void PeeringState::recalc_readable_until()
   }
   readable_until = min;
   readable_until_ub = min;
-  dout(20) << __func__ << " readable_until[_ub] " << readable_until
+  dout(20) << __FFL__ << " readable_until[_ub] " << readable_until
 	   << " (sent " << readable_until_ub_sent << ")" << dendl;
 }
 
@@ -1249,7 +1249,7 @@ bool PeeringState::check_prior_readable_down_osds(const OSDMapRef& map)
   auto p = prior_readable_down_osds.begin();
   while (p != prior_readable_down_osds.end()) {
     if (map->is_dead(*p)) {
-      dout(10) << __func__ << " prior_readable_down_osds osd." << *p
+      dout(10) << __FFL__ << " prior_readable_down_osds osd." << *p
 	       << " is dead as of epoch " << map->get_epoch()
 	       << dendl;
       p = prior_readable_down_osds.erase(p);
@@ -1345,7 +1345,7 @@ bool PeeringState::needs_recovery() const
   auto &missing = pg_log.get_missing();
 
   if (missing.num_missing()) {
-    psdout(10) << __func__ << " primary has " << missing.num_missing()
+    psdout(10) << __FFL__ << " primary has " << missing.num_missing()
 	       << " missing" << dendl;
     return true;
   }
@@ -1358,18 +1358,18 @@ bool PeeringState::needs_recovery() const
     pg_shard_t peer = *a;
     map<pg_shard_t, pg_missing_t>::const_iterator pm = peer_missing.find(peer);
     if (pm == peer_missing.end()) {
-      psdout(10) << __func__ << " osd." << peer << " doesn't have missing set"
+      psdout(10) << __FFL__ << " osd." << peer << " doesn't have missing set"
 		 << dendl;
       continue;
     }
     if (pm->second.num_missing()) {
-      psdout(10) << __func__ << " osd." << peer << " has "
+      psdout(10) << __FFL__ << " osd." << peer << " has "
 		 << pm->second.num_missing() << " missing" << dendl;
       return true;
     }
   }
 
-  psdout(10) << __func__ << " is recovered" << dendl;
+  psdout(10) << __FFL__ << " is recovered" << dendl;
   return false;
 }
 
@@ -1385,13 +1385,13 @@ bool PeeringState::needs_backfill() const
     pg_shard_t peer = *a;
     map<pg_shard_t, pg_info_t>::const_iterator pi = peer_info.find(peer);
     if (!pi->second.last_backfill.is_max()) {
-      psdout(10) << __func__ << " osd." << peer
+      psdout(10) << __FFL__ << " osd." << peer
 		 << " has last_backfill " << pi->second.last_backfill << dendl;
       return true;
     }
   }
 
-  psdout(10) << __func__ << " does not need backfill" << dendl;
+  psdout(10) << __FFL__ << " does not need backfill" << dendl;
   return false;
 }
 
@@ -1534,13 +1534,13 @@ map<pg_shard_t, pg_info_t>::const_iterator PeeringState::find_best_info(
     }
 
     if (!p->second.has_missing() && best->second.has_missing()) {
-      psdout(10) << __func__ << " prefer osd." << p->first
+      psdout(10) << __FFL__ << " prefer osd." << p->first
                << " because it is complete while best has missing"
                << dendl;
       best = p;
       continue;
     } else if (p->second.has_missing() && !best->second.has_missing()) {
-      psdout(10) << __func__ << " skipping osd." << p->first
+      psdout(10) << __FFL__ << " skipping osd." << p->first
                << " because it has missing while best is complete"
                << dendl;
       continue;
@@ -1652,7 +1652,7 @@ void PeeringState::calc_replicated_acting(
 {
   pg_shard_t auth_log_shard_id = auth_log_shard->first;
 
-  ss << __func__ << " newest update on osd." << auth_log_shard_id
+  ss << __FFL__ << " newest update on osd." << auth_log_shard_id
      << " with " << auth_log_shard->second
      << (restrict_to_up_acting ? " restrict_to_up_acting" : "") << std::endl;
 
@@ -1695,7 +1695,7 @@ void PeeringState::calc_replicated_acting(
     primary = auth_log_shard;
   }
 
-  ss << __func__ << " primary is osd." << primary->first
+  ss << __FFL__ << " primary is osd." << primary->first
      << " with " << primary->second << std::endl;
   want->push_back(primary->first.osd);
   acting_backfill->insert(primary->first);
@@ -1841,17 +1841,17 @@ bool PeeringState::recoverable(const vector<int> &want) const
       HAVE_FEATURE(get_osdmap()->get_up_osd_features(), SERVER_OCTOPUS);
 
     if (pool.info.is_erasure() && !recovery_ec_pool_below_min_size) {
-      psdout(10) << __func__ << " failed, ec recovery below min size not supported by pre-octopus" << dendl;
+      psdout(10) << __FFL__ << " failed, ec recovery below min size not supported by pre-octopus" << dendl;
       return false;
     } else if (!cct->_conf.get_val<bool>("osd_allow_recovery_below_min_size")) {
-      psdout(10) << __func__ << " failed, recovery below min size not enabled" << dendl;
+      psdout(10) << __FFL__ << " failed, recovery below min size not enabled" << dendl;
       return false;
     }
   }
   if (missing_loc.get_recoverable_predicate()(have)) {
     return true;
   } else {
-    psdout(10) << __func__ << " failed, not recoverable " << dendl;
+    psdout(10) << __FFL__ << " failed, not recoverable " << dendl;
     return false;
   }
 }
@@ -1906,7 +1906,7 @@ void PeeringState::choose_async_recovery_ec(
     }
   }
 
-  psdout(20) << __func__ << " candidates by cost are: " << candidates_by_cost
+  psdout(20) << __FFL__ << " candidates by cost are: " << candidates_by_cost
 	     << dendl;
 
   // take out as many osds as we can for async recovery, in order of cost
@@ -1920,7 +1920,7 @@ void PeeringState::choose_async_recovery_ec(
       async_recovery->insert(cur_shard);
     }
   }
-  psdout(20) << __func__ << " result want=" << *want
+  psdout(20) << __FFL__ << " result want=" << *want
 	     << " async_recovery=" << *async_recovery << dendl;
 }
 
@@ -1973,7 +1973,7 @@ void PeeringState::choose_async_recovery_replicated(
     }
   }
 
-  psdout(20) << __func__ << " candidates by cost are: " << candidates_by_cost
+  psdout(20) << __FFL__ << " candidates by cost are: " << candidates_by_cost
 	     << dendl;
   // take out as many osds as we can for async recovery, in order of cost
   for (auto rit = candidates_by_cost.rbegin();
@@ -1992,7 +1992,7 @@ void PeeringState::choose_async_recovery_replicated(
       }
     }
   }
-  psdout(20) << __func__ << " result want=" << *want
+  psdout(20) << __FFL__ << " result want=" << *want
 	     << " async_recovery=" << *async_recovery << dendl;
 }
 
@@ -2025,7 +2025,7 @@ bool PeeringState::choose_acting(pg_shard_t &auth_log_shard_id,
     for (map<pg_shard_t, pg_info_t>::iterator p = all_info.begin();
          p != all_info.end();
          ++p) {
-      psdout(10) << __func__ << " all_info osd." << p->first << " "
+      psdout(10) << __FFL__ << " all_info osd." << p->first << " "
 		 << p->second << dendl;
     }
   }
@@ -2035,13 +2035,13 @@ bool PeeringState::choose_acting(pg_shard_t &auth_log_shard_id,
 
   if (auth_log_shard == all_info.end()) {
     if (up != acting) {
-      psdout(10) << __func__ << " no suitable info found (incomplete backfills?),"
+      psdout(10) << __FFL__ << " no suitable info found (incomplete backfills?),"
 		 << " reverting to up" << dendl;
       want_acting = up;
       vector<int> empty;
       pl->queue_want_pg_temp(empty);
     } else {
-      psdout(10) << __func__ << " failed" << dendl;
+      psdout(10) << __FFL__ << " failed" << dendl;
       ceph_assert(want_acting.empty());
     }
     return false;
@@ -2104,12 +2104,12 @@ bool PeeringState::choose_acting(pg_shard_t &auth_log_shard_id,
     // async recovery should have taken out as many osds as it can.
     // if not, then always evict the last peer
     // (will get synchronously recovered later)
-    psdout(10) << __func__ << " evicting osd." << want.back()
+    psdout(10) << __FFL__ << " evicting osd." << want.back()
                << " from oversized want " << want << dendl;
     want.pop_back();
   }
   if (want != acting) {
-    psdout(10) << __func__ << " want " << want << " != acting " << acting
+    psdout(10) << __FFL__ << " want " << want << " != acting " << acting
 	       << ", requesting pg_temp change" << dendl;
     want_acting = want;
 
@@ -2232,7 +2232,7 @@ bool PeeringState::discover_all_missing(
   uint64_t unfound = get_num_unfound();
   bool any = false;  // did we start any queries
 
-  psdout(10) << __func__ << " "
+  psdout(10) << __FFL__ << " "
 	     << missing.num_missing() << " missing, "
 	     << unfound << " unfound"
 	     << dendl;
@@ -2243,12 +2243,12 @@ bool PeeringState::discover_all_missing(
     pg_shard_t peer(*m);
 
     if (!get_osdmap()->is_up(peer.osd)) {
-      psdout(20) << __func__ << " skipping down osd." << peer << dendl;
+      psdout(20) << __FFL__ << " skipping down osd." << peer << dendl;
       continue;
     }
 
     if (peer_purged.count(peer)) {
-      psdout(20) << __func__ << " skipping purged osd." << peer << dendl;
+      psdout(20) << __FFL__ << " skipping purged osd." << peer << dendl;
       continue;
     }
 
@@ -2263,23 +2263,23 @@ bool PeeringState::discover_all_missing(
     // should be on its way.
     // TODO: coalsce requested_* into a single data structure
     if (peer_missing.find(peer) != peer_missing.end()) {
-      psdout(20) << __func__ << ": osd." << peer
+      psdout(20) << __FFL__ << ": osd." << peer
 		 << ": we already have pg_missing_t" << dendl;
       continue;
     }
     if (peer_log_requested.find(peer) != peer_log_requested.end()) {
-      psdout(20) << __func__ << ": osd." << peer
+      psdout(20) << __FFL__ << ": osd." << peer
 		 << ": in peer_log_requested" << dendl;
       continue;
     }
     if (peer_missing_requested.find(peer) != peer_missing_requested.end()) {
-      psdout(20) << __func__ << ": osd." << peer
+      psdout(20) << __FFL__ << ": osd." << peer
 		 << ": in peer_missing_requested" << dendl;
       continue;
     }
 
     // Request missing
-    psdout(10) << __func__ << ": osd." << peer << ": requesting pg_missing_t"
+    psdout(10) << __FFL__ << ": osd." << peer << ": requesting pg_missing_t"
 	       << dendl;
     peer_missing_requested.insert(peer);
     rctx.send_query(
@@ -2307,7 +2307,7 @@ void PeeringState::build_might_have_unfound()
   ceph_assert(might_have_unfound.empty());
   ceph_assert(is_primary());
 
-  psdout(10) << __func__ << dendl;
+  psdout(10) << __FFL__ << dendl;
 
   check_past_interval_bounds();
 
@@ -2321,7 +2321,7 @@ void PeeringState::build_might_have_unfound()
        ++p)
     might_have_unfound.insert(p->first);
 
-  psdout(15) << __func__ << ": built " << might_have_unfound << dendl;
+  psdout(15) << __FFL__ << ": built " << might_have_unfound << dendl;
 }
 
 void PeeringState::activate(
@@ -2423,7 +2423,7 @@ void PeeringState::activate(
 
     // start up replicas
     if (prior_readable_down_osds.empty()) {
-      dout(10) << __func__ << " no prior_readable_down_osds to wait on, clearing ub"
+      dout(10) << __FFL__ << " no prior_readable_down_osds to wait on, clearing ub"
 	       << dendl;
       clear_prior_readable_until_ub();
     }
@@ -2577,7 +2577,7 @@ void PeeringState::activate(
     for (set<pg_shard_t>::iterator i = acting_recovery_backfill.begin();
 	 i != acting_recovery_backfill.end();
 	 ++i) {
-      psdout(20) << __func__ << " setting up missing_loc from shard " << *i
+      psdout(20) << __FFL__ << " setting up missing_loc from shard " << *i
 		 << " " << dendl;
       if (*i == get_primary()) {
 	missing_loc.add_active_missing(missing);
@@ -2611,7 +2611,7 @@ void PeeringState::activate(
 	     i != acting_recovery_backfill.end();
 	     ++i) {
 	  if (*i == pg_whoami) continue;
-	  psdout(10) << __func__ << ": adding " << *i << " as a source" << dendl;
+	  psdout(10) << __FFL__ << ": adding " << *i << " as a source" << dendl;
 	  ceph_assert(peer_missing.count(*i));
 	  ceph_assert(peer_info.count(*i));
 	  missing_loc.add_source_info(
@@ -2724,7 +2724,7 @@ void PeeringState::proc_primary_info(
   }
 
   if (!(info.purged_snaps == oinfo.purged_snaps)) {
-    psdout(10) << __func__ << " updating purged_snaps to "
+    psdout(10) << __FFL__ << " updating purged_snaps to "
 	       << oinfo.purged_snaps
 	       << dendl;
     info.purged_snaps = oinfo.purged_snaps;
@@ -2997,19 +2997,19 @@ void PeeringState::merge_from(
   if (info.last_complete != info.last_update ||
       info.is_incomplete() ||
       info.dne()) {
-    psdout(10) << __func__ << " target incomplete" << dendl;
+    psdout(10) << __FFL__ << " target incomplete" << dendl;
     incomplete = true;
   }
   if (last_pg_merge_meta.source_pgid != pg_t()) {
     if (info.pgid.pgid != last_pg_merge_meta.source_pgid.get_parent()) {
-      psdout(10) << __func__ << " target doesn't match expected parent "
+      psdout(10) << __FFL__ << " target doesn't match expected parent "
 		 << last_pg_merge_meta.source_pgid.get_parent()
 		 << " of source_pgid " << last_pg_merge_meta.source_pgid
 		 << dendl;
       incomplete = true;
     }
     if (info.last_update != last_pg_merge_meta.target_version) {
-      psdout(10) << __func__ << " target version doesn't match expected "
+      psdout(10) << __FFL__ << " target version doesn't match expected "
 	       << last_pg_merge_meta.target_version << dendl;
       incomplete = true;
     }
@@ -3026,27 +3026,27 @@ void PeeringState::merge_from(
   for (auto& i : sources) {
     auto& source = i.second;
     if (!source) {
-      psdout(10) << __func__ << " source " << i.first << " missing" << dendl;
+      psdout(10) << __FFL__ << " source " << i.first << " missing" << dendl;
       incomplete = true;
       continue;
     }
     if (source->info.last_complete != source->info.last_update ||
 	source->info.is_incomplete() ||
 	source->info.dne()) {
-      psdout(10) << __func__ << " source " << source->pg_whoami
+      psdout(10) << __FFL__ << " source " << source->pg_whoami
 		 << " incomplete"
 		 << dendl;
       incomplete = true;
     }
     if (last_pg_merge_meta.source_pgid != pg_t()) {
       if (source->info.pgid.pgid != last_pg_merge_meta.source_pgid) {
-	dout(10) << __func__ << " source " << source->info.pgid.pgid
+	dout(10) << __FFL__ << " source " << source->info.pgid.pgid
 		 << " doesn't match expected source pgid "
 		 << last_pg_merge_meta.source_pgid << dendl;
 	incomplete = true;
       }
       if (source->info.last_update != last_pg_merge_meta.source_version) {
-	dout(10) << __func__ << " source version doesn't match expected "
+	dout(10) << __FFL__ << " source version doesn't match expected "
 		 << last_pg_merge_meta.target_version << dendl;
 	incomplete = true;
       }
@@ -3071,7 +3071,7 @@ void PeeringState::merge_from(
     // pgp_num has been reduced prior to the merge, so the OSD mappings for
     // the PGs are identical.
     if (past_intervals.empty() && !source->past_intervals.empty()) {
-      psdout(10) << __func__ << " taking source's past_intervals" << dendl;
+      psdout(10) << __FFL__ << " taking source's past_intervals" << dendl;
       past_intervals = source->past_intervals;
     }
   }
@@ -3113,7 +3113,7 @@ void PeeringState::merge_from(
     // fix history.same_interval_since first so that start_peering_interval()
     // will not complain)
     if (info.history.epoch_created == 0) {
-      dout(10) << __func__ << " both merge target and source are placeholders,"
+      dout(10) << __FFL__ << " both merge target and source are placeholders,"
                << " set sis to lec " << info.history.last_epoch_clean
                << dendl;
       info.history.same_interval_since = info.history.last_epoch_clean;
@@ -3127,7 +3127,7 @@ void PeeringState::merge_from(
     // not complain.
     auto pib = past_intervals.get_bounds();
     if (info.history.last_epoch_clean < pib.first) {
-      psdout(10) << __func__ << " last_epoch_clean "
+      psdout(10) << __FFL__ << " last_epoch_clean "
 		 << info.history.last_epoch_clean << " < past_interval start "
 		 << pib.first << ", adjusting start backwards" << dendl;
       past_intervals.adjust_start_backwards(info.history.last_epoch_clean);
@@ -3141,7 +3141,7 @@ void PeeringState::merge_from(
     // happens.  (We trust the les and lec values more because they came from
     // the real target, whereas the history value we stole from the source.)
     if (info.history.last_epoch_started < info.history.same_interval_since) {
-      psdout(10) << __func__ << " last_epoch_started "
+      psdout(10) << __FFL__ << " last_epoch_started "
 		 << info.history.last_epoch_started << " < same_interval_since "
 		 << info.history.same_interval_since
 		 << ", adjusting pg_history backwards" << dendl;
@@ -3248,7 +3248,7 @@ void PeeringState::update_calc_stats()
   // We should never hit this condition, but if end up hitting it,
   // make sure to update num_objects and set PG_STATE_INCONSISTENT.
   if (info.stats.stats.sum.num_objects < 0) {
-    psdout(0) << __func__ << " negative num_objects = "
+    psdout(0) << __FFL__ << " negative num_objects = "
               << info.stats.stats.sum.num_objects << " setting it to 0 "
               << dendl;
     info.stats.stats.sum.num_objects = 0;
@@ -3257,7 +3257,7 @@ void PeeringState::update_calc_stats()
 
   if ((is_remapped() || is_undersized() || !is_clean()) &&
       (is_peered()|| is_activating())) {
-    psdout(20) << __func__ << " actingset " << actingset << " upset "
+    psdout(20) << __FFL__ << " actingset " << actingset << " upset "
 	       << upset << " acting_recovery_backfill " << acting_recovery_backfill << dendl;
 
     ceph_assert(!acting_recovery_backfill.empty());
@@ -3289,7 +3289,7 @@ void PeeringState::update_calc_stats()
       info.stats.stats.sum.num_objects_missing_on_primary = missing;
       if (missing == 0)
         info.stats.avail_no_missing.push_back(pg_whoami);
-      psdout(20) << __func__ << " shard " << pg_whoami
+      psdout(20) << __FFL__ << " shard " << pg_whoami
 		 << " primary objects " << num_objects
 		 << " missing " << missing
 		 << dendl;
@@ -3310,7 +3310,7 @@ void PeeringState::update_calc_stats()
         if (peer_missing.count(peer.first)) {
           missing = peer_missing[peer.first].num_missing();
         } else {
-          psdout(20) << __func__ << " no peer_missing found for "
+          psdout(20) << __FFL__ << " no peer_missing found for "
 		     << peer.first << dendl;
           if (is_recovering()) {
             estimate = true;
@@ -3326,7 +3326,7 @@ void PeeringState::update_calc_stats()
       peer.second.stats.stats.sum.num_objects_missing = missing;
       if (missing == 0)
         info.stats.avail_no_missing.push_back(peer.first);
-      psdout(20) << __func__ << " shard " << peer.first
+      psdout(20) << __FFL__ << " shard " << peer.first
 		 << " objects " << peer_num_objects
 		 << " missing " << missing
 		 << dendl;
@@ -3335,7 +3335,7 @@ void PeeringState::update_calc_stats()
     // Compute object_location_counts
     for (auto& ml: missing_loc.get_missing_locs()) {
       info.stats.object_location_counts[ml.second]++;
-      psdout(30) << __func__ << " " << ml.first << " object_location_counts["
+      psdout(30) << __FFL__ << " " << ml.first << " object_location_counts["
 		 << ml.second << "]=" << info.stats.object_location_counts[ml.second]
 		 << dendl;
     }
@@ -3345,10 +3345,10 @@ void PeeringState::update_calc_stats()
 	// During backfill we know that all non-missing objects are in the actingset
         info.stats.object_location_counts[actingset] = not_missing;
     }
-    psdout(30) << __func__ << " object_location_counts["
+    psdout(30) << __FFL__ << " object_location_counts["
 	       << upset << "]=" << info.stats.object_location_counts[upset]
 	       << dendl;
-    psdout(20) << __func__ << " object_location_counts "
+    psdout(20) << __FFL__ << " object_location_counts "
 	       << info.stats.object_location_counts << dendl;
 
     // A misplaced object is not stored on the correct OSD
@@ -3361,7 +3361,7 @@ void PeeringState::update_calc_stats()
         for (auto& ml: sml.second) {
           int missing_shards;
           if (sml.first == shard_id_t::NO_SHARD) {
-            psdout(20) << __func__ << " ml " << ml.second
+            psdout(20) << __FFL__ << " ml " << ml.second
 		       << " upset size " << upset.size()
 		       << " up " << ml.first.up << dendl;
             missing_shards = (int)upset.size() - ml.first.up;
@@ -3387,9 +3387,9 @@ void PeeringState::update_calc_stats()
         }
       }
 
-      psdout(20) << __func__ << " missing based degraded "
+      psdout(20) << __FFL__ << " missing based degraded "
 		 << degraded << dendl;
-      psdout(20) << __func__ << " missing based misplaced "
+      psdout(20) << __FFL__ << " missing based misplaced "
 		 << misplaced << dendl;
 
       // Handle undersized case
@@ -3448,10 +3448,10 @@ void PeeringState::update_calc_stats()
     }
 
     for (const auto& item : missing_target_objects)
-      psdout(20) << __func__ << " missing shard " << std::get<1>(item)
+      psdout(20) << __FFL__ << " missing shard " << std::get<1>(item)
 		 << " missing= " << std::get<0>(item) << dendl;
     for (const auto& item : acting_source_objects)
-      psdout(20) << __func__ << " acting shard " << std::get<1>(item)
+      psdout(20) << __FFL__ << " acting shard " << std::get<1>(item)
 		 << " missing= " << std::get<0>(item) << dendl;
 
     // Handle all objects not in missing for remapped
@@ -3494,15 +3494,15 @@ void PeeringState::update_calc_stats()
     // then they are misplaced
     for (const auto& a : acting_source_objects) {
       int64_t extra_misplaced = std::max((int64_t)0, num_objects - std::get<0>(a));
-      psdout(20) << __func__ << " extra acting misplaced " << extra_misplaced
+      psdout(20) << __FFL__ << " extra acting misplaced " << extra_misplaced
 		 << dendl;
       misplaced += extra_misplaced;
     }
 out:
     // NOTE: Tests use these messages to verify this code
-    psdout(20) << __func__ << " degraded " << degraded
+    psdout(20) << __FFL__ << " degraded " << degraded
 	       << (estimate ? " (est)": "") << dendl;
-    psdout(20) << __func__ << " misplaced " << misplaced
+    psdout(20) << __FFL__ << " misplaced " << misplaced
 	       << (estimate ? " (est)": "")<< dendl;
 
     info.stats.stats.sum.num_objects_degraded = degraded;
@@ -3564,7 +3564,7 @@ std::optional<pg_stat_t> PeeringState::prepare_stats_for_publish(
     ++num;
     ++i;
   }
-  psdout(20) << __func__ << " reporting purged_snaps "
+  psdout(20) << __FFL__ << " reporting purged_snaps "
 	     << pre_publish.purged_snaps << dendl;
 
   if (pg_stats_publish_valid && pre_publish == pg_stats_publish &&
@@ -3633,7 +3633,7 @@ void PeeringState::init(
   }
 
   if (backfill) {
-    psdout(10) << __func__ << ": Setting backfill" << dendl;
+    psdout(10) << __FFL__ << ": Setting backfill" << dendl;
     info.set_last_backfill(hobject_t());
     info.last_complete = info.last_update;
     pg_log.mark_log_for_rewrite();
@@ -3743,7 +3743,7 @@ bool PeeringState::append_log_entries_update_missing(
   }
   info.stats.stats_invalid = info.stats.stats_invalid || invalidate_stats;
 
-  psdout(20) << __func__ << " trim_to bool = " << bool(trim_to)
+  psdout(20) << __FFL__ << " trim_to bool = " << bool(trim_to)
 	     << " trim_to = " << (trim_to ? *trim_to : eversion_t()) << dendl;
   if (trim_to)
     pg_log.trim(*trim_to, info);
@@ -3758,7 +3758,7 @@ void PeeringState::merge_new_log_entries(
   std::optional<eversion_t> trim_to,
   std::optional<eversion_t> roll_forward_to)
 {
-  psdout(10) << __func__ << " " << entries << dendl;
+  psdout(10) << __FFL__ << " " << entries << dendl;
   ceph_assert(is_primary());
 
   bool rebuild_missing = append_log_entries_update_missing(entries, t, trim_to, roll_forward_to);
@@ -3770,7 +3770,7 @@ void PeeringState::merge_new_log_entries(
     ceph_assert(peer_missing.count(peer));
     ceph_assert(peer_info.count(peer));
     pg_missing_t& pmissing(peer_missing[peer]);
-    psdout(20) << __func__ << " peer_missing for " << peer
+    psdout(20) << __FFL__ << " peer_missing for " << peer
 	       << " = " << pmissing << dendl;
     pg_info_t& pinfo(peer_info[peer]);
     bool invalidate_stats = PGLog::append_log_entries_update_missing(
@@ -3879,14 +3879,14 @@ void PeeringState::append_log(
     last_rollback_info_trimmed_to_applied = roll_forward_to;
   }
 
-  psdout(10) << __func__ << " approx pg log length =  "
+  psdout(10) << __FFL__ << " approx pg log length =  "
 	     << pg_log.get_log().approx_size() << dendl;
-  psdout(10) << __func__ << " dups pg log length =  "
+  psdout(10) << __FFL__ << " dups pg log length =  "
 	     << pg_log.get_log().dups.size() << dendl;
-  psdout(10) << __func__ << " transaction_applied = "
+  psdout(10) << __FFL__ << " transaction_applied = "
 	     << transaction_applied << dendl;
   if (!transaction_applied || async)
-    psdout(10) << __func__ << " " << pg_whoami
+    psdout(10) << __FFL__ << " " << pg_whoami
 	       << " is async_recovery or backfill target" << dendl;
   pg_log.trim(trim_to, info, transaction_applied, async);
 
@@ -3948,13 +3948,13 @@ void PeeringState::update_backfill_progress(
   ObjectStore::Transaction &t) {
   info.set_last_backfill(updated_backfill);
   if (preserve_local_num_bytes) {
-    psdout(25) << __func__ << " primary " << updated_stats.stats.sum.num_bytes
+    psdout(25) << __FFL__ << " primary " << updated_stats.stats.sum.num_bytes
 	       << " local " << info.stats.stats.sum.num_bytes << dendl;
     int64_t bytes = info.stats.stats.sum.num_bytes;
     info.stats = updated_stats;
     info.stats.stats.sum.num_bytes = bytes;
   } else {
-    psdout(20) << __func__ << " final " << updated_stats.stats.sum.num_bytes
+    psdout(20) << __FFL__ << " final " << updated_stats.stats.sum.num_bytes
 	       << " replaces local " << info.stats.stats.sum.num_bytes << dendl;
     info.stats = updated_stats;
   }
@@ -4041,7 +4041,7 @@ void PeeringState::pre_submit_op(
 
   if (requires_missing_loc) {
     for (auto &&entry: logv) {
-      psdout(30) << __func__ << " missing_loc before: "
+      psdout(30) << __FFL__ << " missing_loc before: "
 		 << missing_loc.get_locations(entry.soid) << dendl;
       missing_loc.add_missing(entry.soid, entry.version,
                               eversion_t(), entry.is_delete());
@@ -4051,7 +4051,7 @@ void PeeringState::pre_submit_op(
         if (!get_peer_missing(i).is_missing(entry.soid))
           missing_loc.add_location(entry.soid, i);
       }
-      psdout(30) << __func__ << " missing_loc after: "
+      psdout(30) << __FFL__ << " missing_loc after: "
 		 << missing_loc.get_locations(entry.soid) << dendl;
     }
   }
@@ -4059,7 +4059,7 @@ void PeeringState::pre_submit_op(
 
 void PeeringState::recovery_committed_to(eversion_t version)
 {
-  psdout(10) << __func__ << " version " << version
+  psdout(10) << __FFL__ << " version " << version
 	     << " now ondisk" << dendl;
   last_complete_ondisk = version;
 
@@ -4130,16 +4130,16 @@ void PeeringState::calc_trim_to_aggressive()
     pg_log.get_head(),
     pg_log.get_can_rollback_to(),
     last_update_ondisk});
-  psdout(10) << __func__ << " limit = " << limit << dendl;
+  psdout(10) << __FFL__ << " limit = " << limit << dendl;
 
   if (limit != eversion_t() &&
       limit != pg_trim_to &&
       pg_log.get_log().approx_size() > target) {
-    psdout(10) << __func__ << " approx pg log length =  "
+    psdout(10) << __FFL__ << " approx pg log length =  "
              << pg_log.get_log().approx_size() << dendl;
     uint64_t num_to_trim = std::min<uint64_t>(pg_log.get_log().approx_size() - target,
                                               cct->_conf->osd_pg_log_trim_max);
-    psdout(10) << __func__ << " num_to_trim =  " << num_to_trim << dendl;
+    psdout(10) << __FFL__ << " num_to_trim =  " << num_to_trim << dendl;
     if (num_to_trim < cct->_conf->osd_pg_log_trim_min &&
 	cct->_conf->osd_pg_log_trim_max >= cct->_conf->osd_pg_log_trim_min) {
       return;
@@ -4167,7 +4167,7 @@ void PeeringState::calc_trim_to_aggressive()
     }
 
     pg_trim_to = std::min({by_n_to_keep, by_n_to_trim, limit});
-    psdout(10) << __func__ << " pg_trim_to now " << pg_trim_to << dendl;
+    psdout(10) << __FFL__ << " pg_trim_to now " << pg_trim_to << dendl;
     ceph_assert(pg_trim_to <= pg_log.get_head());
   }
 }
@@ -4812,7 +4812,7 @@ PeeringState::WaitRemoteBackfillReserved::react(const RemoteBackfillReserved &ev
   DECLARE_LOCALS;
 
   int64_t num_bytes = ps->info.stats.stats.sum.num_bytes;
-  psdout(10) << __func__ << " num_bytes " << num_bytes << dendl;
+  psdout(10) << __FFL__ << " num_bytes " << num_bytes << dendl;
   if (backfill_osd_it !=
       context< Active >().remote_shards_to_reserve_backfill.end()) {
     // The primary never backfills itself
@@ -6025,7 +6025,7 @@ boost::statechart::result PeeringState::ReplicaActive::react(
   const ActivateCommitted &evt)
 {
   DECLARE_LOCALS;
-  psdout(10) << __func__ << " " << evt.epoch << " telling primary" << dendl;
+  psdout(10) << __FFL__ << " " << evt.epoch << " telling primary" << dendl;
 
   auto &rctx = context<PeeringMachine>().get_recovery_ctx();
   auto epoch = ps->get_osdmap_epoch();
@@ -6160,7 +6160,7 @@ PeeringState::Stray::Stray(my_context ctx)
   ceph_assert(!ps->is_primary());
 
   if (!ps->get_osdmap()->have_pg_pool(ps->info.pgid.pgid.pool())) {
-    ldout(ps->cct,10) << __func__ << " pool is deleted" << dendl;
+    ldout(ps->cct,10) << __FFL__ << " pool is deleted" << dendl;
     post_event(DeleteStart());
   } else {
     ps->start_flush(context< PeeringMachine >().get_cur_transaction());
@@ -6305,7 +6305,7 @@ boost::statechart::result PeeringState::ToDelete::react(
 {
   DECLARE_LOCALS;
   if (ps->get_delete_priority() != priority) {
-    psdout(10) << __func__ << " delete priority changed, resetting"
+    psdout(10) << __FFL__ << " delete priority changed, resetting"
 		   << dendl;
     return transit<ToDelete>();
   }
@@ -6357,7 +6357,7 @@ void PeeringState::Deleting::exit()
   DECLARE_LOCALS;
   ps->deleting = false;
   pl->cancel_local_background_io_reservation();
-  psdout(20) << "Deleting::" << __func__ << this <<" finished in "
+  psdout(20) << "Deleting::" << __FFL__ << this <<" finished in "
            << ceph::mono_clock::now() - start
            << dendl;
 }

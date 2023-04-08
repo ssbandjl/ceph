@@ -532,7 +532,7 @@ int MDSDaemon::init()
 
   mds_lock.lock();
   if (beacon.get_want_state() == CEPH_MDS_STATE_DNE) {
-    dout(4) << __func__ << ": terminated already, dropping out" << dendl;
+    dout(4) << __FFL__ << ": terminated already, dropping out" << dendl;
     mds_lock.unlock();
     return 0;
   }
@@ -548,7 +548,7 @@ int MDSDaemon::init()
   std::lock_guard locker{mds_lock};
   if (beacon.get_want_state() == MDSMap::STATE_DNE) {
     suicide();  // we could do something more graceful here
-    dout(4) << __func__ << ": terminated already, dropping out" << dendl;
+    dout(4) << __FFL__ << ": terminated already, dropping out" << dendl;
     return 0; 
   }
 
@@ -1035,16 +1035,16 @@ bool MDSDaemon::parse_caps(const AuthCapsInfo& info, MDSAuthCaps& caps)
     try {
       decode(auth_cap_str, it);
     } catch (const buffer::error& e) {
-      dout(1) << __func__ << ": cannot decode auth caps buffer of length " << info.caps.length() << dendl;
+      dout(1) << __FFL__ << ": cannot decode auth caps buffer of length " << info.caps.length() << dendl;
       return false;
     }
 
-    dout(10) << __func__ << ": parsing auth_cap_str='" << auth_cap_str << "'" << dendl;
+    dout(10) << __FFL__ << ": parsing auth_cap_str='" << auth_cap_str << "'" << dendl;
     CachedStackStringStream cs;
     if (caps.parse(g_ceph_context, auth_cap_str, cs.get())) {
       return true;
     } else {
-      dout(1) << __func__ << ": auth cap parse error: " << cs->strv() << " parsing '" << auth_cap_str << "'" << dendl;
+      dout(1) << __FFL__ << ": auth cap parse error: " << cs->strv() << " parsing '" << auth_cap_str << "'" << dendl;
       return false;
     }
   }

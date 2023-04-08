@@ -2599,7 +2599,7 @@ void PGMap::get_health_checks(
       }
     }
   } else {
-    dout(10) << __func__ << " skipping loop over PGs: counters look OK" << dendl;
+    dout(10) << __FFL__ << " skipping loop over PGs: counters look OK" << dendl;
   }
 
   for (const auto &i : detected) {
@@ -3779,7 +3779,7 @@ void PGMapUpdater::check_osd_map(
   // deleted pgs (pools)?
   for (auto& p : pgmap.pg_pool_sum) {
     if (!osdmap.have_pg_pool(p.first)) {
-      ldout(cct, 10) << __func__ << " pool " << p.first << " gone, removing pgs"
+      ldout(cct, 10) << __FFL__ << " pool " << p.first << " gone, removing pgs"
 		     << dendl;
       for (auto& q : pgmap.pg_stat) {
 	if (q.first.pool() == p.first) {
@@ -3809,12 +3809,12 @@ void PGMapUpdater::check_osd_map(
     unsigned pg_num = pi.get_pg_num();
     new_pg_num[poolid] = pg_num;
     if (my_pg_num < pg_num) {
-      ldout(cct,10) << __func__ << " pool " << poolid << " pg_num " << pg_num
+      ldout(cct,10) << __FFL__ << " pool " << poolid << " pg_num " << pg_num
 		    << " > my pg_num " << my_pg_num << dendl;
       for (unsigned ps = my_pg_num; ps < pg_num; ++ps) {
 	pg_t pgid(ps, poolid);
 	if (pending_inc->pg_stat_updates.count(pgid) == 0) {
-	  ldout(cct,20) << __func__ << " adding " << pgid << dendl;
+	  ldout(cct,20) << __FFL__ << " adding " << pgid << dendl;
 	  pg_stat_t &stats = pending_inc->pg_stat_updates[pgid];
 	  stats.last_fresh = osdmap.get_modified();
 	  stats.last_active = osdmap.get_modified();
@@ -3830,11 +3830,11 @@ void PGMapUpdater::check_osd_map(
 	}
       }
     } else if (my_pg_num > pg_num) {
-      ldout(cct,10) << __func__ << " pool " << poolid << " pg_num " << pg_num
+      ldout(cct,10) << __FFL__ << " pool " << poolid << " pg_num " << pg_num
 		    << " < my pg_num " << my_pg_num << dendl;
       for (unsigned i = pg_num; i < my_pg_num; ++i) {
 	pg_t pgid(i, poolid);
-	ldout(cct,20) << __func__ << " removing merged " << pgid << dendl;
+	ldout(cct,20) << __FFL__ << " removing merged " << pgid << dendl;
 	if (pgmap.pg_stat.count(pgid)) {
 	  pending_inc->pg_remove.insert(pgid);
 	}
@@ -3847,7 +3847,7 @@ void PGMapUpdater::check_osd_map(
     auto j = new_pg_num.find(i->first.pool());
     if (j == new_pg_num.end() ||
 	i->first.ps() >= j->second) {
-      ldout(cct,20) << __func__ << " removing pending update to old "
+      ldout(cct,20) << __FFL__ << " removing pending update to old "
 		    << i->first << dendl;
       i = pending_inc->pg_stat_updates.erase(i);
     } else {
@@ -3881,7 +3881,7 @@ static void _try_mark_pg_stale(
       newstat = &pending_inc->pg_stat_updates[pgid];
       *newstat = cur;
     }
-    dout(10) << __func__ << " marking pg " << pgid
+    dout(10) << __FFL__ << " marking pg " << pgid
 	     << " stale (acting_primary " << newstat->acting_primary
 	     << ")" << dendl;
     newstat->state |= PG_STATE_STALE;

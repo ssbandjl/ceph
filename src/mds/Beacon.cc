@@ -162,7 +162,7 @@ void Beacon::send_and_wait(const double duration)
   std::unique_lock lock(mutex);
   _send();
   auto awaiting_seq = last_seq;
-  dout(20) << __func__ << ": awaiting " << awaiting_seq
+  dout(20) << __FFL__ << ": awaiting " << awaiting_seq
            << " for up to " << duration << "s" << dendl;
 
   auto start = clock::now();
@@ -270,7 +270,7 @@ void Beacon::set_want_state(const MDSMap &mdsmap, MDSMap::DaemonState newstate)
   _notify_mdsmap(mdsmap);
 
   if (want_state != newstate) {
-    dout(5) << __func__ << ": "
+    dout(5) << __FFL__ << ": "
       << ceph_mds_state_name(want_state) << " -> "
       << ceph_mds_state_name(newstate) << dendl;
     want_state = newstate;

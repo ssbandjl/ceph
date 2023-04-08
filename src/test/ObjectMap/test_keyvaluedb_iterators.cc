@@ -227,7 +227,7 @@ public:
 
   void print_iterator(KeyValueDB::WholeSpaceIterator iter) {
     if (!iter->valid()) {
-      std::cerr << __func__ << " iterator is not valid; stop." << std::endl;
+      std::cerr << __FFL__ << " iterator is not valid; stop." << std::endl;
       return;
     }
 

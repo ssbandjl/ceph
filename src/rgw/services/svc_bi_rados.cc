@@ -95,7 +95,7 @@ int RGWSI_BucketIndex_RADOS::open_bucket_index(const RGWBucketInfo& bucket_info,
   const rgw_bucket& bucket = bucket_info.bucket;
   int r = open_bucket_index_pool(bucket_info, index_pool);
   if (r < 0) {
-    ldout(cct, 20) << __func__ << ": open_bucket_index_pool() returned "
+    ldout(cct, 20) << __FFL__ << ": open_bucket_index_pool() returned "
                    << r << dendl;
     return r;
   }
@@ -171,7 +171,7 @@ int RGWSI_BucketIndex_RADOS::open_bucket_index(const RGWBucketInfo& bucket_info,
   string bucket_oid_base;
   int ret = open_bucket_index_base(bucket_info, index_pool, &bucket_oid_base);
   if (ret < 0) {
-    ldout(cct, 20) << __func__ << ": open_bucket_index_pool() returned "
+    ldout(cct, 20) << __FFL__ << ": open_bucket_index_pool() returned "
                    << ret << dendl;
     return ret;
   }
@@ -238,7 +238,7 @@ int RGWSI_BucketIndex_RADOS::open_bucket_index_shard(const RGWBucketInfo& bucket
 
   int ret = open_bucket_index_base(bucket_info, &pool, &bucket_oid_base);
   if (ret < 0) {
-    ldout(cct, 20) << __func__ << ": open_bucket_index_pool() returned "
+    ldout(cct, 20) << __FFL__ << ": open_bucket_index_pool() returned "
                    << ret << dendl;
     return ret;
   }
@@ -265,7 +265,7 @@ int RGWSI_BucketIndex_RADOS::open_bucket_index_shard(const RGWBucketInfo& bucket
   string bucket_oid_base;
   int ret = open_bucket_index_base(bucket_info, &index_pool, &bucket_oid_base);
   if (ret < 0) {
-    ldout(cct, 20) << __func__ << ": open_bucket_index_pool() returned "
+    ldout(cct, 20) << __FFL__ << ": open_bucket_index_pool() returned "
                    << ret << dendl;
     return ret;
   }
@@ -398,7 +398,7 @@ int RGWSI_BucketIndex_RADOS::get_reshard_status(const RGWBucketInfo& bucket_info
 
     int ret = cls_rgw_get_bucket_resharding(index_pool.ioctx(), i.second, &entry);
     if (ret < 0 && ret != -ENOENT) {
-      lderr(cct) << "ERROR: " << __func__ << ": cls_rgw_get_bucket_resharding() returned ret=" << ret << dendl;
+      lderr(cct) << "ERROR: " << __FFL__ << ": cls_rgw_get_bucket_resharding() returned ret=" << ret << dendl;
       return ret;
     }
 

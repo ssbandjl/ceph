@@ -18,7 +18,7 @@
 #define dout_subsys ceph_subsys_rbd
 #undef dout_prefix
 #define dout_prefix *_dout << "librbd::cache::ParentCacheObjectDispatch: " \
-                           << this << " " << __func__ << ": "
+                           << this << " " << __FFL__ << ": "
 
 using namespace ceph::immutable_obj_cache;
 using librbd::util::data_object_name;

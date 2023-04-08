@@ -165,7 +165,7 @@ int RGWShardCollectCR::operate() {
         if (collect_next(&child_ret)) {
           current_running--;
           if (child_ret < 0 && child_ret != -ENOENT) {
-            ldout(cct, 10) << __func__ << ": failed to fetch log status, ret=" << child_ret << dendl;
+            ldout(cct, 10) << __FFL__ << ": failed to fetch log status, ret=" << child_ret << dendl;
             status = child_ret;
           }
         }
@@ -177,7 +177,7 @@ int RGWShardCollectCR::operate() {
       if (collect_next(&child_ret)) {
         current_running--;
         if (child_ret < 0 && child_ret != -ENOENT) {
-          ldout(cct, 10) << __func__ << ": failed to fetch log status, ret=" << child_ret << dendl;
+          ldout(cct, 10) << __FFL__ << ": failed to fetch log status, ret=" << child_ret << dendl;
           status = child_ret;
         }
       }
@@ -1230,7 +1230,7 @@ public:
       sync_marker.timestamp = timestamp;
     }
 
-    ldpp_dout(sync_env->dpp, 20) << __func__ << "(): updating marker marker_oid=" << marker_oid << " marker=" << new_marker << " realm_epoch=" << sync_marker.realm_epoch << dendl;
+    ldpp_dout(sync_env->dpp, 20) << __FFL__ << "(): updating marker marker_oid=" << marker_oid << " marker=" << new_marker << " realm_epoch=" << sync_marker.realm_epoch << dendl;
     tn->log(20, SSTR("new marker=" << new_marker));
     rgw::sal::RGWRadosStore *store = sync_env->store;
     return new RGWSimpleRadosWriteCR<rgw_meta_sync_marker>(sync_env->async_rados,
@@ -1594,7 +1594,7 @@ public:
         yield call(new RGWRadosGetOmapKeysCR(sync_env->store, rgw_raw_obj(pool, oid),
                                              marker, max_entries, omapkeys));
         if (retcode < 0) {
-          ldpp_dout(sync_env->dpp, 0) << "ERROR: " << __func__ << "(): RGWRadosGetOmapKeysCR() returned ret=" << retcode << dendl;
+          ldpp_dout(sync_env->dpp, 0) << "ERROR: " << __FFL__ << "(): RGWRadosGetOmapKeysCR() returned ret=" << retcode << dendl;
           tn->log(0, SSTR("ERROR: failed to list omap keys, status=" << retcode));
           yield lease_cr->go_down();
           drain_all();
@@ -1746,7 +1746,7 @@ public:
           break;
         }
 #define INCREMENTAL_MAX_ENTRIES 100
-        ldpp_dout(sync_env->dpp, 20) << __func__ << ":" << __LINE__ << ": shard_id=" << shard_id << " mdlog_marker=" << mdlog_marker << " sync_marker.marker=" << sync_marker.marker << " period_marker=" << period_marker << dendl;
+        ldpp_dout(sync_env->dpp, 20) << __FFL__ << ":" << __LINE__ << ": shard_id=" << shard_id << " mdlog_marker=" << mdlog_marker << " sync_marker.marker=" << sync_marker.marker << " period_marker=" << period_marker << dendl;
         if (!period_marker.empty() && period_marker <= mdlog_marker) {
           tn->log(10, SSTR("finished syncing current period: mdlog_marker=" << mdlog_marker << " sync_marker=" << sync_marker.marker << " period_marker=" << period_marker));
           done_with_period = true;
@@ -1754,7 +1754,7 @@ public:
         }
 	if (mdlog_marker <= max_marker) {
 	  /* we're at the tip, try to bring more entries */
-          ldpp_dout(sync_env->dpp, 20) << __func__ << ":" << __LINE__ << ": shard_id=" << shard_id << " syncing mdlog for shard_id=" << shard_id << dendl;
+          ldpp_dout(sync_env->dpp, 20) << __FFL__ << ":" << __LINE__ << ": shard_id=" << shard_id << " syncing mdlog for shard_id=" << shard_id << dendl;
           yield call(new RGWCloneMetaLogCoroutine(sync_env, mdlog,
                                                   period, shard_id,
                                                   mdlog_marker, &mdlog_marker));
@@ -1813,7 +1813,7 @@ public:
           }
         }
         collect_children();
-	ldpp_dout(sync_env->dpp, 20) << __func__ << ":" << __LINE__ << ": shard_id=" << shard_id << " mdlog_marker=" << mdlog_marker << " max_marker=" << max_marker << " sync_marker.marker=" << sync_marker.marker << " period_marker=" << period_marker << dendl;
+	ldpp_dout(sync_env->dpp, 20) << __FFL__ << ":" << __LINE__ << ": shard_id=" << shard_id << " mdlog_marker=" << mdlog_marker << " max_marker=" << max_marker << " sync_marker.marker=" << sync_marker.marker << " period_marker=" << period_marker << dendl;
         if (done_with_period) {
           // return control to RGWMetaSyncCR and advance to the next period
           tn->log(10, SSTR(*this << ": done with period"));
@@ -2138,13 +2138,13 @@ int RGWRemoteMetaLog::run_sync()
   rgw_mdlog_info mdlog_info;
   for (;;) {
     if (going_down) {
-      ldpp_dout(dpp, 1) << __func__ << "(): going down" << dendl;
+      ldpp_dout(dpp, 1) << __FFL__ << "(): going down" << dendl;
       return 0;
     }
     r = read_log_info(&mdlog_info);
     if (r == -EIO || r == -ENOENT) {
       // keep retrying if master isn't alive or hasn't initialized the log
-      ldpp_dout(dpp, 10) << __func__ << "(): waiting for master.." << dendl;
+      ldpp_dout(dpp, 10) << __FFL__ << "(): waiting for master.." << dendl;
       backoff.backoff_sleep();
       continue;
     }
@@ -2159,7 +2159,7 @@ int RGWRemoteMetaLog::run_sync()
   rgw_meta_sync_status sync_status;
   do {
     if (going_down) {
-      ldpp_dout(dpp, 1) << __func__ << "(): going down" << dendl;
+      ldpp_dout(dpp, 1) << __FFL__ << "(): going down" << dendl;
       return 0;
     }
     r = run(new RGWReadSyncStatusCoroutine(&sync_env, &sync_status));
@@ -2189,7 +2189,7 @@ int RGWRemoteMetaLog::run_sync()
     }
 
     if (sync_status.sync_info.state == rgw_meta_sync_info::StateInit) {
-      ldpp_dout(dpp, 20) << __func__ << "(): init" << dendl;
+      ldpp_dout(dpp, 20) << __FFL__ << "(): init" << dendl;
       sync_status.sync_info.num_shards = mdlog_info.num_shards;
       auto cursor = store->svc()->mdlog->get_period_history()->get_current();
       if (cursor) {
@@ -2282,32 +2282,32 @@ int RGWCloneMetaLogCoroutine::operate()
   reenter(this) {
     do {
       yield {
-        ldpp_dout(sync_env->dpp, 20) << __func__ << ": shard_id=" << shard_id << ": init request" << dendl;
+        ldpp_dout(sync_env->dpp, 20) << __FFL__ << ": shard_id=" << shard_id << ": init request" << dendl;
         return state_init();
       }
       yield {
-        ldpp_dout(sync_env->dpp, 20) << __func__ << ": shard_id=" << shard_id << ": reading shard status" << dendl;
+        ldpp_dout(sync_env->dpp, 20) << __FFL__ << ": shard_id=" << shard_id << ": reading shard status" << dendl;
         return state_read_shard_status();
       }
       yield {
-        ldpp_dout(sync_env->dpp, 20) << __func__ << ": shard_id=" << shard_id << ": reading shard status complete" << dendl;
+        ldpp_dout(sync_env->dpp, 20) << __FFL__ << ": shard_id=" << shard_id << ": reading shard status complete" << dendl;
         return state_read_shard_status_complete();
       }
       yield {
-        ldpp_dout(sync_env->dpp, 20) << __func__ << ": shard_id=" << shard_id << ": sending rest request" << dendl;
+        ldpp_dout(sync_env->dpp, 20) << __FFL__ << ": shard_id=" << shard_id << ": sending rest request" << dendl;
         return state_send_rest_request();
       }
       yield {
-        ldpp_dout(sync_env->dpp, 20) << __func__ << ": shard_id=" << shard_id << ": receiving rest response" << dendl;
+        ldpp_dout(sync_env->dpp, 20) << __FFL__ << ": shard_id=" << shard_id << ": receiving rest response" << dendl;
         return state_receive_rest_response();
       }
       yield {
-        ldpp_dout(sync_env->dpp, 20) << __func__ << ": shard_id=" << shard_id << ": storing mdlog entries" << dendl;
+        ldpp_dout(sync_env->dpp, 20) << __FFL__ << ": shard_id=" << shard_id << ": storing mdlog entries" << dendl;
         return state_store_mdlog_entries();
       }
     } while (truncated);
     yield {
-      ldpp_dout(sync_env->dpp, 20) << __func__ << ": shard_id=" << shard_id << ": storing mdlog entries complete" << dendl;
+      ldpp_dout(sync_env->dpp, 20) << __FFL__ << ": shard_id=" << shard_id << ": storing mdlog entries complete" << dendl;
       return state_store_mdlog_entries_complete();
     }
   }

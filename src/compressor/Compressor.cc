@@ -82,19 +82,19 @@ CompressorRef Compressor::create(CephContext *cct, const std::string &type)
   auto reg = cct->get_plugin_registry();
   auto factory = dynamic_cast<ceph::CompressionPlugin*>(reg->get_with_load("compressor", type));
   if (factory == NULL) {
-    lderr(cct) << __func__ << " cannot load compressor of type " << type << dendl;
+    lderr(cct) << __FFL__ << " cannot load compressor of type " << type << dendl;
     return NULL;
   }
   int err = factory->factory(&cs_impl, &ss);
   if (err)
-    lderr(cct) << __func__ << " factory return error " << err << dendl;
+    lderr(cct) << __FFL__ << " factory return error " << err << dendl;
   return cs_impl;
 }
 
 CompressorRef Compressor::create(CephContext *cct, int alg)
 {
   if (alg < 0 || alg >= COMP_ALG_LAST) {
-    lderr(cct) << __func__ << " invalid algorithm value:" << alg << dendl;
+    lderr(cct) << __FFL__ << " invalid algorithm value:" << alg << dendl;
     return CompressorRef();
   }
   std::string type_name = get_comp_alg_name(alg);

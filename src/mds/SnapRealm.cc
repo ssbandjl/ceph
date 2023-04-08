@@ -127,12 +127,12 @@ void SnapRealm::_remove_missing_parent(snapid_t snapid, inodeno_t parent, int er
 {
   map<snapid_t, snaplink_t>::iterator p = srnode.past_parents.find(snapid);
   if (p != srnode.past_parents.end()) {
-    dout(10) << __func__ << " " << parent << " [" << p->second.first << ","
+    dout(10) << __FFL__ << " " << parent << " [" << p->second.first << ","
 	     << p->first << "]  errno " << err << dendl;
     srnode.past_parents.erase(p);
     past_parents_dirty = true;
   } else {
-    dout(10) << __func__ << " " << parent << " not found" << dendl;
+    dout(10) << __FFL__ << " " << parent << " not found" << dendl;
   }
 }
 

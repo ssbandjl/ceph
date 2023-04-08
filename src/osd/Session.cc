@@ -47,13 +47,13 @@ void Session::ack_backoff(
   std::lock_guard l(backoff_lock);
   auto p = backoffs.find(pgid);
   if (p == backoffs.end()) {
-    dout(20) << __func__ << " " << pgid << " " << id << " [" << begin << ","
+    dout(20) << __FFL__ << " " << pgid << " " << id << " [" << begin << ","
 	     << end << ") pg not found" << dendl;
     return;
   }
   auto q = p->second.find(begin);
   if (q == p->second.end()) {
-    dout(20) << __func__ << " " << pgid << " " << id << " [" << begin << ","
+    dout(20) << __FFL__ << " " << pgid << " " << id << " [" << begin << ","
 	     << end << ") begin not found" << dendl;
     return;
   }
@@ -62,9 +62,9 @@ void Session::ack_backoff(
     if (b->id == id) {
       if (b->is_new()) {
 	b->state = Backoff::STATE_ACKED;
-	dout(20) << __func__ << " now " << *b << dendl;
+	dout(20) << __FFL__ << " now " << *b << dendl;
       } else if (b->is_deleting()) {
-	dout(20) << __func__ << " deleting " << *b << dendl;
+	dout(20) << __FFL__ << " deleting " << *b << dendl;
 	q->second.erase(i);
 	--backoff_count;
       }
@@ -72,10 +72,10 @@ void Session::ack_backoff(
     }
   }
   if (q->second.empty()) {
-    dout(20) << __func__ << " clearing begin bin " << q->first << dendl;
+    dout(20) << __FFL__ << " clearing begin bin " << q->first << dendl;
     p->second.erase(q);
     if (p->second.empty()) {
-      dout(20) << __func__ << " clearing pg bin " << p->first << dendl;
+      dout(20) << __FFL__ << " clearing pg bin " << p->first << dendl;
       backoffs.erase(p);
     }
   }
@@ -87,7 +87,7 @@ bool Session::check_backoff(
 {
   auto b = have_backoff(pgid, oid);
   if (b) {
-    dout(10) << __func__ << " session " << this << " has backoff " << *b
+    dout(10) << __FFL__ << " session " << this << " has backoff " << *b
 	     << " for " << *m << dendl;
     ceph_assert(!b->is_acked() || !g_conf()->osd_debug_crash_on_ignored_backoff);
     return true;
@@ -96,7 +96,7 @@ bool Session::check_backoff(
   // backoffs, so if we see con is cleared here we have to abort this
   // request.
   if (!con) {
-    dout(10) << __func__ << " session " << this << " disconnected" << dendl;
+    dout(10) << __FFL__ << " session " << this << " disconnected" << dendl;
     return true;
   }
   return false;

@@ -175,7 +175,7 @@ static int decode_policy(CephContext *cct,
     return -EIO;
   }
   if (cct->_conf->subsys.should_gather<ceph_subsys_rgw, 15>()) {
-    ldout(cct, 15) << __func__ << " Read AccessControlPolicy";
+    ldout(cct, 15) << __FFL__ << " Read AccessControlPolicy";
     RGWAccessControlPolicy_S3 *s3policy = static_cast<RGWAccessControlPolicy_S3 *>(policy);
     s3policy->to_xml(*_dout);
     *_dout << dendl;
@@ -2175,7 +2175,7 @@ static bool object_is_expired(map<string, bufferlist>& attrs) {
     try {
       decode(delete_at, iter->second);
     } catch (buffer::error& err) {
-      dout(0) << "ERROR: " << __func__ << ": failed to decode " RGW_ATTR_DELETE_AT " attr" << dendl;
+      dout(0) << "ERROR: " << __FFL__ << ": failed to decode " RGW_ATTR_DELETE_AT " attr" << dendl;
       return false;
     }
 
@@ -6339,7 +6339,7 @@ bool RGWCompleteMultipart::check_previously_completed(const DoutPrefixProvider* 
   map<string, bufferlist> sattrs;
   int ret = get_obj_attrs(store, s, {s->bucket, s->object}, sattrs);
   if (ret < 0) {
-    ldpp_dout(dpp, 0) << __func__ << "() ERROR: get_obj_attrs() returned ret=" << ret << dendl;
+    ldpp_dout(dpp, 0) << __FFL__ << "() ERROR: get_obj_attrs() returned ret=" << ret << dendl;
     return false;
   }
   string oetag = sattrs[RGW_ATTR_ETAG].to_str();
@@ -6352,7 +6352,7 @@ bool RGWCompleteMultipart::check_previously_completed(const DoutPrefixProvider* 
     char petag[CEPH_CRYPTO_MD5_DIGESTSIZE];
     hex_to_buf(partetag.c_str(), petag, CEPH_CRYPTO_MD5_DIGESTSIZE);
     hash.Update((const unsigned char *)petag, sizeof(petag));
-    ldpp_dout(dpp, 20) << __func__ << "() re-calculating multipart etag: part: "
+    ldpp_dout(dpp, 20) << __FFL__ << "() re-calculating multipart etag: part: "
                                    << index << ", etag: " << partetag << dendl;
   }
 
@@ -6364,11 +6364,11 @@ bool RGWCompleteMultipart::check_previously_completed(const DoutPrefixProvider* 
            "-%lld", (long long)parts->parts.size());
 
   if (oetag.compare(final_etag_str) != 0) {
-    ldpp_dout(dpp, 1) << __func__ << "() NOTICE: etag mismatch: object etag:"
+    ldpp_dout(dpp, 1) << __FFL__ << "() NOTICE: etag mismatch: object etag:"
                                   << oetag << ", re-calculated etag:" << final_etag_str << dendl;
     return false;
   }
-  ldpp_dout(dpp, 5) << __func__ << "() object etag and re-calculated etag match, etag: " << oetag << dendl;
+  ldpp_dout(dpp, 5) << __FFL__ << "() object etag and re-calculated etag match, etag: " << oetag << dendl;
   return true;
 }
 
@@ -7959,7 +7959,7 @@ void RGWPutBucketObjectLock::execute()
   if (!store->svc()->zone->is_meta_master()) {
     op_ret = forward_request_to_master(s, NULL, store, data, nullptr);
     if (op_ret < 0) {
-      ldout(s->cct, 20) << __func__ << "forward_request_to_master returned ret=" << op_ret << dendl;
+      ldout(s->cct, 20) << __FFL__ << "forward_request_to_master returned ret=" << op_ret << dendl;
       return;
     }
   }
@@ -8130,7 +8130,7 @@ void RGWGetObjRetention::execute()
   try {
     obj_retention.decode(iter);
   } catch (const buffer::error& e) {
-    ldout(s->cct, 0) << __func__ <<  "decode object retention config failed" << dendl;
+    ldout(s->cct, 0) << __FFL__ <<  "decode object retention config failed" << dendl;
     op_ret = -EIO;
     return;
   }
@@ -8228,7 +8228,7 @@ void RGWGetObjLegalHold::execute()
   try {
     obj_legal_hold.decode(iter);
   } catch (const buffer::error& e) {
-    ldout(s->cct, 0) << __func__ <<  "decode object legal hold config failed" << dendl;
+    ldout(s->cct, 0) << __FFL__ <<  "decode object legal hold config failed" << dendl;
     op_ret = -EIO;
     return;
   }
@@ -8338,7 +8338,7 @@ void RGWGetBucketPublicAccessBlock::execute()
     try {
       access_conf.decode(iter);
     } catch (const buffer::error& e) {
-      ldpp_dout(this, 0) << __func__ <<  "decode access_conf failed" << dendl;
+      ldpp_dout(this, 0) << __FFL__ <<  "decode access_conf failed" << dendl;
       op_ret = -EIO;
       return;
     }

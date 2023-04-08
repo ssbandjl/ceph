@@ -27,7 +27,7 @@
 int KqueueDriver::test_kqfd() {
   struct kevent ke[1];
   if (kevent(kqfd, ke, 0, NULL, 0, KEVENT_NOWAIT) == -1) {
-    ldout(cct,0) << __func__ << " invalid kqfd = " << kqfd 
+    ldout(cct,0) << __FFL__ << " invalid kqfd = " << kqfd 
                  << cpp_strerror(errno) << dendl;
     return -errno;
   }
@@ -38,12 +38,12 @@ int KqueueDriver::restore_events() {
   struct kevent ke[2];
   int i;
 
-  ldout(cct,30) << __func__ << " on kqfd = " << kqfd << dendl;
+  ldout(cct,30) << __FFL__ << " on kqfd = " << kqfd << dendl;
   for(i=0;i<size;i++) {
     int num = 0;
     if (sav_events[i].mask == 0 )
       continue;
-    ldout(cct,30) << __func__ << " restore kqfd = " << kqfd 
+    ldout(cct,30) << __FFL__ << " restore kqfd = " << kqfd 
                   << " fd = " << i << " mask " << sav_events[i].mask << dendl;
     if (sav_events[i].mask & EVENT_READABLE)
       EV_SET(&ke[num++], i, EVFILT_READ, EV_ADD, 0, 0, NULL);
@@ -51,7 +51,7 @@ int KqueueDriver::restore_events() {
       EV_SET(&ke[num++], i, EVFILT_WRITE, EV_ADD, 0, 0, NULL);
     if (num) {
       if (kevent(kqfd, ke, num, NULL, 0, KEVENT_NOWAIT) == -1) {
-        ldout(cct,0) << __func__ << " unable to add event: "
+        ldout(cct,0) << __FFL__ << " unable to add event: "
                      << cpp_strerror(errno) << dendl;
         return -errno;
       }
@@ -106,7 +106,7 @@ int KqueueDriver::init(EventCenter *c, int nevent)
   // Reserve the space to accept the kevent return events.
   res_events = (struct kevent*)malloc(sizeof(struct kevent)*nevent);
   if (!res_events) {
-    lderr(cct) << __func__ << " unable to malloc memory: "
+    lderr(cct) << __FFL__ << " unable to malloc memory: "
                            << cpp_strerror(errno) << dendl;
     return -ENOMEM;
   }
@@ -117,7 +117,7 @@ int KqueueDriver::init(EventCenter *c, int nevent)
   // when we change trhread ID. 
   sav_events = (struct SaveEvent*)malloc(sizeof(struct SaveEvent)*nevent);
   if (!sav_events) {
-    lderr(cct) << __func__ << " unable to malloc memory: "
+    lderr(cct) << __FFL__ << " unable to malloc memory: "
                            << cpp_strerror(errno) << dendl;
     return -ENOMEM;
   }
@@ -135,7 +135,7 @@ int KqueueDriver::add_event(int fd, int cur_mask, int add_mask)
   struct kevent ke[2];
   int num = 0;
 
-  ldout(cct,30) << __func__ << " add event kqfd = " << kqfd << " fd = " << fd 
+  ldout(cct,30) << __FFL__ << " add event kqfd = " << kqfd << " fd = " << fd 
 	<< " cur_mask = " << cur_mask << " add_mask = " << add_mask 
 	<< dendl;
 
@@ -150,7 +150,7 @@ int KqueueDriver::add_event(int fd, int cur_mask, int add_mask)
 
   if (num) {
     if (kevent(kqfd, ke, num, NULL, 0, KEVENT_NOWAIT) == -1) {
-      lderr(cct) << __func__ << " unable to add event: "
+      lderr(cct) << __FFL__ << " unable to add event: "
                              << cpp_strerror(errno) << dendl;
       return -errno;
     }
@@ -168,7 +168,7 @@ int KqueueDriver::del_event(int fd, int cur_mask, int del_mask)
   int num = 0;
   int mask = cur_mask & del_mask;
 
-  ldout(cct,30) << __func__ << " delete event kqfd = " << kqfd 
+  ldout(cct,30) << __FFL__ << " delete event kqfd = " << kqfd 
 	<< " fd = " << fd << " cur_mask = " << cur_mask 
 	<< " del_mask = " << del_mask << dendl;
 
@@ -184,7 +184,7 @@ int KqueueDriver::del_event(int fd, int cur_mask, int del_mask)
   if (num) {
     int r = 0;
     if ((r = kevent(kqfd, ke, num, NULL, 0, KEVENT_NOWAIT)) < 0) {
-      lderr(cct) << __func__ << " kevent: delete fd=" << fd << " mask=" << mask
+      lderr(cct) << __FFL__ << " kevent: delete fd=" << fd << " mask=" << mask
                  << " failed." << cpp_strerror(errno) << dendl;
       return -errno;
     }
@@ -196,12 +196,12 @@ int KqueueDriver::del_event(int fd, int cur_mask, int del_mask)
 
 int KqueueDriver::resize_events(int newsize)
 {
-  ldout(cct,30) << __func__ << " kqfd = " << kqfd << "newsize = " << newsize 
+  ldout(cct,30) << __FFL__ << " kqfd = " << kqfd << "newsize = " << newsize 
                 << dendl;
   if (newsize > sav_max) {
     sav_events = (struct SaveEvent*)realloc(sav_events, sizeof(struct SaveEvent)*newsize);
     if (!sav_events) {
-      lderr(cct) << __func__ << " unable to realloc memory: "
+      lderr(cct) << __FFL__ << " unable to realloc memory: "
                              << cpp_strerror(errno) << dendl;
       ceph_assert(sav_events);
       return -ENOMEM;
@@ -217,7 +217,7 @@ int KqueueDriver::event_wait(vector<FiredFileEvent> &fired_events, struct timeva
   int retval, numevents = 0;
   struct timespec timeout;
 
-  ldout(cct,10) << __func__ << " kqfd = " << kqfd << dendl;
+  ldout(cct,10) << __FFL__ << " kqfd = " << kqfd << dendl;
 
   int r = test_thread_change(__func__);
   if ( r < 0 )
@@ -226,23 +226,23 @@ int KqueueDriver::event_wait(vector<FiredFileEvent> &fired_events, struct timeva
   if (tvp != NULL) {
       timeout.tv_sec = tvp->tv_sec;
       timeout.tv_nsec = tvp->tv_usec * 1000;
-      ldout(cct,20) << __func__ << " "
+      ldout(cct,20) << __FFL__ << " "
 		<< timeout.tv_sec << " sec "
 		<< timeout.tv_nsec << " nsec"
 		<< dendl;
       retval = kevent(kqfd, NULL, 0, res_events, size, &timeout);
   } else {
-      ldout(cct,30) << __func__ << " event_wait: " << " NULL" << dendl;
+      ldout(cct,30) << __FFL__ << " event_wait: " << " NULL" << dendl;
       retval = kevent(kqfd, NULL, 0, res_events, size, KEVENT_NOWAIT);
   }
 
-  ldout(cct,25) << __func__ << " kevent retval: " << retval << dendl;
+  ldout(cct,25) << __FFL__ << " kevent retval: " << retval << dendl;
   if (retval < 0) {
-    lderr(cct) << __func__ << " kqueue error: "
+    lderr(cct) << __FFL__ << " kqueue error: "
                            << cpp_strerror(errno) << dendl;
     return -errno;
   } else if (retval == 0) {
-    ldout(cct,5) << __func__ << " Hit timeout("
+    ldout(cct,5) << __FFL__ << " Hit timeout("
                  << timeout.tv_sec << " sec "
                  << timeout.tv_nsec << " nsec"
 		 << ")." << dendl;

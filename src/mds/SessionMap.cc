@@ -191,7 +191,7 @@ void SessionMap::_load_finish(
   // Decode header
   if (first) {
     if (header_r != 0) {
-      derr << __func__ << ": header error: " << cpp_strerror(header_r) << dendl;
+      derr << __FFL__ << ": header error: " << cpp_strerror(header_r) << dendl;
       mds->clog->error() << "error reading sessionmap header "
                          << header_r << " (" << cpp_strerror(header_r) << ")";
       mds->damaged();
@@ -199,7 +199,7 @@ void SessionMap::_load_finish(
     }
 
     if(header_bl.length() == 0) {
-      dout(4) << __func__ << ": header missing, loading legacy..." << dendl;
+      dout(4) << __FFL__ << ": header missing, loading legacy..." << dendl;
       load_legacy();
       return;
     }
@@ -211,11 +211,11 @@ void SessionMap::_load_finish(
       mds->damaged();
       ceph_abort();  // Should be unreachable because damaged() calls respawn()
     }
-    dout(10) << __func__ << " loaded version " << version << dendl;
+    dout(10) << __FFL__ << " loaded version " << version << dendl;
   }
 
   if (values_r != 0) {
-    derr << __func__ << ": error reading values: "
+    derr << __FFL__ << ": error reading values: "
       << cpp_strerror(values_r) << dendl;
     mds->clog->error() << "error reading sessionmap values: " 
                        << values_r << " (" << cpp_strerror(values_r) << ")";
@@ -235,7 +235,7 @@ void SessionMap::_load_finish(
   if (more_session_vals) {
     // Issue another read if we're not at the end of the omap
     const std::string last_key = session_vals.rbegin()->first;
-    dout(10) << __func__ << ": continue omap load from '"
+    dout(10) << __FFL__ << ": continue omap load from '"
              << last_key << "'" << dendl;
     object_t oid = get_object_name();
     object_locator_t oloc(mds->mdsmap->get_metadata_pool());
@@ -247,7 +247,7 @@ void SessionMap::_load_finish(
         new C_OnFinisher(c, mds->finisher));
   } else {
     // I/O is complete.  Update `by_state`
-    dout(10) << __func__ << ": omap load complete" << dendl;
+    dout(10) << __FFL__ << ": omap load complete" << dendl;
     for (ceph::unordered_map<entity_name_t, Session*>::iterator i = session_map.begin();
          i != session_map.end(); ++i) {
       Session *s = i->second;
@@ -259,7 +259,7 @@ void SessionMap::_load_finish(
     }
 
     // Population is complete.  Trigger load waiters.
-    dout(10) << __func__ << ": v " << version 
+    dout(10) << __FFL__ << ": v " << version 
 	   << ", " << session_map.size() << " sessions" << dendl;
     projected = committing = committed = version;
     dump();
@@ -313,7 +313,7 @@ public:
  */
 void SessionMap::load_legacy()
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
 
   C_IO_SM_LoadLegacy *c = new C_IO_SM_LoadLegacy(this);
   object_t oid = get_object_name();
@@ -376,7 +376,7 @@ public:
 
 void SessionMap::save(MDSContext *onsave, version_t needv)
 {
-  dout(10) << __func__ << ": needv " << needv << ", v " << version << dendl;
+  dout(10) << __FFL__ << ": needv " << needv << ", v " << version << dendl;
  
   if (needv && committing >= needv) {
     ceph_assert(committing > committed);
@@ -402,7 +402,7 @@ void SessionMap::save(MDSContext *onsave, version_t needv)
    * an old-versioned MDS tries to read it, it'll fail out safely
    * with an end_of_buffer exception */
   if (loaded_legacy) {
-    dout(4) << __func__ << " erasing legacy sessionmap" << dendl;
+    dout(4) << __FFL__ << " erasing legacy sessionmap" << dendl;
     op.truncate(0);
     loaded_legacy = false;  // only need to truncate once.
   }
@@ -646,7 +646,7 @@ void SessionMap::wipe_ino_prealloc()
 
 void SessionMap::add_session(Session *s)
 {
-  dout(10) << __func__ << " s=" << s << " name=" << s->info.inst.name << dendl;
+  dout(10) << __FFL__ << " s=" << s << " name=" << s->info.inst.name << dendl;
 
   ceph_assert(session_map.count(s->info.inst.name) == 0);
   session_map[s->info.inst.name] = s;
@@ -664,7 +664,7 @@ void SessionMap::add_session(Session *s)
 
 void SessionMap::remove_session(Session *s)
 {
-  dout(10) << __func__ << " s=" << s << " name=" << s->info.inst.name << dendl;
+  dout(10) << __FFL__ << " s=" << s << " name=" << s->info.inst.name << dendl;
 
   update_average_birth_time(*s, false);
 
@@ -681,7 +681,7 @@ void SessionMap::remove_session(Session *s)
 
 void SessionMap::touch_session(Session *session)
 {
-  dout(10) << __func__ << " s=" << session << " name=" << session->info.inst.name << dendl;
+  dout(10) << __FFL__ << " s=" << session << " name=" << session->info.inst.name << dendl;
 
   // Move to the back of the session list for this state (should
   // already be on a list courtesy of add_session and set_state)
@@ -714,7 +714,7 @@ void SessionMap::_mark_dirty(Session *s, bool may_save)
 
 void SessionMap::mark_dirty(Session *s, bool may_save)
 {
-  dout(20) << __func__ << " s=" << s << " name=" << s->info.inst.name
+  dout(20) << __FFL__ << " s=" << s << " name=" << s->info.inst.name
     << " v=" << version << dendl;
 
   _mark_dirty(s, may_save);
@@ -724,7 +724,7 @@ void SessionMap::mark_dirty(Session *s, bool may_save)
 
 void SessionMap::replay_dirty_session(Session *s)
 {
-  dout(20) << __func__ << " s=" << s << " name=" << s->info.inst.name
+  dout(20) << __FFL__ << " s=" << s << " name=" << s->info.inst.name
     << " v=" << version << dendl;
 
   _mark_dirty(s, false);
@@ -780,7 +780,7 @@ bad:
 
 version_t SessionMap::mark_projected(Session *s)
 {
-  dout(20) << __func__ << " s=" << s << " name=" << s->info.inst.name
+  dout(20) << __FFL__ << " s=" << s << " name=" << s->info.inst.name
     << " pv=" << projected << " -> " << projected + 1 << dendl;
   ++projected;
   s->push_pv(projected);
@@ -846,7 +846,7 @@ void SessionMap::save_if_dirty(const std::set<entity_name_t> &tgt_sessions,
     write_sessions.push_back(*i);
   }
 
-  dout(4) << __func__ << ": writing " << write_sessions.size() << dendl;
+  dout(4) << __FFL__ << ": writing " << write_sessions.size() << dendl;
 
   // Batch writes into mds_sessionmap_keys_per_op
   const uint32_t kpo = g_conf()->mds_sessionmap_keys_per_op;
@@ -998,10 +998,10 @@ int Session::check_access(CInode *in, unsigned mask,
     diri = in->get_projected_parent_dn()->get_dir()->get_inode();
   if (diri && diri->is_stray()){
     path = in->get_projected_inode()->stray_prior_path;
-    dout(20) << __func__ << " stray_prior_path " << path << dendl;
+    dout(20) << __FFL__ << " stray_prior_path " << path << dendl;
   } else {
     in->make_path_string(path, true);
-    dout(20) << __func__ << " path " << path << dendl;
+    dout(20) << __FFL__ << " path " << path << dendl;
   }
   if (path.length())
     path = path.substr(1);    // drop leading /
@@ -1010,7 +1010,7 @@ int Session::check_access(CInode *in, unsigned mask,
       in->inode.has_layout() &&
       in->inode.layout.pool_ns.length() &&
       !connection->has_feature(CEPH_FEATURE_FS_FILE_LAYOUT_V2)) {
-    dout(10) << __func__ << " client doesn't support FS_FILE_LAYOUT_V2" << dendl;
+    dout(10) << __FFL__ << " client doesn't support FS_FILE_LAYOUT_V2" << dendl;
     return -EIO;
   }
 
@@ -1113,7 +1113,7 @@ int SessionFilter::parse(
   ceph_assert(ss != NULL);
 
   for (const auto &s : args) {
-    dout(20) << __func__ << " parsing filter '" << s << "'" << dendl;
+    dout(20) << __FFL__ << " parsing filter '" << s << "'" << dendl;
 
     auto eq = s.find("=");
     if (eq == std::string::npos || eq == s.size()) {
@@ -1135,7 +1135,7 @@ int SessionFilter::parse(
     auto k = s.substr(0, eq);
     auto v = s.substr(eq + 1);
 
-    dout(20) << __func__ << " parsed k='" << k << "', v='" << v << "'" << dendl;
+    dout(20) << __FFL__ << " parsed k='" << k << "', v='" << v << "'" << dendl;
 
     if (k.compare(0, metadata_prefix.size(), metadata_prefix) == 0
         && k.size() > metadata_prefix.size()) {

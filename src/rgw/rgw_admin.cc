@@ -2287,7 +2287,7 @@ static int bucket_source_sync_status(rgw::sal::RGWRadosStore *store, const RGWZo
   }
 
   if (!pipe.source.bucket) {
-    lderr(store->ctx()) << __func__ << "(): missing source bucket" << dendl;
+    lderr(store->ctx()) << __FFL__ << "(): missing source bucket" << dendl;
     return -EINVAL;
   }
 

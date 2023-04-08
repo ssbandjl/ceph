@@ -17,7 +17,7 @@
 #define dout_subsys ceph_subsys_rbd_mirror
 #undef dout_prefix
 #define dout_prefix *_dout << "rbd::mirror::NamespaceReplayer: " \
-                           << this << " " << __func__ << ": "
+                           << this << " " << __FFL__ << ": "
 
 using librbd::util::create_async_context_callback;
 using librbd::util::create_context_callback;

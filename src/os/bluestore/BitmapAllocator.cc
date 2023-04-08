@@ -15,7 +15,7 @@ BitmapAllocator::BitmapAllocator(CephContext* _cct,
     Allocator(name),
     cct(_cct)
 {
-  ldout(cct, 10) << __func__ << " 0x" << std::hex << capacity << "/"
+  ldout(cct, 10) << __FFL__ << " 0x" << std::hex << capacity << "/"
 		 << alloc_unit << std::dec << dendl;
   _init(capacity, alloc_unit, false);
 }
@@ -26,7 +26,7 @@ int64_t BitmapAllocator::allocate(
 {
   uint64_t allocated = 0;
   size_t old_size = extents->size();
-  ldout(cct, 10) << __func__ << std::hex << " 0x" << want_size
+  ldout(cct, 10) << __FFL__ << std::hex << " 0x" << want_size
 		 << "/" << alloc_unit << "," << max_alloc_size << "," << hint
 		 << std::dec << dendl;
     
@@ -50,17 +50,17 @@ void BitmapAllocator::release(
   const interval_set<uint64_t>& release_set)
 {
   for (auto r : release_set) {
-    ldout(cct, 10) << __func__ << " 0x" << std::hex << r.first << "~" << r.second
+    ldout(cct, 10) << __FFL__ << " 0x" << std::hex << r.first << "~" << r.second
 		  << std::dec << dendl;
   }
   _free_l2(release_set);
-  ldout(cct, 10) << __func__ << " done" << dendl;
+  ldout(cct, 10) << __FFL__ << " done" << dendl;
 }
 
 
 void BitmapAllocator::init_add_free(uint64_t offset, uint64_t length)
 {
-  ldout(cct, 10) << __func__ << " 0x" << std::hex << offset << "~" << length
+  ldout(cct, 10) << __FFL__ << " 0x" << std::hex << offset << "~" << length
 		  << std::dec << dendl;
 
   auto mas = get_min_alloc_size();
@@ -68,22 +68,22 @@ void BitmapAllocator::init_add_free(uint64_t offset, uint64_t length)
   uint64_t l = p2align(offset + length - offs, mas);
 
   _mark_free(offs, l);
-  ldout(cct, 10) << __func__ << " done" << dendl;
+  ldout(cct, 10) << __FFL__ << " done" << dendl;
 }
 void BitmapAllocator::init_rm_free(uint64_t offset, uint64_t length)
 {
-  ldout(cct, 10) << __func__ << " 0x" << std::hex << offset << "~" << length
+  ldout(cct, 10) << __FFL__ << " 0x" << std::hex << offset << "~" << length
 		 << std::dec << dendl;
   auto mas = get_min_alloc_size();
   uint64_t offs = round_up_to(offset, mas);
   uint64_t l = p2align(offset + length - offs, mas);
   _mark_allocated(offs, l);
-  ldout(cct, 10) << __func__ << " done" << dendl;
+  ldout(cct, 10) << __FFL__ << " done" << dendl;
 }
 
 void BitmapAllocator::shutdown()
 {
-  ldout(cct, 1) << __func__ << dendl;
+  ldout(cct, 1) << __FFL__ << dendl;
   _shutdown();
 }
 

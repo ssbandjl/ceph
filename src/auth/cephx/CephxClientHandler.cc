@@ -30,7 +30,7 @@
 
 void CephxClientHandler::reset()
 {
-  ldout(cct,10) << __func__ << dendl;
+  ldout(cct,10) << __FFL__ << dendl;
   starting = true;
   server_challenge = 0;
 }
@@ -131,7 +131,7 @@ int CephxClientHandler::handle_response(
     try {
       decode(ch, indata);
     } catch (buffer::error& e) {
-      ldout(cct, 1) << __func__ << " failed to decode CephXServerChallenge: "
+      ldout(cct, 1) << __FFL__ << " failed to decode CephXServerChallenge: "
 		    << e.what() << dendl;
       return -EPERM;
     }
@@ -148,7 +148,7 @@ int CephxClientHandler::handle_response(
   try {
     decode(header, indata);
   } catch (buffer::error& e) {
-    ldout(cct, 1) << __func__ << " failed to decode CephXResponseHeader: "
+    ldout(cct, 1) << __FFL__ << " failed to decode CephXResponseHeader: "
 		  << e.what() << dendl;
     return -EPERM;
   }
@@ -175,7 +175,7 @@ int CephxClientHandler::handle_response(
 	  decode(cbl, indata);
 	  decode(extra_tickets, indata);
 	} catch (buffer::error& e) {
-	  ldout(cct, 1) << __func__ << " failed to decode tickets: "
+	  ldout(cct, 1) << __FFL__ << " failed to decode tickets: "
 			<< e.what() << dendl;
 	  return -EPERM;
 	}
@@ -193,7 +193,7 @@ int CephxClientHandler::handle_response(
 	    string err;
 	    if (decode_decrypt(cct, *connection_secret, *session_key, p,
 			       err)) {
-	      lderr(cct) << __func__ << " failed to decrypt connection_secret"
+	      lderr(cct) << __FFL__ << " failed to decrypt connection_secret"
 			 << dendl;
 	    } else {
 	      ldout(cct, 10) << " got connection_secret "

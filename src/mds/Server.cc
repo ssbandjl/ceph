@@ -413,7 +413,7 @@ void Server::reclaim_session(Session *session, const cref_t<MClientReclaim> &m)
 
   auto reply = make_message<MClientReclaimReply>(0);
   if (m->get_uuid().empty()) {
-    dout(10) << __func__ << " invalid message (no uuid)" << dendl;
+    dout(10) << __FFL__ << " invalid message (no uuid)" << dendl;
     reply->set_result(-EINVAL);
     mds->send_message_client(reply, session);
     return;
@@ -421,7 +421,7 @@ void Server::reclaim_session(Session *session, const cref_t<MClientReclaim> &m)
 
   unsigned flags = m->get_flags();
   if (flags != CEPH_RECLAIM_RESET) { // currently only support reset
-    dout(10) << __func__ << " unsupported flags" << dendl;
+    dout(10) << __FFL__ << " unsupported flags" << dendl;
     reply->set_result(-EOPNOTSUPP);
     mds->send_message_client(reply, session);
     return;
@@ -430,7 +430,7 @@ void Server::reclaim_session(Session *session, const cref_t<MClientReclaim> &m)
   Session* target = find_session_by_uuid(m->get_uuid());
   if (target) {
     if (session->info.auth_name != target->info.auth_name) {
-      dout(10) << __func__ << " session auth_name " << session->info.auth_name
+      dout(10) << __FFL__ << " session auth_name " << session->info.auth_name
 	       << " != target auth_name " << target->info.auth_name << dendl;
       reply->set_result(-EPERM);
       mds->send_message_client(reply, session);
@@ -491,7 +491,7 @@ void Server::finish_reclaim_session(Session *session, const ref_t<MClientReclaim
 void Server::handle_client_reclaim(const cref_t<MClientReclaim> &m)
 {
   Session *session = mds->get_session(m);
-  dout(3) << __func__ <<  " " << *m << " from " << m->get_source() << dendl;
+  dout(3) << __FFL__ <<  " " << *m << " from " << m->get_source() << dendl;
   assert(m->get_source().is_client()); // should _not_ come from an mds!
 
   if (!session) {
@@ -613,7 +613,7 @@ void Server::handle_client_session(const cref_t<MClientSession> &m)
       if (client_metadata.features.empty())
 	infer_supported_features(session, client_metadata);
 
-      dout(20) << __func__ << " CEPH_SESSION_REQUEST_OPEN metadata entries:" << dendl;
+      dout(20) << __FFL__ << " CEPH_SESSION_REQUEST_OPEN metadata entries:" << dendl;
       dout(20) << " features: '" << client_metadata.features << "'" << dendl;
       dout(20) << " metric specification: [" << client_metadata.metric_spec << "]" << dendl;
       for (const auto& p : client_metadata) {
@@ -986,7 +986,7 @@ void Server::finish_force_open_sessions(const map<client_t,pair<Session*,uint64_
     mds->sessionmap.mark_dirty(session);
   }
 
-  dout(10) << __func__ << ": final v " << mds->sessionmap.get_version() << dendl;
+  dout(10) << __FFL__ << ": final v " << mds->sessionmap.get_version() << dendl;
 }
 
 class C_MDS_TerminatedSessions : public ServerContext {
@@ -1168,7 +1168,7 @@ void Server::evict_cap_revoke_non_responders() {
     mds->clog->warn() << "client id " << client << " has not responded to"
                       << " cap revoke by MDS for over " << cap_revoke_eviction_timeout
                       << " seconds, evicting";
-    dout(1) << __func__ << ": evicting cap revoke non-responder client id "
+    dout(1) << __FFL__ << ": evicting cap revoke non-responder client id "
             << client << dendl;
 
     std::stringstream ss;
@@ -1187,7 +1187,7 @@ void Server::handle_conf_change(const std::set<std::string>& changed) {
   }
   if (changed.count("mds_cap_revoke_eviction_timeout")) {
     cap_revoke_eviction_timeout = g_conf().get_val<double>("mds_cap_revoke_eviction_timeout");
-    dout(20) << __func__ << " cap revoke eviction timeout changed to "
+    dout(20) << __FFL__ << " cap revoke eviction timeout changed to "
             << cap_revoke_eviction_timeout << dendl;
   }
   if (changed.count("mds_recall_max_decay_rate")) {
@@ -1195,7 +1195,7 @@ void Server::handle_conf_change(const std::set<std::string>& changed) {
   }
   if (changed.count("mds_max_snaps_per_dir")) {
     max_snaps_per_dir = g_conf().get_val<uint64_t>("mds_max_snaps_per_dir");
-    dout(20) << __func__ << " max snapshots per directory changed to "
+    dout(20) << __FFL__ << " max snapshots per directory changed to "
             << max_snaps_per_dir << dendl;
   }
   if (changed.count("mds_client_delegate_inos_pct")) {
@@ -1288,7 +1288,7 @@ size_t Server::apply_blacklist(const std::set<entity_addr_t> &blacklist)
 
 void Server::journal_close_session(Session *session, int state, Context *on_safe, bool need_purge_inos)
 {
-  dout(10) << __func__ << " : "
+  dout(10) << __FFL__ << " : "
 	   << "("<< need_purge_inos << ")"
 	   << session->info.inst
 	   << "(" << session->info.prealloc_inos.size() << "|" << session->pending_prealloc_inos.size() << ")" << dendl;
@@ -1537,7 +1537,7 @@ void Server::infer_supported_features(Session *session, client_metadata_t& clien
   if (supported >= 0) {
     unsigned long value = (1UL << (supported + 1)) - 1;
     client_metadata.features = feature_bitset_t(value);
-    dout(10) << __func__ << " got '" << client_metadata.features << "'" << dendl;
+    dout(10) << __FFL__ << " got '" << client_metadata.features << "'" << dendl;
   }
 }
 
@@ -1729,7 +1729,7 @@ std::pair<bool, uint64_t> Server::recall_client_state(MDSGatherBuilder* gather, 
   const auto recall_max_decay_threshold = g_conf().get_val<Option::size_t>("mds_recall_max_decay_threshold");
   const auto cache_liveness_magnitude = g_conf().get_val<Option::size_t>("mds_session_cache_liveness_magnitude");
 
-  dout(7) << __func__ << ":"
+  dout(7) << __FFL__ << ":"
            << " min=" << min_caps_per_client
            << " max=" << max_caps_per_client
            << " total=" << Capability::count()
@@ -1756,7 +1756,7 @@ std::pair<bool, uint64_t> Server::recall_client_state(MDSGatherBuilder* gather, 
 	!session->info.inst.name.is_client())
       continue;
 
-    dout(10) << __func__ << ":"
+    dout(10) << __FFL__ << ":"
              << " session " << session->info.inst
 	     << " caps " << num_caps
 	     << ", leases " << session->leases.size()
@@ -1906,7 +1906,7 @@ void Server::respond_to_request(MDRequestRef& mdr, int r)
 {
   if (mdr->client_request) {
     if (mdr->is_batch_head()) {
-      dout(20) << __func__ << " batch head " << *mdr << dendl;
+      dout(20) << __FFL__ << " batch head " << *mdr << dendl;
       mdr->release_batch_op()->respond(r);
     } else {
      reply_client_request(mdr, make_message<MClientReply>(*mdr->client_request, r));
@@ -2385,7 +2385,7 @@ void Server::handle_client_request(const cref_t<MClientRequest> &req)
 	   << session->get_num_completed_requests()
 	   << " completed requests recorded in session\n";
 	mds->clog->warn() << ss.str();
-	dout(20) << __func__ << " " << ss.str() << dendl;
+	dout(20) << __FFL__ << " " << ss.str() << dendl;
       }
     }
   }
@@ -2425,7 +2425,7 @@ void Server::handle_osd_map()
   mds->objecter->with_osdmap([this](const OSDMap& o) {
       auto pi = o.get_pg_pool(mds->mdsmap->get_metadata_pool());
       is_full = pi && pi->has_flag(pg_pool_t::FLAG_FULL);
-      dout(7) << __func__ << ": full = " << is_full << " epoch = "
+      dout(7) << __FFL__ << ": full = " << is_full << " epoch = "
 	      << o.get_epoch() << dendl;
     });
 }
@@ -2488,11 +2488,11 @@ void Server::dispatch_client_request(MDRequestRef& mdr)
 	 (!mdr->has_more() || mdr->more()->witnessed.empty())) // haven't started slave request
 	) {
 
-      dout(20) << __func__ << ": full, responding ENOSPC to op " << ceph_mds_op_name(req->get_op()) << dendl;
+      dout(20) << __FFL__ << ": full, responding ENOSPC to op " << ceph_mds_op_name(req->get_op()) << dendl;
       respond_to_request(mdr, -ENOSPC);
       return;
     } else {
-      dout(20) << __func__ << ": full, permitting op " << ceph_mds_op_name(req->get_op()) << dendl;
+      dout(20) << __FFL__ << ": full, permitting op " << ceph_mds_op_name(req->get_op()) << dendl;
     }
   }
 
@@ -3761,7 +3761,7 @@ void Server::handle_client_getattr(MDRequestRef& mdr, bool is_lookup)
       if (em.second) {
 	em.first->second = std::make_unique<Batch_Getattr_Lookup>(this, mdr);
       } else {
-	dout(20) << __func__ << ": LOOKUP op, wait for previous same getattr ops to respond. " << *mdr << dendl;
+	dout(20) << __FFL__ << ": LOOKUP op, wait for previous same getattr ops to respond. " << *mdr << dendl;
 	em.first->second->add_request(mdr);
 	return;
       }
@@ -3772,7 +3772,7 @@ void Server::handle_client_getattr(MDRequestRef& mdr, bool is_lookup)
       if (em.second) {
 	em.first->second = std::make_unique<Batch_Getattr_Lookup>(this, mdr);
       } else {
-	dout(20) << __func__ << ": GETATTR op, wait for previous same getattr ops to respond. " << *mdr << dendl;
+	dout(20) << __FFL__ << ": GETATTR op, wait for previous same getattr ops to respond. " << *mdr << dendl;
 	em.first->second->add_request(mdr);
 	return;
       }
@@ -4970,7 +4970,7 @@ void Server::handle_client_setattr(MDRequestRef& mdr)
 
   // ENOSPC on growing file while full, but allow shrinks
   if (is_full && req->head.args.setattr.size > old_size) {
-    dout(20) << __func__ << ": full, responding ENOSPC to setattr with larger size" << dendl;
+    dout(20) << __FFL__ << ": full, responding ENOSPC to setattr with larger size" << dendl;
     respond_to_request(mdr, -ENOSPC);
     return;
   }
@@ -5453,7 +5453,7 @@ int Server::parse_quota_vxattr(string name, string value, quota_info_t *quota)
 
 void Server::create_quota_realm(CInode *in)
 {
-  dout(10) << __func__ << " " << *in << dendl;
+  dout(10) << __FFL__ << " " << *in << dendl;
 
   auto req = make_message<MClientRequest>(CEPH_MDS_OP_SETXATTR);
   req->set_filepath(filepath(in->ino()));
@@ -5815,7 +5815,7 @@ void Server::handle_remove_vxattr(MDRequestRef& mdr, CInode *cur)
   const cref_t<MClientRequest> &req = mdr->client_request;
   string name(req->get_path2());
 
-  dout(10) << __func__ << " " << name << " on " << *cur << dendl;
+  dout(10) << __FFL__ << " " << name << " on " << *cur << dendl;
 
   if (name == "ceph.dir.layout") {
     if (!cur->is_dir()) {

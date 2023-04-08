@@ -440,7 +440,7 @@ public:
     index_io.type = IO::IndexIO;
     index_io.index = index;
 
-    ldpp_dout(dpp, 20) << __func__ <<
+    ldpp_dout(dpp, 20) << __FFL__ <<
       " removing entries from gc log shard index=" << index << ", size=" <<
       rt.size() << ", entries=" << rt << dendl;
 

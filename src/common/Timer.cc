@@ -123,9 +123,9 @@ Context* SafeTimer::add_event_after(double seconds, Context *callback)
 Context* SafeTimer::add_event_at(SafeTimer::clock_t::time_point when, Context *callback)
 {
   ceph_assert(ceph_mutex_is_locked(lock));
-  ldout(cct,10) << __func__ << " " << when << " -> " << callback << dendl;
+  ldout(cct,10) << __FFL__ << " " << when << " -> " << callback << dendl;
   if (stopping) {
-    ldout(cct,5) << __func__ << " already shutdown, event not added" << dendl;
+    ldout(cct,5) << __FFL__ << " already shutdown, event not added" << dendl;
     delete callback;
     return nullptr;
   }

@@ -237,7 +237,7 @@ void AdminSocket::entry() noexcept
     fds[1].fd = m_wakeup_rd_fd;
     fds[1].events = POLLIN | POLLRDBAND;
 
-    ldout(m_cct,20) << __func__ << " waiting" << dendl;
+    ldout(m_cct,20) << __FFL__ << " waiting" << dendl;
     int ret = poll(fds, 2, -1);
     if (ret < 0) {
       int err = errno;
@@ -248,7 +248,7 @@ void AdminSocket::entry() noexcept
 		   << cpp_strerror(err) << dendl;
       return;
     }
-    ldout(m_cct,20) << __func__ << " awake" << dendl;
+    ldout(m_cct,20) << __FFL__ << " awake" << dendl;
 
     if (fds[0].revents & POLLIN) {
       // Send out some data
@@ -394,7 +394,7 @@ void AdminSocket::do_accept()
 
 void AdminSocket::do_tell_queue()
 {
-  ldout(m_cct,10) << __func__ << dendl;
+  ldout(m_cct,10) << __FFL__ << dendl;
   std::list<cref_t<MCommand>> q;
   std::list<cref_t<MMonCommand>> lq;
   {
@@ -476,7 +476,7 @@ void AdminSocket::execute_command(
   string format;
   stringstream errss;
   bufferlist empty;
-  ldout(m_cct,10) << __func__ << " cmdvec='" << cmdvec << "'" << dendl;
+  ldout(m_cct,10) << __FFL__ << " cmdvec='" << cmdvec << "'" << dendl;
   if (!cmdmap_from_json(cmdvec, &cmdmap, errss)) {
     ldout(m_cct, 0) << "AdminSocket: " << errss.str() << dendl;
     return on_finish(-EINVAL, "invalid json", empty);
@@ -548,14 +548,14 @@ AdminSocket::find_matched_hook(std::string& prefix,
 
 void AdminSocket::queue_tell_command(cref_t<MCommand> m)
 {
-  ldout(m_cct,10) << __func__ << " " << *m << dendl;
+  ldout(m_cct,10) << __FFL__ << " " << *m << dendl;
   std::lock_guard l(tell_lock);
   tell_queue.push_back(std::move(m));
   wakeup();
 }
 void AdminSocket::queue_tell_command(cref_t<MMonCommand> m)
 {
-  ldout(m_cct,10) << __func__ << " " << *m << dendl;
+  ldout(m_cct,10) << __FFL__ << " " << *m << dendl;
   std::lock_guard l(tell_lock);
   tell_legacy_queue.push_back(std::move(m));
   wakeup();
@@ -593,7 +593,7 @@ void AdminSocket::unregister_commands(const AdminSocketHook *hook)
   auto i = hooks.begin();
   while (i != hooks.end()) {
     if (i->second.hook == hook) {
-      ldout(m_cct, 5) << __func__ << " " << i->first << dendl;
+      ldout(m_cct, 5) << __FFL__ << " " << i->first << dendl;
 
       // If we are currently processing a command, wait for it to
       // complete in case it referenced the hook that we are

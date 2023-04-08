@@ -77,7 +77,7 @@ using util::create_rados_callback;
 
 #undef dout_prefix
 #define dout_prefix *_dout << "librbd::operation::SparsifyObject: " << this \
-                           << " " << m_oid << " " << __func__ << ": "
+                           << " " << m_oid << " " << __FFL__ << ": "
 
 template <typename I>
 class C_SparsifyObject : public C_AsyncObjectThrottle<I> {
@@ -443,7 +443,7 @@ private:
 
 #undef dout_prefix
 #define dout_prefix *_dout << "librbd::operation::SparsifyRequest: " << this \
-                           << " " << __func__ << ": "
+                           << " " << __FFL__ << ": "
 
 template <typename I>
 bool SparsifyRequest<I>::should_complete(int r) {

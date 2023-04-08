@@ -31,7 +31,7 @@ int RGWSI_Meta::create_be_handler(RGWSI_MetaBackend::Type be_type,
 {
   auto iter = be_svc.find(be_type);
   if (iter == be_svc.end()) {
-    ldout(cct, 0) << __func__ << "(): ERROR: backend type not found" << dendl;
+    ldout(cct, 0) << __FFL__ << "(): ERROR: backend type not found" << dendl;
     return -EINVAL;
   }
 

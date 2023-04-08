@@ -41,7 +41,7 @@
 
 #define dout_subsys ceph_subsys_rbd
 #undef dout_prefix
-#define dout_prefix *_dout << "librbd::Migration: " << __func__ << ": "
+#define dout_prefix *_dout << "librbd::Migration: " << __FFL__ << ": "
 
 namespace librbd {
 

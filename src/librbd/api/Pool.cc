@@ -25,7 +25,7 @@ namespace {
 
 #undef dout_prefix
 #define dout_prefix *_dout << "librbd::api::Pool::ImageStatRequest: " \
-                           << __func__ << " " << this << ": " \
+                           << __FFL__ << " " << this << ": " \
                            << "(id=" << m_image_id << "): "
 
 template <typename I>
@@ -233,7 +233,7 @@ int get_pool_stats(librados::IoCtx& io_ctx, const ConfigProxy& config,
 } // anonymous namespace
 
 #undef dout_prefix
-#define dout_prefix *_dout << "librbd::api::Pool: " << __func__ << ": "
+#define dout_prefix *_dout << "librbd::api::Pool: " << __FFL__ << ": "
 
 template <typename I>
 int Pool<I>::init(librados::IoCtx& io_ctx, bool force) {

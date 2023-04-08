@@ -524,7 +524,7 @@ int validate_pool(IoCtx &io_ctx, CephContext *cct) {
   {
     CephContext *cct = (CephContext *)io_ctx.cct();
 
-    ldout(cct, 20) << __func__ << " "  << &io_ctx << " name = " << imgname
+    ldout(cct, 20) << __FFL__ << " "  << &io_ctx << " name = " << imgname
 		   << " size = " << size << " order = " << order << dendl;
     int r = validate_pool(io_ctx, cct);
     if (r < 0) {
@@ -646,7 +646,7 @@ int validate_pool(IoCtx &io_ctx, CephContext *cct) {
       return -EINVAL;
     }
 
-    ldout(cct, 10) << __func__ << " name=" << image_name << ", "
+    ldout(cct, 10) << __FFL__ << " name=" << image_name << ", "
 		   << "id= " << id << ", "
 		   << "size=" << size << ", opts=" << opts << dendl;
 
@@ -782,7 +782,7 @@ int validate_pool(IoCtx &io_ctx, CephContext *cct) {
       clone_id = c_id;
     }
 
-    ldout(cct, 10) << __func__ << " "
+    ldout(cct, 10) << __FFL__ << " "
 		   << "c_name=" << c_name << ", "
 		   << "c_id= " << clone_id << ", "
 		   << "c_opts=" << c_opts << dendl;
@@ -893,7 +893,7 @@ int validate_pool(IoCtx &io_ctx, CephContext *cct) {
   int set_image_notification(ImageCtx *ictx, int fd, int type)
   {
     CephContext *cct = ictx->cct;
-    ldout(cct, 20) << __func__ << " " << ictx << " fd " << fd << " type" << type << dendl;
+    ldout(cct, 20) << __FFL__ << " " << ictx << " fd " << fd << " type" << type << dendl;
 
     int r = ictx->state->refresh_if_required();
     if (r < 0) {
@@ -908,7 +908,7 @@ int validate_pool(IoCtx &io_ctx, CephContext *cct) {
   int is_exclusive_lock_owner(ImageCtx *ictx, bool *is_owner)
   {
     CephContext *cct = ictx->cct;
-    ldout(cct, 20) << __func__ << ": ictx=" << ictx << dendl;
+    ldout(cct, 20) << __FFL__ << ": ictx=" << ictx << dendl;
     *is_owner = false;
 
     std::shared_lock owner_locker{ictx->owner_lock};
@@ -932,7 +932,7 @@ int validate_pool(IoCtx &io_ctx, CephContext *cct) {
   int lock_acquire(ImageCtx *ictx, rbd_lock_mode_t lock_mode)
   {
     CephContext *cct = ictx->cct;
-    ldout(cct, 20) << __func__ << ": ictx=" << ictx << ", "
+    ldout(cct, 20) << __FFL__ << ": ictx=" << ictx << ", "
                    << "lock_mode=" << lock_mode << dendl;
 
     if (lock_mode != RBD_LOCK_MODE_EXCLUSIVE) {
@@ -981,7 +981,7 @@ int validate_pool(IoCtx &io_ctx, CephContext *cct) {
   int lock_release(ImageCtx *ictx)
   {
     CephContext *cct = ictx->cct;
-    ldout(cct, 20) << __func__ << ": ictx=" << ictx << dendl;
+    ldout(cct, 20) << __FFL__ << ": ictx=" << ictx << dendl;
 
     C_SaferCond lock_ctx;
     {
@@ -1009,7 +1009,7 @@ int validate_pool(IoCtx &io_ctx, CephContext *cct) {
                       std::list<std::string> *lock_owners)
   {
     CephContext *cct = ictx->cct;
-    ldout(cct, 20) << __func__ << ": ictx=" << ictx << dendl;
+    ldout(cct, 20) << __FFL__ << ": ictx=" << ictx << dendl;
 
     managed_lock::Locker locker;
     C_SaferCond get_owner_ctx;
@@ -1042,7 +1042,7 @@ int validate_pool(IoCtx &io_ctx, CephContext *cct) {
   int lock_break(ImageCtx *ictx, rbd_lock_mode_t lock_mode,
                  const std::string &lock_owner) {
     CephContext *cct = ictx->cct;
-    ldout(cct, 20) << __func__ << ": ictx=" << ictx << ", "
+    ldout(cct, 20) << __FFL__ << ": ictx=" << ictx << ", "
                    << "lock_mode=" << lock_mode << ", "
                    << "lock_owner=" << lock_owner << dendl;
 
@@ -1617,7 +1617,7 @@ int validate_pool(IoCtx &io_ctx, CephContext *cct) {
     if (numcomp <= 0)
       return -EINVAL;
     CephContext *cct = ictx->cct;
-    ldout(cct, 20) << __func__ << " " << ictx << " numcomp = " << numcomp
+    ldout(cct, 20) << __FFL__ << " " << ictx << " numcomp = " << numcomp
                    << dendl;
     int i = 0;
     while (i < numcomp && ictx->event_socket_completions.pop(comps[i])) {

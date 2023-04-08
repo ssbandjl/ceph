@@ -16,7 +16,7 @@
 #define dout_subsys ceph_subsys_rbd_mirror
 #undef dout_prefix
 #define dout_prefix *_dout << "rbd::mirror::ClusterWatcher:" << this << " " \
-                           << __func__ << ": "
+                           << __FFL__ << ": "
 
 using std::list;
 using std::map;

@@ -416,7 +416,7 @@ RGWHandler_REST* RGWRESTMgr_MDSearch_S3::get_handler(struct req_state* const s,
 
   RGWHandler_REST *handler = new RGWHandler_REST_MDSearch_S3(auth_registry);
 
-  ldout(s->cct, 20) << __func__ << " handler=" << typeid(*handler).name()
+  ldout(s->cct, 20) << __FFL__ << " handler=" << typeid(*handler).name()
 		    << dendl;
   return handler;
 }

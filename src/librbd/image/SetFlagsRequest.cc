@@ -34,7 +34,7 @@ void SetFlagsRequest<I>::send() {
 template <typename I>
 void SetFlagsRequest<I>::send_set_flags() {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 20) << __func__ << dendl;
+  ldout(cct, 20) << __FFL__ << dendl;
 
   std::unique_lock image_locker{m_image_ctx->image_lock};
   std::vector<uint64_t> snap_ids;
@@ -63,7 +63,7 @@ void SetFlagsRequest<I>::send_set_flags() {
 template <typename I>
 Context *SetFlagsRequest<I>::handle_set_flags(int *result) {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 20) << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 20) << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "set_flags failed: " << cpp_strerror(*result)

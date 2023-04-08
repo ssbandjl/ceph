@@ -26,7 +26,7 @@ int C_DecodeTag::decode(bufferlist::const_iterator *it, TagData *tag_data) {
 
 int C_DecodeTag::process(int r) {
   if (r < 0) {
-    lderr(cct) << "C_DecodeTag: " << this << " " << __func__ << ": "
+    lderr(cct) << "C_DecodeTag: " << this << " " << __FFL__ << ": "
                << "failed to allocate tag: " << cpp_strerror(r)
       	 << dendl;
     return r;
@@ -38,12 +38,12 @@ int C_DecodeTag::process(int r) {
   auto data_it = tag.data.cbegin();
   r = decode(&data_it, tag_data);
   if (r < 0) {
-    lderr(cct) << "C_DecodeTag: " << this << " " << __func__ << ": "
+    lderr(cct) << "C_DecodeTag: " << this << " " << __FFL__ << ": "
                << "failed to decode allocated tag" << dendl;
     return r;
   }
 
-  ldout(cct, 20) << "C_DecodeTag: " << this << " " << __func__ << ": "
+  ldout(cct, 20) << "C_DecodeTag: " << this << " " << __FFL__ << ": "
                  << "allocated journal tag: "
                  << "tid=" << tag.tid << ", "
                  << "data=" << *tag_data << dendl;
@@ -52,14 +52,14 @@ int C_DecodeTag::process(int r) {
 
 int C_DecodeTags::process(int r) {
   if (r < 0) {
-    lderr(cct) << "C_DecodeTags: " << this << " " << __func__ << ": "
+    lderr(cct) << "C_DecodeTags: " << this << " " << __FFL__ << ": "
                << "failed to retrieve journal tags: " << cpp_strerror(r)
                << dendl;
     return r;
   }
 
   if (tags.empty()) {
-    lderr(cct) << "C_DecodeTags: " << this << " " << __func__ << ": "
+    lderr(cct) << "C_DecodeTags: " << this << " " << __FFL__ << ": "
                << "no journal tags retrieved" << dendl;
     return -ENOENT;
   }
@@ -69,12 +69,12 @@ int C_DecodeTags::process(int r) {
   auto data_it = tags.back().data.cbegin();
   r = C_DecodeTag::decode(&data_it, tag_data);
   if (r < 0) {
-    lderr(cct) << "C_DecodeTags: " << this << " " << __func__ << ": "
+    lderr(cct) << "C_DecodeTags: " << this << " " << __FFL__ << ": "
                << "failed to decode journal tag" << dendl;
     return r;
   }
 
-  ldout(cct, 20) << "C_DecodeTags: " << this << " " << __func__ << ": "
+  ldout(cct, 20) << "C_DecodeTags: " << this << " " << __FFL__ << ": "
                  << "most recent journal tag: "
                  << "tid=" << *tag_tid << ", "
                  << "data=" << *tag_data << dendl;

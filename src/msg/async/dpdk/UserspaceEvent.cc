@@ -36,13 +36,13 @@ int UserspaceEventManager::get_eventfd()
   Tub<UserspaceFDImpl> &impl = fds[fd];
   ceph_assert(!impl);
   impl.construct();
-  ldout(cct, 20) << __func__ << " fd=" << fd << dendl;
+  ldout(cct, 20) << __FFL__ << " fd=" << fd << dendl;
   return fd;
 }
 
 int UserspaceEventManager::notify(int fd, int mask)
 {
-  ldout(cct, 20) << __func__ << " fd=" << fd << " mask=" << mask << dendl;
+  ldout(cct, 20) << __FFL__ << " fd=" << fd << " mask=" << mask << dendl;
   if ((size_t)fd >= fds.size())
     return -ENOENT;
 
@@ -50,7 +50,7 @@ int UserspaceEventManager::notify(int fd, int mask)
   if (!impl)
     return -ENOENT;
 
-  ldout(cct, 20) << __func__ << " activing=" << int(impl->activating_mask)
+  ldout(cct, 20) << __FFL__ << " activing=" << int(impl->activating_mask)
                  << " listening=" << int(impl->listening_mask)
                  << " waiting_idx=" << int(impl->waiting_idx) << dendl;
 
@@ -65,7 +65,7 @@ int UserspaceEventManager::notify(int fd, int mask)
     waiting_fds[max_wait_idx] = fd;
   }
 
-  ldout(cct, 20) << __func__ << " activing=" << int(impl->activating_mask)
+  ldout(cct, 20) << __FFL__ << " activing=" << int(impl->activating_mask)
                  << " listening=" << int(impl->listening_mask)
                  << " waiting_idx=" << int(impl->waiting_idx) << " done " << dendl;
   return 0;
@@ -73,7 +73,7 @@ int UserspaceEventManager::notify(int fd, int mask)
 
 void UserspaceEventManager::close(int fd)
 {
-  ldout(cct, 20) << __func__ << " fd=" << fd << dendl;
+  ldout(cct, 20) << __FFL__ << " fd=" << fd << dendl;
   if ((size_t)fd >= fds.size())
     return ;
 
@@ -113,7 +113,7 @@ int UserspaceEventManager::poll(int *events, int *masks, int num_events, struct 
     ceph_assert(impl);
     masks[count] = impl->listening_mask & impl->activating_mask;
     ceph_assert(masks[count]);
-    ldout(cct, 20) << __func__ << " fd=" << fd << " mask=" << masks[count] << dendl;
+    ldout(cct, 20) << __FFL__ << " fd=" << fd << " mask=" << masks[count] << dendl;
     impl->activating_mask &= (~masks[count]);
     impl->waiting_idx = 0;
     if (++count >= num_events)

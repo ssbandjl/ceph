@@ -477,7 +477,7 @@ int main(int argc, const char **argv)
               pg_t pg(ps, i.first);
               vector<int> up;
               osdmap.pg_to_up_acting_osds(pg, &up, nullptr, nullptr, nullptr);
-              //ldout(cct, 20) << __func__ << " " << pg << " up " << up << dendl;
+              //ldout(cct, 20) << __FFL__ << " " << pg << " up " << up << dendl;
               for (auto osd : up) {
                 if (osd != CRUSH_ITEM_NONE)
                   pgs_by_osd[osd].insert(pg);

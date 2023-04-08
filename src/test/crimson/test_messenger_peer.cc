@@ -268,7 +268,7 @@ class FailoverTestPeer : public Dispatcher {
       break;
      }
      default:
-      lderr(cct) << "[CmdSrv] " << __func__ << " " << cmd_conn
+      lderr(cct) << "[CmdSrv] " << __FFL__ << " " << cmd_conn
                  << " got unexpected msg from CmdCli: "
                  << m << dendl;
       ceph_abort();

@@ -55,7 +55,7 @@ bool KeyServerData::get_service_secret(CephContext *cct, uint32_t service_id,
   ttl = min(ttl, static_cast<double>(
 		     secrets.secrets.rbegin()->second.expiration - now));
 
-  ldout(cct, 30) << __func__ << " service "
+  ldout(cct, 30) << __FFL__ << " service "
 		 << ceph_entity_type_name(service_id) << " secret_id "
 		 << secret_id << " " << riter->second << " ttl " << ttl
 		 << dendl;
@@ -160,7 +160,7 @@ bool KeyServer::_check_rotating_secrets()
   added += _rotate_secret(CEPH_ENTITY_TYPE_MGR);
 
   if (added) {
-    ldout(cct, 10) << __func__ << " added " << added << dendl;
+    ldout(cct, 10) << __FFL__ << " added " << added << dendl;
     data.rotating_ver++;
     //data.next_rotating_time = ceph_clock_now(cct);
     //data.next_rotating_time += std::min(cct->_conf->auth_mon_ticket_ttl, cct->_conf->auth_service_ticket_ttl);

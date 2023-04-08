@@ -152,7 +152,7 @@ int ipv4::handle_received_packet(Packet p, ethernet_address from)
   unsigned pkt_len = p.len();
   auto offset = h.offset();
 
-  ldout(cct, 10) << __func__ << " get " << std::hex << int(h.ip_proto)
+  ldout(cct, 10) << __FFL__ << " get " << std::hex << int(h.ip_proto)
                  << std::dec << " packet from "
                  << h.src_ip << " -> " << h.dst_ip << " id=" << h.id
                  << " ip_len=" << ip_len << " ip_hdr_len=" << ip_hdr_len
@@ -172,7 +172,7 @@ int ipv4::handle_received_packet(Packet p, ethernet_address from)
 
   // FIXME: process options
   if (in_my_netmask(h.src_ip) && h.src_ip != _host_address) {
-    ldout(cct, 20) << __func__ << " learn mac " << from << " with " << h.src_ip << dendl;
+    ldout(cct, 20) << __FFL__ << " learn mac " << from << " with " << h.src_ip << dendl;
     _arp.learn(from, h.src_ip);
   }
 

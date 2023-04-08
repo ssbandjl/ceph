@@ -12,7 +12,7 @@
 #define dout_subsys ceph_subsys_journaler
 #undef dout_prefix
 #define dout_prefix *_dout << "ObjectRecorder: " << this << " " \
-                           << __func__ << " (" << m_oid << "): "
+                           << __FFL__ << " (" << m_oid << "): "
 
 using namespace cls::journal;
 using std::shared_ptr;

@@ -21,7 +21,7 @@
 #define dout_context g_ceph_context
 #define dout_subsys ceph_subsys_mds
 #undef dout_prefix
-#define dout_prefix *_dout << "pgeffects." << __func__ << ": "
+#define dout_prefix *_dout << "pgeffects." << __FFL__ << ": "
 
 int PgFiles::init()
 {

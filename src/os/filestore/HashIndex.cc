@@ -295,7 +295,7 @@ int HashIndex::col_split_level(
 int HashIndex::_merge(
   uint32_t bits,
   CollectionIndex* dest) {
-  dout(20) << __func__ << " bits " << bits << dendl;
+  dout(20) << __FFL__ << " bits " << bits << dendl;
   ceph_assert(collection_version() == dest->collection_version());
 
   vector<string> emptypath;
@@ -304,7 +304,7 @@ int HashIndex::_merge(
   // directories already exist at the destination.  Since each
   // directory is a nibble (4 bits),
   unsigned shared = bits / 4;
-  dout(20) << __func__ << " pre-splitting to shared level " << shared << dendl;
+  dout(20) << __FFL__ << " pre-splitting to shared level " << shared << dendl;
   if (shared) {
     split_dirs(emptypath, shared);
     ((HashIndex*)dest)->split_dirs(emptypath, shared);
@@ -321,7 +321,7 @@ int HashIndex::_merge_dirs(
   HashIndex& to,
   const vector<string>& path)
 {
-  dout(20) << __func__ << " path " << path << dendl;
+  dout(20) << __FFL__ << " path " << path << dendl;
   int r;
 
   vector<string> src_subs, dst_subs;
@@ -424,7 +424,7 @@ int HashIndex::_split(
 }
 
 int HashIndex::split_dirs(const vector<string> &path, int target_level) {
-  dout(20) << __func__ << " " << path << " target level: " 
+  dout(20) << __FFL__ << " " << path << " target level: " 
            << target_level << dendl;
   subdir_info_s info;
   int r = get_info(path, &info);
@@ -435,7 +435,7 @@ int HashIndex::split_dirs(const vector<string> &path, int target_level) {
   }
 
   if (must_split(info, target_level)) {
-    dout(1) << __func__ << " " << path << " has " << info.objs
+    dout(1) << __FFL__ << " " << path << " has " << info.objs
             << " objects, " << info.hash_level 
             << " level, starting split in pg " << coll() << "." << dendl;
     r = initiate_split(path, info);
@@ -446,7 +446,7 @@ int HashIndex::split_dirs(const vector<string> &path, int target_level) {
     }
 
     r = complete_split(path, info);
-    dout(1) << __func__ << " " << path << " split completed in pg " << coll() << "."
+    dout(1) << __FFL__ << " " << path << " split completed in pg " << coll() << "."
             << dendl;
     if (r < 0) {
       dout(10) << "error completing split on " << path << ": "
@@ -477,7 +477,7 @@ int HashIndex::split_dirs(const vector<string> &path, int target_level) {
 
 int HashIndex::apply_layout_settings(int target_level) {
   vector<string> path;
-  dout(10) << __func__ << " split multiple = " << split_multiplier
+  dout(10) << __FFL__ << " split multiple = " << split_multiplier
 	   << " merge threshold = " << merge_threshold
 	   << " split rand factor = " << cct->_conf->filestore_split_rand_factor
 	   << " target level = " << target_level
@@ -516,12 +516,12 @@ int HashIndex::read_settings() {
   if (r == -ENODATA)
     return 0;
   if (r < 0) {
-    derr << __func__ << " error reading settings: " << cpp_strerror(r) << dendl;
+    derr << __FFL__ << " error reading settings: " << cpp_strerror(r) << dendl;
     return r;
   }
   auto it = bl.cbegin();
   settings.decode(it);
-  dout(20) << __func__ << " split_rand_factor = " << settings.split_rand_factor << dendl;
+  dout(20) << __FFL__ << " split_rand_factor = " << settings.split_rand_factor << dendl;
   return 0;
 }
 
@@ -540,21 +540,21 @@ int HashIndex::_created(const vector<string> &path,
     return r;
 
   if (must_split(info)) {
-    dout(1) << __func__ << " " << path << " has " << info.objs
+    dout(1) << __FFL__ << " " << path << " has " << info.objs
             << " objects, starting split in pg " << coll() << "." << dendl;
     int r = initiate_split(path, info);
     if (r < 0) {
-      derr << __func__ << " error starting split " << path << " in pg "
+      derr << __FFL__ << " error starting split " << path << " in pg "
            << coll() << ": " << cpp_strerror(r) << dendl;
       ceph_assert(!cct->_conf->filestore_fail_eio);
     } else {
       r = complete_split(path, info);
       if (r < 0) {
-        derr << __func__ << " error completing split " << path << " in pg "
+        derr << __FFL__ << " error completing split " << path << " in pg "
              << coll() << ": " << cpp_strerror(r) << dendl;
         ceph_assert(!cct->_conf->filestore_fail_eio);
       }
-      dout(1) << __func__ << " " << path << " split completed in pg " << coll()
+      dout(1) << __FFL__ << " " << path << " split completed in pg " << coll()
               << "." << dendl;
     }
   }
@@ -579,21 +579,21 @@ int HashIndex::_remove(const vector<string> &path,
     return r;
 
   if (must_merge(info)) {
-    dout(1) << __func__ << " " << path << " has " << info.objs
+    dout(1) << __FFL__ << " " << path << " has " << info.objs
             << " objects, starting merge in pg " << coll() << "." << dendl;
     r = initiate_merge(path, info);
     if (r < 0) {
-      derr << __func__ << " error starting merge " << path << " in pg "
+      derr << __FFL__ << " error starting merge " << path << " in pg "
            << coll() << ": " << cpp_strerror(r) << dendl;
       ceph_assert(!cct->_conf->filestore_fail_eio);
     } else {
       r = complete_merge(path, info);
       if (r < 0) {
-        derr << __func__ << " error completing merge " << path << " in pg "
+        derr << __FFL__ << " error completing merge " << path << " in pg "
              << coll() << ": " << cpp_strerror(r) << dendl;
         ceph_assert(!cct->_conf->filestore_fail_eio);
       }
-      dout(1) << __func__ << " " << path << " merge completed in pg " << coll()
+      dout(1) << __FFL__ << " " << path << " merge completed in pg " << coll()
               << "." << dendl;
     }
   }
@@ -636,7 +636,7 @@ int HashIndex::_collection_list_partial(const ghobject_t &start,
   if (!next)
     next = &_next;
   *next = start;
-  dout(20) << __func__ << " start:" << start << " end:" << end << "-" << max_count << " ls.size " << ls->size() << dendl;
+  dout(20) << __FFL__ << " start:" << start << " end:" << end << "-" << max_count << " ls.size " << ls->size() << dendl;
   return list_by_hash(path, end, max_count, next, ls);
 }
 
@@ -798,7 +798,7 @@ int HashIndex::recursive_remove(const vector<string> &path) {
 
 int HashIndex::_recursive_remove(const vector<string> &path, bool top) {
   vector<string> subdirs;
-  dout(20) << __func__ << " path=" << path << dendl;
+  dout(20) << __FFL__ << " path=" << path << dendl;
   int r = list_subdirs(path, &subdirs);
   if (r < 0)
     return r;
@@ -1168,7 +1168,7 @@ int HashIndex::list_by_hash_bitwise(
   for (set<string, CmpHexdigitStringBitwise>::iterator i = hash_prefixes.begin();
        i != hash_prefixes.end();
        ++i) {
-    dout(20) << __func__ << " prefix " << *i << dendl;
+    dout(20) << __FFL__ << " prefix " << *i << dendl;
     set<pair<string, ghobject_t>, CmpPairBitwise>::iterator j = objects.lower_bound(
       make_pair(*i, ghobject_t()));
     if (j == objects.end() || j->first != *i) {
@@ -1202,7 +1202,7 @@ int HashIndex::list_by_hash_bitwise(
 	  return 0;
 	}
 	if (!next || j->second >= *next) {
-	  dout(20) << __func__ << " prefix " << *i << " ob " << j->second << dendl;
+	  dout(20) << __FFL__ << " prefix " << *i << " ob " << j->second << dendl;
 	  out->push_back(j->second);
 	}
 	++j;

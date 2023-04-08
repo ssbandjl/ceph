@@ -161,7 +161,7 @@ void CDentry::add_waiter(uint64_t tag, MDSContext *c)
 version_t CDentry::pre_dirty(version_t min)
 {
   projected_version = dir->pre_dirty(min);
-  dout(10) << __func__ << " " << *this << dendl;
+  dout(10) << __FFL__ << " " << *this << dendl;
   return projected_version;
 }
 
@@ -182,7 +182,7 @@ void CDentry::_mark_dirty(LogSegment *ls)
 
 void CDentry::mark_dirty(version_t pv, LogSegment *ls) 
 {
-  dout(10) << __func__ << " " << *this << dendl;
+  dout(10) << __FFL__ << " " << *this << dendl;
 
   // i now live in this new dir version
   ceph_assert(pv <= projected_version);
@@ -196,7 +196,7 @@ void CDentry::mark_dirty(version_t pv, LogSegment *ls)
 
 void CDentry::mark_clean() 
 {
-  dout(10) << __func__ << " " << *this << dendl;
+  dout(10) << __FFL__ << " " << *this << dendl;
   ceph_assert(is_dirty());
 
   // not always true for recalc_auth_bits during resolve finish
@@ -213,7 +213,7 @@ void CDentry::mark_clean()
 
 void CDentry::mark_new() 
 {
-  dout(10) << __func__ << " " << *this << dendl;
+  dout(10) << __FFL__ << " " << *this << dendl;
   state_set(STATE_NEW);
 }
 
@@ -435,7 +435,7 @@ void CDentry::decode_lock_state(int type, const bufferlist& bl)
   decode(newfirst, p);
 
   if (!is_auth() && newfirst != first) {
-    dout(10) << __func__ << " first " << first << " -> " << newfirst << dendl;
+    dout(10) << __FFL__ << " first " << first << " -> " << newfirst << dendl;
     ceph_assert(newfirst > first);
     first = newfirst;
   }
@@ -457,7 +457,7 @@ void CDentry::decode_lock_state(int type, const bufferlist& bl)
     // newly linked?
     if (linkage.is_null() && !is_auth()) {
       // force trim from cache!
-      dout(10) << __func__ << " replica dentry null -> non-null, must trim" << dendl;
+      dout(10) << __FFL__ << " replica dentry null -> non-null, must trim" << dendl;
       //assert(get_num_ref() == 0);
     } else {
       // verify?
@@ -476,7 +476,7 @@ ClientLease *CDentry::add_client_lease(client_t c, Session *session)
   if (client_lease_map.count(c))
     l = client_lease_map[c];
   else {
-    dout(20) << __func__ << " client." << c << " on " << lock << dendl;
+    dout(20) << __FFL__ << " client." << c << " on " << lock << dendl;
     if (client_lease_map.empty()) {
       get(PIN_CLIENTLEASE);
       lock.get_client_lease();
@@ -495,7 +495,7 @@ void CDentry::remove_client_lease(ClientLease *l, Locker *locker)
 
   bool gather = false;
 
-  dout(20) << __func__ << " client." << l->client << " on " << lock << dendl;
+  dout(20) << __FFL__ << " client." << l->client << " on " << lock << dendl;
 
   client_lease_map.erase(l->client);
   l->item_lease.remove_myself();

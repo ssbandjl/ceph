@@ -102,7 +102,7 @@ class MessengerClient {
         m->write(0, msg_len, msg_data);
         inflight++;
         conn->send_message(m);
-        //cerr << __func__ << " send m=" << m << std::endl;
+        //cerr << __FFL__ << " send m=" << m << std::endl;
       }
       locker.unlock();
       msgr->shutdown();
@@ -178,7 +178,7 @@ void usage(const string &name) {
 
 int main(int argc, char **argv)
 {
-  cerr << __func__ << " " << __FL__ << " start" << std::endl;
+  cerr << __FFL__ << " " << __FL__ << " start" << std::endl;
   vector<const char*> args;
   argv_to_vec(argc, (const char **)argv, args);
 

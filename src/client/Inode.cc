@@ -24,13 +24,13 @@ Inode::~Inode()
   }
 
   if (!oset.objects.empty()) {
-    lsubdout(client->cct, client, 0) << __func__ << ": leftover objects on inode 0x"
+    lsubdout(client->cct, client, 0) << __FFL__ << ": leftover objects on inode 0x"
       << std::hex << ino << std::dec << dendl;
     ceph_assert(oset.objects.empty());
   }
 
   if (!delegations.empty()) {
-    lsubdout(client->cct, client, 0) << __func__ << ": leftover delegations on inode 0x"
+    lsubdout(client->cct, client, 0) << __FFL__ << ": leftover delegations on inode 0x"
       << std::hex << ino << std::dec << dendl;
     ceph_assert(delegations.empty());
   }
@@ -675,7 +675,7 @@ int Inode::set_deleg(Fh *fh, unsigned type, ceph_deleg_cb_t cb, void *priv)
 
   // Just say no if we have any recalled delegs still outstanding
   if (has_recalled_deleg()) {
-    lsubdout(client->cct, client, 10) << __func__ <<
+    lsubdout(client->cct, client, 10) << __FFL__ <<
 	  ": has_recalled_deleg" << dendl;
     return -EAGAIN;
   }
@@ -684,14 +684,14 @@ int Inode::set_deleg(Fh *fh, unsigned type, ceph_deleg_cb_t cb, void *priv)
   switch (type) {
   case CEPH_DELEGATION_RD:
     if (open_count_for_write()) {
-      lsubdout(client->cct, client, 10) << __func__ <<
+      lsubdout(client->cct, client, 10) << __FFL__ <<
 	    ": open for write" << dendl;
       return -EAGAIN;
     }
     break;
   case CEPH_DELEGATION_WR:
     if (open_count() > 1) {
-      lsubdout(client->cct, client, 10) << __func__ << ": open" << dendl;
+      lsubdout(client->cct, client, 10) << __FFL__ << ": open" << dendl;
       return -EAGAIN;
     }
     break;
@@ -715,7 +715,7 @@ int Inode::set_deleg(Fh *fh, unsigned type, ceph_deleg_cb_t cb, void *priv)
    */
   int need = ceph_deleg_caps_for_type(type);
   if (!caps_issued_mask(need)) {
-    lsubdout(client->cct, client, 10) << __func__ << ": cap mismatch, have="
+    lsubdout(client->cct, client, 10) << __FFL__ << ": cap mismatch, have="
       << ccap_string(caps_issued()) << " need=" << ccap_string(need) << dendl;
     return -EAGAIN;
   }
@@ -761,7 +761,7 @@ void Inode::unset_deleg(Fh *fh)
 */
 void Inode::mark_caps_dirty(int caps)
 {
-  lsubdout(client->cct, client, 10) << __func__ << " " << *this << " " << ccap_string(dirty_caps) << " -> "
+  lsubdout(client->cct, client, 10) << __FFL__ << " " << *this << " " << ccap_string(dirty_caps) << " -> "
            << ccap_string(dirty_caps | caps) << dendl;
   if (caps && !caps_dirty())
     get();
@@ -774,7 +774,7 @@ void Inode::mark_caps_dirty(int caps)
 */
 void Inode::mark_caps_clean()
 {
-  lsubdout(client->cct, client, 10) << __func__ << " " << *this << dendl;
+  lsubdout(client->cct, client, 10) << __FFL__ << " " << *this << dendl;
   dirty_caps = 0;
   dirty_cap_item.remove_myself();
 }

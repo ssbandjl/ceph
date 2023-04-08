@@ -126,7 +126,7 @@ void ConfigKeyService::store_dump(stringstream &ss, const string& prefix)
   KeyValueDB::Iterator iter =
     mon->store->get_iterator(CONFIG_PREFIX);
 
-  dout(10) << __func__ << " prefix '" << prefix << "'" << dendl;
+  dout(10) << __FFL__ << " prefix '" << prefix << "'" << dendl;
   if (prefix.size()) {
     iter->lower_bound(prefix);
   }
@@ -175,10 +175,10 @@ bool ConfigKeyService::service_dispatch(MonOpRequestRef op)
 {
   Message *m = op->get_req();
   ceph_assert(m != NULL);
-  dout(10) << __func__ << " " << *m << dendl;
+  dout(10) << __FFL__ << " " << *m << dendl;
 
   if (!in_quorum()) {
-    dout(1) << __func__ << " not in quorum -- waiting" << dendl;
+    dout(1) << __FFL__ << " not in quorum -- waiting" << dendl;
     paxos->wait_for_readable(op, new Monitor::C_RetryMessage(mon, op));
     return false;
   }
@@ -346,7 +346,7 @@ int ConfigKeyService::validate_osd_new(
     bufferlist existing_value;
     int err = store_get(dmcrypt_prefix, existing_value);
     if (err < 0) {
-      dout(10) << __func__ << " unable to get dm-crypt key from store (r = "
+      dout(10) << __FFL__ << " unable to get dm-crypt key from store (r = "
                << err << ")" << dendl;
       return err;
     }

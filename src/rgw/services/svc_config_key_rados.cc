@@ -20,7 +20,7 @@ void RGWSI_ConfigKey_RADOS::warn_if_insecure()
 
   svc.rados->clog_warn(s);
 
-  lderr(ctx()) << __func__ << "(): WARNING: " << s << dendl;
+  lderr(ctx()) << __FFL__ << "(): WARNING: " << s << dendl;
 }
 
 int RGWSI_ConfigKey_RADOS::get(const string& key, bool secure, bufferlist *result)

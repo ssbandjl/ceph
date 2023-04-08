@@ -428,7 +428,7 @@ public:
   uint64_t get_estimated_size(map<string,uint64_t> &extra) override {
     DIR *store_dir = opendir(path.c_str());
     if (!store_dir) {
-      lderr(cct) << __func__ << " something happened opening the store: "
+      lderr(cct) << __FFL__ << " something happened opening the store: "
                  << cpp_strerror(errno) << dendl;
       return 0;
     }
@@ -458,7 +458,7 @@ public:
 	continue;
       }
       if (err < 0) {
-        lderr(cct) << __func__ << " error obtaining stats for " << fpath
+        lderr(cct) << __FFL__ << " error obtaining stats for " << fpath
                    << ": " << cpp_strerror(err) << dendl;
         goto err;
       }

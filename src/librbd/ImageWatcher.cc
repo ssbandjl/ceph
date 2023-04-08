@@ -100,7 +100,7 @@ void ImageWatcher<I>::unregister_watch(Context *on_finish) {
 template <typename I>
 void ImageWatcher<I>::block_notifies(Context *on_finish) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " "  << __func__ << dendl;
+  ldout(cct, 10) << this << " "  << __FFL__ << dendl;
 
   on_finish = new LambdaContext([this, on_finish](int r) {
       cancel_async_requests();
@@ -152,7 +152,7 @@ void ImageWatcher<I>::notify_async_complete(const AsyncRequestId &request,
 template <typename I>
 void ImageWatcher<I>::handle_async_complete(const AsyncRequestId &request,
                                             int r, int ret_val) {
-  ldout(m_image_ctx.cct, 20) << this << " " << __func__ << ": "
+  ldout(m_image_ctx.cct, 20) << this << " " << __FFL__ << ": "
                              << "request=" << request << ", r=" << ret_val
                              << dendl;
   if (ret_val < 0) {
@@ -321,7 +321,7 @@ void ImageWatcher<I>::notify_sparsify(uint64_t request_id, size_t sparse_size,
 
 template <typename I>
 void ImageWatcher<I>::notify_header_update(Context *on_finish) {
-  ldout(m_image_ctx.cct, 10) << this << ": " << __func__ << dendl;
+  ldout(m_image_ctx.cct, 10) << this << ": " << __FFL__ << dendl;
 
   // supports legacy (empty buffer) clients
   send_notify(HeaderUpdatePayload(), on_finish);
@@ -1139,7 +1139,7 @@ void ImageWatcher<I>::handle_error(uint64_t handle, int err) {
 template <typename I>
 void ImageWatcher<I>::handle_rewatch_complete(int r) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << r << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << r << dendl;
 
   {
     std::shared_lock owner_locker{m_image_ctx.owner_lock};

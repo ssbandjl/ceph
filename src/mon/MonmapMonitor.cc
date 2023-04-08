@@ -38,12 +38,12 @@ static ostream& _prefix(std::ostream *_dout, Monitor *mon) {
 
 void MonmapMonitor::create_initial()
 {
-  dout(10) << __func__ << " using current monmap" << dendl;
+  dout(10) << __FFL__ << " using current monmap" << dendl;
   pending_map = *mon->monmap;
   pending_map.epoch = 1;
 
   if (g_conf()->mon_debug_no_initial_persistent_features) {
-    derr << __func__ << " mon_debug_no_initial_persistent_features=true"
+    derr << __FFL__ << " mon_debug_no_initial_persistent_features=true"
 	 << dendl;
   } else {
     // initialize with default persistent features for new clusters
@@ -58,7 +58,7 @@ void MonmapMonitor::update_from_paxos(bool *need_bootstrap)
   if (version <= mon->monmap->get_epoch())
     return;
 
-  dout(10) << __func__ << " version " << version
+  dout(10) << __FFL__ << " version " << version
 	   << ", my v " << mon->monmap->epoch << dendl;
   
   if (need_bootstrap && version != mon->monmap->get_epoch()) {
@@ -72,7 +72,7 @@ void MonmapMonitor::update_from_paxos(bool *need_bootstrap)
   ceph_assert(ret == 0);
   ceph_assert(monmap_bl.length());
 
-  dout(10) << __func__ << " got " << version << dendl;
+  dout(10) << __FFL__ << " got " << version << dendl;
   mon->monmap->decode(monmap_bl);
 
   if (mon->store->exists("mkfs", "monmap")) {
@@ -88,7 +88,7 @@ void MonmapMonitor::update_from_paxos(bool *need_bootstrap)
   if (mon->store->read_meta("min_mon_release", &val) < 0 ||
       val.size() == 0 ||
       atoi(val.c_str()) != (int)ceph_release()) {
-    dout(10) << __func__ << " updating min_mon_release meta" << dendl;
+    dout(10) << __FFL__ << " updating min_mon_release meta" << dendl;
     mon->store->write_meta("min_mon_release",
 			   stringify(ceph_release()));
   }
@@ -99,12 +99,12 @@ void MonmapMonitor::create_pending()
   pending_map = *mon->monmap;
   pending_map.epoch++;
   pending_map.last_changed = ceph_clock_now();
-  dout(10) << __func__ << " monmap epoch " << pending_map.epoch << dendl;
+  dout(10) << __FFL__ << " monmap epoch " << pending_map.epoch << dendl;
 }
 
 void MonmapMonitor::encode_pending(MonitorDBStore::TransactionRef t)
 {
-  dout(10) << __func__ << " epoch " << pending_map.epoch << dendl;
+  dout(10) << __FFL__ << " epoch " << pending_map.epoch << dendl;
 
   ceph_assert(mon->monmap->epoch + 1 == pending_map.epoch ||
 	 pending_map.epoch == 1);  // special case mkfs!
@@ -144,7 +144,7 @@ void MonmapMonitor::apply_mon_features(const mon_feature_t& features,
 				       ceph_release_t min_mon_release)
 {
   if (!is_writeable()) {
-    dout(5) << __func__ << " wait for service to be writeable" << dendl;
+    dout(5) << __FFL__ << " wait for service to be writeable" << dendl;
     wait_for_writeable_ctx(new C_ApplyFeatures(this, features, min_mon_release));
     return;
   }
@@ -166,13 +166,13 @@ void MonmapMonitor::apply_mon_features(const mon_feature_t& features,
 
   if (new_features.empty() &&
       pending_map.min_mon_release == min_mon_release) {
-    dout(10) << __func__ << " min_mon_release (" << (int)min_mon_release
+    dout(10) << __FFL__ << " min_mon_release (" << (int)min_mon_release
 	     << ") and features (" << features << ") match" << dendl;
     return;
   }
 
   if (!new_features.empty()) {
-    dout(1) << __func__ << " applying new features "
+    dout(1) << __FFL__ << " applying new features "
 	    << new_features << ", had " << pending_map.persistent_features
 	    << ", will have "
 	    << (new_features | pending_map.persistent_features)
@@ -180,7 +180,7 @@ void MonmapMonitor::apply_mon_features(const mon_feature_t& features,
     pending_map.persistent_features |= new_features;
   }
   if (min_mon_release > pending_map.min_mon_release) {
-    dout(1) << __func__ << " increasing min_mon_release to "
+    dout(1) << __FFL__ << " increasing min_mon_release to "
 	    << ceph::to_integer<int>(min_mon_release) << " (" << min_mon_release
 	    << ")" << dendl;
     pending_map.min_mon_release = min_mon_release;
@@ -447,7 +447,7 @@ reply:
 bool MonmapMonitor::prepare_update(MonOpRequestRef op)
 {
   auto m = op->get_req<PaxosServiceMessage>();
-  dout(7) << __func__ << " " << *m << " from " << m->get_orig_source_inst() << dendl;
+  dout(7) << __FFL__ << " " << *m << " from " << m->get_orig_source_inst() << dendl;
   
   switch (m->get_type()) {
   case MSG_MON_COMMAND:
@@ -582,7 +582,7 @@ bool MonmapMonitor::prepare_command(MonOpRequestRef op)
       addr.set_type(entity_addr_t::TYPE_LEGACY);
       addrs.v.push_back(addr);
     }
-    dout(20) << __func__ << " addr " << addr << " -> addrs " << addrs << dendl;
+    dout(20) << __FFL__ << " addr " << addr << " -> addrs " << addrs << dendl;
 
     /**
      * If we have a monitor with the same name and different addr, then EEXIST
@@ -632,7 +632,7 @@ bool MonmapMonitor::prepare_command(MonOpRequestRef op)
     pending_map.last_changed = ceph_clock_now();
     ss << "adding mon." << name << " at " << addrs;
     propose = true;
-    dout(0) << __func__ << " proposing new mon." << name << dendl;
+    dout(0) << __FFL__ << " proposing new mon." << name << dendl;
 
   } else if (prefix == "mon remove" ||
              prefix == "mon rm") {
@@ -739,7 +739,7 @@ bool MonmapMonitor::prepare_command(MonOpRequestRef op)
 
     err = 0;
     if (monmap.persistent_features.contains_all(feature)) {
-      dout(10) << __func__ << " feature '" << feature
+      dout(10) << __FFL__ << " feature '" << feature
                << "' already set on monmap; no-op." << dendl;
       goto reply;
     }
@@ -748,7 +748,7 @@ bool MonmapMonitor::prepare_command(MonOpRequestRef op)
     pending_map.last_changed = ceph_clock_now();
     propose = true;
 
-    dout(1) << __func__ << " " << ss.str() << "; new features will be: "
+    dout(1) << __FFL__ << " " << ss.str() << "; new features will be: "
             << "persistent = " << pending_map.persistent_features
             // output optional nevertheless, for auditing purposes.
             << ", optional = " << pending_map.optional_features << dendl;
@@ -860,7 +860,7 @@ reply:
 bool MonmapMonitor::preprocess_join(MonOpRequestRef op)
 {
   auto join = op->get_req<MMonJoin>();
-  dout(10) << __func__ << " " << join->name << " at " << join->addrs << dendl;
+  dout(10) << __FFL__ << " " << join->name << " at " << join->addrs << dendl;
 
   MonSession *session = op->get_session();
   if (!session ||
@@ -904,14 +904,14 @@ bool MonmapMonitor::should_propose(double& delay)
 int MonmapMonitor::get_monmap(bufferlist &bl)
 {
   version_t latest_ver = get_last_committed();
-  dout(10) << __func__ << " ver " << latest_ver << dendl;
+  dout(10) << __FFL__ << " ver " << latest_ver << dendl;
 
   if (!mon->store->exists(get_service_name(), stringify(latest_ver)))
     return -ENOENT;
 
   int err = get_version(latest_ver, bl);
   if (err < 0) {
-    dout(1) << __func__ << " error obtaining monmap: "
+    dout(1) << __FFL__ << " error obtaining monmap: "
             << cpp_strerror(err) << dendl;
     return err;
   }
@@ -957,7 +957,7 @@ void MonmapMonitor::tick()
   }
 
   if (mon->monmap->created.is_zero()) {
-    dout(10) << __func__ << " detected empty created stamp" << dendl;
+    dout(10) << __FFL__ << " detected empty created stamp" << dendl;
     utime_t ctime;
     for (version_t v = 1; v <= get_last_committed(); v++) {
       bufferlist bl;
@@ -969,7 +969,7 @@ void MonmapMonitor::tick()
       auto p = bl.cbegin();
       decode(m, p);
       if (!m.last_changed.is_zero()) {
-	dout(10) << __func__ << " first monmap with last_changed is "
+	dout(10) << __FFL__ << " first monmap with last_changed is "
 		 << v << " with " << m.last_changed << dendl;
 	ctime = m.last_changed;
 	break;
@@ -978,7 +978,7 @@ void MonmapMonitor::tick()
     if (ctime.is_zero()) {
       ctime = ceph_clock_now();
     }
-    dout(10) << __func__ << " updating created stamp to " << ctime << dendl;
+    dout(10) << __FFL__ << " updating created stamp to " << ctime << dendl;
     pending_map.created = ctime;
     propose_pending();
   }

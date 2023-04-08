@@ -755,7 +755,7 @@ public:
     RGWRESTStreamRWRequest *in_req;
     int ret = conn->get_obj(src_obj, req_params, false /* send */, &in_req);
     if (ret < 0) {
-      ldout(sc->cct, 0) << "ERROR: " << __func__ << "(): conn->get_obj() returned ret=" << ret << dendl;
+      ldout(sc->cct, 0) << "ERROR: " << __FFL__ << "(): conn->get_obj() returned ret=" << ret << dendl;
       return ret;
     }
 
@@ -767,7 +767,7 @@ public:
   int decode_rest_obj(map<string, string>& headers, bufferlist& extra_data) override {
     map<string, bufferlist> src_attrs;
 
-    ldout(sc->cct, 20) << __func__ << ":" << " headers=" << headers << " extra_data.length()=" << extra_data.length() << dendl;
+    ldout(sc->cct, 20) << __FFL__ << ":" << " headers=" << headers << " extra_data.length()=" << extra_data.length() << dendl;
 
     if (extra_data.length() > 0) {
       JSONParser jp;

@@ -365,7 +365,7 @@ void SnapServer::check_osd_map(bool force)
 
 void SnapServer::handle_remove_snaps(const cref_t<MRemoveSnaps> &m)
 {
-  dout(10) << __func__ << " " << *m << dendl;
+  dout(10) << __FFL__ << " " << *m << dendl;
 
   map<int32_t, vector<snapid_t> > all_purged;
   int num = 0;
@@ -384,7 +384,7 @@ void SnapServer::handle_remove_snaps(const cref_t<MRemoveSnaps> &m)
     }
   }
 
-  dout(10) << __func__ << " " << num << " now removed" << dendl;
+  dout(10) << __FFL__ << " " << num << " now removed" << dendl;
   if (num) {
     bufferlist bl;
     using ceph::encode;

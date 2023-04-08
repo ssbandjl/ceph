@@ -466,7 +466,7 @@ public:
       if (j != i->second.end()) {
 	if (version)
 	  j->second.version = version;
-	cout << __func__ << " oid " << oid
+	cout << __FFL__ << " oid " << oid
 	     << " v " << version << " " << j->second.most_recent()
 	     << " " << (j->second.dirty ? "dirty" : "clean")
 	     << " " << (j->second.exists ? "exists" : "dne")

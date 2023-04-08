@@ -11,7 +11,7 @@ namespace util {
 
 #define dout_subsys ceph_subsys_rbd
 #undef dout_prefix
-#define dout_prefix *_dout << "librbd::deep_copy::util::" << __func__ << ": "
+#define dout_prefix *_dout << "librbd::deep_copy::util::" << __FFL__ << ": "
 
 void compute_snap_map(CephContext* cct,
                       librados::snap_t src_snap_id_start,

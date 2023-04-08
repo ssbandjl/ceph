@@ -58,7 +58,7 @@ namespace rgw {
     void enqueue_req(RGWLibRequest* req) {
 
       lsubdout(g_ceph_context, rgw, 10)
-	<< __func__ << " enqueue request req="
+	<< __FFL__ << " enqueue request req="
 	<< hex << req << dec << dendl;
 
       req_throttle.get(1);

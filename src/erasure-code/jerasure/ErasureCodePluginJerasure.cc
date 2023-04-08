@@ -60,7 +60,7 @@ int ErasureCodePluginJerasure::factory(const std::string& directory,
 	   << "cauchy_good, liberation, blaum_roth, liber8tion";
       return -ENOENT;
     }
-    dout(20) << __func__ << ": " << profile << dendl;
+    dout(20) << __FFL__ << ": " << profile << dendl;
     int r = interface->init(profile, ss);
     if (r) {
       delete interface;

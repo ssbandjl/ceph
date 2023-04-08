@@ -21,7 +21,7 @@ int64_t HybridAllocator::allocate(
   int64_t  hint,
   PExtentVector* extents)
 {
-  ldout(cct, 10) << __func__ << std::hex
+  ldout(cct, 10) << __FFL__ << std::hex
                  << " want 0x" << want
                  << " unit 0x" << unit
                  << " max_alloc_size 0x" << max_alloc_size
@@ -158,7 +158,7 @@ void HybridAllocator::init_rm_free(uint64_t offset, uint64_t length)
   if (!length)
     return;
   std::lock_guard l(lock);
-  ldout(cct, 10) << __func__ << std::hex
+  ldout(cct, 10) << __FFL__ << std::hex
                  << " offset 0x" << offset
                  << " length 0x" << length
                  << std::dec << dendl;

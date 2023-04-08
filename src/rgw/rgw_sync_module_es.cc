@@ -612,7 +612,7 @@ struct es_obj_metadata {
         real_time t;
         int r = parse_time(i.second.c_str(), &t);
         if (r < 0) {
-          ldout(cct, 20) << __func__ << "(): failed to parse time (" << i.second << "), skipping encoding of custom date attribute" << dendl;
+          ldout(cct, 20) << __FFL__ << "(): failed to parse time (" << i.second << "), skipping encoding of custom date attribute" << dendl;
           continue;
         }
 

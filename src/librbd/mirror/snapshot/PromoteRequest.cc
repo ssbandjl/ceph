@@ -19,7 +19,7 @@
 #define dout_subsys ceph_subsys_rbd
 #undef dout_prefix
 #define dout_prefix *_dout << "librbd::mirror::snapshot::PromoteRequest: " \
-                           << this << " " << __func__ << ": "
+                           << this << " " << __FFL__ << ": "
 
 namespace librbd {
 namespace mirror {

@@ -28,7 +28,7 @@
 
 #define dout_subsys ceph_subsys_rbd
 #undef dout_prefix
-#define dout_prefix *_dout << "librbd::api::Trash: " << __func__ << ": "
+#define dout_prefix *_dout << "librbd::api::Trash: " << __FFL__ << ": "
 
 namespace librbd {
 namespace api {
@@ -327,7 +327,7 @@ template <typename I>
 int Trash<I>::get(IoCtx &io_ctx, const std::string &id,
               trash_image_info_t *info) {
   CephContext *cct((CephContext *)io_ctx.cct());
-  ldout(cct, 20) << __func__ << " " << &io_ctx << dendl;
+  ldout(cct, 20) << __FFL__ << " " << &io_ctx << dendl;
 
   cls::rbd::TrashImageSpec spec;
   int r = cls_client::trash_get(&io_ctx, id, &spec);
@@ -350,7 +350,7 @@ template <typename I>
 int Trash<I>::list(IoCtx &io_ctx, vector<trash_image_info_t> &entries,
                    bool exclude_user_remove_source) {
   CephContext *cct((CephContext *)io_ctx.cct());
-  ldout(cct, 20) << __func__ << " " << &io_ctx << dendl;
+  ldout(cct, 20) << __FFL__ << " " << &io_ctx << dendl;
 
   std::map<std::string, cls::rbd::TrashImageSpec> trash_image_specs;
   int r = list_trash_image_specs(io_ctx, &trash_image_specs,

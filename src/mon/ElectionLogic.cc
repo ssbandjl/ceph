@@ -42,7 +42,7 @@ void ElectionLogic::init()
 
 void ElectionLogic::bump_epoch(epoch_t e)
 {
-  ldout(cct, 10) << __func__ << epoch << " to " << e << dendl;
+  ldout(cct, 10) << __FFL__ << epoch << " to " << e << dendl;
   ceph_assert(epoch <= e);
   epoch = e;
   elector->persist_epoch(epoch);

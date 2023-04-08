@@ -14,7 +14,7 @@
 
 #define dout_subsys ceph_subsys_rbd
 #undef dout_prefix
-#define dout_prefix *_dout << "librbd::Config: " << __func__ << ": "
+#define dout_prefix *_dout << "librbd::Config: " << __FFL__ << ": "
 
 namespace librbd {
 namespace api {

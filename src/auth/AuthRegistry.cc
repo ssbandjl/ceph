@@ -82,7 +82,7 @@ void AuthRegistry::_parse_method_list(const string& s,
   if (v->empty()) {
     lderr(cct) << "WARNING: no auth protocol defined" << dendl;
   }
-  ldout(cct,20) << __func__ << " " << s << " -> " << *v << dendl;
+  ldout(cct,20) << __FFL__ << " " << s << " -> " << *v << dendl;
 }
 
 void AuthRegistry::_parse_mode_list(const string& s,
@@ -107,7 +107,7 @@ void AuthRegistry::_parse_mode_list(const string& s,
   if (v->empty()) {
     lderr(cct) << "WARNING: no connection modes defined" << dendl;
   }
-  ldout(cct,20) << __func__ << " " << s << " -> " << *v << dendl;
+  ldout(cct,20) << __FFL__ << " " << s << " -> " << *v << dendl;
 }
 
 void AuthRegistry::_refresh_config()
@@ -134,11 +134,11 @@ void AuthRegistry::_refresh_config()
   _parse_mode_list(cct->_conf.get_val<string>("ms_client_mode"),
 		   &client_modes);
 
-  ldout(cct,10) << __func__ << " cluster_methods " << cluster_methods
+  ldout(cct,10) << __FFL__ << " cluster_methods " << cluster_methods
 		<< " service_methods " << service_methods
 		<< " client_methods " << client_methods
 		<< dendl;
-  ldout(cct,10) << __func__ << " mon_cluster_modes " << mon_cluster_modes
+  ldout(cct,10) << __FFL__ << " mon_cluster_modes " << mon_cluster_modes
 		<< " mon_service_modes " << mon_service_modes
 		<< " mon_client_modes " << mon_client_modes
 		<< "; cluster_modes " << cluster_modes
@@ -319,7 +319,7 @@ uint32_t AuthRegistry::pick_mode(
 AuthAuthorizeHandler *AuthRegistry::get_handler(int peer_type, int method)
 {
   std::scoped_lock l{lock};
-  ldout(cct,20) << __func__ << " peer_type " << peer_type << " method " << method
+  ldout(cct,20) << __FFL__ << " peer_type " << peer_type << " method " << method
 		<< " cluster_methods " << cluster_methods
 		<< " service_methods " << service_methods
 		<< " client_methods " << client_methods

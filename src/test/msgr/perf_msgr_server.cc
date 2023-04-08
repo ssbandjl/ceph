@@ -97,7 +97,7 @@ class ServerDispatcher : public Dispatcher {
   bool ms_handle_refused(Connection *con) override { return false; }
   void ms_fast_dispatch(Message *m) override {
     usleep(think_time);
-    //cerr << __func__ << " reply message=" << m << std::endl;
+    //cerr << __FFL__ << " reply message=" << m << std::endl;
     op_wq.queue(m);
   }
   int ms_handle_authentication(Connection *con) override {
@@ -144,7 +144,7 @@ void usage(const string &name) {
 
 int main(int argc, char **argv)
 {
-  cerr << __func__ << " " << __FL__ << " start" << std::endl;
+  cerr << __FFL__ << " " << __FL__ << " start" << std::endl;
   vector<const char*> args;
   argv_to_vec(argc, (const char **)argv, args);
 

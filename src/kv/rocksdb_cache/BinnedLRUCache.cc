@@ -574,7 +574,7 @@ int64_t BinnedLRUCache::request_cache_bytes(PriorityCache::Priority pri, uint64_
     break;
   }
   request = (request > assigned) ? request - assigned : 0;
-  ldout(cct, 10) << __func__ << " Priority: " << static_cast<uint32_t>(pri)
+  ldout(cct, 10) << __FFL__ << " Priority: " << static_cast<uint32_t>(pri)
                  << " Request: " << request << dendl;
   return request;
 }
@@ -584,7 +584,7 @@ int64_t BinnedLRUCache::commit_cache_size(uint64_t total_bytes)
   size_t old_bytes = GetCapacity();
   int64_t new_bytes = PriorityCache::get_chunk(
       get_cache_bytes(), total_bytes);
-  ldout(cct, 10) << __func__ << " old: " << old_bytes
+  ldout(cct, 10) << __FFL__ << " old: " << old_bytes
                  << " new: " << new_bytes << dendl;
   SetCapacity((size_t) new_bytes);
 
@@ -595,7 +595,7 @@ int64_t BinnedLRUCache::commit_cache_size(uint64_t total_bytes)
     pri0_bytes += (new_bytes - get_cache_bytes()) / 10;
     ratio = (double) pri0_bytes / new_bytes;
   }
-  ldout(cct, 10) << __func__ << " High Pri Pool Ratio set to " << ratio << dendl;
+  ldout(cct, 10) << __FFL__ << " High Pri Pool Ratio set to " << ratio << dendl;
   SetHighPriPoolRatio(ratio);
   return new_bytes;
 }

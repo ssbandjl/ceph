@@ -47,7 +47,7 @@ JournalTrimmer::~JournalTrimmer() {
 }
 
 void JournalTrimmer::shut_down(Context *on_finish) {
-  ldout(m_cct, 20) << __func__ << dendl;
+  ldout(m_cct, 20) << __FFL__ << dendl;
   {
     std::lock_guard locker{m_lock};
     ceph_assert(!m_shutdown);
@@ -64,7 +64,7 @@ void JournalTrimmer::shut_down(Context *on_finish) {
 }
 
 void JournalTrimmer::remove_objects(bool force, Context *on_finish) {
-  ldout(m_cct, 20) << __func__ << dendl;
+  ldout(m_cct, 20) << __FFL__ << dendl;
 
   on_finish = new LambdaContext([this, force, on_finish](int r) {
 				    std::lock_guard locker{m_lock};
@@ -97,7 +97,7 @@ void JournalTrimmer::remove_objects(bool force, Context *on_finish) {
 }
 
 void JournalTrimmer::committed(uint64_t commit_tid) {
-  ldout(m_cct, 20) << __func__ << ": commit_tid=" << commit_tid << dendl;
+  ldout(m_cct, 20) << __FFL__ << ": commit_tid=" << commit_tid << dendl;
   m_journal_metadata->committed(commit_tid,
                                 m_create_commit_position_safe_context);
 }
@@ -105,7 +105,7 @@ void JournalTrimmer::committed(uint64_t commit_tid) {
 void JournalTrimmer::trim_objects(uint64_t minimum_set) {
   ceph_assert(ceph_mutex_is_locked(m_lock));
 
-  ldout(m_cct, 20) << __func__ << ": min_set=" << minimum_set << dendl;
+  ldout(m_cct, 20) << __FFL__ << ": min_set=" << minimum_set << dendl;
   if (minimum_set <= m_journal_metadata->get_minimum_set()) {
     return;
   }
@@ -127,7 +127,7 @@ void JournalTrimmer::remove_set(uint64_t object_set) {
   uint8_t splay_width = m_journal_metadata->get_splay_width();
   C_RemoveSet *ctx = new C_RemoveSet(this, object_set, splay_width);
 
-  ldout(m_cct, 20) << __func__ << ": removing object set " << object_set
+  ldout(m_cct, 20) << __FFL__ << ": removing object set " << object_set
                    << dendl;
   for (uint64_t object_number = object_set * splay_width;
        object_number < (object_set + 1) * splay_width;
@@ -146,7 +146,7 @@ void JournalTrimmer::remove_set(uint64_t object_set) {
 }
 
 void JournalTrimmer::handle_metadata_updated() {
-  ldout(m_cct, 20) << __func__ << dendl;
+  ldout(m_cct, 20) << __FFL__ << dendl;
 
   std::lock_guard locker{m_lock};
 
@@ -189,7 +189,7 @@ void JournalTrimmer::handle_metadata_updated() {
 }
 
 void JournalTrimmer::handle_set_removed(int r, uint64_t object_set) {
-  ldout(m_cct, 20) << __func__ << ": r=" << r << ", set=" << object_set << ", "
+  ldout(m_cct, 20) << __FFL__ << ": r=" << r << ", set=" << object_set << ", "
                    << "trim=" << m_remove_set << dendl;
 
   std::lock_guard locker{m_lock};

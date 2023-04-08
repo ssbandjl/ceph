@@ -546,7 +546,7 @@ void MDLog::_prepare_new_segment()
   ceph_assert(ceph_mutex_is_locked_by_me(submit_mutex));
 
   uint64_t seq = event_seq + 1;
-  dout(7) << __func__ << " seq " << seq << dendl;
+  dout(7) << __FFL__ << " seq " << seq << dendl;
 
   segments[seq] = new LogSegment(seq);
 
@@ -563,7 +563,7 @@ void MDLog::_journal_segment_subtree_map(MDSContext *onsync)
 {
   ceph_assert(ceph_mutex_is_locked_by_me(submit_mutex));
 
-  dout(7) << __func__ << dendl;
+  dout(7) << __FFL__ << dendl;
   ESubtreeMap *sle = mds->mdcache->create_subtree_map();
   sle->event_seq = get_last_segment_seq();
 
@@ -722,7 +722,7 @@ int MDLog::trim_all()
 {
   submit_mutex.lock();
 
-  dout(10) << __func__ << ": "
+  dout(10) << __FFL__ << ": "
 	   << segments.size()
            << "/" << expiring_segments.size()
            << "/" << expired_segments.size() << dendl;
@@ -749,7 +749,7 @@ int MDLog::trim_all()
 
     // Caller should have flushed journaler before calling this
     if (pending_events.count(ls->seq)) {
-      dout(5) << __func__ << ": segment " << ls->seq << " has pending events" << dendl;
+      dout(5) << __FFL__ << ": segment " << ls->seq << " has pending events" << dendl;
       submit_mutex.unlock();
       return -EAGAIN;
     }
@@ -1201,7 +1201,7 @@ void MDLog::_reformat_journal(JournalPointer const &jp_in, Journaler *old_journa
           // the new effective sequence number will be its position
           // in the new journal.
           segment_pos_rewrite[le_pos] = new_journal->get_write_pos();
-          dout(20) << __func__ << " discovered segment seq mapping "
+          dout(20) << __FFL__ << " discovered segment seq mapping "
             << le_pos << " -> " << new_journal->get_write_pos() << dendl;
         }
       } else {
@@ -1219,7 +1219,7 @@ void MDLog::_reformat_journal(JournalPointer const &jp_in, Journaler *old_journa
       if (le->get_type() == EVENT_SUBTREEMAP
           || le->get_type() == EVENT_SUBTREEMAP_TEST) {
         auto& sle = dynamic_cast<ESubtreeMap&>(*le);
-        dout(20) << __func__ << " zeroing expire_pos in subtreemap event at "
+        dout(20) << __FFL__ << " zeroing expire_pos in subtreemap event at "
           << le_pos << " seq=" << sle.event_seq << dendl;
         sle.expire_pos = 0;
         modified = true;
@@ -1232,7 +1232,7 @@ void MDLog::_reformat_journal(JournalPointer const &jp_in, Journaler *old_journa
     } else {
       // Failure from LogEvent::decode, our job is to change the journal wrapper,
       // not validate the contents, so pass it through.
-      dout(1) << __func__ << " transcribing un-decodable LogEvent at old position "
+      dout(1) << __FFL__ << " transcribing un-decodable LogEvent at old position "
         << old_journal->get_read_pos() << ", new position " << new_journal->get_write_pos()
         << dendl;
     }

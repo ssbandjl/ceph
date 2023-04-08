@@ -24,7 +24,7 @@
 
 #define dout_subsys ceph_subsys_rbd
 #undef dout_prefix
-#define dout_prefix *_dout << "librbd::io::ImageRequest: " << __func__ << ": "
+#define dout_prefix *_dout << "librbd::io::ImageRequest: " << __FFL__ << ": "
 
 namespace librbd {
 namespace io {
@@ -155,7 +155,7 @@ bool should_update_timestamp(const utime_t& now, const utime_t& timestamp,
 
 #undef dout_prefix
 #define dout_prefix *_dout << "librbd::io::ImageRequest: " << this \
-                           << " " << __func__ << ": "
+                           << " " << __FFL__ << ": "
 
 template <typename I>
 void ImageRequest<I>::aio_read(I *ictx, AioCompletion *c,

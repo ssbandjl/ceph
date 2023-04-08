@@ -336,7 +336,7 @@ void OSDService::identify_splits_and_merges(
   if (p == osd->pg_num_history.pg_nums.end()) {
     return;
   }
-  dout(20) << __func__ << " " << pgid << " e" << old_map->get_epoch()
+  dout(20) << __FFL__ << " " << pgid << " e" << old_map->get_epoch()
 	   << " to e" << new_map->get_epoch()
 	   << " pg_nums " << p->second << dendl;
   deque<spg_t> queue;
@@ -356,7 +356,7 @@ void OSDService::identify_splits_and_merges(
 	if (cur.ps() < pgnum) {
 	  set<spg_t> children;
 	  if (cur.is_split(pgnum, q->second, &children)) {
-	    dout(20) << __func__ << " " << cur << " e" << q->first
+	    dout(20) << __FFL__ << " " << cur << " e" << q->first
 		     << " pg_num " << pgnum << " -> " << q->second
 		     << " children " << children << dendl;
 	    for (auto i : children) {
@@ -366,7 +366,7 @@ void OSDService::identify_splits_and_merges(
 	    }
 	  }
 	} else if (cur.ps() < q->second) {
-	  dout(20) << __func__ << " " << cur << " e" << q->first
+	  dout(20) << __FFL__ << " " << cur << " e" << q->first
 		   << " pg_num " << pgnum << " -> " << q->second
 		   << " is a child" << dendl;
 	  // normally we'd capture this from the parent, but it's
@@ -375,7 +375,7 @@ void OSDService::identify_splits_and_merges(
 	  // as a split child here to be sure we catch it.
 	  split_children->insert(make_pair(cur, q->first));
 	} else {
-	  dout(20) << __func__ << " " << cur << " e" << q->first
+	  dout(20) << __FFL__ << " " << cur << " e" << q->first
 		   << " pg_num " << pgnum << " -> " << q->second
 		   << " is post-split, skipping" << dendl;
 	}
@@ -387,7 +387,7 @@ void OSDService::identify_splits_and_merges(
 	    if (cur.is_merge_source(pgnum, q->second, &parent)) {
 	      set<spg_t> children;
 	      parent.is_split(q->second, pgnum, &children);
-	      dout(20) << __func__ << " " << cur << " e" << q->first
+	      dout(20) << __FFL__ << " " << cur << " e" << q->first
 		       << " pg_num " << pgnum << " -> " << q->second
 		       << " is merge source, target " << parent
 		       << ", source(s) " << children << dendl;
@@ -404,14 +404,14 @@ void OSDService::identify_splits_and_merges(
 	      }
 	    }
 	  } else {
-	    dout(20) << __func__ << " " << cur << " e" << q->first
+	    dout(20) << __FFL__ << " " << cur << " e" << q->first
 		     << " pg_num " << pgnum << " -> " << q->second
 		     << " is beyond old pgnum, skipping" << dendl;
 	  }
 	} else {
 	  set<spg_t> children;
 	  if (cur.is_split(q->second, pgnum, &children)) {
-	    dout(20) << __func__ << " " << cur << " e" << q->first
+	    dout(20) << __FFL__ << " " << cur << " e" << q->first
 		     << " pg_num " << pgnum << " -> " << q->second
 		     << " is merge target, source " << children << dendl;
 	    for (auto c : children) {
@@ -551,12 +551,12 @@ public:
 
 void OSDService::agent_entry()
 {
-  dout(10) << __func__ << " start" << dendl;
+  dout(10) << __FFL__ << " start" << dendl;
   std::unique_lock agent_locker{agent_lock};
 
   while (!agent_stop_flag) {
     if (agent_queue.empty()) {
-      dout(20) << __func__ << " empty queue" << dendl;
+      dout(20) << __FFL__ << " empty queue" << dendl;
       agent_cond.wait(agent_locker);
       continue;
     }
@@ -570,7 +570,7 @@ void OSDService::agent_entry()
 	     << cct->_conf->osd_agent_max_ops
 	     << (agent_active ? " active" : " NOT ACTIVE")
 	     << dendl;
-    dout(20) << __func__ << " oids " << agent_oids << dendl;
+    dout(20) << __FFL__ << " oids " << agent_oids << dendl;
     int max = cct->_conf->osd_agent_max_ops - agent_ops;
     int agent_flush_quota = max;
     if (!flush_mode_high_count)
@@ -590,7 +590,7 @@ void OSDService::agent_entry()
 	     << " flush_quota " << agent_flush_quota << dendl;
     agent_locker.unlock();
     if (!pg->agent_work(max, agent_flush_quota)) {
-      dout(10) << __func__ << " " << pg->pg_id
+      dout(10) << __FFL__ << " " << pg->pg_id
 	<< " no agent_work, delay for " << cct->_conf->osd_agent_delay_time
 	<< " seconds" << dendl;
 
@@ -602,7 +602,7 @@ void OSDService::agent_entry()
     }
     agent_locker.lock();
   }
-  dout(10) << __func__ << " finish" << dendl;
+  dout(10) << __FFL__ << " finish" << dendl;
 }
 
 void OSDService::agent_stop()
@@ -641,7 +641,7 @@ void OSDService::promote_throttle_recalibrate()
 
   uint64_t attempts, obj, bytes;
   promote_counter.sample_and_attenuate(&attempts, &obj, &bytes);
-  dout(10) << __func__ << " " << attempts << " attempts, promoted "
+  dout(10) << __FFL__ << " " << attempts << " attempts, promoted "
 	   << obj << " objects and " << byte_u_t(bytes) << "; target "
 	   << target_obj_sec << " obj/sec or "
 	   << byte_u_t(target_bytes_sec) << "/sec"
@@ -656,7 +656,7 @@ void OSDService::promote_throttle_recalibrate()
     unsigned po = (double)target_obj_sec * dur * 1000.0 / (double)attempts;
     unsigned pb = (double)target_bytes_sec / (double)avg_size * dur * 1000.0
       / (double)attempts;
-    dout(20) << __func__ << "  po " << po << " pb " << pb << " avg_size "
+    dout(20) << __FFL__ << "  po " << po << " pb " << pb << " avg_size "
 	     << avg_size << dendl;
     if (target_obj_sec && target_bytes_sec)
       new_prob = std::min(po, pb);
@@ -669,7 +669,7 @@ void OSDService::promote_throttle_recalibrate()
   } else {
     new_prob = 1000;
   }
-  dout(20) << __func__ << "  new_prob " << new_prob << dendl;
+  dout(20) << __FFL__ << "  new_prob " << new_prob << dendl;
 
   // correct for persistent skew between target rate and actual rate, adjust
   double ratio = 1.0;
@@ -686,7 +686,7 @@ void OSDService::promote_throttle_recalibrate()
   prob = (prob + new_prob) / 2;
   prob = std::max(prob, min_prob);
   prob = std::min(prob, 1000u);
-  dout(10) << __func__ << "  actual " << actual
+  dout(10) << __FFL__ << "  actual " << actual
 	   << ", actual/prob ratio " << ratio
 	   << ", adjusted new_prob " << new_prob
 	   << ", prob " << promote_probability_millis << " -> " << prob
@@ -731,7 +731,7 @@ OSDService::s_names OSDService::recalc_full_state(float ratio, float pratio, str
   } else if (full_ratio <= 0 ||
 	     backfillfull_ratio <= 0 ||
 	     nearfull_ratio <= 0) {
-    derr << __func__ << " full_ratio, backfillfull_ratio or nearfull_ratio is <= 0" << dendl;
+    derr << __FFL__ << " full_ratio, backfillfull_ratio or nearfull_ratio is <= 0" << dendl;
     // use failsafe flag.  ick.  the monitor did something wrong or the user
     // did something stupid.
     full_ratio = failsafe_ratio;
@@ -765,7 +765,7 @@ void OSDService::check_full_status(float ratio, float pratio)
   s_names new_state;
   new_state = recalc_full_state(ratio, pratio, inject);
 
-  dout(20) << __func__ << " cur ratio " << ratio
+  dout(20) << __FFL__ << " cur ratio " << ratio
            << ", physical ratio " << pratio
 	   << ", new state " << get_full_state_name(new_state)
 	   << " " << inject
@@ -773,7 +773,7 @@ void OSDService::check_full_status(float ratio, float pratio)
 
   // warn
   if (cur_state != new_state) {
-    dout(10) << __func__ << " " << get_full_state_name(cur_state)
+    dout(10) << __FFL__ << " " << get_full_state_name(cur_state)
 	     << " -> " << get_full_state_name(new_state) << dendl;
     if (new_state == FAILSAFE) {
       clog->error() << "full status failsafe engaged, dropping updates, now "
@@ -816,7 +816,7 @@ bool OSDService::_check_inject_full(DoutPrefixProvider *dpp, s_names type) const
     // or if -1 then always return full
     if (injectfull > 0)
       --injectfull;
-    ldpp_dout(dpp, 10) << __func__ << " Injected " << get_full_state_name(type) << " OSD ("
+    ldpp_dout(dpp, 10) << __FFL__ << " Injected " << get_full_state_name(type) << " OSD ("
              << (injectfull < 0 ? "set" : std::to_string(injectfull)) << ")"
              << dendl;
     return true;
@@ -832,7 +832,7 @@ bool OSDService::_check_full(DoutPrefixProvider *dpp, s_names type) const
     return true;
 
   if (cur_state >= type)
-    ldpp_dout(dpp, 10) << __func__ << " current usage is " << cur_ratio
+    ldpp_dout(dpp, 10) << __FFL__ << " current usage is " << cur_ratio
                        << " physical " << physical_ratio << dendl;
 
   return cur_state >= type;
@@ -840,7 +840,7 @@ bool OSDService::_check_full(DoutPrefixProvider *dpp, s_names type) const
 
 bool OSDService::_tentative_full(DoutPrefixProvider *dpp, s_names type, uint64_t adjust_used, osd_stat_t adjusted_stat)
 {
-  ldpp_dout(dpp, 20) << __func__ << " type " << get_full_state_name(type) << " adjust_used " << (adjust_used >> 10) << "KiB" << dendl;
+  ldpp_dout(dpp, 20) << __FFL__ << " type " << get_full_state_name(type) << " adjust_used " << (adjust_used >> 10) << "KiB" << dendl;
   {
     std::lock_guard l(full_status_lock);
     if (_check_inject_full(dpp, type)) {
@@ -855,7 +855,7 @@ bool OSDService::_tentative_full(DoutPrefixProvider *dpp, s_names type, uint64_t
   s_names tentative_state = recalc_full_state(ratio, pratio, notused);
 
   if (tentative_state >= type)
-    ldpp_dout(dpp, 10) << __func__ << " tentative usage is " << ratio << dendl;
+    ldpp_dout(dpp, 10) << __FFL__ << " tentative usage is " << ratio << dendl;
 
   return tentative_state >= type;
 }
@@ -937,7 +937,7 @@ void OSDService::set_statfs(const struct store_statfs_t &stbuf,
       avail = bytes - total_num_bytes;
     else
       avail = 0;
-    dout(0) << __func__ << " fake total " << cct->_conf->fake_statfs_for_testing
+    dout(0) << __FFL__ << " fake total " << cct->_conf->fake_statfs_for_testing
             << " adjust available " << avail
             << dendl;
     used = bytes - avail;
@@ -974,7 +974,7 @@ osd_stat_t OSDService::set_osd_stat(vector<int>& hb_peers,
     if (i.second.last_update == 0)
       continue;
     if (stale_time && now.sec() - i.second.last_update > stale_time) {
-      dout(20) << __func__ << " time out heartbeat for osd " << i.first
+      dout(20) << __FFL__ << " time out heartbeat for osd " << i.first
 	       << " last_update " << i.second.last_update << dendl;
       osd_stat.hb_pingtime.erase(i.first);
       break;
@@ -997,12 +997,12 @@ float OSDService::compute_adjusted_ratio(osd_stat_t new_stat, float *pratio,
    ((float)new_stat.statfs.get_used_raw()) / ((float)new_stat.statfs.total);
 
   if (adjust_used) {
-    dout(20) << __func__ << " Before kb_used() " << new_stat.statfs.kb_used()  << dendl;
+    dout(20) << __FFL__ << " Before kb_used() " << new_stat.statfs.kb_used()  << dendl;
     if (new_stat.statfs.available > adjust_used)
       new_stat.statfs.available -= adjust_used;
     else
       new_stat.statfs.available = 0;
-    dout(20) << __func__ << " After kb_used() " << new_stat.statfs.kb_used() << dendl;
+    dout(20) << __FFL__ << " After kb_used() " << new_stat.statfs.kb_used() << dendl;
   }
 
   // Check all pgs and adjust kb_used to include all pending backfill data
@@ -1013,7 +1013,7 @@ float OSDService::compute_adjusted_ratio(osd_stat_t new_stat, float *pratio,
     backfill_adjusted += p->pg_stat_adjust(&new_stat);
   }
   if (backfill_adjusted) {
-    dout(20) << __func__ << " backfill adjusted " << new_stat << dendl;
+    dout(20) << __FFL__ << " backfill adjusted " << new_stat << dendl;
   }
   return ((float)new_stat.statfs.get_used_raw()) / ((float)new_stat.statfs.total);
 }
@@ -1153,7 +1153,7 @@ void OSDService::requeue_pg_temp()
   unsigned old_pending = pg_temp_pending.size();
   _sent_pg_temp();
   pg_temp_wanted.swap(pg_temp_pending);
-  dout(10) << __func__ << " " << old_wanted << " + " << old_pending << " -> "
+  dout(10) << __FFL__ << " " << old_wanted << " + " << old_pending << " -> "
 	   << pg_temp_wanted.size() << dendl;
 }
 
@@ -1193,7 +1193,7 @@ void OSDService::send_pg_temp()
 void OSDService::send_pg_created(pg_t pgid)
 {
   std::lock_guard l(pg_created_lock);
-  dout(20) << __func__ << dendl;
+  dout(20) << __FFL__ << dendl;
   auto o = get_osdmap();
   if (o->require_osd_release >= ceph_release_t::luminous) {
     pg_created.insert(pgid);
@@ -1204,7 +1204,7 @@ void OSDService::send_pg_created(pg_t pgid)
 void OSDService::send_pg_created()
 {
   std::lock_guard l(pg_created_lock);
-  dout(20) << __func__ << dendl;
+  dout(20) << __FFL__ << dendl;
   auto o = get_osdmap();
   if (o->require_osd_release >= ceph_release_t::luminous) {
     for (auto pgid : pg_created) {
@@ -1216,16 +1216,16 @@ void OSDService::send_pg_created()
 void OSDService::prune_pg_created()
 {
   std::lock_guard l(pg_created_lock);
-  dout(20) << __func__ << dendl;
+  dout(20) << __FFL__ << dendl;
   auto o = get_osdmap();
   auto i = pg_created.begin();
   while (i != pg_created.end()) {
     auto p = o->get_pg_pool(i->pool());
     if (!p || !p->has_flag(pg_pool_t::FLAG_CREATING)) {
-      dout(20) << __func__ << " pruning " << *i << dendl;
+      dout(20) << __FFL__ << " pruning " << *i << dendl;
       i = pg_created.erase(i);
     } else {
-      dout(20) << __func__ << " keeping " << *i << dendl;
+      dout(20) << __FFL__ << " keeping " << *i << dendl;
       ++i;
     }
   }
@@ -1241,11 +1241,11 @@ bool OSDService::can_inc_scrubs()
   std::lock_guard l(sched_scrub_lock);
 
   if (scrubs_local + scrubs_remote < cct->_conf->osd_max_scrubs) {
-    dout(20) << __func__ << " == true " << scrubs_local << " local + " << scrubs_remote
+    dout(20) << __FFL__ << " == true " << scrubs_local << " local + " << scrubs_remote
 	     << " remote < max " << cct->_conf->osd_max_scrubs << dendl;
     can_inc = true;
   } else {
-    dout(20) << __func__ << " == false " << scrubs_local << " local + " << scrubs_remote
+    dout(20) << __FFL__ << " == false " << scrubs_local << " local + " << scrubs_remote
 	     << " remote >= max " << cct->_conf->osd_max_scrubs << dendl;
   }
 
@@ -1257,12 +1257,12 @@ bool OSDService::inc_scrubs_local()
   bool result = false;
   std::lock_guard l{sched_scrub_lock};
   if (scrubs_local + scrubs_remote < cct->_conf->osd_max_scrubs) {
-    dout(20) << __func__ << " " << scrubs_local << " -> " << (scrubs_local+1)
+    dout(20) << __FFL__ << " " << scrubs_local << " -> " << (scrubs_local+1)
 	     << " (max " << cct->_conf->osd_max_scrubs << ", remote " << scrubs_remote << ")" << dendl;
     result = true;
     ++scrubs_local;
   } else {
-    dout(20) << __func__ << " " << scrubs_local << " local + " << scrubs_remote << " remote >= max " << cct->_conf->osd_max_scrubs << dendl;
+    dout(20) << __FFL__ << " " << scrubs_local << " local + " << scrubs_remote << " remote >= max " << cct->_conf->osd_max_scrubs << dendl;
   }
   return result;
 }
@@ -1270,7 +1270,7 @@ bool OSDService::inc_scrubs_local()
 void OSDService::dec_scrubs_local()
 {
   std::lock_guard l{sched_scrub_lock};
-  dout(20) << __func__ << " " << scrubs_local << " -> " << (scrubs_local-1)
+  dout(20) << __FFL__ << " " << scrubs_local << " -> " << (scrubs_local-1)
 	   << " (max " << cct->_conf->osd_max_scrubs << ", remote " << scrubs_remote << ")" << dendl;
   --scrubs_local;
   ceph_assert(scrubs_local >= 0);
@@ -1281,12 +1281,12 @@ bool OSDService::inc_scrubs_remote()
   bool result = false;
   std::lock_guard l{sched_scrub_lock};
   if (scrubs_local + scrubs_remote < cct->_conf->osd_max_scrubs) {
-    dout(20) << __func__ << " " << scrubs_remote << " -> " << (scrubs_remote+1)
+    dout(20) << __FFL__ << " " << scrubs_remote << " -> " << (scrubs_remote+1)
 	     << " (max " << cct->_conf->osd_max_scrubs << ", local " << scrubs_local << ")" << dendl;
     result = true;
     ++scrubs_remote;
   } else {
-    dout(20) << __func__ << " " << scrubs_local << " local + " << scrubs_remote << " remote >= max " << cct->_conf->osd_max_scrubs << dendl;
+    dout(20) << __FFL__ << " " << scrubs_local << " local + " << scrubs_remote << " remote >= max " << cct->_conf->osd_max_scrubs << dendl;
   }
   return result;
 }
@@ -1294,7 +1294,7 @@ bool OSDService::inc_scrubs_remote()
 void OSDService::dec_scrubs_remote()
 {
   std::lock_guard l{sched_scrub_lock};
-  dout(20) << __func__ << " " << scrubs_remote << " -> " << (scrubs_remote-1)
+  dout(20) << __FFL__ << " " << scrubs_remote << " -> " << (scrubs_remote-1)
 	   << " (max " << cct->_conf->osd_max_scrubs << ", local " << scrubs_local << ")" << dendl;
   --scrubs_remote;
   ceph_assert(scrubs_remote >= 0);
@@ -1346,7 +1346,7 @@ bool OSDService::prepare_to_stop()
 
   OSDMapRef osdmap = get_osdmap();
   if (osdmap && osdmap->is_up(whoami)) {
-    dout(0) << __func__ << " telling mon we are shutting down and dead " << dendl;
+    dout(0) << __FFL__ << " telling mon we are shutting down and dead " << dendl;
     set_state(PREPARING_TO_STOP);
     monc->send_mon_message(
       new MOSDMarkMeDown(
@@ -1362,7 +1362,7 @@ bool OSDService::prepare_to_stop()
       [this] { return get_state() == STOPPING; });
   }
 
-  dout(0) << __func__ << " starting shutdown" << dendl;
+  dout(0) << __FFL__ << " starting shutdown" << dendl;
   set_state(STOPPING);
   return true;
 }
@@ -1371,11 +1371,11 @@ void OSDService::got_stop_ack()
 {
   std::scoped_lock l(is_stopping_lock);
   if (get_state() == PREPARING_TO_STOP) {
-    dout(0) << __func__ << " starting shutdown" << dendl;
+    dout(0) << __FFL__ << " starting shutdown" << dendl;
     set_state(STOPPING);
     is_stopping_cond.notify_all();
   } else {
-    dout(10) << __func__ << " ignoring msg" << dendl;
+    dout(10) << __FFL__ << " ignoring msg" << dendl;
   }
 }
 
@@ -1394,11 +1394,11 @@ MOSDMap *OSDService::build_incremental_map_msg(epoch_t since, epoch_t to,
     // we don't have the next map the target wants, so start with a
     // full map.
     bufferlist bl;
-    dout(10) << __func__ << " oldest map " << max_oldest_map << " > since "
+    dout(10) << __FFL__ << " oldest map " << max_oldest_map << " > since "
 	     << since << ", starting with full map" << dendl;
     since = m->oldest_map;
     if (!get_map_bl(since, bl)) {
-      derr << __func__ << " missing full map " << since << dendl;
+      derr << __FFL__ << " missing full map " << since << dendl;
       goto panic;
     }
     max--;
@@ -1410,9 +1410,9 @@ MOSDMap *OSDService::build_incremental_map_msg(epoch_t since, epoch_t to,
     if (get_inc_map_bl(e, bl)) {
       m->incremental_maps[e].claim(bl);
     } else {
-      dout(10) << __func__ << " missing incremental map " << e << dendl;
+      dout(10) << __FFL__ << " missing incremental map " << e << dendl;
       if (!get_map_bl(e, bl)) {
-	derr << __func__ << " also missing full map " << e << dendl;
+	derr << __FFL__ << " also missing full map " << e << dendl;
 	goto panic;
       }
       m->maps[e].claim(bl);
@@ -1436,9 +1436,9 @@ MOSDMap *OSDService::build_incremental_map_msg(epoch_t since, epoch_t to,
   if (get_inc_map_bl(m->newest_map, bl)) {
     m->incremental_maps[m->newest_map].claim(bl);
   } else {
-    derr << __func__ << " unable to load latest map " << m->newest_map << dendl;
+    derr << __FFL__ << " unable to load latest map " << m->newest_map << dendl;
     if (!get_map_bl(m->newest_map, bl)) {
-      derr << __func__ << " unable to load latest full map " << m->newest_map
+      derr << __FFL__ << " unable to load latest full map " << m->newest_map
 	   << dendl;
       ceph_abort();
     }
@@ -1656,7 +1656,7 @@ void OSDService::handle_misdirected_op(PG *pg, OpRequestRef op)
     ceph_assert(m->get_map_epoch() <= superblock.newest_map);
     OSDMapRef opmap = try_get_map(m->get_map_epoch());
     if (!opmap) {
-      dout(7) << __func__ << ": " << *pg << " no longer have map for "
+      dout(7) << __FFL__ << ": " << *pg << " no longer have map for "
 	      << m->get_map_epoch() << ", dropping" << dendl;
       return;
     }
@@ -1666,7 +1666,7 @@ void OSDService::handle_misdirected_op(PG *pg, OpRequestRef op)
       _pgid = opmap->raw_pg_to_pg(_pgid);
     if (opmap->get_primary_shard(_pgid, &pgid) &&
 	pgid.shard != pg->pg_id.shard) {
-      dout(7) << __func__ << ": " << *pg << " primary changed since "
+      dout(7) << __FFL__ << ": " << *pg << " primary changed since "
 	      << m->get_map_epoch() << ", dropping" << dendl;
       return;
     }
@@ -1739,7 +1739,7 @@ void OSDService::queue_for_scrub(PG *pg, bool with_high_priority)
 
 void OSDService::queue_for_pg_delete(spg_t pgid, epoch_t e)
 {
-  dout(10) << __func__ << " on " << pgid << " e " << e  << dendl;
+  dout(10) << __FFL__ << " on " << pgid << " e " << e  << dendl;
   enqueue_back(
     OpSchedulerItem(
       unique_ptr<OpSchedulerItem::OpQueueable>(
@@ -1761,7 +1761,7 @@ bool OSDService::try_finish_pg_delete(PG *pg, unsigned old_pg_num)
 void OSDService::set_ready_to_merge_source(PG *pg, eversion_t version)
 {
   std::lock_guard l(merge_lock);
-  dout(10) << __func__ << " " << pg->pg_id << dendl;
+  dout(10) << __FFL__ << " " << pg->pg_id << dendl;
   ready_to_merge_source[pg->pg_id.pgid] = version;
   assert(not_ready_to_merge_source.count(pg->pg_id.pgid) == 0);
   _send_ready_to_merge();
@@ -1773,7 +1773,7 @@ void OSDService::set_ready_to_merge_target(PG *pg,
 					   epoch_t last_epoch_clean)
 {
   std::lock_guard l(merge_lock);
-  dout(10) << __func__ << " " << pg->pg_id << dendl;
+  dout(10) << __FFL__ << " " << pg->pg_id << dendl;
   ready_to_merge_target.insert(make_pair(pg->pg_id.pgid,
 					 make_tuple(version,
 						    last_epoch_started,
@@ -1785,7 +1785,7 @@ void OSDService::set_ready_to_merge_target(PG *pg,
 void OSDService::set_not_ready_to_merge_source(pg_t source)
 {
   std::lock_guard l(merge_lock);
-  dout(10) << __func__ << " " << source << dendl;
+  dout(10) << __FFL__ << " " << source << dendl;
   not_ready_to_merge_source.insert(source);
   assert(ready_to_merge_source.count(source) == 0);
   _send_ready_to_merge();
@@ -1794,7 +1794,7 @@ void OSDService::set_not_ready_to_merge_source(pg_t source)
 void OSDService::set_not_ready_to_merge_target(pg_t target, pg_t source)
 {
   std::lock_guard l(merge_lock);
-  dout(10) << __func__ << " " << target << " source " << source << dendl;
+  dout(10) << __FFL__ << " " << target << " source " << source << dendl;
   not_ready_to_merge_target[target] = source;
   assert(ready_to_merge_target.count(target) == 0);
   _send_ready_to_merge();
@@ -1859,7 +1859,7 @@ void OSDService::_send_ready_to_merge()
 void OSDService::clear_ready_to_merge(PG *pg)
 {
   std::lock_guard l(merge_lock);
-  dout(10) << __func__ << " " << pg->pg_id << dendl;
+  dout(10) << __FFL__ << " " << pg->pg_id << dendl;
   ready_to_merge_source.erase(pg->pg_id.pgid);
   ready_to_merge_target.erase(pg->pg_id.pgid);
   not_ready_to_merge_source.erase(pg->pg_id.pgid);
@@ -1879,7 +1879,7 @@ void OSDService::prune_sent_ready_to_merge(const OSDMapRef& osdmap)
   auto i = sent_ready_to_merge_source.begin();
   while (i != sent_ready_to_merge_source.end()) {
     if (!osdmap->pg_exists(*i)) {
-      dout(10) << __func__ << " " << *i << dendl;
+      dout(10) << __FFL__ << " " << *i << dendl;
       i = sent_ready_to_merge_source.erase(i);
     } else {
       ++i;
@@ -2043,7 +2043,7 @@ int OSD::write_meta(CephContext *cct, ObjectStore *store, uuid_d& cluster_fsid, 
       string err;
       r = keybl.read_file(keyfile.c_str(), &err);
       if (r < 0) {
-	derr << __func__ << " failed to read keyfile " << keyfile << ": "
+	derr << __FFL__ << " failed to read keyfile " << keyfile << ": "
 	     << err << ": " << cpp_strerror(r) << dendl;
 	return r;
       }
@@ -2265,7 +2265,7 @@ int OSD::set_numa_affinity()
   int store_node = -1;
   store->get_numa_node(&store_node, nullptr, nullptr);
   if (store_node >= 0) {
-    dout(1) << __func__ << " storage numa node " << store_node << dendl;
+    dout(1) << __FFL__ << " storage numa node " << store_node << dendl;
   }
 
   // check network numa node(s)
@@ -2278,11 +2278,11 @@ int OSD::set_numa_affinity()
     cluster_messenger->get_myaddrs().front().get_sockaddr_storage());
   int r = get_iface_numa_node(front_iface, &front_node);
   if (r >= 0 && front_node >= 0) {
-    dout(1) << __func__ << " public network " << front_iface << " numa node "
+    dout(1) << __FFL__ << " public network " << front_iface << " numa node "
             << front_node << dendl;
     r = get_iface_numa_node(back_iface, &back_node);
     if (r >= 0 && back_node >= 0) {
-      dout(1) << __func__ << " cluster network " << back_iface << " numa node "
+      dout(1) << __FFL__ << " cluster network " << back_iface << " numa node "
 	      << back_node << dendl;
       if (front_node == back_node &&
 	  front_node == store_node) {
@@ -2291,24 +2291,24 @@ int OSD::set_numa_affinity()
 	  numa_node = front_node;
 	}
       } else if (front_node != back_node) {
-        dout(1) << __func__ << " public and cluster network numa nodes do not match"
+        dout(1) << __FFL__ << " public and cluster network numa nodes do not match"
                 << dendl;
       } else {
-	dout(1) << __func__ << " objectstore and network numa nodes do not match"
+	dout(1) << __FFL__ << " objectstore and network numa nodes do not match"
 		<< dendl;
       }
     } else if (back_node == -2) {
-      dout(1) << __func__ << " cluster network " << back_iface
+      dout(1) << __FFL__ << " cluster network " << back_iface
               << " ports numa nodes do not match" << dendl;
     } else {
-      derr << __func__ << " unable to identify cluster interface '" << back_iface
+      derr << __FFL__ << " unable to identify cluster interface '" << back_iface
            << "' numa node: " << cpp_strerror(r) << dendl;
     }
   } else if (front_node == -2) {
-    dout(1) << __func__ << " public network " << front_iface
+    dout(1) << __FFL__ << " public network " << front_iface
             << " ports numa nodes do not match" << dendl;
   } else {
-    derr << __func__ << " unable to identify public interface '" << front_iface
+    derr << __FFL__ << " unable to identify public interface '" << front_iface
 	 << "' numa node: " << cpp_strerror(r) << dendl;
   }
   if (int node = g_conf().get_val<int64_t>("osd_numa_node"); node >= 0) {
@@ -2318,24 +2318,24 @@ int OSD::set_numa_affinity()
   if (numa_node >= 0) {
     int r = get_numa_node_cpu_set(numa_node, &numa_cpu_set_size, &numa_cpu_set);
     if (r < 0) {
-      dout(1) << __func__ << " unable to determine numa node " << numa_node
+      dout(1) << __FFL__ << " unable to determine numa node " << numa_node
 	      << " CPUs" << dendl;
       numa_node = -1;
     } else {
-      dout(1) << __func__ << " setting numa affinity to node " << numa_node
+      dout(1) << __FFL__ << " setting numa affinity to node " << numa_node
 	      << " cpus "
 	      << cpu_set_to_str_list(numa_cpu_set_size, &numa_cpu_set)
 	      << dendl;
       r = set_cpu_affinity_all_threads(numa_cpu_set_size, &numa_cpu_set);
       if (r < 0) {
 	r = -errno;
-	derr << __func__ << " failed to set numa affinity: " << cpp_strerror(r)
+	derr << __FFL__ << " failed to set numa affinity: " << cpp_strerror(r)
 	     << dendl;
 	numa_node = -1;
       }
     }
   } else {
-    dout(1) << __func__ << " not setting numa affinity" << dendl;
+    dout(1) << __FFL__ << " not setting numa affinity" << dendl;
   }
   return 0;
 }
@@ -3154,33 +3154,33 @@ int OSD::enable_disable_fuse(bool stop)
   int r;
   string mntpath = cct->_conf->osd_data + "/fuse";
   if (fuse_store && (stop || !cct->_conf->osd_objectstore_fuse)) {
-    dout(1) << __func__ << " disabling" << dendl;
+    dout(1) << __FFL__ << " disabling" << dendl;
     fuse_store->stop();
     delete fuse_store;
     fuse_store = NULL;
     r = ::rmdir(mntpath.c_str());
     if (r < 0) {
       r = -errno;
-      derr << __func__ << " failed to rmdir " << mntpath << ": "
+      derr << __FFL__ << " failed to rmdir " << mntpath << ": "
            << cpp_strerror(r) << dendl;
       return r;
     }
     return 0;
   }
   if (!fuse_store && cct->_conf->osd_objectstore_fuse) {
-    dout(1) << __func__ << " enabling" << dendl;
+    dout(1) << __FFL__ << " enabling" << dendl;
     r = ::mkdir(mntpath.c_str(), 0700);
     if (r < 0)
       r = -errno;
     if (r < 0 && r != -EEXIST) {
-      derr << __func__ << " unable to create " << mntpath << ": "
+      derr << __FFL__ << " unable to create " << mntpath << ": "
 	   << cpp_strerror(r) << dendl;
       return r;
     }
     fuse_store = new FuseStore(store, mntpath);
     r = fuse_store->start();
     if (r < 0) {
-      derr << __func__ << " unable to start fuse: " << cpp_strerror(r) << dendl;
+      derr << __FFL__ << " unable to start fuse: " << cpp_strerror(r) << dendl;
       delete fuse_store;
       fuse_store = NULL;
       return r;
@@ -3402,7 +3402,7 @@ int OSD::init()
 	  !osdmap->have_pg_pool(pgid.pool())) {
 	ghobject_t oid = make_final_pool_info_oid(pgid.pool());
 	if (!store->exists(service.meta_ch, oid)) {
-	  derr << __func__ << " missing pg_pool_t for deleted pool "
+	  derr << __FFL__ << " missing pg_pool_t for deleted pool "
 	       << pgid.pool() << " for pg " << pgid
 	       << "; please downgrade to luminous and allow "
 	       << "pg deletion to complete before upgrading" << dendl;
@@ -3417,7 +3417,7 @@ int OSD::init()
   if (superblock.compat_features.merge(initial)) {
     // Are we adding SNAPMAPPER2?
     if (diff.incompat.contains(CEPH_OSD_FEATURE_INCOMPAT_SNAPMAPPER2)) {
-      dout(1) << __func__ << " upgrade snap_mapper (first start as octopus)"
+      dout(1) << __FFL__ << " upgrade snap_mapper (first start as octopus)"
 	      << dendl;
       auto ch = service.meta_ch;
       auto hoid = make_snapmapper_oid();
@@ -3597,7 +3597,7 @@ int OSD::init()
 
   r = monc->authenticate();
   if (r < 0) {
-    derr << __func__ << " authentication failed: " << cpp_strerror(r)
+    derr << __FFL__ << " authentication failed: " << cpp_strerror(r)
          << dendl;
     exit(1);
   }
@@ -3606,21 +3606,21 @@ int OSD::init()
     derr << "unable to obtain rotating service keys; retrying" << dendl;
     ++rotating_auth_attempts;
     if (rotating_auth_attempts > g_conf()->max_rotating_auth_attempts) {
-        derr << __func__ << " wait_auth_rotating timed out" << dendl;
+        derr << __FFL__ << " wait_auth_rotating timed out" << dendl;
 	exit(1);
     }
   }
 
   r = update_crush_device_class();
   if (r < 0) {
-    derr << __func__ << " unable to update_crush_device_class: "
+    derr << __FFL__ << " unable to update_crush_device_class: "
 	 << cpp_strerror(r) << dendl;
     exit(1);
   }
 
   r = update_crush_location();
   if (r < 0) {
-    derr << __func__ << " unable to update_crush_location: "
+    derr << __FFL__ << " unable to update_crush_location: "
          << cpp_strerror(r) << dendl;
     exit(1);
   }
@@ -4241,7 +4241,7 @@ int OSD::mon_cmd_maybe_osd_create(string &cmd)
 {
   bool created = false;
   while (true) {
-    dout(10) << __func__ << " cmd: " << cmd << dendl;
+    dout(10) << __FFL__ << " cmd: " << cmd << dendl;
     vector<string> vcmd{cmd};
     bufferlist inbl;
     C_SaferCond w;
@@ -4259,14 +4259,14 @@ int OSD::mon_cmd_maybe_osd_create(string &cmd)
 	monc->start_mon_command(vnewcmd, inbl, NULL, &outs, &w);
 	int r = w.wait();
 	if (r < 0) {
-	  derr << __func__ << " fail: osd does not exist and created failed: "
+	  derr << __FFL__ << " fail: osd does not exist and created failed: "
 	       << cpp_strerror(r) << dendl;
 	  return r;
 	}
 	created = true;
 	continue;
       }
-      derr << __func__ << " fail: '" << outs << "': " << cpp_strerror(r) << dendl;
+      derr << __FFL__ << " fail: '" << outs << "': " << cpp_strerror(r) << dendl;
       return r;
     }
     break;
@@ -4278,7 +4278,7 @@ int OSD::mon_cmd_maybe_osd_create(string &cmd)
 int OSD::update_crush_location()
 {
   if (!cct->_conf->osd_crush_update_on_start) {
-    dout(10) << __func__ << " osd_crush_update_on_start = false" << dendl;
+    dout(10) << __FFL__ << " osd_crush_update_on_start = false" << dendl;
     return 0;
   }
 
@@ -4299,7 +4299,7 @@ int OSD::update_crush_location()
 		      double(1ull << 40 /* TB */)));
   }
 
-  dout(10) << __func__ << " crush location is " << cct->crush_location << dendl;
+  dout(10) << __FFL__ << " crush location is " << cct->crush_location << dendl;
 
   string cmd =
     string("{\"prefix\": \"osd crush create-or-move\", ") +
@@ -4312,7 +4312,7 @@ int OSD::update_crush_location()
 int OSD::update_crush_device_class()
 {
   if (!cct->_conf->osd_class_update_on_start) {
-    dout(10) << __func__ << " osd_class_update_on_start = false" << dendl;
+    dout(10) << __FFL__ << " osd_class_update_on_start = false" << dendl;
     return 0;
   }
 
@@ -4323,7 +4323,7 @@ int OSD::update_crush_device_class()
   }
 
   if (device_class.empty()) {
-    dout(20) << __func__ << " no device class stored locally" << dendl;
+    dout(20) << __FFL__ << " no device class stored locally" << dendl;
     return 0;
   }
 
@@ -4371,7 +4371,7 @@ int OSD::read_superblock()
 
 void OSD::clear_temp_objects()
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   vector<coll_t> ls;
   store->list_collections(ls);
   for (vector<coll_t>::iterator p = ls.begin(); p != ls.end(); ++p) {
@@ -4447,7 +4447,7 @@ void OSD::recursive_remove_collection(CephContext* cct,
     objects.clear();
     store->collection_list(ch, next, ghobject_t::get_max(),
       max, &objects, &next);
-    generic_dout(10) << __func__ << " " << objects << dendl;
+    generic_dout(10) << __FFL__ << " " << objects << dendl;
     if (objects.empty())
       break;
     for (auto& p: objects) {
@@ -4479,7 +4479,7 @@ PG* OSD::_make_pg(
   OSDMapRef createmap,
   spg_t pgid)
 {
-  dout(10) << __func__ << " " << pgid << dendl;
+  dout(10) << __FFL__ << " " << pgid << dendl;
   pg_pool_t pi;
   map<string,string> ec_profile;
   string name;
@@ -4495,7 +4495,7 @@ PG* OSD::_make_pg(
     bufferlist bl;
     int r = store->read(service.meta_ch, oid, 0, 0, bl);
     if (r < 0) {
-      derr << __func__ << " missing pool " << pgid.pool() << " tombstone"
+      derr << __FFL__ << " missing pool " << pgid.pool() << " tombstone"
 	   << dendl;
       return nullptr;
     }
@@ -4504,7 +4504,7 @@ PG* OSD::_make_pg(
     decode(pi, p);
     decode(name, p);
     if (p.end()) { // dev release v13.0.2 did not include ec_profile
-      derr << __func__ << " missing ec_profile from pool " << pgid.pool()
+      derr << __FFL__ << " missing ec_profile from pool " << pgid.pool()
 	   << " tombstone" << dendl;
       return nullptr;
     }
@@ -4562,7 +4562,7 @@ void OSD::register_pg(PGRef pg)
   auto r = sdata->pg_slots.emplace(pgid, make_unique<OSDShardPGSlot>());
   ceph_assert(r.second);
   auto *slot = r.first->second.get();
-  dout(20) << __func__ << " " << pgid << " " << pg << dendl;
+  dout(20) << __FFL__ << " " << pgid << " " << pg << dendl;
   sdata->_attach_pg(slot, pg.get());
 }
 
@@ -4575,14 +4575,14 @@ bool OSD::try_finish_pg_delete(PG *pg, unsigned old_pg_num)
     auto p = sdata->pg_slots.find(pg->pg_id);
     if (p == sdata->pg_slots.end() ||
 	!p->second->pg) {
-      dout(20) << __func__ << " " << pg->pg_id << " not found" << dendl;
+      dout(20) << __FFL__ << " " << pg->pg_id << " not found" << dendl;
       return false;
     }
     if (p->second->waiting_for_merge_epoch) {
-      dout(20) << __func__ << " " << pg->pg_id << " waiting for merge" << dendl;
+      dout(20) << __FFL__ << " " << pg->pg_id << " waiting for merge" << dendl;
       return false;
     }
-    dout(20) << __func__ << " " << pg->pg_id << " " << pg << dendl;
+    dout(20) << __FFL__ << " " << pg->pg_id << " " << pg << dendl;
     sdata->_detach_pg(p->second.get());
   }
 
@@ -4645,7 +4645,7 @@ void OSD::load_pgs()
       auto p = bl.cbegin();
       decode(pg_num_history, p);
     }
-    dout(20) << __func__ << " pg_num_history " << pg_num_history << dendl;
+    dout(20) << __FFL__ << " pg_num_history " << pg_num_history << dendl;
   }
 
   vector<coll_t> ls;
@@ -4676,7 +4676,7 @@ void OSD::load_pgs()
     epoch_t map_epoch = 0;
     int r = PG::peek_map_epoch(store, pgid, &map_epoch);
     if (r < 0) {
-      derr << __func__ << " unable to peek at " << pgid << " metadata, skipping"
+      derr << __FFL__ << " unable to peek at " << pgid << " metadata, skipping"
 	   << dendl;
       continue;
     }
@@ -4686,14 +4686,14 @@ void OSD::load_pgs()
       OSDMapRef pgosdmap = service.try_get_map(map_epoch);
       if (!pgosdmap) {
 	if (!get_osdmap()->have_pg_pool(pgid.pool())) {
-	  derr << __func__ << ": could not find map for epoch " << map_epoch
+	  derr << __FFL__ << ": could not find map for epoch " << map_epoch
 	       << " on pg " << pgid << ", but the pool is not present in the "
 	       << "current map, so this is probably a result of bug 10617.  "
 	       << "Skipping the pg for now, you can use ceph-objectstore-tool "
 	       << "to clean it up later." << dendl;
 	  continue;
 	} else {
-	  derr << __func__ << ": have pgid " << pgid << " at epoch "
+	  derr << __FFL__ << ": have pgid " << pgid << " at epoch "
 	       << map_epoch << ", but missing map.  Crashing."
 	       << dendl;
 	  ceph_abort_msg("Missing map in load_pgs");
@@ -4731,13 +4731,13 @@ void OSD::load_pgs()
 
     pg->reg_next_scrub();
 
-    dout(10) << __func__ << " loaded " << *pg << dendl;
+    dout(10) << __FFL__ << " loaded " << *pg << dendl;
     pg->unlock();
 
     register_pg(pg);
     ++num;
   }
-  dout(0) << __func__ << " opened " << num << " pgs" << dendl;
+  dout(0) << __FFL__ << " opened " << num << " pgs" << dendl;
 }
 
 
@@ -4747,7 +4747,7 @@ PGRef OSD::handle_pg_create_info(const OSDMapRef& osdmap,
   spg_t pgid = info->pgid;
 
   if (maybe_wait_for_max_pg(osdmap, pgid, info->by_mon)) {
-    dout(10) << __func__ << " hit max pg, dropping" << dendl;
+    dout(10) << __FFL__ << " hit max pg, dropping" << dendl;
     return nullptr;
   }
 
@@ -4759,7 +4759,7 @@ PGRef OSD::handle_pg_create_info(const OSDMapRef& osdmap,
     int64_t pool_id = pgid.pgid.pool();
     const pg_pool_t *pool = osdmap->get_pg_pool(pool_id);
     if (!pool) {
-      dout(10) << __func__ << " ignoring " << pgid << ", pool dne" << dendl;
+      dout(10) << __FFL__ << " ignoring " << pgid << ", pool dne" << dendl;
       return nullptr;
     }
     if (osdmap->require_osd_release >= ceph_release_t::nautilus &&
@@ -4767,7 +4767,7 @@ PGRef OSD::handle_pg_create_info(const OSDMapRef& osdmap,
       // this ensures we do not process old creating messages after the
       // pool's initial pgs have been created (and pg are subsequently
       // allowed to split or merge).
-      dout(20) << __func__ << "  dropping " << pgid
+      dout(20) << __FFL__ << "  dropping " << pgid
 	       << "create, pool does not have CREATING flag set" << dendl;
       return nullptr;
     }
@@ -4829,7 +4829,7 @@ PGRef OSD::handle_pg_create_info(const OSDMapRef& osdmap,
 
   dispatch_context(rctx, pg.get(), osdmap, nullptr);
 
-  dout(10) << __func__ << " new pg " << *pg << dendl;
+  dout(10) << __FFL__ << " new pg " << *pg << dendl;
   return pg;
 }
 
@@ -4852,7 +4852,7 @@ bool OSD::maybe_wait_for_max_pg(const OSDMapRef& osdmap,
     bool is_primary = osdmap->get_pg_acting_role(pgid, whoami) == 0;
     pending_creates_from_osd.emplace(pgid, is_primary);
   }
-  dout(1) << __func__ << " withhold creation of pg " << pgid
+  dout(1) << __FFL__ << " withhold creation of pg " << pgid
 	  << ": " << num_pgs << " >= "<< max_pgs_per_osd << dendl;
   return true;
 }
@@ -4885,7 +4885,7 @@ void OSD::resume_creating_pg()
     unsigned spare_pgs = max_pgs_per_osd - num_pgs;
     std::lock_guard l(pending_creates_lock);
     if (pending_creates_from_mon > 0) {
-      dout(20) << __func__ << " pending_creates_from_mon "
+      dout(20) << __FFL__ << " pending_creates_from_mon "
 	       << pending_creates_from_mon << dendl;
       do_sub_pg_creates = true;
       if (pending_creates_from_mon >= spare_pgs) {
@@ -4897,7 +4897,7 @@ void OSD::resume_creating_pg()
     }
     auto pg = pending_creates_from_osd.cbegin();
     while (spare_pgs > 0 && pg != pending_creates_from_osd.cend()) {
-      dout(20) << __func__ << " pg " << pg->first << dendl;
+      dout(20) << __FFL__ << " pg " << pg->first << dendl;
       vector<int> acting;
       get_osdmap()->pg_to_up_acting_osds(pg->first.pgid, nullptr, nullptr, &acting, nullptr);
       service.queue_want_pg_temp(pg->first.pgid, twiddle(acting), true);
@@ -4912,7 +4912,7 @@ void OSD::resume_creating_pg()
   bool do_renew_subs = false;
   if (do_sub_pg_creates) {
     if (monc->sub_want("osd_pg_creates", last_pg_create_epoch, 0)) {
-      dout(4) << __func__ << ": resolicit pg creates from mon since "
+      dout(4) << __FFL__ << ": resolicit pg creates from mon since "
 	      << last_pg_create_epoch << dendl;
       do_renew_subs = true;
     }
@@ -4921,7 +4921,7 @@ void OSD::resume_creating_pg()
   if (have_pending_creates) {
     // don't miss any new osdmap deleting PGs
     if (monc->sub_want("osdmap", start, 0)) {
-      dout(4) << __func__ << ": resolicit osdmap from mon since "
+      dout(4) << __FFL__ << ": resolicit osdmap from mon since "
 	      << start << dendl;
       do_renew_subs = true;
     }
@@ -4929,7 +4929,7 @@ void OSD::resume_creating_pg()
     // no need to subscribe the osdmap continuously anymore
     // once the pgtemp and/or mon_subscribe(pg_creates) is sent
     if (monc->sub_want_increment("osdmap", start, CEPH_SUBSCRIBE_ONETIME)) {
-      dout(4) << __func__ << ": re-subscribe osdmap(onetime) since "
+      dout(4) << __FFL__ << ": re-subscribe osdmap(onetime) since "
 	      << start << dendl;
       do_renew_subs = true;
     }
@@ -4949,7 +4949,7 @@ void OSD::build_initial_pg_history(
   pg_history_t *h,
   PastIntervals *pi)
 {
-  dout(10) << __func__ << " " << pgid << " created " << created << dendl;
+  dout(10) << __FFL__ << " " << pgid << " created " << created << dendl;
   *h = pg_history_t(created, created_stamp);
 
   OSDMapRef lastmap = service.get_map(created);
@@ -5010,8 +5010,8 @@ void OSD::build_initial_pg_history(
     }
     lastmap = osdmap;
   }
-  dout(20) << __func__ << " " << debug.str() << dendl;
-  dout(10) << __func__ << " " << *h << " " << *pi
+  dout(20) << __FFL__ << " " << debug.str() << dendl;
+  dout(10) << __FFL__ << " " << *h << " " << *pi
 	   << " [" << (pi->empty() ? pair<epoch_t,epoch_t>(0,0) :
 		       pi->get_bounds()) << ")"
 	   << dendl;
@@ -5293,7 +5293,7 @@ void OSD::handle_osd_ping(MOSDPing *m)
 	m->mono_send_stamp,
 	m->delta_ub,
 	&sender_delta_ub);
-      dout(20) << __func__ << " new stamps " << *s->stamps << dendl;
+      dout(20) << __FFL__ << " new stamps " << *s->stamps << dendl;
 
       if (!cct->get_heartbeat_map()->is_healthy()) {
 	dout(10) << "internal heartbeat not healthy, dropping ping request"
@@ -5550,7 +5550,7 @@ void OSD::handle_osd_ping(MOSDPing *m)
 	mnow,
 	m->mono_send_stamp,
 	m->delta_ub);
-      dout(20) << __func__ << " new stamps " << *s->stamps << dendl;
+      dout(20) << __FFL__ << " new stamps " << *s->stamps << dendl;
     }
     break;
 
@@ -5668,7 +5668,7 @@ void OSD::heartbeat()
     hb_peers.push_back(p->first);
 
   auto new_stat = service.set_osd_stat(hb_peers, get_num_pgs());
-  dout(5) << __func__ << " " << new_stat << dendl;
+  dout(5) << __FFL__ << " " << new_stat << dendl;
   ceph_assert(new_stat.statfs.total);
 
   float pratio;
@@ -5747,7 +5747,7 @@ bool OSD::heartbeat_reset(Connection *con)
 {
   std::lock_guard l(heartbeat_lock);
   auto s = con->get_priv();
-  dout(20) << __func__ << " con " << con << " s " << s.get() << dendl;
+  dout(20) << __FFL__ << " con " << con << " s " << s.get() << dendl;
   con->set_priv(nullptr);
   if (s) {
     if (is_stopping()) {
@@ -5810,7 +5810,7 @@ void OSD::tick()
     std::lock_guard l(heartbeat_lock);
     if (now - last_mon_heartbeat > cct->_conf->osd_mon_heartbeat_interval) {
       last_mon_heartbeat = now;
-      dout(1) << __func__ << " checking mon for new map" << dendl;
+      dout(1) << __FFL__ << " checking mon for new map" << dendl;
       osdmap_subscribe(get_osdmap_epoch() + 1, false);
     }
   }
@@ -5831,11 +5831,11 @@ void OSD::tick()
       cct->_conf->osd_scrub_min_interval *
       cct->_conf->osd_scrub_interval_randomize_ratio * r;
     if (next < ceph_clock_now()) {
-      dout(20) << __func__ << " last_purged_snaps_scrub " << last
+      dout(20) << __FFL__ << " last_purged_snaps_scrub " << last
 	       << " next " << next << " ... now" << dendl;
       scrub_purged_snaps();
     } else {
-      dout(20) << __func__ << " last_purged_snaps_scrub " << last
+      dout(20) << __FFL__ << " last_purged_snaps_scrub " << last
 	       << " next " << next << dendl;
     }
   }
@@ -5885,7 +5885,7 @@ void OSD::tick_without_osd_lock()
 				   s->get_max_waiting_epoch());
     }
     if (max_waiting_epoch > get_osdmap()->get_epoch()) {
-      dout(20) << __func__ << " max_waiting_epoch " << max_waiting_epoch
+      dout(20) << __FFL__ << " max_waiting_epoch " << max_waiting_epoch
 	       << ", requesting new map" << dendl;
       osdmap_subscribe(superblock.newest_map + 1, false);
     }
@@ -6105,12 +6105,12 @@ void TestOpsSocketHook::test_ops(OSDService *service, ObjectStore *store,
 
 void OSD::ms_handle_connect(Connection *con)
 {
-  dout(10) << __func__ << " con " << con << dendl;
+  dout(10) << __FFL__ << " con " << con << dendl;
   if (con->get_peer_type() == CEPH_ENTITY_TYPE_MON) {
     std::lock_guard l(osd_lock);
     if (is_stopping())
       return;
-    dout(10) << __func__ << " on mon" << dendl;
+    dout(10) << __FFL__ << " on mon" << dendl;
 
     if (is_preboot()) {
       start_boot();
@@ -6249,7 +6249,7 @@ void OSD::start_boot()
     heartbeat_kick();
     return;
   }
-  dout(1) << __func__ << dendl;
+  dout(1) << __FFL__ << dendl;
   set_state(STATE_PREBOOT);
   dout(10) << "start_boot - have maps " << superblock.oldest_map
 	   << ".." << superblock.newest_map << dendl;
@@ -6268,7 +6268,7 @@ void OSD::_got_mon_epochs(epoch_t oldest, epoch_t newest)
 void OSD::_preboot(epoch_t oldest, epoch_t newest)
 {
   ceph_assert(is_preboot());
-  dout(10) << __func__ << " _preboot mon has osdmaps "
+  dout(10) << __FFL__ << " _preboot mon has osdmaps "
 	   << oldest << ".." << newest << dendl;
 
   // ensure our local fullness awareness is accurate
@@ -6302,7 +6302,7 @@ void OSD::_preboot(epoch_t oldest, epoch_t newest)
     send_full_update();
   } else if (monmap.min_mon_release >= ceph_release_t::octopus &&
 	     superblock.purged_snaps_last < superblock.current_epoch) {
-    dout(10) << __func__ << " purged_snaps_last " << superblock.purged_snaps_last
+    dout(10) << __FFL__ << " purged_snaps_last " << superblock.purged_snaps_last
 	     << " < newest_map " << superblock.current_epoch << dendl;
     _get_purged_snaps();
   } else if (osdmap->get_epoch() >= oldest - 1 &&
@@ -6316,7 +6316,7 @@ void OSD::_preboot(epoch_t oldest, epoch_t newest)
 	[this](int r) {
 	  std::unique_lock l(osd_lock);
 	  if (is_preboot()) {
-	    dout(10) << __func__ << " waiting for peering work to drain"
+	    dout(10) << __FFL__ << " waiting for peering work to drain"
 		     << dendl;
 	    l.unlock();
 	    for (auto shard : shards) {
@@ -6343,7 +6343,7 @@ void OSD::_get_purged_snaps()
   // NOTE: this is a naive, stateless implementaiton.  it may send multiple
   // overlapping requests to the mon, which will be somewhat inefficient, but
   // it should be reliable.
-  dout(10) << __func__ << " purged_snaps_last " << superblock.purged_snaps_last
+  dout(10) << __FFL__ << " purged_snaps_last " << superblock.purged_snaps_last
 	   << ", newest_map " << superblock.current_epoch << dendl;
   MMonGetPurgedSnaps *m = new MMonGetPurgedSnaps(
     superblock.purged_snaps_last + 1,
@@ -6353,7 +6353,7 @@ void OSD::_get_purged_snaps()
 
 void OSD::handle_get_purged_snaps_reply(MMonGetPurgedSnapsReply *m)
 {
-  dout(10) << __func__ << " " << *m << dendl;
+  dout(10) << __FFL__ << " " << *m << dendl;
   ObjectStore::Transaction t;
   if (!is_preboot() ||
       m->last < superblock.purged_snaps_last) {
@@ -6391,7 +6391,7 @@ void OSD::send_full_update()
   }
   set<string> s;
   OSDMap::calc_state_set(state, s);
-  dout(10) << __func__ << " want state " << s << dendl;
+  dout(10) << __FFL__ << " want state " << s << dendl;
   monc->send_mon_message(new MOSDFull(get_osdmap_epoch(), state));
 }
 
@@ -6415,7 +6415,7 @@ bool OSD::_is_healthy()
   if (is_waiting_for_healthy()) {
      utime_t now = ceph_clock_now();
      if (osd_markdown_log.empty()) {
-       dout(5) << __func__ << " force returning true since last markdown"
+       dout(5) << __FFL__ << " force returning true since last markdown"
                << " was " << cct->_conf->osd_max_markdown_period
                << "s ago" << dendl;
        return true;
@@ -6580,9 +6580,9 @@ void OSD::_collect_metadata(map<string,string> *pm)
   map<string,string> errs;
   get_device_metadata(devnames, pm, &errs);
   for (auto& i : errs) {
-    dout(1) << __func__ << " " << i.first << ": " << i.second << dendl;
+    dout(1) << __FFL__ << " " << i.first << ": " << i.second << dendl;
   }
-  dout(10) << __func__ << " " << *pm << dendl;
+  dout(10) << __FFL__ << " " << *pm << dendl;
 }
 
 void OSD::queue_want_up_thru(epoch_t want)
@@ -6619,7 +6619,7 @@ void OSD::send_alive()
 
 void OSD::request_full_map(epoch_t first, epoch_t last)
 {
-  dout(10) << __func__ << " " << first << ".." << last
+  dout(10) << __FFL__ << " " << first << ".." << last
 	   << ", previously requested "
 	   << requested_full_first << ".." << requested_full_last << dendl;
   ceph_assert(ceph_mutex_is_locked(osd_lock));
@@ -6648,17 +6648,17 @@ void OSD::got_full_map(epoch_t e)
   ceph_assert(requested_full_first <= requested_full_last);
   ceph_assert(ceph_mutex_is_locked(osd_lock));
   if (requested_full_first == 0) {
-    dout(20) << __func__ << " " << e << ", nothing requested" << dendl;
+    dout(20) << __FFL__ << " " << e << ", nothing requested" << dendl;
     return;
   }
   if (e < requested_full_first) {
-    dout(10) << __func__ << " " << e << ", requested " << requested_full_first
+    dout(10) << __FFL__ << " " << e << ", requested " << requested_full_first
 	     << ".." << requested_full_last
 	     << ", ignoring" << dendl;
     return;
   }
   if (e >= requested_full_last) {
-    dout(10) << __func__ << " " << e << ", requested " << requested_full_first
+    dout(10) << __FFL__ << " " << e << ", requested " << requested_full_first
 	     << ".." << requested_full_last << ", resetting" << dendl;
     requested_full_first = requested_full_last = 0;
     return;
@@ -6666,7 +6666,7 @@ void OSD::got_full_map(epoch_t e)
   
   requested_full_first = e + 1;
 
-  dout(10) << __func__ << " " << e << ", requested " << requested_full_first
+  dout(10) << __FFL__ << " " << e << ", requested " << requested_full_first
            << ".." << requested_full_last
            << ", still need more" << dendl;
 }
@@ -6680,7 +6680,7 @@ void OSD::requeue_failures()
     failure_queue[p->first] = p->second.first;
     failure_pending.erase(p++);
   }
-  dout(10) << __func__ << " " << old_queue << " + " << old_pending << " -> "
+  dout(10) << __FFL__ << " " << old_queue << " + " << old_pending << " -> "
 	   << failure_queue.size() << dendl;
 }
 
@@ -6721,7 +6721,7 @@ void OSD::cancel_pending_failures()
   std::lock_guard l(heartbeat_lock);
   auto it = failure_pending.begin();
   while (it != failure_pending.end()) {
-    dout(10) << __func__ << " canceling in-flight failure report for osd."
+    dout(10) << __FFL__ << " canceling in-flight failure report for osd."
              << it->first << dendl;
     send_still_alive(get_osdmap_epoch(), it->first, it->second.second);
     failure_pending.erase(it++);
@@ -6736,7 +6736,7 @@ void OSD::send_beacon(const ceph::coarse_mono_clock::time_point& now)
   if (monmap.epoch > 0 &&
       monmap.get_required_features().contains_all(
         ceph::features::mon::FEATURE_LUMINOUS)) {
-    dout(20) << __func__ << " sending" << dendl;
+    dout(20) << __FFL__ << " sending" << dendl;
     MOSDBeacon* beacon = nullptr;
     {
       std::lock_guard l{min_last_epoch_clean_lock};
@@ -6748,7 +6748,7 @@ void OSD::send_beacon(const ceph::coarse_mono_clock::time_point& now)
     }
     monc->send_mon_message(beacon);
   } else {
-    dout(20) << __func__ << " not sending" << dendl;
+    dout(20) << __FFL__ << " not sending" << dendl;
   }
 }
 
@@ -6788,7 +6788,7 @@ namespace {
 
 void OSD::scrub_purged_snaps()
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   ceph_assert(ceph_mutex_is_locked(osd_lock));
   SnapMapper::Scrubber s(cct, store, service.meta_ch,
 			 make_snapmapper_oid(),
@@ -6805,24 +6805,24 @@ void OSD::scrub_purged_snaps()
   for (auto& [pool, snap, hash, shard] : s.stray) {
     const pg_pool_t *pi = get_osdmap()->get_pg_pool(pool);
     if (!pi) {
-      dout(20) << __func__ << " pool " << pool << " dne" << dendl;
+      dout(20) << __FFL__ << " pool " << pool << " dne" << dendl;
       continue;
     }
     pg_t pgid(pi->raw_hash_to_pg(hash), pool);
     spg_t spgid(pgid, shard);
     pair<spg_t,snapid_t> p(spgid, snap);
     if (queued.count(p)) {
-      dout(20) << __func__ << " pg " << spgid << " snap " << snap
+      dout(20) << __FFL__ << " pg " << spgid << " snap " << snap
 	       << " already queued" << dendl;
       continue;
     }
     PGRef pg = lookup_lock_pg(spgid);
     if (!pg) {
-      dout(20) << __func__ << " pg " << spgid << " not found" << dendl;
+      dout(20) << __FFL__ << " pg " << spgid << " not found" << dendl;
       continue;
     }
     queued.insert(p);
-    dout(10) << __func__ << " requeue pg " << spgid << " " << pg << " snap "
+    dout(10) << __FFL__ << " requeue pg " << spgid << " " << pg << " snap "
 	     << snap << dendl;
     pg->queue_snap_retrim(snap);
     pg->unlock();
@@ -6831,7 +6831,7 @@ void OSD::scrub_purged_snaps()
   if (is_stopping()) {
     return;
   }
-  dout(10) << __func__ << " done queueing pgs, updating superblock" << dendl;
+  dout(10) << __FFL__ << " done queueing pgs, updating superblock" << dendl;
   ObjectStore::Transaction t;
   superblock.last_purged_snaps_scrub = ceph_clock_now();
   write_superblock(t);
@@ -6840,7 +6840,7 @@ void OSD::scrub_purged_snaps()
   if (is_active()) {
     send_beacon(ceph::coarse_mono_clock::now());
   }
-  dout(10) << __func__ << " done" << dendl;
+  dout(10) << __FFL__ << " done" << dendl;
 }
 
 void OSD::probe_smart(const string& only_devid, ostream& ss)
@@ -6862,7 +6862,7 @@ void OSD::probe_smart(const string& only_devid, ostream& ss)
     string err;
     string devid = get_device_id(dev, &err);
     if (devid.size() == 0) {
-      dout(10) << __func__ << " no unique id for dev " << dev << " ("
+      dout(10) << __FFL__ << " no unique id for dev " << dev << " ("
 	       << err << "), skipping" << dendl;
       continue;
     }
@@ -6945,7 +6945,7 @@ void OSDService::maybe_share_map(
   // we think we sent them.
   session->sent_epoch_lock.lock();
   if (peer_epoch_lb > session->last_sent_epoch) {
-    dout(10) << __func__ << " con " << con
+    dout(10) << __FFL__ << " con " << con
 	     << " " << con->get_peer_addr()
 	     << " map epoch " << session->last_sent_epoch
 	     << " -> " << peer_epoch_lb << " (as per caller)" << dendl;
@@ -6963,7 +6963,7 @@ void OSDService::maybe_share_map(
 
   session->sent_epoch_lock.lock();
   if (session->last_sent_epoch < last_sent_epoch) {
-    dout(10) << __func__ << " con " << con
+    dout(10) << __FFL__ << " con " << con
 	     << " " << con->get_peer_addr()
 	     << " map epoch " << session->last_sent_epoch
 	     << " -> " << last_sent_epoch << " (shared)" << dendl;
@@ -7112,11 +7112,11 @@ int OSD::ms_handle_authentication(Connection *con)
     s = ceph::make_ref<Session>(cct, con);
     con->set_priv(s);
     s->entity_name = con->get_peer_entity_name();
-    dout(10) << __func__ << " new session " << s << " con " << s->con
+    dout(10) << __FFL__ << " new session " << s << " con " << s->con
 	     << " entity " << s->entity_name
 	     << " addr " << con->get_peer_addrs() << dendl;
   } else {
-    dout(10) << __func__ << " existing session " << s << " con " << s->con
+    dout(10) << __FFL__ << " existing session " << s << " con " << s->con
 	     << " entity " << s->entity_name
 	     << " addr " << con->get_peer_addrs() << dendl;
   }
@@ -7131,19 +7131,19 @@ int OSD::ms_handle_authentication(Connection *con)
       decode(str, p);
     }
     catch (buffer::error& e) {
-      dout(10) << __func__ << " session " << s << " " << s->entity_name
+      dout(10) << __FFL__ << " session " << s << " " << s->entity_name
 	       << " failed to decode caps string" << dendl;
       ret = -EACCES;
     }
     if (!ret) {
       bool success = s->caps.parse(str);
       if (success) {
-	dout(10) << __func__ << " session " << s
+	dout(10) << __FFL__ << " session " << s
 		 << " " << s->entity_name
 		 << " has caps " << s->caps << " '" << str << "'" << dendl;
 	ret = 1;
       } else {
-	dout(10) << __func__ << " session " << s << " " << s->entity_name
+	dout(10) << __FFL__ << " session " << s << " " << s->entity_name
 		 << " failed to parse caps '" << str << "'" << dendl;
 	ret = -EACCES;
       }
@@ -7267,13 +7267,13 @@ void OSD::handle_scrub(MOSDScrub *m)
 
 void OSD::handle_fast_scrub(MOSDScrub2 *m)
 {
-  dout(10) << __func__ <<  " " << *m << dendl;
+  dout(10) << __FFL__ <<  " " << *m << dendl;
   if (!require_mon_or_mgr_peer(m)) {
     m->put();
     return;
   }
   if (m->fsid != monc->get_fsid()) {
-    dout(0) << __func__ << " fsid " << m->fsid << " != " << monc->get_fsid()
+    dout(0) << __FFL__ << " fsid " << m->fsid << " != " << monc->get_fsid()
 	    << dendl;
     m->put();
     return;
@@ -7370,7 +7370,7 @@ bool OSD::scrub_time_permit(utime_t now)
   }
 
   if (!day_permit) {
-    dout(20) << __func__ << " should run between week day " << cct->_conf->osd_scrub_begin_week_day
+    dout(20) << __FFL__ << " should run between week day " << cct->_conf->osd_scrub_begin_week_day
             << " - " << cct->_conf->osd_scrub_end_week_day
             << " now " << bdt.tm_wday << " = no" << dendl;
     return false;
@@ -7387,11 +7387,11 @@ bool OSD::scrub_time_permit(utime_t now)
     }
   }
   if (!time_permit) {
-    dout(20) << __func__ << " should run between " << cct->_conf->osd_scrub_begin_hour
+    dout(20) << __FFL__ << " should run between " << cct->_conf->osd_scrub_begin_hour
             << " - " << cct->_conf->osd_scrub_end_hour
             << " now " << bdt.tm_hour << " = no" << dendl;
   } else {
-    dout(20) << __func__ << " should run between " << cct->_conf->osd_scrub_begin_hour
+    dout(20) << __FFL__ << " should run between " << cct->_conf->osd_scrub_begin_hour
             << " - " << cct->_conf->osd_scrub_end_hour
             << " now " << bdt.tm_hour << " = yes" << dendl;
   }
@@ -7402,7 +7402,7 @@ bool OSD::scrub_load_below_threshold()
 {
   double loadavgs[3];
   if (getloadavg(loadavgs, 3) != 3) {
-    dout(10) << __func__ << " couldn't read loadavgs\n" << dendl;
+    dout(10) << __FFL__ << " couldn't read loadavgs\n" << dendl;
     return false;
   }
 
@@ -7410,7 +7410,7 @@ bool OSD::scrub_load_below_threshold()
   long cpus = sysconf(_SC_NPROCESSORS_ONLN);
   double loadavg_per_cpu = cpus > 0 ? loadavgs[0] / cpus : loadavgs[0];
   if (loadavg_per_cpu < cct->_conf->osd_scrub_load_threshold) {
-    dout(20) << __func__ << " loadavg per cpu " << loadavg_per_cpu
+    dout(20) << __FFL__ << " loadavg per cpu " << loadavg_per_cpu
 	     << " < max " << cct->_conf->osd_scrub_load_threshold
 	     << " = yes" << dendl;
     return true;
@@ -7418,14 +7418,14 @@ bool OSD::scrub_load_below_threshold()
 
   // allow scrub if below daily avg and currently decreasing
   if (loadavgs[0] < daily_loadavg && loadavgs[0] < loadavgs[2]) {
-    dout(20) << __func__ << " loadavg " << loadavgs[0]
+    dout(20) << __FFL__ << " loadavg " << loadavgs[0]
 	     << " < daily_loadavg " << daily_loadavg
 	     << " and < 15m avg " << loadavgs[2]
 	     << " = yes" << dendl;
     return true;
   }
 
-  dout(20) << __func__ << " loadavg " << loadavgs[0]
+  dout(20) << __FFL__ << " loadavg " << loadavgs[0]
 	   << " >= max " << cct->_conf->osd_scrub_load_threshold
 	   << " and ( >= daily_loadavg " << daily_loadavg
 	   << " or >= 15m avg " << loadavgs[2]
@@ -7442,7 +7442,7 @@ void OSD::sched_scrub()
   bool allow_requested_repair_only = false;
   if (service.is_recovery_active() && !cct->_conf->osd_scrub_during_recovery) {
     if (!cct->_conf->osd_repair_during_recovery) {
-      dout(20) << __func__ << " not scheduling scrubs due to active recovery" << dendl;
+      dout(20) << __FFL__ << " not scheduling scrubs due to active recovery" << dendl;
       return;
     }
     dout(10) << __func__
@@ -7469,7 +7469,7 @@ void OSD::sched_scrub()
       }
 
       if ((scrub.deadline.is_zero() || scrub.deadline >= now) && !(time_permit && load_is_low)) {
-        dout(10) << __func__ << " not scheduling scrub for " << scrub.pgid << " due to "
+        dout(10) << __FFL__ << " not scheduling scrub for " << scrub.pgid << " due to "
                  << (!time_permit ? "time not permit" : "high load") << dendl;
         continue;
       }
@@ -7480,13 +7480,13 @@ void OSD::sched_scrub()
       // This has already started, so go on to the next scrub job
       if (pg->scrubber.active) {
 	pg->unlock();
-	dout(30) << __func__ << ": already in progress pgid " << scrub.pgid << dendl;
+	dout(30) << __FFL__ << ": already in progress pgid " << scrub.pgid << dendl;
 	continue;
       }
       // Skip other kinds of scrubing if only explicitly requested repairing is allowed
       if (allow_requested_repair_only && !pg->scrubber.must_repair) {
         pg->unlock();
-        dout(10) << __func__ << " skip " << scrub.pgid
+        dout(10) << __FFL__ << " skip " << scrub.pgid
                  << " because repairing is not explicitly requested on it"
                  << dendl;
         continue;
@@ -7494,7 +7494,7 @@ void OSD::sched_scrub()
       // If it is reserving, let it resolve before going to the next scrub job
       if (pg->scrubber.local_reserved && !pg->scrubber.active) {
 	pg->unlock();
-	dout(30) << __func__ << ": reserve in progress pgid " << scrub.pgid << dendl;
+	dout(30) << __FFL__ << ": reserve in progress pgid " << scrub.pgid << dendl;
 	break;
       }
       dout(10) << "sched_scrub scrubbing " << scrub.pgid << " at " << scrub.sched_time
@@ -7513,7 +7513,7 @@ void OSD::sched_scrub()
 
 void OSD::resched_all_scrubs()
 {
-  dout(10) << __func__ << ": start" << dendl;
+  dout(10) << __FFL__ << ": start" << dendl;
   const vector<spg_t> pgs = [this] {
     vector<spg_t> pgs;
     OSDService::ScrubJob job;
@@ -7525,17 +7525,17 @@ void OSD::resched_all_scrubs()
     return pgs;
   }();
   for (auto& pgid : pgs) {
-      dout(20) << __func__ << ": examine " << pgid << dendl;
+      dout(20) << __FFL__ << ": examine " << pgid << dendl;
       PGRef pg = _lookup_lock_pg(pgid);
       if (!pg)
 	continue;
       if (!pg->scrubber.must_scrub && !pg->scrubber.need_auto) {
-        dout(15) << __func__ << ": reschedule " << pgid << dendl;
+        dout(15) << __FFL__ << ": reschedule " << pgid << dendl;
         pg->on_info_history_change();
       }
       pg->unlock();
   }
-  dout(10) << __func__ << ": done" << dendl;
+  dout(10) << __FFL__ << ": done" << dendl;
 }
 
 MPGStats* OSD::collect_pg_stats()
@@ -7645,7 +7645,7 @@ vector<DaemonHealthMetric> OSD::get_health_metrics()
     };
     if (op_tracker.visit_ops_in_flight(&oldest_secs, count_slow_ops)) {
       if (slow) {
-	derr << __func__ << " reporting " << slow << " slow ops, oldest is "
+	derr << __FFL__ << " reporting " << slow << " slow ops, oldest is "
 	     << oldest_op->get_desc() << dendl;
         if (log_aggregated_slow_op &&
              slow_op_types.size() > 0) {
@@ -7822,12 +7822,12 @@ void OSD::handle_osd_map(MOSDMap *m)
 	osdmap_epoch > max_lag &&
 	osdmap_epoch - max_lag > osd_min) {
       epoch_t need = osdmap_epoch - max_lag;
-      dout(10) << __func__ << " waiting for pgs to catch up (need " << need
+      dout(10) << __FFL__ << " waiting for pgs to catch up (need " << need
 	       << " max_lag " << max_lag << ")" << dendl;
       for (auto shard : shards) {
 	epoch_t min = shard->get_min_pg_epoch();
 	if (need > min) {
-	  dout(10) << __func__ << " waiting for pgs to consume " << need
+	  dout(10) << __FFL__ << " waiting for pgs to consume " << need
 		   << " (shard " << shard->shard_id << " min " << min
 		   << ", map cache is " << cct->_conf->osd_map_cache_size
 		   << ", max_lag_factor " << m_osd_pg_epoch_max_lag_factor
@@ -7923,7 +7923,7 @@ void OSD::handle_osd_map(MOSDMap *m)
   epoch_t start = std::max(superblock.newest_map + 1, first);
   for (epoch_t e = start; e <= last; e++) {
     if (txn_size >= t.get_num_bytes()) {
-      derr << __func__ << " transaction size overflowed" << dendl;
+      derr << __FFL__ << " transaction size overflowed" << dendl;
       ceph_assert(txn_size < t.get_num_bytes());
     }
     txn_size = t.get_num_bytes();
@@ -7980,7 +7980,7 @@ void OSD::handle_osd_map(MOSDMap *m)
       bool injected_failure = false;
       if (cct->_conf->osd_inject_bad_map_crc_probability > 0 &&
 	  (rand() % 10000) < cct->_conf->osd_inject_bad_map_crc_probability*10000.0) {
-	derr << __func__ << " injecting map crc failure" << dendl;
+	derr << __FFL__ << " injecting map crc failure" << dendl;
 	injected_failure = true;
       }
 
@@ -7998,7 +7998,7 @@ void OSD::handle_osd_map(MOSDMap *m)
 
 	// don't continue committing if we failed to enc the first inc map
 	if (last < start) {
-	  dout(10) << __func__ << " bailing because last < start (" << last << "<" << start << ")" << dendl;
+	  dout(10) << __FFL__ << " bailing because last < start (" << last << "<" << start << ")" << dendl;
 	  m->put();
 	  return;
 	}
@@ -8021,7 +8021,7 @@ void OSD::handle_osd_map(MOSDMap *m)
   monc->sub_got("osdmap", last);
 
   if (!m->maps.empty() && requested_full_first) {
-    dout(10) << __func__ << " still missing full maps " << requested_full_first
+    dout(10) << __FFL__ << " still missing full maps " << requested_full_first
 	     << ".." << requested_full_last << dendl;
     rerequest_full_maps();
   }
@@ -8049,7 +8049,7 @@ void OSD::handle_osd_map(MOSDMap *m)
   for (auto& i : added_maps) {
     if (!lastmap) {
       if (!(lastmap = service.try_get_map(i.first - 1))) {
-        dout(10) << __func__ << " can't get previous map " << i.first - 1
+        dout(10) << __FFL__ << " can't get previous map " << i.first - 1
                  << " probably first start of this osd" << dendl;
         continue;
       }
@@ -8058,7 +8058,7 @@ void OSD::handle_osd_map(MOSDMap *m)
     for (auto& j : lastmap->get_pools()) {
       if (!i.second->have_pg_pool(j.first)) {
 	pg_num_history.log_pool_delete(i.first, j.first);
-	dout(10) << __func__ << " recording final pg_pool_t for pool "
+	dout(10) << __FFL__ << " recording final pg_pool_t for pool "
 		 << j.first << dendl;
 	// this information is needed by _make_pg() if have to restart before
 	// the pool is deleted and need to instantiate a new (zombie) PG[Pool].
@@ -8076,14 +8076,14 @@ void OSD::handle_osd_map(MOSDMap *m)
 	t.write(coll_t::meta(), obj, 0, bl.length(), bl);
       } else if (unsigned new_pg_num = i.second->get_pg_num(j.first);
 		 new_pg_num != j.second.get_pg_num()) {
-	dout(10) << __func__ << " recording pool " << j.first << " pg_num "
+	dout(10) << __FFL__ << " recording pool " << j.first << " pg_num "
 		 << j.second.get_pg_num() << " -> " << new_pg_num << dendl;
 	pg_num_history.log_pg_num_change(i.first, j.first, new_pg_num);
       }
     }
     for (auto& j : i.second->get_pools()) {
       if (!lastmap->have_pg_pool(j.first)) {
-	dout(10) << __func__ << " recording new pool " << j.first << " pg_num "
+	dout(10) << __FFL__ << " recording new pool " << j.first << " pg_num "
 		 << j.second.get_pg_num() << dendl;
 	pg_num_history.log_pg_num_change(i.first, j.first,
 					 j.second.get_pg_num());
@@ -8096,7 +8096,7 @@ void OSD::handle_osd_map(MOSDMap *m)
     bufferlist bl;
     ::encode(pg_num_history, bl);
     t.write(coll_t::meta(), make_pg_num_history_oid(), 0, bl.length(), bl);
-    dout(20) << __func__ << " pg_num_history " << pg_num_history << dendl;
+    dout(20) << __FFL__ << " pg_num_history " << pg_num_history << dendl;
   }
 
   // record new purged_snaps
@@ -8106,7 +8106,7 @@ void OSD::handle_osd_map(MOSDMap *m)
 				    purged_snaps);
     superblock.purged_snaps_last = last;
   } else {
-    dout(10) << __func__ << " superblock purged_snaps_last is "
+    dout(10) << __FFL__ << " superblock purged_snaps_last is "
 	     << superblock.purged_snaps_last
 	     << ", not recording new purged_snaps" << dendl;
   }
@@ -8122,14 +8122,14 @@ void OSD::handle_osd_map(MOSDMap *m)
 
 void OSD::_committed_osd_maps(epoch_t first, epoch_t last, MOSDMap *m)
 {
-  dout(10) << __func__ << " " << first << ".." << last << dendl;
+  dout(10) << __FFL__ << " " << first << ".." << last << dendl;
   if (is_stopping()) {
-    dout(10) << __func__ << " bailing, we are shutting down" << dendl;
+    dout(10) << __FFL__ << " bailing, we are shutting down" << dendl;
     return;
   }
   std::lock_guard l(osd_lock);
   if (is_stopping()) {
-    dout(10) << __func__ << " bailing, we are shutting down" << dendl;
+    dout(10) << __FFL__ << " bailing, we are shutting down" << dendl;
     return;
   }
   map_lock.lock();
@@ -8176,7 +8176,7 @@ void OSD::_committed_osd_maps(epoch_t first, epoch_t last, MOSDMap *m)
     }
 
     if (osdmap->is_noup(whoami) != newmap->is_noup(whoami)) {
-      dout(10) << __func__ << " NOUP flag changed in " << newmap->get_epoch()
+      dout(10) << __FFL__ << " NOUP flag changed in " << newmap->get_epoch()
 	       << dendl;
       if (is_booting()) {
 	// this captures the case where we sent the boot message while
@@ -8299,7 +8299,7 @@ void OSD::_committed_osd_maps(epoch_t first, epoch_t last, MOSDMap *m)
 	utime_t grace = utime_t(cct->_conf->osd_max_markdown_period, 0);
 	osd_markdown_log.push_back(now);
 	if ((int)osd_markdown_log.size() > cct->_conf->osd_max_markdown_count) {
-	  derr << __func__ << " marked down "
+	  derr << __FFL__ << " marked down "
 	       << osd_markdown_log.size()
 	       << " > osd_max_markdown_count "
 	       << cct->_conf->osd_max_markdown_count
@@ -8324,7 +8324,7 @@ void OSD::_committed_osd_maps(epoch_t first, epoch_t last, MOSDMap *m)
 	if (r != 0) {
 	  do_shutdown = true;  // FIXME: do_restart?
           network_error = true;
-          derr << __func__ << " marked down:"
+          derr << __FFL__ << " marked down:"
 	       << " rebind cluster_messenger failed" << dendl;
         }
 
@@ -8360,7 +8360,7 @@ void OSD::_committed_osd_maps(epoch_t first, epoch_t last, MOSDMap *m)
       cancel_pending_failures();
     }
     // trigger shutdown in a different thread
-    dout(0) << __func__ << " shutdown OSD via async signal" << dendl;
+    dout(0) << __FFL__ << " shutdown OSD via async signal" << dendl;
     queue_async_signal(SIGINT);
   }
   else if (m->newest_map && m->newest_map > last) {
@@ -8427,7 +8427,7 @@ void OSD::check_osdmap_features()
     }
 
     if (!superblock.compat_features.incompat.contains(CEPH_OSD_FEATURE_INCOMPAT_SHARDS)) {
-      dout(0) << __func__ << " enabling on-disk ERASURE CODES compat feature" << dendl;
+      dout(0) << __FFL__ << " enabling on-disk ERASURE CODES compat feature" << dendl;
       superblock.compat_features.incompat.insert(CEPH_OSD_FEATURE_INCOMPAT_SHARDS);
       ObjectStore::Transaction t;
       write_superblock(t);
@@ -8445,7 +8445,7 @@ void OSD::check_osdmap_features()
   }
 
   if (osdmap->require_osd_release != last_require_osd_release) {
-    dout(1) << __func__ << " require_osd_release " << last_require_osd_release
+    dout(1) << __FFL__ << " require_osd_release " << last_require_osd_release
 	    << " -> " << to_string(osdmap->require_osd_release) << dendl;
     store->write_meta("require_osd_release",
 		      stringify((int)osdmap->require_osd_release));
@@ -8465,7 +8465,7 @@ struct C_FinishSplits : public Context {
 
 void OSD::_finish_splits(set<PGRef>& pgs)
 {
-  dout(10) << __func__ << " " << pgs << dendl;
+  dout(10) << __FFL__ << " " << pgs << dendl;
   if (is_stopping())
     return;
   for (set<PGRef>::iterator i = pgs.begin();
@@ -8475,7 +8475,7 @@ void OSD::_finish_splits(set<PGRef>& pgs)
 
     PeeringCtx rctx = create_context();
     pg->lock();
-    dout(10) << __func__ << " " << *pg << dendl;
+    dout(10) << __FFL__ << " " << *pg << dendl;
     epoch_t e = pg->get_osdmap_epoch();
     pg->handle_initialize(rctx);
     pg->queue_null(e, e);
@@ -8493,7 +8493,7 @@ bool OSD::add_merge_waiter(OSDMapRef nextmap, spg_t target, PGRef src,
   std::lock_guard l(merge_lock);
   auto& p = merge_waiters[nextmap->get_epoch()][target];
   p[src->pg_id] = src;
-  dout(10) << __func__ << " added merge_waiter " << src->pg_id
+  dout(10) << __FFL__ << " added merge_waiter " << src->pg_id
 	   << " for " << target  << ", have " << p.size() << "/" << need
 	   << dendl;
   return p.size() == need;
@@ -8521,7 +8521,7 @@ bool OSD::advance_pg(
        ++next_epoch) {
     OSDMapRef nextmap = service.try_get_map(next_epoch);
     if (!nextmap) {
-      dout(20) << __func__ << " missing map " << next_epoch << dendl;
+      dout(20) << __FFL__ << " missing map " << next_epoch << dendl;
       continue;
     }
 
@@ -8538,7 +8538,7 @@ bool OSD::advance_pg(
 	      &parent)) {
 	  // we are merge source
 	  PGRef spg = pg; // carry a ref
-	  dout(1) << __func__ << " " << pg->pg_id
+	  dout(1) << __FFL__ << " " << pg->pg_id
 		  << " is merge source, target is " << parent
 		   << dendl;
 	  pg->write_if_dirty(rctx);
@@ -8589,7 +8589,7 @@ bool OSD::advance_pg(
 	  // we are merge target
 	  set<spg_t> children;
 	  pg->pg_id.is_split(new_pg_num, old_pg_num, &children);
-	  dout(20) << __func__ << " " << pg->pg_id
+	  dout(20) << __FFL__ << " " << pg->pg_id
 		   << " is merge target, sources are " << children
 		   << dendl;
 	  map<spg_t,PGRef> sources;
@@ -8597,7 +8597,7 @@ bool OSD::advance_pg(
 	    std::lock_guard l(merge_lock);
 	    auto& s = merge_waiters[nextmap->get_epoch()][pg->pg_id];
 	    unsigned need = children.size();
-	    dout(20) << __func__ << " have " << s.size() << "/"
+	    dout(20) << __FFL__ << " have " << s.size() << "/"
 		     << need << dendl;
 	    if (s.size() == need) {
 	      sources.swap(s);
@@ -8610,14 +8610,14 @@ bool OSD::advance_pg(
 	  if (!sources.empty()) {
 	    unsigned new_pg_num = nextmap->get_pg_num(pg->pg_id.pool());
 	    unsigned split_bits = pg->pg_id.get_split_bits(new_pg_num);
-	    dout(1) << __func__ << " merging " << pg->pg_id << dendl;
+	    dout(1) << __FFL__ << " merging " << pg->pg_id << dendl;
 	    pg->merge_from(
 	      sources, rctx, split_bits,
 	      nextmap->get_pg_pool(
 		pg->pg_id.pool())->last_pg_merge_meta);
 	    pg->pg_slot->waiting_for_merge_epoch = 0;
 	  } else {
-	    dout(20) << __func__ << " not ready to merge yet" << dendl;
+	    dout(20) << __FFL__ << " not ready to merge yet" << dendl;
 	    pg->write_if_dirty(rctx);
 	    if (!new_pgs.empty()) {
 	      rctx.transaction.register_on_applied(new C_FinishSplits(this,
@@ -8628,7 +8628,7 @@ bool OSD::advance_pg(
 	    pg->unlock();
 	    // kick source(s) to get them ready
 	    for (auto& i : children) {
-	      dout(20) << __func__ << " kicking source " << i << dendl;
+	      dout(20) << __FFL__ << " kicking source " << i << dendl;
 	      enqueue_peering_evt(
 		i,
 		PGPeeringEventRef(
@@ -8717,7 +8717,7 @@ void OSD::consume_map()
    *  a shutdown if we are merely processing old maps, though.
    */
   if (!osdmap->test_flag(CEPH_OSDMAP_SORTBITWISE) && is_active()) {
-    derr << __func__ << " SORTBITWISE flag is not set" << dendl;
+    derr << __FFL__ << " SORTBITWISE flag is not set" << dendl;
     ceph_abort();
   }
 
@@ -8791,7 +8791,7 @@ void OSD::consume_map()
     for (auto pg = pending_creates_from_osd.begin();
 	 pg != pending_creates_from_osd.end();) {
       if (osdmap->get_pg_acting_role(pg->first, whoami) < 0) {
-	dout(10) << __func__ << " pg " << pg->first << " doesn't map here, "
+	dout(10) << __FFL__ << " pg " << pg->first << " doesn't map here, "
 		 << "discarding pending_create_from_osd" << dendl;
 	pg = pending_creates_from_osd.erase(pg);
       } else {
@@ -8990,7 +8990,7 @@ void OSD::split_pgs(
        i != childpgids.end();
        ++i, ++stat_iter) {
     ceph_assert(stat_iter != updated_stats.end());
-    dout(10) << __func__ << " splitting " << *parent << " into " << *i << dendl;
+    dout(10) << __FFL__ << " splitting " << *parent << " into " << *i << dendl;
     PG* child = _make_pg(nextmap, *i);
     child->lock(true);
     out_pgs->insert(child);
@@ -9092,7 +9092,7 @@ void OSD::handle_pg_create(OpRequestRef op)
     // same_interval_since.  We'll pass this history with the current
     // epoch as the event.
     if (history.same_primary_since > m->epoch) {
-      dout(10) << __func__ << ": got obsolete pg create on pgid "
+      dout(10) << __FFL__ << ": got obsolete pg create on pgid "
 	       << pgid << " from epoch " << m->epoch
 	       << ", primary changed in " << history.same_primary_since
 	       << dendl;
@@ -9138,19 +9138,19 @@ void OSD::dispatch_context(PeeringCtx &ctx, PG *pg, OSDMapRef curmap,
                            ThreadPool::TPHandle *handle)
 {
   if (!service.get_osdmap()->is_up(whoami)) {
-    dout(20) << __func__ << " not up in osdmap" << dendl;
+    dout(20) << __FFL__ << " not up in osdmap" << dendl;
   } else if (!is_active()) {
-    dout(20) << __func__ << " not active" << dendl;
+    dout(20) << __FFL__ << " not active" << dendl;
   } else {
     for (auto& [osd, ls] : ctx.message_map) {
       if (!curmap->is_up(osd)) {
-	dout(20) << __func__ << " skipping down osd." << osd << dendl;
+	dout(20) << __FFL__ << " skipping down osd." << osd << dendl;
 	continue;
       }
       ConnectionRef con = service.get_con_osd_cluster(
 	osd, curmap->get_epoch());
       if (!con) {
-	dout(20) << __func__ << " skipping osd." << osd << " (NULL con)"
+	dout(20) << __FFL__ << " skipping osd." << osd << " (NULL con)"
 		 << dendl;
 	continue;
       }
@@ -9172,7 +9172,7 @@ void OSD::dispatch_context(PeeringCtx &ctx, PG *pg, OSDMapRef curmap,
 
 void OSD::handle_fast_pg_create(MOSDPGCreate2 *m)
 {
-  dout(7) << __func__ << " " << *m << " from " << m->get_source() << dendl;
+  dout(7) << __FFL__ << " " << *m << " from " << m->get_source() << dendl;
   if (!require_mon_peer(m)) {
     m->put();
     return;
@@ -9183,7 +9183,7 @@ void OSD::handle_fast_pg_create(MOSDPGCreate2 *m)
     utime_t created_stamp = p.second.second;
     auto q = m->pg_extra.find(pgid);
     if (q == m->pg_extra.end()) {
-      dout(20) << __func__ << " " << pgid << " e" << created
+      dout(20) << __FFL__ << " " << pgid << " e" << created
 	       << "@" << created_stamp
 	       << " (no history or past_intervals)" << dendl;
       // pre-octopus ... no pg history.  this can be removed in Q release.
@@ -9203,7 +9203,7 @@ void OSD::handle_fast_pg_create(MOSDPGCreate2 *m)
 	      true)
 	    )));
     } else {
-      dout(20) << __func__ << " " << pgid << " e" << created
+      dout(20) << __FFL__ << " " << pgid << " e" << created
 	       << "@" << created_stamp
 	       << " history " << q->second.first
 	       << " pi " << q->second.second << dendl;
@@ -9244,7 +9244,7 @@ void OSD::handle_fast_pg_create(MOSDPGCreate2 *m)
 
 void OSD::handle_fast_pg_query(MOSDPGQuery *m)
 {
-  dout(7) << __func__ << " " << *m << " from " << m->get_source() << dendl;
+  dout(7) << __FFL__ << " " << *m << " from " << m->get_source() << dendl;
   if (!require_osd_peer(m)) {
     m->put();
     return;
@@ -9269,7 +9269,7 @@ void OSD::handle_fast_pg_query(MOSDPGQuery *m)
 
 void OSD::handle_fast_pg_notify(MOSDPGNotify* m)
 {
-  dout(7) << __func__ << " " << *m << " from " << m->get_source() << dendl;
+  dout(7) << __FFL__ << " " << *m << " from " << m->get_source() << dendl;
   if (!require_osd_peer(m)) {
     m->put();
     return;
@@ -9301,7 +9301,7 @@ void OSD::handle_fast_pg_notify(MOSDPGNotify* m)
 
 void OSD::handle_fast_pg_info(MOSDPGInfo* m)
 {
-  dout(7) << __func__ << " " << *m << " from " << m->get_source() << dendl;
+  dout(7) << __FFL__ << " " << *m << " from " << m->get_source() << dendl;
   if (!require_osd_peer(m)) {
     m->put();
     return;
@@ -9324,7 +9324,7 @@ void OSD::handle_fast_pg_info(MOSDPGInfo* m)
 
 void OSD::handle_fast_pg_remove(MOSDPGRemove *m)
 {
-  dout(7) << __func__ << " " << *m << " from " << m->get_source() << dendl;
+  dout(7) << __FFL__ << " " << *m << " from " << m->get_source() << dendl;
   if (!require_osd_peer(m)) {
     m->put();
     return;
@@ -9342,7 +9342,7 @@ void OSD::handle_fast_pg_remove(MOSDPGRemove *m)
 
 void OSD::handle_fast_force_recovery(MOSDForceRecovery *m)
 {
-  dout(10) << __func__ << " " << *m << dendl;
+  dout(10) << __FFL__ << " " << *m << dendl;
   if (!require_mon_or_mgr_peer(m)) {
     m->put();
     return;
@@ -9389,7 +9389,7 @@ void OSD::handle_fast_force_recovery(MOSDForceRecovery *m)
 void OSD::handle_pg_query_nopg(const MQuery& q)
 {
   spg_t pgid = q.pgid;
-  dout(10) << __func__ << " " << pgid << dendl;
+  dout(10) << __FFL__ << " " << pgid << dendl;
 
   OSDMapRef osdmap = get_osdmap();
   if (!osdmap->have_pg_pool(pgid.pool()))
@@ -9456,7 +9456,7 @@ void OSDService::_maybe_queue_recovery() {
       cct->_conf->osd_recovery_max_single_start);
     _queue_for_recovery(awaiting_throttle.front(), to_start);
     awaiting_throttle.pop_front();
-    dout(10) << __func__ << " starting " << to_start
+    dout(10) << __FFL__ << " starting " << to_start
 	     << ", recovery_ops_reserved " << recovery_ops_reserved
 	     << " -> " << (recovery_ops_reserved + to_start) << dendl;
     recovery_ops_reserved += to_start;
@@ -9469,18 +9469,18 @@ bool OSDService::_recover_now(uint64_t *available_pushes)
       *available_pushes = 0;
 
   if (ceph_clock_now() < defer_recovery_until) {
-    dout(15) << __func__ << " defer until " << defer_recovery_until << dendl;
+    dout(15) << __FFL__ << " defer until " << defer_recovery_until << dendl;
     return false;
   }
 
   if (recovery_paused) {
-    dout(15) << __func__ << " paused" << dendl;
+    dout(15) << __FFL__ << " paused" << dendl;
     return false;
   }
 
   uint64_t max = osd->get_recovery_max_active();
   if (max <= recovery_ops_active + recovery_ops_reserved) {
-    dout(15) << __func__ << " active " << recovery_ops_active
+    dout(15) << __FFL__ << " active " << recovery_ops_active
 	     << " + reserved " << recovery_ops_reserved
 	     << " >= max " << max << dendl;
     return false;
@@ -9637,7 +9637,7 @@ bool OSDService::is_recovery_active()
 void OSDService::release_reserved_pushes(uint64_t pushes)
 {
   std::lock_guard l(recovery_lock);
-  dout(10) << __func__ << "(" << pushes << "), recovery_ops_reserved "
+  dout(10) << __FFL__ << "(" << pushes << "), recovery_ops_reserved "
 	   << recovery_ops_reserved << " -> " << (recovery_ops_reserved-pushes)
 	   << dendl;
   ceph_assert(recovery_ops_reserved >= pushes);
@@ -9684,7 +9684,7 @@ void OSD::enqueue_op(spg_t pg, OpRequestRef&& op, epoch_t epoch)
 
 void OSD::enqueue_peering_evt(spg_t pgid, PGPeeringEventRef evt)
 {
-  dout(15) << __func__ << " " << pgid << " " << evt->get_desc() << dendl;
+  dout(15) << __FFL__ << " " << pgid << " " << evt->get_desc() << dendl;
   op_shardedwq.queue(
     OpSchedulerItem(
       unique_ptr<OpSchedulerItem::OpQueueable>(new PGPeeringItem(pgid, evt)),
@@ -9751,7 +9751,7 @@ void OSD::dequeue_peering_evt(
     if (const MQuery *q = dynamic_cast<const MQuery*>(evt->evt.get())) {
       handle_pg_query_nopg(*q);
     } else {
-      derr << __func__ << " unrecognized pg-less event " << evt->get_desc() << dendl;
+      derr << __FFL__ << " unrecognized pg-less event " << evt->get_desc() << dendl;
       ceph_abort();
     }
   } else if (advance_pg(curmap->get_epoch(), pg, handle, rctx)) {
@@ -9921,7 +9921,7 @@ void OSD::handle_conf_change(const ConfigProxy& conf,
   if (changed.count("osd_scrub_min_interval") ||
       changed.count("osd_scrub_max_interval")) {
     resched_all_scrubs();
-    dout(0) << __func__ << ": scrub interval change" << dendl;
+    dout(0) << __FFL__ << ": scrub interval change" << dendl;
   }
   check_config();
 }
@@ -9968,13 +9968,13 @@ void OSD::check_config()
 
 void OSD::get_latest_osdmap()
 {
-  dout(10) << __func__ << " -- start" << dendl;
+  dout(10) << __FFL__ << " -- start" << dendl;
 
   C_SaferCond cond;
   service.objecter->wait_for_latest_osdmap(&cond);
   cond.wait();
 
-  dout(10) << __func__ << " -- finish" << dendl;
+  dout(10) << __FFL__ << " -- finish" << dendl;
 }
 
 // --------------------------------
@@ -10037,7 +10037,7 @@ MetricPayload OSD::get_perf_reports() {
 #undef dout_context
 #define dout_context cct
 #undef dout_prefix
-#define dout_prefix *_dout << "osd." << osd->get_nodeid() << ":" << shard_id << "." << __func__ << " "
+#define dout_prefix *_dout << "osd." << osd->get_nodeid() << ":" << shard_id << "." << __FFL__ << " "
 
 void OSDShard::_attach_pg(OSDShardPGSlot *slot, PG *pg)
 {
@@ -10143,15 +10143,15 @@ void OSDShard::consume_map(
   while (p != pg_slots.end()) {
     OSDShardPGSlot *slot = p->second.get();
     const spg_t& pgid = p->first;
-    dout(20) << __func__ << " " << pgid << dendl;
+    dout(20) << __FFL__ << " " << pgid << dendl;
     if (!slot->waiting_for_split.empty()) {
-      dout(20) << __func__ << "  " << pgid
+      dout(20) << __FFL__ << "  " << pgid
 	       << " waiting for split " << slot->waiting_for_split << dendl;
       ++p;
       continue;
     }
     if (slot->waiting_for_merge_epoch > new_osdmap->get_epoch()) {
-      dout(20) << __func__ << "  " << pgid
+      dout(20) << __FFL__ << "  " << pgid
 	       << " waiting for merge by epoch " << slot->waiting_for_merge_epoch
 	       << dendl;
       ++p;
@@ -10160,7 +10160,7 @@ void OSDShard::consume_map(
     if (!slot->waiting_peering.empty()) {
       epoch_t first = slot->waiting_peering.begin()->first;
       if (first <= new_osdmap->get_epoch()) {
-	dout(20) << __func__ << "  " << pgid
+	dout(20) << __FFL__ << "  " << pgid
 		 << " pending_peering first epoch " << first
 		 << " <= " << new_osdmap->get_epoch() << ", requeueing" << dendl;
 	_wake_pg_slot(pgid, slot);
@@ -10171,7 +10171,7 @@ void OSDShard::consume_map(
     }
     if (!slot->waiting.empty()) {
       if (new_osdmap->is_up_acting_osd_shard(pgid, osd->get_nodeid())) {
-	dout(20) << __func__ << "  " << pgid << " maps to us, keeping"
+	dout(20) << __FFL__ << "  " << pgid << " maps to us, keeping"
 		 << dendl;
 	++p;
 	continue;
@@ -10179,7 +10179,7 @@ void OSDShard::consume_map(
       while (!slot->waiting.empty() &&
 	     slot->waiting.front().get_map_epoch() <= new_osdmap->get_epoch()) {
 	auto& qi = slot->waiting.front();
-	dout(20) << __func__ << "  " << pgid
+	dout(20) << __FFL__ << "  " << pgid
 		 << " waiting item " << qi
 		 << " epoch " << qi.get_map_epoch()
 		 << " <= " << new_osdmap->get_epoch()
@@ -10195,7 +10195,7 @@ void OSDShard::consume_map(
 	slot->num_running == 0 &&
 	slot->waiting_for_split.empty() &&
 	!slot->pg) {
-      dout(20) << __func__ << "  " << pgid << " empty, pruning" << dendl;
+      dout(20) << __FFL__ << "  " << pgid << " empty, pruning" << dendl;
       p = pg_slots.erase(p);
       continue;
     }
@@ -10212,7 +10212,7 @@ void OSDShard::_wake_pg_slot(
   spg_t pgid,
   OSDShardPGSlot *slot)
 {
-  dout(20) << __func__ << " " << pgid
+  dout(20) << __FFL__ << " " << pgid
 	   << " to_process " << slot->to_process
 	   << " waiting " << slot->waiting
 	   << " waiting_peering " << slot->waiting_peering << dendl;
@@ -10261,7 +10261,7 @@ void OSDShard::identify_splits_and_merges(
 	  shard_osdmap, as_of_osdmap, pgid,
 	  split_pgs, nullptr);
       } else {
-	dout(20) << __func__ << " slot " << pgid
+	dout(20) << __FFL__ << " slot " << pgid
 		 << " has no pg and waiting_for_split " << dendl;
       }
     }
@@ -10326,7 +10326,7 @@ void OSDShard::prime_merges(const OSDMapRef& as_of_osdmap,
 			    set<pair<spg_t,epoch_t>> *merge_pgs)
 {
   std::lock_guard l(shard_lock);
-  dout(20) << __func__ << " checking shard " << shard_id
+  dout(20) << __FFL__ << " checking shard " << shard_id
 	   << " for remaining merge pgs " << merge_pgs << dendl;
   auto p = merge_pgs->begin();
   while (p != merge_pgs->end()) {
@@ -10345,14 +10345,14 @@ void OSDShard::prime_merges(const OSDMapRef& as_of_osdmap,
     slot = r.first->second.get();
     if (slot->pg) {
       // already have pg
-      dout(20) << __func__ << "  have merge participant pg " << pgid
+      dout(20) << __FFL__ << "  have merge participant pg " << pgid
 	       << " " << slot->pg << dendl;
     } else if (!slot->waiting_for_split.empty() &&
 	       *slot->waiting_for_split.begin() < epoch) {
-      dout(20) << __func__ << "  pending split on merge participant pg " << pgid
+      dout(20) << __FFL__ << "  pending split on merge participant pg " << pgid
 	       << " " << slot->waiting_for_split << dendl;
     } else {
-      dout(20) << __func__ << "  creating empty merge participant " << pgid
+      dout(20) << __FFL__ << "  creating empty merge participant " << pgid
 	       << " for merge in " << epoch << dendl;
       // leave history zeroed; PG::merge_from() will fill it in.
       pg_history_t history;
@@ -10364,7 +10364,7 @@ void OSDShard::prime_merges(const OSDMapRef& as_of_osdmap,
       pg->unlock();
     }
     // mark slot for merge
-    dout(20) << __func__ << "  marking merge participant " << pgid << dendl;
+    dout(20) << __FFL__ << "  marking merge participant " << pgid << dendl;
     slot->waiting_for_merge_epoch = epoch;
     p = merge_pgs->erase(p);
   }
@@ -10391,7 +10391,7 @@ void OSDShard::register_and_wake_split_child(PG *pg)
     if (slot->waiting_for_split.empty()) {
       _wake_pg_slot(pg->pg_id, slot);
     } else {
-      dout(10) << __func__ << " still waiting for split on "
+      dout(10) << __FFL__ << " still waiting for split on "
 	       << slot->waiting_for_split << dendl;
     }
   }
@@ -10416,7 +10416,7 @@ void OSDShard::unprime_split_children(spg_t parent, unsigned old_pg_num)
   for (auto& i : pg_slots) {
     if (i.first != parent &&
 	i.first.get_ancestor(old_pg_num) == parent) {
-      dout(10) << __func__ << " parent " << parent << " clearing " << i.first
+      dout(10) << __FFL__ << " parent " << parent << " clearing " << i.first
 	       << dendl;
       _wake_pg_slot(i.first, i.second.get());
       to_delete.push_back(i.first);
@@ -10460,13 +10460,13 @@ void OSD::ShardedOpWQ::_add_slot_waiter(
   OpSchedulerItem&& qi)
 {
   if (qi.is_peering()) {
-    dout(20) << __func__ << " " << pgid
+    dout(20) << __FFL__ << " " << pgid
 	     << " peering, item epoch is "
 	     << qi.get_map_epoch()
 	     << ", will wait on " << qi << dendl;
     slot->waiting_peering[qi.get_map_epoch()].push_back(std::move(qi));
   } else {
-    dout(20) << __func__ << " " << pgid
+    dout(20) << __FFL__ << " " << pgid
 	     << " item epoch is "
 	     << qi.get_map_epoch()
 	     << ", will wait on " << qi << dendl;
@@ -10498,7 +10498,7 @@ void OSD::ShardedOpWQ::_process(uint32_t thread_index, heartbeat_handle_d *hb)
       // we raced with a context_queue addition, don't wait
       wait_lock.unlock();
     } else if (!sdata->stop_waiting) {
-      dout(20) << __func__ << " empty q, waiting" << dendl;
+      dout(20) << __FFL__ << " empty q, waiting" << dendl;
       osd->cct->get_heartbeat_map()->clear_timeout(hb);
       sdata->shard_lock.unlock();
       sdata->sdata_cond.wait(wait_lock);
@@ -10513,7 +10513,7 @@ void OSD::ShardedOpWQ::_process(uint32_t thread_index, heartbeat_handle_d *hb)
       osd->cct->get_heartbeat_map()->reset_timeout(hb,
         timeout_interval, suicide_interval);
     } else {
-      dout(20) << __func__ << " need return immediately" << dendl;
+      dout(20) << __FFL__ << " need return immediately" << dendl;
       wait_lock.unlock();
       sdata->shard_lock.unlock();
       return;
@@ -10529,7 +10529,7 @@ void OSD::ShardedOpWQ::_process(uint32_t thread_index, heartbeat_handle_d *hb)
     if (osd->is_stopping()) {
       sdata->shard_lock.unlock();
       for (auto c : oncommits) {
-	dout(10) << __func__ << " discarding in-flight oncommit " << c << dendl;
+	dout(10) << __FFL__ << " discarding in-flight oncommit " << c << dendl;
 	delete c;
       }
       return;    // OSD shutdown, discard.
@@ -10543,7 +10543,7 @@ void OSD::ShardedOpWQ::_process(uint32_t thread_index, heartbeat_handle_d *hb)
   if (osd->is_stopping()) {
     sdata->shard_lock.unlock();
     for (auto c : oncommits) {
-      dout(10) << __func__ << " discarding in-flight oncommit " << c << dendl;
+      dout(10) << __FFL__ << " discarding in-flight oncommit " << c << dendl;
       delete c;
     }
     return;    // OSD shutdown, discard.
@@ -10555,14 +10555,14 @@ void OSD::ShardedOpWQ::_process(uint32_t thread_index, heartbeat_handle_d *hb)
     r.first->second = make_unique<OSDShardPGSlot>();
   }
   OSDShardPGSlot *slot = r.first->second.get();
-  dout(20) << __func__ << " " << token
+  dout(20) << __FFL__ << " " << token
 	   << (r.second ? " (new)" : "")
 	   << " to_process " << slot->to_process
 	   << " waiting " << slot->waiting
 	   << " waiting_peering " << slot->waiting_peering
 	   << dendl;
   slot->to_process.push_back(std::move(item));
-  dout(20) << __func__ << " " << slot->to_process.back()
+  dout(20) << __FFL__ << " " << slot->to_process.back()
 	   << " queued" << dendl;
 
  retry_pg:
@@ -10583,7 +10583,7 @@ void OSD::ShardedOpWQ::_process(uint32_t thread_index, heartbeat_handle_d *hb)
     auto q = sdata->pg_slots.find(token);
     if (q == sdata->pg_slots.end()) {
       // this can happen if we race with pg removal.
-      dout(20) << __func__ << " slot " << token << " no longer there" << dendl;
+      dout(20) << __FFL__ << " slot " << token << " no longer there" << dendl;
       pg->unlock();
       sdata->shard_lock.unlock();
       handle_oncommits(oncommits);
@@ -10594,7 +10594,7 @@ void OSD::ShardedOpWQ::_process(uint32_t thread_index, heartbeat_handle_d *hb)
 
     if (slot->to_process.empty()) {
       // raced with _wake_pg_slot or consume_map
-      dout(20) << __func__ << " " << token
+      dout(20) << __FFL__ << " " << token
 	       << " nothing queued" << dendl;
       pg->unlock();
       sdata->shard_lock.unlock();
@@ -10602,7 +10602,7 @@ void OSD::ShardedOpWQ::_process(uint32_t thread_index, heartbeat_handle_d *hb)
       return;
     }
     if (requeue_seq != slot->requeue_seq) {
-      dout(20) << __func__ << " " << token
+      dout(20) << __FFL__ << " " << token
 	       << " requeue_seq " << slot->requeue_seq << " > our "
 	       << requeue_seq << ", we raced with _wake_pg_slot"
 	       << dendl;
@@ -10613,14 +10613,14 @@ void OSD::ShardedOpWQ::_process(uint32_t thread_index, heartbeat_handle_d *hb)
     }
     if (slot->pg != pg) {
       // this can happen if we race with pg removal.
-      dout(20) << __func__ << " slot " << token << " no longer attached to "
+      dout(20) << __FFL__ << " slot " << token << " no longer attached to "
 	       << pg << dendl;
       pg->unlock();
       goto retry_pg;
     }
   }
 
-  dout(20) << __func__ << " " << token
+  dout(20) << __FFL__ << " " << token
 	   << " to_process " << slot->to_process
 	   << " waiting " << slot->waiting
 	   << " waiting_peering " << slot->waiting_peering << dendl;
@@ -10631,7 +10631,7 @@ void OSD::ShardedOpWQ::_process(uint32_t thread_index, heartbeat_handle_d *hb)
   // take next item
   auto qi = std::move(slot->to_process.front());
   slot->to_process.pop_front();
-  dout(20) << __func__ << " " << qi << " pg " << pg << dendl;
+  dout(20) << __FFL__ << " " << qi << " pg " << pg << dendl;
   set<pair<spg_t,epoch_t>> new_children;
   OSDMapRef osdmap;
 
@@ -10640,11 +10640,11 @@ void OSD::ShardedOpWQ::_process(uint32_t thread_index, heartbeat_handle_d *hb)
     osdmap = sdata->shard_osdmap;
     const PGCreateInfo *create_info = qi.creates_pg();
     if (!slot->waiting_for_split.empty()) {
-      dout(20) << __func__ << " " << token
+      dout(20) << __FFL__ << " " << token
 	       << " splitting " << slot->waiting_for_split << dendl;
       _add_slot_waiter(token, slot, std::move(qi));
     } else if (qi.get_map_epoch() > osdmap->get_epoch()) {
-      dout(20) << __func__ << " " << token
+      dout(20) << __FFL__ << " " << token
 	       << " map " << qi.get_map_epoch() << " > "
 	       << osdmap->get_epoch() << dendl;
       _add_slot_waiter(token, slot, std::move(qi));
@@ -10657,11 +10657,11 @@ void OSD::ShardedOpWQ::_process(uint32_t thread_index, heartbeat_handle_d *hb)
 	if (create_info) {
 	  if (create_info->by_mon &&
 	      osdmap->get_pg_acting_primary(token.pgid) != osd->whoami) {
-	    dout(20) << __func__ << " " << token
+	    dout(20) << __FFL__ << " " << token
 		     << " no pg, no longer primary, ignoring mon create on "
 		     << qi << dendl;
 	  } else {
-	    dout(20) << __func__ << " " << token
+	    dout(20) << __FFL__ << " " << token
 		     << " no pg, should create on " << qi << dendl;
 	    pg = osd->handle_pg_create_info(osdmap, create_info);
 	    if (pg) {
@@ -10676,25 +10676,25 @@ void OSD::ShardedOpWQ::_process(uint32_t thread_index, heartbeat_handle_d *hb)
 	      // distribute remaining split children to other shards below!
 	      break;
 	    }
-	    dout(20) << __func__ << " ignored create on " << qi << dendl;
+	    dout(20) << __FFL__ << " ignored create on " << qi << dendl;
 	  }
 	} else {
-	  dout(20) << __func__ << " " << token
+	  dout(20) << __FFL__ << " " << token
 		   << " no pg, peering, !create, discarding " << qi << dendl;
 	}
       } else {
-	dout(20) << __func__ << " " << token
+	dout(20) << __FFL__ << " " << token
 		 << " no pg, peering, doesn't map here e" << osdmap->get_epoch()
 		 << ", discarding " << qi
 		 << dendl;
       }
     } else if (osdmap->is_up_acting_osd_shard(token, osd->whoami)) {
-      dout(20) << __func__ << " " << token
+      dout(20) << __FFL__ << " " << token
 	       << " no pg, should exist e" << osdmap->get_epoch()
 	       << ", will wait on " << qi << dendl;
       _add_slot_waiter(token, slot, std::move(qi));
     } else {
-      dout(20) << __func__ << " " << token
+      dout(20) << __FFL__ << " " << token
 	       << " no pg, shouldn't exist e" << osdmap->get_epoch()
 	       << ", dropping " << qi << dendl;
       // share map with client?
@@ -10776,7 +10776,7 @@ void OSD::ShardedOpWQ::_enqueue(OpSchedulerItem&& item) {
   uint32_t shard_index =
     item.get_ordering_token().hash_to_shard(osd->shards.size());
 
-  dout(20) << __func__ << " " << item << dendl;
+  dout(20) << __FFL__ << " " << item << dendl;
 
   OSDShard* sdata = osd->shards[shard_index];
   assert (NULL != sdata);
@@ -10814,7 +10814,7 @@ void OSD::ShardedOpWQ::_enqueue_front(OpSchedulerItem&& item)
 	     << " " << p->second->to_process.front()
 	     << " shuffled w/ " << item << dendl;
   } else {
-    dout(20) << __func__ << " " << item << dendl;
+    dout(20) << __FFL__ << " " << item << dendl;
   }
   sdata->scheduler->enqueue_front(std::move(item));
   sdata->shard_lock.unlock();

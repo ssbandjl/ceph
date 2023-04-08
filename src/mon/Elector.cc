@@ -220,7 +220,7 @@ void Elector::handle_propose(MonOpRequestRef op)
   uint64_t required_features = mon->get_required_features();
   mon_feature_t required_mon_features = mon->get_required_mon_features();
 
-  dout(10) << __func__ << " required features " << required_features
+  dout(10) << __FFL__ << " required features " << required_features
            << " " << required_mon_features
            << ", peer features " << m->get_connection()->get_features()
            << " " << m->mon_features

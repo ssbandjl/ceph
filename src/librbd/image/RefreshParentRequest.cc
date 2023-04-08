@@ -96,7 +96,7 @@ void RefreshParentRequest<I>::apply() {
 template <typename I>
 void RefreshParentRequest<I>::finalize(Context *on_finish) {
   CephContext *cct = m_child_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   m_on_finish = on_finish;
   if (m_parent_image_ctx != nullptr) {
@@ -111,7 +111,7 @@ void RefreshParentRequest<I>::send_open_parent() {
   ceph_assert(m_parent_md.spec.pool_id >= 0);
 
   CephContext *cct = m_child_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   librados::IoCtx parent_io_ctx;
   int r = util::create_ioctx(m_child_image_ctx.md_ctx, "parent image",
@@ -151,7 +151,7 @@ void RefreshParentRequest<I>::send_open_parent() {
 template <typename I>
 Context *RefreshParentRequest<I>::handle_open_parent(int *result) {
   CephContext *cct = m_child_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << " r=" << *result << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << " r=" << *result << dendl;
 
   save_result(result);
   if (*result < 0) {
@@ -171,7 +171,7 @@ void RefreshParentRequest<I>::send_close_parent() {
   ceph_assert(m_parent_image_ctx != nullptr);
 
   CephContext *cct = m_child_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   using klass = RefreshParentRequest<I>;
   Context *ctx = create_async_context_callback(
@@ -184,7 +184,7 @@ void RefreshParentRequest<I>::send_close_parent() {
 template <typename I>
 Context *RefreshParentRequest<I>::handle_close_parent(int *result) {
   CephContext *cct = m_child_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << " r=" << *result << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << " r=" << *result << dendl;
 
   delete m_parent_image_ctx;
   m_parent_image_ctx = nullptr;
@@ -201,7 +201,7 @@ Context *RefreshParentRequest<I>::handle_close_parent(int *result) {
 template <typename I>
 void RefreshParentRequest<I>::send_reset_existence_cache() {
   CephContext *cct = m_child_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   Context *ctx = create_async_context_callback(
     m_child_image_ctx, create_context_callback<
@@ -213,7 +213,7 @@ void RefreshParentRequest<I>::send_reset_existence_cache() {
 template <typename I>
 Context *RefreshParentRequest<I>::handle_reset_existence_cache(int *result) {
   CephContext *cct = m_child_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << " r=" << *result << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << " r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to reset object existence cache: "
@@ -232,7 +232,7 @@ Context *RefreshParentRequest<I>::handle_reset_existence_cache(int *result) {
 template <typename I>
 void RefreshParentRequest<I>::send_complete(int r) {
   CephContext *cct = m_child_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   m_on_finish->complete(r);
 }

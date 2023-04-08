@@ -333,7 +333,7 @@ int format_mirror_peers(librados::IoCtx& io_ctx,
 class ImageRequestBase {
 public:
   void send() {
-    dout(20) << this << " " << __func__ << ": image_name=" << m_image_name
+    dout(20) << this << " " << __FFL__ << ": image_name=" << m_image_name
              << dendl;
 
     auto ctx = new LambdaContext([this](int r) {
@@ -369,7 +369,7 @@ protected:
   virtual void execute_action(librbd::Image &image,
                               librbd::RBD::AioCompletion *aio_comp) = 0;
   virtual void handle_execute_action(int r) {
-    dout(20) << this << " " << __func__ << ": r=" << r << dendl;
+    dout(20) << this << " " << __FFL__ << ": r=" << r << dendl;
 
     if (r < 0 && r != -ENOENT) {
       std::cerr << "rbd: failed to " << get_action_type() << " image "
@@ -423,7 +423,7 @@ private:
   int m_ret_val = 0;
 
   void open_image() {
-    dout(20) << this << " " << __func__ << dendl;
+    dout(20) << this << " " << __FFL__ << dendl;
 
     librbd::RBD rbd;
     auto aio_completion = utils::create_aio_completion<
@@ -433,7 +433,7 @@ private:
   }
 
   void handle_open_image(int r) {
-    dout(20) << this << " " << __func__ << ": r=" << r << dendl;
+    dout(20) << this << " " << __FFL__ << ": r=" << r << dendl;
 
     if (r < 0) {
       std::cerr << "rbd: failed to open image "
@@ -450,7 +450,7 @@ private:
       execute_action();
       return;
     }
-    dout(20) << this << " " << __func__ << dendl;
+    dout(20) << this << " " << __FFL__ << dendl;
 
     auto aio_completion = utils::create_aio_completion<
       ImageRequestBase, &ImageRequestBase::handle_get_info>(this);
@@ -458,7 +458,7 @@ private:
   }
 
   void handle_get_info(int r) {
-    dout(20) << this << " " << __func__ << ": r=" << r << dendl;
+    dout(20) << this << " " << __FFL__ << ": r=" << r << dendl;
 
     if (r == -ENOENT) {
       close_image();
@@ -479,7 +479,7 @@ private:
       close_image();
       return;
     }
-    dout(20) << this << " " << __func__ << dendl;
+    dout(20) << this << " " << __FFL__ << dendl;
 
     auto aio_completion = utils::create_aio_completion<
       ImageRequestBase, &ImageRequestBase::handle_execute_action>(this);
@@ -487,7 +487,7 @@ private:
   }
 
   void close_image() {
-    dout(20) << this << " " << __func__ << dendl;
+    dout(20) << this << " " << __FFL__ << dendl;
 
     auto aio_completion = utils::create_aio_completion<
       ImageRequestBase, &ImageRequestBase::handle_close_image>(this);
@@ -495,7 +495,7 @@ private:
   }
 
   void handle_close_image(int r) {
-    dout(20) << this << " " << __func__ << ": r=" << r << dendl;
+    dout(20) << this << " " << __FFL__ << ": r=" << r << dendl;
 
     if (r < 0) {
       std::cerr << "rbd: failed to close image "
@@ -506,7 +506,7 @@ private:
   }
 
   void handle_finalize(int r) {
-    dout(20) << this << " " << __func__ << ": r=" << r << dendl;
+    dout(20) << this << " " << __FFL__ << ": r=" << r << dendl;
 
     if (r == 0 && m_ret_val < 0) {
       r = m_ret_val;

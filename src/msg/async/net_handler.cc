@@ -40,7 +40,7 @@ int NetHandler::create_socket(int domain, bool reuse_addr)
 
   if ((s = socket_cloexec(domain, SOCK_STREAM, 0)) == -1) {
     r = errno;
-    lderr(cct) << __func__ << " couldn't create socket " << cpp_strerror(r) << dendl;
+    lderr(cct) << __FFL__ << " couldn't create socket " << cpp_strerror(r) << dendl;
     return -r;
   }
 
@@ -51,7 +51,7 @@ int NetHandler::create_socket(int domain, bool reuse_addr)
     int on = 1;
     if (::setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) == -1) {
       r = errno;
-      lderr(cct) << __func__ << " setsockopt SO_REUSEADDR failed: "
+      lderr(cct) << __FFL__ << " setsockopt SO_REUSEADDR failed: "
                  << strerror(r) << dendl;
       close(s);
       return -r;
@@ -72,12 +72,12 @@ int NetHandler::set_nonblock(int sd)
    * interrupted by a signal. */
   if ((flags = fcntl(sd, F_GETFL)) < 0 ) {
     r = errno;
-    lderr(cct) << __func__ << " fcntl(F_GETFL) failed: " << cpp_strerror(r) << dendl;
+    lderr(cct) << __FFL__ << " fcntl(F_GETFL) failed: " << cpp_strerror(r) << dendl;
     return -r;
   }
   if (fcntl(sd, F_SETFL, flags | O_NONBLOCK) < 0) {
     r = errno;
-    lderr(cct) << __func__ << " fcntl(F_SETFL,O_NONBLOCK): " << cpp_strerror(r) << dendl;
+    lderr(cct) << __FFL__ << " fcntl(F_SETFL,O_NONBLOCK): " << cpp_strerror(r) << dendl;
     return -r;
   }
 
@@ -150,7 +150,7 @@ void NetHandler::set_priority(int sd, int prio, int domain)
   r = ::setsockopt(sd, SOL_SOCKET, SO_PRIORITY, &prio, sizeof(prio));
   if (r < 0) {
     r = errno;
-    ldout(cct, 0) << __func__ << " couldn't set SO_PRIORITY to " << prio
+    ldout(cct, 0) << __FFL__ << " couldn't set SO_PRIORITY to " << prio
 		  << ": " << cpp_strerror(r) << dendl;
   }
 #else
@@ -182,7 +182,7 @@ int NetHandler::generic_connect(const entity_addr_t& addr, const entity_addr_t &
       ret = ::bind(s, addr.get_sockaddr(), addr.get_sockaddr_len());
       if (ret < 0) {
         ret = errno;
-        ldout(cct, 2) << __func__ << " client bind error " << ", " << cpp_strerror(ret) << dendl;
+        ldout(cct, 2) << __FFL__ << " client bind error " << ", " << cpp_strerror(ret) << dendl;
         close(s);
         return -ret;
       }
@@ -195,7 +195,7 @@ int NetHandler::generic_connect(const entity_addr_t& addr, const entity_addr_t &
     if (errno == EINPROGRESS && nonblock)
       return s;
 
-    ldout(cct, 10) << __func__ << " connect: " << cpp_strerror(ret) << dendl;
+    ldout(cct, 10) << __FFL__ << " connect: " << cpp_strerror(ret) << dendl;
     close(s);
     return -ret;
   }
@@ -210,7 +210,7 @@ int NetHandler::reconnect(const entity_addr_t &addr, int sd)
 
   if (ret < 0 && errno != EISCONN) {
     r = errno;
-    ldout(cct, 10) << __func__ << " reconnect: " << strerror(r) << dendl;
+    ldout(cct, 10) << __FFL__ << " reconnect: " << strerror(r) << dendl;
     if (r == EINPROGRESS || r == EALREADY)
       return 1;
     return -r;

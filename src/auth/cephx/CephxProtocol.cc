@@ -156,7 +156,7 @@ bool CephXTicketHandler::verify_service_ticket_reply(
     CephXServiceTicket msg_a;
     std::string error;
     if (decode_decrypt(cct, msg_a, secret, indata, error)) {
-      ldout(cct, 0) << __func__ << " failed decode_decrypt, error is: " << error
+      ldout(cct, 0) << __FFL__ << " failed decode_decrypt, error is: " << error
 		    << dendl;
       return false;
     }
@@ -166,10 +166,10 @@ bool CephXTicketHandler::verify_service_ticket_reply(
 
     bufferlist service_ticket_bl;
     if (ticket_enc) {
-      ldout(cct, 10) << __func__ << " got encrypted ticket" << dendl;
+      ldout(cct, 10) << __FFL__ << " got encrypted ticket" << dendl;
       std::string error;
       if (decode_decrypt(cct, service_ticket_bl, session_key, indata, error)) {
-	ldout(cct, 10) << __func__ << " decode_decrypt failed "
+	ldout(cct, 10) << __FFL__ << " decode_decrypt failed "
 		       << "with " << error << dendl;
 	return false;
       }
@@ -178,10 +178,10 @@ bool CephXTicketHandler::verify_service_ticket_reply(
     }
     auto iter = service_ticket_bl.cbegin();
     decode(ticket, iter);
-    ldout(cct, 10) << __func__ << " ticket.secret_id=" <<  ticket.secret_id
+    ldout(cct, 10) << __FFL__ << " ticket.secret_id=" <<  ticket.secret_id
 		   << dendl;
 
-    ldout(cct, 10) << __func__ << " service "
+    ldout(cct, 10) << __FFL__ << " service "
 		   << ceph_entity_type_name(service_id)
 		   << " secret_id " << ticket.secret_id
 		   << " session_key " << msg_a.session_key
@@ -192,14 +192,14 @@ bool CephXTicketHandler::verify_service_ticket_reply(
       expires += msg_a.validity;
       renew_after = expires;
       renew_after -= ((double)msg_a.validity.sec() / 4);
-      ldout(cct, 10) << __func__ << " ticket expires=" << expires
+      ldout(cct, 10) << __FFL__ << " ticket expires=" << expires
 		     << " renew_after=" << renew_after << dendl;
     }
 
     have_key_flag = true;
     return true;
   } catch (buffer::error& e) {
-    ldout(cct, 1) << __func__ << " decode error: " << e.what() << dendl;
+    ldout(cct, 1) << __FFL__ << " decode error: " << e.what() << dendl;
     return false;
   }
 }
@@ -283,7 +283,7 @@ bool CephXTicketManager::verify_service_ticket_reply(CryptoKey& secret,
     decode(service_ticket_reply_v, indata);
     decode(num, indata);
   } catch (buffer::error& e) {
-    ldout(cct, 10) << __func__ << " failed to decode ticket v or count: "
+    ldout(cct, 10) << __FFL__ << " failed to decode ticket v or count: "
 		   << e.what() << dendl;
   }
   ldout(cct, 10) << "verify_service_ticket_reply got " << num << " keys" << dendl;
@@ -293,7 +293,7 @@ bool CephXTicketManager::verify_service_ticket_reply(CryptoKey& secret,
     try {
       decode(type, indata);
     } catch (buffer::error& e) {
-      ldout(cct, 10) << __func__ << " failed to decode ticket type: " << e.what()
+      ldout(cct, 10) << __FFL__ << " failed to decode ticket type: " << e.what()
 		     << dendl;
     }
     ldout(cct, 10) << "got key for service_id " << ceph_entity_type_name(type) << dendl;
@@ -489,7 +489,7 @@ bool cephx_verify_authorizer(CephContext *cct, const KeyStore& keys,
       c = new CephXAuthorizeChallenge;
       challenge->reset(c);
       cct->random()->get_bytes((char*)&c->server_challenge, sizeof(c->server_challenge));
-      ldout(cct,10) << __func__ << " adding server_challenge " << c->server_challenge
+      ldout(cct,10) << __FFL__ << " adding server_challenge " << c->server_challenge
 		    << dendl;
 
       encode_encrypt_enc_bl(cct, *c, ticket_info.session_key, *reply_bl, error);
@@ -499,7 +499,7 @@ bool cephx_verify_authorizer(CephContext *cct, const KeyStore& keys,
       }
       return false;
     }
-    ldout(cct, 10) << __func__ << " got server_challenge+1 "
+    ldout(cct, 10) << __FFL__ << " got server_challenge+1 "
 		   << auth_msg.server_challenge_plus_one
 		   << " expecting " << c->server_challenge + 1 << dendl;
     if (c->server_challenge + 1 != auth_msg.server_challenge_plus_one) {
@@ -584,7 +584,7 @@ bool CephXAuthorizer::add_challenge(CephContext *cct,
 
   std::string error;
   if (encode_encrypt(cct, msg, session_key, bl, error)) {
-    ldout(cct, 0) << __func__ << " failed to encrypt authorizer: " << error << dendl;
+    ldout(cct, 0) << __FFL__ << " failed to encrypt authorizer: " << error << dendl;
     return false;
   }
   return true;

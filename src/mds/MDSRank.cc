@@ -55,16 +55,16 @@ public:
   void send() {
     assert(ceph_mutex_is_locked(mds->mds_lock));
 
-    dout(20) << __func__ << dendl;
+    dout(20) << __FFL__ << dendl;
 
     if (mdcache->is_readonly()) {
-      dout(5) << __func__ << ": read-only FS" << dendl;
+      dout(5) << __FFL__ << ": read-only FS" << dendl;
       complete(-EROFS);
       return;
     }
 
     if (!mds->is_active()) {
-      dout(5) << __func__ << ": MDS not active, no-op" << dendl;
+      dout(5) << __FFL__ << ": MDS not active, no-op" << dendl;
       complete(0);
       return;
     }
@@ -75,7 +75,7 @@ public:
 private:
 
   void flush_mdlog() {
-    dout(20) << __func__ << dendl;
+    dout(20) << __FFL__ << dendl;
 
     // I need to seal off the current segment, and then mark all
     // previous segments for expiry
@@ -92,7 +92,7 @@ private:
   }
 
   void handle_flush_mdlog(int r) {
-    dout(20) << __func__ << ": r=" << r << dendl;
+    dout(20) << __FFL__ << ": r=" << r << dendl;
 
     if (r != 0) {
       *ss << "Error " << r << " (" << cpp_strerror(r) << ") while flushing journal";
@@ -104,7 +104,7 @@ private:
   }
 
   void clear_mdlog() {
-    dout(20) << __func__ << dendl;
+    dout(20) << __FFL__ << dendl;
 
     Context *ctx = new LambdaContext([this](int r) {
         handle_clear_mdlog(r);
@@ -119,7 +119,7 @@ private:
   }
 
   void handle_clear_mdlog(int r) {
-    dout(20) << __func__ << ": r=" << r << dendl;
+    dout(20) << __FFL__ << ": r=" << r << dendl;
 
     if (r != 0) {
       *ss << "Error " << r << " (" << cpp_strerror(r) << ") while flushing journal";
@@ -132,7 +132,7 @@ private:
 
   void trim_mdlog() {
     // Put all the old log segments into expiring or expired state
-    dout(5) << __func__ << ": beginning segment expiry" << dendl;
+    dout(5) << __FFL__ << ": beginning segment expiry" << dendl;
 
     int ret = mdlog->trim_all();
     if (ret != 0) {
@@ -145,7 +145,7 @@ private:
   }
 
   void expire_segments() {
-    dout(20) << __func__ << dendl;
+    dout(20) << __FFL__ << dendl;
 
     // Attach contexts to wait for all expiring segments to expire
     MDSGatherBuilder expiry_gather(g_ceph_context);
@@ -154,7 +154,7 @@ private:
     for (auto p : expiring_segments) {
       p->wait_for_expiry(expiry_gather.new_sub());
     }
-    dout(5) << __func__ << ": waiting for " << expiry_gather.num_subs_created()
+    dout(5) << __FFL__ << ": waiting for " << expiry_gather.num_subs_created()
             << " segments to expire" << dendl;
 
     if (!expiry_gather.has_subs()) {
@@ -170,7 +170,7 @@ private:
   }
 
   void handle_expire_segments(int r) {
-    dout(20) << __func__ << ": r=" << r << dendl;
+    dout(20) << __FFL__ << ": r=" << r << dendl;
 
     ceph_assert(r == 0); // MDLog is not allowed to raise errors via
                          // wait_for_expiry
@@ -178,7 +178,7 @@ private:
   }
 
   void trim_segments() {
-    dout(20) << __func__ << dendl;
+    dout(20) << __FFL__ << dendl;
 
     Context *ctx = new C_OnFinisher(new LambdaContext([this](int) {
           std::lock_guard locker(mds->mds_lock);
@@ -188,14 +188,14 @@ private:
   }
 
   void trim_expired_segments() {
-    dout(5) << __func__ << ": expiry complete, expire_pos/trim_pos is now "
+    dout(5) << __FFL__ << ": expiry complete, expire_pos/trim_pos is now "
             << std::hex << mdlog->get_journaler()->get_expire_pos() << "/"
             << mdlog->get_journaler()->get_trimmed_pos() << dendl;
 
     // Now everyone I'm interested in is expired
     mdlog->trim_expired_segments();
 
-    dout(5) << __func__ << ": trim complete, expire_pos/trim_pos is now "
+    dout(5) << __FFL__ << ": trim complete, expire_pos/trim_pos is now "
             << std::hex << mdlog->get_journaler()->get_expire_pos() << "/"
             << mdlog->get_journaler()->get_trimmed_pos() << dendl;
 
@@ -203,7 +203,7 @@ private:
   }
 
   void write_journal_head() {
-    dout(20) << __func__ << dendl;
+    dout(20) << __FFL__ << dendl;
 
     Context *ctx = new LambdaContext([this](int r) {
         std::lock_guard locker(mds->mds_lock);
@@ -218,14 +218,14 @@ private:
     if (r != 0) {
       *ss << "Error " << r << " (" << cpp_strerror(r) << ") while writing header";
     } else {
-      dout(5) << __func__ << ": write_head complete, all done!" << dendl;
+      dout(5) << __FFL__ << ": write_head complete, all done!" << dendl;
     }
 
     complete(r);
   }
 
   void finish(int r) override {
-    dout(20) << __func__ << ": r=" << r << dendl;
+    dout(20) << __FFL__ << ": r=" << r << dendl;
     on_finish->complete(r);
   }
 
@@ -256,7 +256,7 @@ public:
     // case we change the logic here.
     assert(ceph_mutex_is_locked(mds->mds_lock));
 
-    dout(20) << __func__ << dendl;
+    dout(20) << __FFL__ << dendl;
     f->open_object_section("result");
     recall_client_state();
   }
@@ -323,7 +323,7 @@ private:
   }
 
   void recall_client_state() {
-    dout(20) << __func__ << dendl;
+    dout(20) << __FFL__ << dendl;
     auto now = mono_clock::now();
     auto duration = std::chrono::duration<double>(now-recall_start).count();
 
@@ -367,7 +367,7 @@ private:
   }
 
   void handle_recall_client_state(int r) {
-    dout(20) << __func__ << ": r=" << r << dendl;
+    dout(20) << __FFL__ << ": r=" << r << dendl;
 
     // client recall section
     f->open_object_section("client_recall");
@@ -381,7 +381,7 @@ private:
   }
 
   void flush_journal() {
-    dout(20) << __func__ << dendl;
+    dout(20) << __FFL__ << dendl;
 
     Context *ctx = new LambdaContext([this](int r) {
         handle_flush_journal(r);
@@ -392,7 +392,7 @@ private:
   }
 
   void handle_flush_journal(int r) {
-    dout(20) << __func__ << ": r=" << r << dendl;
+    dout(20) << __FFL__ << ": r=" << r << dendl;
 
     if (r != 0) {
       cmd_err(f, ss.str());
@@ -410,7 +410,7 @@ private:
   }
 
   void trim_cache() {
-    dout(20) << __func__ << dendl;
+    dout(20) << __FFL__ << dendl;
 
     auto [throttled, count] = do_trim();
     if (throttled && count > 0) {
@@ -424,7 +424,7 @@ private:
   }
 
   void cache_status() {
-    dout(20) << __func__ << dendl;
+    dout(20) << __FFL__ << dendl;
 
     f->open_object_section("trim_cache");
     f->dump_int("trimmed", dentries_trimmed);
@@ -437,7 +437,7 @@ private:
   }
 
   void finish(int r) override {
-    dout(20) << __func__ << ": r=" << r << dendl;
+    dout(20) << __FFL__ << ": r=" << r << dendl;
 
     auto d = std::chrono::duration<double>(mono_clock::now()-recall_start);
     f->dump_float("duration", d.count());
@@ -667,10 +667,10 @@ public:
 void MDSRank::_mon_command_finish(int r, std::string_view cmd, std::string_view outs)
 {
   if (r < 0) {
-    dout(0) << __func__ << ": mon command " << cmd << " failed with errno " << r
+    dout(0) << __FFL__ << ": mon command " << cmd << " failed with errno " << r
 	    << " (" << outs << ")" << dendl;
   } else {
-    dout(1) << __func__ << ": mon command " << cmd << " succeed" << dendl;
+    dout(1) << __FFL__ << ": mon command " << cmd << " succeed" << dendl;
   }
 }
 
@@ -686,7 +686,7 @@ void MDSRank::set_mdsmap_multimds_snaps_allowed()
   ss << "\"confirm\":\"--yes-i-am-really-a-mds\"}";
   std::vector<std::string> cmd = {ss.str()};
 
-  dout(0) << __func__ << ": sending mon command: " << cmd[0] << dendl;
+  dout(0) << __FFL__ << ": sending mon command: " << cmd[0] << dendl;
 
   C_MDS_MonCommand *fin = new C_MDS_MonCommand(this, cmd[0]);
   monc->start_mon_command(cmd, {}, nullptr, &fin->outs, new C_IO_Wrapper(this, fin));
@@ -801,7 +801,7 @@ void MDSRankDispatcher::shutdown()
   ceph_assert(stopping == false);
   stopping = true;
 
-  dout(1) << __func__ << ": shutting down rank " << whoami << dendl;
+  dout(1) << __FFL__ << ": shutting down rank " << whoami << dendl;
 
   g_conf().remove_observer(this);
 
@@ -1351,7 +1351,7 @@ Session *MDSRank::get_session(const cref_t<Message> &m)
     if (session->is_closed()) {
       Session *imported_session = sessionmap.get_session(session->info.inst.name);
       if (imported_session && imported_session != session) {
-        dout(10) << __func__ << " replacing connection bootstrap session "
+        dout(10) << __FFL__ << " replacing connection bootstrap session "
 		 << session << " with imported session " << imported_session
 		 << dendl;
         imported_session->info.auth_name = session->info.auth_name;
@@ -1473,7 +1473,7 @@ void MDSRank::send_message_client(const ref_t<Message>& m, Session* session)
  */
 void MDSRank::set_osd_epoch_barrier(epoch_t e)
 {
-  dout(4) << __func__ << ": epoch=" << e << dendl;
+  dout(4) << __FFL__ << ": epoch=" << e << dendl;
   osd_epoch_barrier = e;
 }
 
@@ -1872,7 +1872,7 @@ void MDSRank::resolve_done()
 
 void MDSRank::apply_blacklist(const std::set<entity_addr_t> &addrs, epoch_t epoch) {
   auto victims = server->apply_blacklist(addrs);
-  dout(4) << __func__ << ": killed " << victims << " blacklisted sessions ("
+  dout(4) << __FFL__ << ": killed " << victims << " blacklisted sessions ("
           << addrs.size() << " blacklist entries, "
           << sessionmap.get_sessions().size() << ")" << dendl;
   if (victims) {
@@ -2119,7 +2119,7 @@ void MDSRank::stopping_start()
       victims.push_back(s);
     }
 
-    dout(20) << __func__ << " matched " << victims.size() << " sessions" << dendl;
+    dout(20) << __FFL__ << " matched " << victims.size() << " sessions" << dendl;
     ceph_assert(!victims.empty());
 
     C_GatherBuilder gather(g_ceph_context, new C_MDSInternalNoop);
@@ -2504,7 +2504,7 @@ void MDSRankDispatcher::handle_asok_command(
     C_SaferCond cond;
     bool already_got = objecter->wait_for_map(target_epoch, &cond);
     if (!already_got) {
-      dout(4) << __func__ << ": waiting for OSD epoch " << target_epoch << dendl;
+      dout(4) << __FFL__ << ": waiting for OSD epoch " << target_epoch << dendl;
       cond.wait();
     }
   } else if (command == "session ls" ||
@@ -2759,7 +2759,7 @@ void MDSRankDispatcher::evict_clients(
     }
   }
 
-  dout(20) << __func__ << " matched " << victims.size() << " sessions" << dendl;
+  dout(20) << __FFL__ << " matched " << victims.size() << " sessions" << dendl;
 
   if (victims.empty()) {
     on_finish(0, {}, outbl);
@@ -3187,7 +3187,7 @@ void MDSRankDispatcher::update_log_config()
 			log_channel, log_prio, log_to_graylog,
 			log_to_graylog_host, log_to_graylog_port,
 			fsid, host);
-  dout(10) << __func__ << " log_to_monitors " << log_to_monitors << dendl;
+  dout(10) << __FFL__ << " log_to_monitors " << log_to_monitors << dendl;
 }
 
 void MDSRank::create_logger()
@@ -3527,7 +3527,7 @@ MDSRankDispatcher::MDSRankDispatcher(
 }
 
 void MDSRank::command_cache_drop(uint64_t timeout, Formatter *f, Context *on_finish) {
-  dout(20) << __func__ << dendl;
+  dout(20) << __FFL__ << dendl;
 
   std::lock_guard locker(mds_lock);
   C_Drop_Cache *request = new C_Drop_Cache(server, mdcache, mdlog, this,
@@ -3633,7 +3633,7 @@ void MDSRankDispatcher::handle_conf_change(const ConfigProxy& conf, const std::s
 }
 
 void MDSRank::get_task_status(std::map<std::string, std::string> *status) {
-  dout(20) << __func__ << dendl;
+  dout(20) << __FFL__ << dendl;
 
   // scrub summary for now..
   std::string_view scrub_summary = scrubstack->scrub_summary();
@@ -3644,7 +3644,7 @@ void MDSRank::get_task_status(std::map<std::string, std::string> *status) {
 }
 
 void MDSRank::schedule_update_timer_task() {
-  dout(20) << __func__ << dendl;
+  dout(20) << __FFL__ << dendl;
 
   timer.add_event_after(g_conf().get_val<double>("mds_task_status_update_interval"),
                         new LambdaContext([this](int) {
@@ -3661,7 +3661,7 @@ void MDSRank::send_task_status() {
       send_status = false;
     }
 
-    dout(20) << __func__ << ": updating " << status.size() << " status keys" << dendl;
+    dout(20) << __FFL__ << ": updating " << status.size() << " status keys" << dendl;
     int r = mgrc->service_daemon_update_task_status(std::move(status));
     if (r < 0) {
       derr << ": failed to update service daemon status: " << cpp_strerror(r) << dendl;

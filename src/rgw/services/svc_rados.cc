@@ -395,18 +395,18 @@ bool RGWSI_RADOS::check_secure_mon_conn() const
   std::vector<uint32_t> modes;
 
   reg.get_supported_methods(CEPH_ENTITY_TYPE_MON, &methods, &modes);
-  ldout(cct, 20) << __func__ << "(): auth registy supported: methods=" << methods << " modes=" << modes << dendl;
+  ldout(cct, 20) << __FFL__ << "(): auth registy supported: methods=" << methods << " modes=" << modes << dendl;
 
   for (auto method : methods) {
     if (!reg.is_secure_method(method)) {
-      ldout(cct, 20) << __func__ << "(): method " << method << " is insecure" << dendl;
+      ldout(cct, 20) << __FFL__ << "(): method " << method << " is insecure" << dendl;
       return false;
     }
   }
 
   for (auto mode : modes) {
     if (!reg.is_secure_mode(mode)) {
-      ldout(cct, 20) << __func__ << "(): mode " << mode << " is insecure" << dendl;
+      ldout(cct, 20) << __FFL__ << "(): mode " << mode << " is insecure" << dendl;
       return false;
     }
   }

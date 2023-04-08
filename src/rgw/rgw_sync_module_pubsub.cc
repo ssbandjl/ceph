@@ -515,7 +515,7 @@ class RGWSingletonCR : public RGWCoroutine {
   int operate_wrapper() override {
     reenter(&wrapper_state) {
       while (!is_done()) {
-        ldout(cct, 20) << __func__ << "(): operate_wrapper() -> operate()" << dendl;
+        ldout(cct, 20) << __FFL__ << "(): operate_wrapper() -> operate()" << dendl;
         operate_ret = operate();
         if (operate_ret < 0) {
           ldout(cct, 20) << *this << ": operate() returned r=" << operate_ret << dendl;
@@ -525,12 +525,12 @@ class RGWSingletonCR : public RGWCoroutine {
         }
       }
 
-      ldout(cct, 20) << __func__ << "(): RGWSingletonCR: operate_wrapper() done, need to wake up " << waiters.size() << " waiters" << dendl;
+      ldout(cct, 20) << __FFL__ << "(): RGWSingletonCR: operate_wrapper() done, need to wake up " << waiters.size() << " waiters" << dendl;
       /* we're done, can't yield anymore */
 
       WaiterInfoRef waiter;
       while (get_next_waiter(&waiter)) {
-        ldout(cct, 20) << __func__ << "(): RGWSingletonCR: waking up waiter" << dendl;
+        ldout(cct, 20) << __FFL__ << "(): RGWSingletonCR: waking up waiter" << dendl;
         waiter->cr->set_retcode(retcode);
         waiter->cr->set_sleeping(false);
         return_result(waiter->result);
@@ -550,19 +550,19 @@ public:
 
   int execute(RGWCoroutine *caller, T *result = nullptr) {
     if (!started) {
-      ldout(cct, 20) << __func__ << "(): singleton not started, starting" << dendl;
+      ldout(cct, 20) << __FFL__ << "(): singleton not started, starting" << dendl;
       started = true;
       caller->call(this);
       return 0;
     } else if (!is_done()) {
-      ldout(cct, 20) << __func__ << "(): singleton not done yet, registering as waiter" << dendl;
+      ldout(cct, 20) << __FFL__ << "(): singleton not done yet, registering as waiter" << dendl;
       get();
       add_waiter(caller, result);
       caller->set_sleeping(true);
       return 0;
     }
 
-    ldout(cct, 20) << __func__ << "(): singleton done, returning retcode=" << retcode << dendl;
+    ldout(cct, 20) << __FFL__ << "(): singleton done, returning retcode=" << retcode << dendl;
     caller->set_retcode(retcode);
     return_result(result);
     return retcode;
@@ -625,7 +625,7 @@ class PSSubscription {
             try {
               old_config.decode(iter);
             } catch (const buffer::error& e) {
-              ldpp_dout(sync_env->dpp, 0) << __func__ <<  "(): decode life cycle config failed" << dendl;
+              ldpp_dout(sync_env->dpp, 0) << __FFL__ <<  "(): decode life cycle config failed" << dendl;
             }
           }
 
@@ -958,7 +958,7 @@ class PSManager
     }
 
     void return_result(PSSubscriptionRef *result) override {
-      ldout(cct, 20) << __func__ << "(): returning result: retcode=" << retcode << " resultp=" << (void *)result << dendl;
+      ldout(cct, 20) << __FFL__ << "(): returning result: retcode=" << retcode << " resultp=" << (void *)result << dendl;
       if (retcode >= 0) {
         *result = *ref;
       }
@@ -1007,14 +1007,14 @@ public:
       RGWCoroutine *caller, const rgw_user& owner, const string& sub_name, PSSubscriptionRef *ref) {
     if (mgr->find_sub_instance(owner, sub_name, ref)) {
       /* found it! nothing to execute */
-      ldout(sc->cct, 20) << __func__ << "(): found sub instance" << dendl;
+      ldout(sc->cct, 20) << __FFL__ << "(): found sub instance" << dendl;
     }
     auto& gs = mgr->get_get_subs(owner, sub_name);
     if (!gs) {
-      ldout(sc->cct, 20) << __func__ << "(): first get subs" << dendl;
+      ldout(sc->cct, 20) << __FFL__ << "(): first get subs" << dendl;
       gs = new GetSubCR(sc, mgr, owner, sub_name, ref);
     }
-    ldout(sc->cct, 20) << __func__ << "(): executing get subs" << dendl;
+    ldout(sc->cct, 20) << __FFL__ << "(): executing get subs" << dendl;
     return gs->execute(caller, ref);
   }
 

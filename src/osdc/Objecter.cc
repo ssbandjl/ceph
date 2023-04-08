@@ -481,7 +481,7 @@ void Objecter::shutdown()
     pool_ops.erase(i->first);
   }
 
-  ldout(cct, 20) << __func__ << " clearing up homeless session..." << dendl;
+  ldout(cct, 20) << __FFL__ << " clearing up homeless session..." << dendl;
   while(!homeless_session->linger_ops.empty()) {
     std::map<uint64_t, LingerOp*>::iterator i
       = homeless_session->linger_ops.begin();
@@ -672,7 +672,7 @@ int Objecter::_normalize_watch_error(int r)
 
 void Objecter::_linger_reconnect(LingerOp *info, int r)
 {
-  ldout(cct, 10) << __func__ << " " << info->linger_id << " = " << r
+  ldout(cct, 10) << __FFL__ << " " << info->linger_id << " = " << r
 		 << " (last_error " << info->last_error << ")" << dendl;
   if (r < 0) {
     LingerOp::unique_lock wl(info->watch_lock);
@@ -693,17 +693,17 @@ void Objecter::_send_linger_ping(LingerOp *info)
   // info->session->lock is locked
 
   if (cct->_conf->objecter_inject_no_watch_ping) {
-    ldout(cct, 10) << __func__ << " " << info->linger_id << " SKIPPING"
+    ldout(cct, 10) << __FFL__ << " " << info->linger_id << " SKIPPING"
 		   << dendl;
     return;
   }
   if (osdmap->test_flag(CEPH_OSDMAP_PAUSERD)) {
-    ldout(cct, 10) << __func__ << " PAUSERD" << dendl;
+    ldout(cct, 10) << __FFL__ << " PAUSERD" << dendl;
     return;
   }
 
   ceph::coarse_mono_time now = ceph::coarse_mono_clock::now();
-  ldout(cct, 10) << __func__ << " " << info->linger_id << " now " << now
+  ldout(cct, 10) << __FFL__ << " " << info->linger_id << " now " << now
 		 << dendl;
 
   vector<OSDOp> opv(1);
@@ -731,7 +731,7 @@ void Objecter::_linger_ping(LingerOp *info, int r, ceph::coarse_mono_time sent,
 			    uint32_t register_gen)
 {
   LingerOp::unique_lock l(info->watch_lock);
-  ldout(cct, 10) << __func__ << " " << info->linger_id
+  ldout(cct, 10) << __FFL__ << " " << info->linger_id
 		 << " sent " << sent << " gen " << register_gen << " = " << r
 		 << " (last_error " << info->last_error
 		 << " register_gen " << info->register_gen << ")" << dendl;
@@ -759,7 +759,7 @@ int Objecter::linger_check(LingerOp *info)
     stamp = std::min(info->watch_valid_thru, info->watch_pending_async.front());
   auto age = ceph::coarse_mono_clock::now() - stamp;
 
-  ldout(cct, 10) << __func__ << " " << info->linger_id
+  ldout(cct, 10) << __FFL__ << " " << info->linger_id
 		 << " err " << info->last_error
 		 << " age " << age << dendl;
   if (info->last_error)
@@ -779,7 +779,7 @@ void Objecter::linger_cancel(LingerOp *info)
 void Objecter::_linger_cancel(LingerOp *info)
 {
   // rwlock is locked unique
-  ldout(cct, 20) << __func__ << " linger_id=" << info->linger_id << dendl;
+  ldout(cct, 20) << __FFL__ << " linger_id=" << info->linger_id << dendl;
   if (!info->canceled) {
     OSDSession *s = info->session;
     OSDSession::unique_lock sl(s->lock);
@@ -815,7 +815,7 @@ Objecter::LingerOp *Objecter::linger_register(const object_t& oid,
 
   // Acquire linger ID
   info->linger_id = ++max_linger_id;
-  ldout(cct, 10) << __func__ << " info " << info
+  ldout(cct, 10) << __FFL__ << " info " << info
 		 << " linger_id " << info->linger_id
 		 << " cookie " << info->get_cookie()
 		 << dendl;
@@ -923,7 +923,7 @@ void Objecter::handle_watch_notify(MWatchNotify *m)
 
   LingerOp *info = reinterpret_cast<LingerOp*>(m->cookie);
   if (linger_ops_set.count(info) == 0) {
-    ldout(cct, 7) << __func__ << " cookie " << m->cookie << " dne" << dendl;
+    ldout(cct, 7) << __FFL__ << " cookie " << m->cookie << " dne" << dendl;
     return;
   }
   LingerOp::unique_lock wl(info->watch_lock);
@@ -940,7 +940,7 @@ void Objecter::handle_watch_notify(MWatchNotify *m)
     // fast-dispatch context
     if (info->notify_id &&
 	info->notify_id != m->notify_id) {
-      ldout(cct, 10) << __func__ << " reply notify " << m->notify_id
+      ldout(cct, 10) << __FFL__ << " reply notify " << m->notify_id
 		     << " != " << info->notify_id << ", ignoring" << dendl;
     } else if (info->on_notify_finish) {
       info->notify_result_bl->claim(m->get_data());
@@ -957,7 +957,7 @@ void Objecter::handle_watch_notify(MWatchNotify *m)
 
 void Objecter::_do_watch_notify(LingerOp *info, MWatchNotify *m)
 {
-  ldout(cct, 10) << __func__ << " " << *m << dendl;
+  ldout(cct, 10) << __FFL__ << " " << *m << dendl;
 
   shared_lock l(rwlock);
   ceph_assert(initialized);
@@ -989,7 +989,7 @@ void Objecter::_do_watch_notify(LingerOp *info, MWatchNotify *m)
 
 bool Objecter::ms_dispatch(Message *m)
 {
-  ldout(cct, 10) << __func__ << " " << cct << " " << *m << dendl;
+  ldout(cct, 10) << __FFL__ << " " << cct << " " << *m << dendl;
   switch (m->get_type()) {
     // these we exlusively handle
   case CEPH_MSG_OSD_OPREPLY:
@@ -1296,7 +1296,7 @@ void Objecter::handle_osd_map(MOSDMap *m)
   for (auto p = need_resend.begin(); p != need_resend.end(); ) {
     Op *op = p->second;
     if (op->target.epoch < osdmap->get_epoch()) {
-      ldout(cct, 10) << __func__ << "  checking op " << p->first << dendl;
+      ldout(cct, 10) << __FFL__ << "  checking op " << p->first << dendl;
       int r = _calc_target(&op->target, nullptr);
       if (r == RECALC_OP_TARGET_POOL_DNE) {
 	p = need_resend.erase(p);
@@ -1788,7 +1788,7 @@ int Objecter::_get_session(int osd, OSDSession **session, shunique_lock& sul)
 
   if (osd < 0) {
     *session = homeless_session;
-    ldout(cct, 20) << __func__ << " osd=" << osd << " returning homeless"
+    ldout(cct, 20) << __FFL__ << " osd=" << osd << " returning homeless"
 		   << dendl;
     return 0;
   }
@@ -1798,7 +1798,7 @@ int Objecter::_get_session(int osd, OSDSession **session, shunique_lock& sul)
     OSDSession *s = p->second;
     s->get();
     *session = s;
-    ldout(cct, 20) << __func__ << " s=" << s << " osd=" << osd << " "
+    ldout(cct, 20) << __FFL__ << " s=" << s << " osd=" << osd << " "
 		   << s->get_nref() << dendl;
     return 0;
   }
@@ -1813,7 +1813,7 @@ int Objecter::_get_session(int osd, OSDSession **session, shunique_lock& sul)
   logger->set(l_osdc_osd_sessions, osd_sessions.size());
   s->get();
   *session = s;
-  ldout(cct, 20) << __func__ << " s=" << s << " osd=" << osd << " "
+  ldout(cct, 20) << __FFL__ << " s=" << s << " osd=" << osd << " "
 		 << s->get_nref() << dendl;
   return 0;
 }
@@ -1821,7 +1821,7 @@ int Objecter::_get_session(int osd, OSDSession **session, shunique_lock& sul)
 void Objecter::put_session(Objecter::OSDSession *s)
 {
   if (s && !s->is_homeless()) {
-    ldout(cct, 20) << __func__ << " s=" << s << " osd=" << s->osd << " "
+    ldout(cct, 20) << __FFL__ << " s=" << s << " osd=" << s->osd << " "
 		   << s->get_nref() << dendl;
     s->put();
   }
@@ -1832,7 +1832,7 @@ void Objecter::get_session(Objecter::OSDSession *s)
   ceph_assert(s != NULL);
 
   if (!s->is_homeless()) {
-    ldout(cct, 20) << __func__ << " s=" << s << " osd=" << s->osd << " "
+    ldout(cct, 20) << __FFL__ << " s=" << s << " osd=" << s->osd << " "
 		   << s->get_nref() << dendl;
     s->get();
   }
@@ -1957,7 +1957,7 @@ struct C_Objecter_GetVersion : public Context {
 
 void Objecter::wait_for_latest_osdmap(Context *fin)
 {
-  ldout(cct, 10) << __func__ << dendl;
+  ldout(cct, 10) << __FFL__ << dendl;
   C_Objecter_GetVersion *c = new C_Objecter_GetVersion(this, fin);
   monc->get_version("osdmap", &c->newest, &c->oldest, c);
 }
@@ -1966,14 +1966,14 @@ void Objecter::get_latest_version(epoch_t oldest, epoch_t newest, Context *fin)
 {
   unique_lock wl(rwlock);
   if (osdmap->get_epoch() >= newest) {
-    ldout(cct, 10) << __func__ << " latest " << newest << ", have it" << dendl;
+    ldout(cct, 10) << __FFL__ << " latest " << newest << ", have it" << dendl;
     wl.unlock();
     if (fin)
       fin->complete(0);
     return;
   }
 
-  ldout(cct, 10) << __func__ << " latest " << newest << ", waiting" << dendl;
+  ldout(cct, 10) << __FFL__ << " latest " << newest << ", waiting" << dendl;
   _wait_for_new_map(fin, newest, 0);
 }
 
@@ -2129,7 +2129,7 @@ void Objecter::tick()
 
   if (!initialized) {
     // we raced with shutdown
-    ldout(cct, 10) << __func__ << " raced with shutdown" << dendl;
+    ldout(cct, 10) << __FFL__ << " raced with shutdown" << dendl;
     return;
   }
 
@@ -2377,7 +2377,7 @@ void Objecter::_op_submit(Op *op, shunique_lock& sul, ceph_tid_t *ptid)
 {
   // rwlock is locked
 
-  ldout(cct, 10) << __func__ << " op " << op << dendl;
+  ldout(cct, 10) << __FFL__ << " op " << op << dendl;
 
   // pick target
   ceph_assert(op->session == NULL);
@@ -2399,7 +2399,7 @@ void Objecter::_op_submit(Op *op, shunique_lock& sul, ceph_tid_t *ptid)
     sul.lock();
     if (orig_epoch != osdmap->get_epoch()) {
       // map changed; recalculate mapping
-      ldout(cct, 10) << __func__ << " relock raced with osdmap, recalc target"
+      ldout(cct, 10) << __FFL__ << " relock raced with osdmap, recalc target"
 		     << dendl;
       check_for_latest_map = _calc_target(&op->target, nullptr)
 	== RECALC_OP_TARGET_POOL_DNE;
@@ -2478,7 +2478,7 @@ int Objecter::op_cancel(OSDSession *s, ceph_tid_t tid, int r)
 
   map<ceph_tid_t, Op*>::iterator p = s->ops.find(tid);
   if (p == s->ops.end()) {
-    ldout(cct, 10) << __func__ << " tid " << tid << " dne in session "
+    ldout(cct, 10) << __FFL__ << " tid " << tid << " dne in session "
 		   << s->osd << dendl;
     return -ENOENT;
   }
@@ -2491,7 +2491,7 @@ int Objecter::op_cancel(OSDSession *s, ceph_tid_t tid, int r)
   }
 #endif
 
-  ldout(cct, 10) << __func__ << " tid " << tid << " in session " << s->osd
+  ldout(cct, 10) << __FFL__ << " tid " << tid << " in session " << s->osd
 		 << dendl;
   Op *op = p->second;
   if (op->onfinish) {
@@ -2519,7 +2519,7 @@ int Objecter::op_cancel(ceph_tid_t tid, int r)
 int Objecter::op_cancel(const vector<ceph_tid_t>& tids, int r)
 {
   unique_lock wl(rwlock);
-  ldout(cct,10) << __func__ << " " << tids << dendl;
+  ldout(cct,10) << __FFL__ << " " << tids << dendl;
   for (auto tid : tids) {
     _op_cancel(tid, r);
   }
@@ -2530,7 +2530,7 @@ int Objecter::_op_cancel(ceph_tid_t tid, int r)
 {
   int ret = 0;
 
-  ldout(cct, 5) << __func__ << ": cancelling tid " << tid << " r=" << r
+  ldout(cct, 5) << __FFL__ << ": cancelling tid " << tid << " r=" << r
 		<< dendl;
 
 start:
@@ -2550,7 +2550,7 @@ start:
     }
   }
 
-  ldout(cct, 5) << __func__ << ": tid " << tid
+  ldout(cct, 5) << __FFL__ << ": tid " << tid
 		<< " not found in live sessions" << dendl;
 
   // Handle case where the op is in homeless session
@@ -2568,7 +2568,7 @@ start:
     sl.unlock();
   }
 
-  ldout(cct, 5) << __func__ << ": tid " << tid
+  ldout(cct, 5) << __FFL__ << ": tid " << tid
 		<< " not found in homeless session" << dendl;
 
   return ret;
@@ -2674,7 +2674,7 @@ bool Objecter::_osdmap_pool_full(const int64_t pool_id) const
 {
   const pg_pool_t *pool = osdmap->get_pg_pool(pool_id);
   if (pool == NULL) {
-    ldout(cct, 4) << __func__ << ": DNE pool " << pool_id << dendl;
+    ldout(cct, 4) << __FFL__ << ": DNE pool " << pool_id << dendl;
     return false;
   }
 
@@ -2757,7 +2757,7 @@ void Objecter::_prune_snapc(
 	}
       }
       op->snapc.snaps.swap(new_snaps);
-      ldout(cct,10) << __func__ << " op " << op->tid << " snapc " << op->snapc
+      ldout(cct,10) << __FFL__ << " op " << op->tid << " snapc " << op->snapc
 		    << " (was " << new_snaps << ")" << dendl;
     }
   }
@@ -2769,7 +2769,7 @@ int Objecter::_calc_target(op_target_t *t, Connection *con, bool any_change)
   bool is_read = t->flags & CEPH_OSD_FLAG_READ;
   bool is_write = t->flags & CEPH_OSD_FLAG_WRITE;
   t->epoch = osdmap->get_epoch();
-  ldout(cct,20) << __func__ << " epoch " << t->epoch
+  ldout(cct,20) << __FFL__ << " epoch " << t->epoch
 		<< " base " << t->base_oid << " " << t->base_oloc
 		<< " precalc_pgid " << (int)t->precalc_pgid
 		<< " pgid " << t->base_pgid
@@ -2782,7 +2782,7 @@ int Objecter::_calc_target(op_target_t *t, Connection *con, bool any_change)
     t->osd = -1;
     return RECALC_OP_TARGET_POOL_DNE;
   }
-  ldout(cct,30) << __func__ << "  base pi " << pi
+  ldout(cct,30) << __FFL__ << "  base pi " << pi
 		<< " pg_num " << pi->get_pg_num() << dendl;
 
   bool force_resend = false;
@@ -2824,9 +2824,9 @@ int Objecter::_calc_target(op_target_t *t, Connection *con, bool any_change)
       return RECALC_OP_TARGET_POOL_DNE;
     }
   }
-  ldout(cct,20) << __func__ << " target " << t->target_oid << " "
+  ldout(cct,20) << __FFL__ << " target " << t->target_oid << " "
 		<< t->target_oloc << " -> pgid " << pgid << dendl;
-  ldout(cct,30) << __func__ << "  target pi " << pi
+  ldout(cct,30) << __FFL__ << "  target pi " << pi
 		<< " pg_num " << pi->get_pg_num() << dendl;
   t->pool_ever_existed = true;
 
@@ -2888,7 +2888,7 @@ int Objecter::_calc_target(op_target_t *t, Connection *con, bool any_change)
     unpaused = true;
   }
   if (t->paused != should_be_paused) {
-    ldout(cct, 10) << __func__ << " paused " << t->paused
+    ldout(cct, 10) << __FFL__ << " paused " << t->paused
 		   << " -> " << should_be_paused << dendl;
     t->paused = should_be_paused;
   }
@@ -2929,7 +2929,7 @@ int Objecter::_calc_target(op_target_t *t, Connection *con, bool any_change)
     t->actual_pgid = spgid;
     t->sort_bitwise = sort_bitwise;
     t->recovery_deletes = recovery_deletes;
-    ldout(cct, 10) << __func__ << " "
+    ldout(cct, 10) << __FFL__ << " "
 		   << " raw pgid " << pgid << " -> actual " << t->actual_pgid
 		   << " acting " << acting
 		   << " primary " << acting_primary << dendl;
@@ -2954,7 +2954,7 @@ int Objecter::_calc_target(op_target_t *t, Connection *con, bool any_change)
 	for (unsigned i = 0; i < acting.size(); ++i) {
 	  int locality = osdmap->crush->get_common_ancestor_distance(
 		 cct, acting[i], crush_location);
-	  ldout(cct, 20) << __func__ << " localize: rank " << i
+	  ldout(cct, 20) << __FFL__ << " localize: rank " << i
 			 << " osd." << acting[i]
 			 << " locality " << locality << dendl;
 	  if (i == 0 ||
@@ -3008,7 +3008,7 @@ void Objecter::_session_op_assign(OSDSession *to, Op *op)
     num_homeless_ops++;
   }
 
-  ldout(cct, 15) << __func__ << " " << to->osd << " " << op->tid << dendl;
+  ldout(cct, 15) << __FFL__ << " " << to->osd << " " << op->tid << dendl;
 }
 
 void Objecter::_session_op_remove(OSDSession *from, Op *op)
@@ -3024,7 +3024,7 @@ void Objecter::_session_op_remove(OSDSession *from, Op *op)
   put_session(from);
   op->session = NULL;
 
-  ldout(cct, 15) << __func__ << " " << from->osd << " " << op->tid << dendl;
+  ldout(cct, 15) << __FFL__ << " " << from->osd << " " << op->tid << dendl;
 }
 
 void Objecter::_session_linger_op_assign(OSDSession *to, LingerOp *op)
@@ -3040,7 +3040,7 @@ void Objecter::_session_linger_op_assign(OSDSession *to, LingerOp *op)
   op->session = to;
   to->linger_ops[op->linger_id] = op;
 
-  ldout(cct, 15) << __func__ << " " << to->osd << " " << op->linger_id
+  ldout(cct, 15) << __FFL__ << " " << to->osd << " " << op->linger_id
 		 << dendl;
 }
 
@@ -3057,7 +3057,7 @@ void Objecter::_session_linger_op_remove(OSDSession *from, LingerOp *op)
   put_session(from);
   op->session = NULL;
 
-  ldout(cct, 15) << __func__ << " " << from->osd << " " << op->linger_id
+  ldout(cct, 15) << __FFL__ << " " << from->osd << " " << op->linger_id
 		 << dendl;
 }
 
@@ -3074,7 +3074,7 @@ void Objecter::_session_command_op_remove(OSDSession *from, CommandOp *op)
   put_session(from);
   op->session = NULL;
 
-  ldout(cct, 15) << __func__ << " " << from->osd << " " << op->tid << dendl;
+  ldout(cct, 15) << __FFL__ << " " << from->osd << " " << op->tid << dendl;
 }
 
 void Objecter::_session_command_op_assign(OSDSession *to, CommandOp *op)
@@ -3091,7 +3091,7 @@ void Objecter::_session_command_op_assign(OSDSession *to, CommandOp *op)
   op->session = to;
   to->command_ops[op->tid] = op;
 
-  ldout(cct, 15) << __func__ << " " << to->osd << " " << op->tid << dendl;
+  ldout(cct, 15) << __FFL__ << " " << to->osd << " " << op->tid << dendl;
 }
 
 int Objecter::_recalc_linger_op_target(LingerOp *linger_op,
@@ -3140,7 +3140,7 @@ void Objecter::_cancel_linger_op(Op *op)
 
 void Objecter::_finish_op(Op *op, int r)
 {
-  ldout(cct, 15) << __func__ << " " << op->tid << dendl;
+  ldout(cct, 15) << __FFL__ << " " << op->tid << dendl;
 
   // op->session->lock is locked unique or op->session is null
 
@@ -3236,11 +3236,11 @@ void Objecter::_send_op(Op *op)
       }
     }
     if (q != p->second.end()) {
-      ldout(cct, 20) << __func__ << " ? " << q->first << " [" << q->second.begin
+      ldout(cct, 20) << __FFL__ << " ? " << q->first << " [" << q->second.begin
 		     << "," << q->second.end << ")" << dendl;
       int r = cmp(hoid, q->second.begin);
       if (r == 0 || (r > 0 && hoid < q->second.end)) {
-	ldout(cct, 10) << __func__ << " backoff " << op->target.actual_pgid
+	ldout(cct, 10) << __FFL__ << " backoff " << op->target.actual_pgid
 		       << " id " << q->second.id << " on " << hoid
 		       << ", queuing " << op << " tid " << op->tid << dendl;
 	return;
@@ -3252,7 +3252,7 @@ void Objecter::_send_op(Op *op)
   MOSDOp *m = _prepare_osd_op(op);
 
   if (op->target.actual_pgid != m->get_spg()) {
-    ldout(cct, 10) << __func__ << " " << op->tid << " pgid change from "
+    ldout(cct, 10) << __FFL__ << " " << op->tid << " pgid change from "
 		   << m->get_spg() << " to " << op->target.actual_pgid
 		   << ", updating and reencoding" << dendl;
     m->set_spg(op->target.actual_pgid);
@@ -3362,7 +3362,7 @@ void Objecter::handle_osd_op_reply(MOSDOpReply *m)
   auto priv = con->get_priv();
   auto s = static_cast<OSDSession*>(priv.get());
   if (!s || s->con != con) {
-    ldout(cct, 7) << __func__ << " no session on con " << con << dendl;
+    ldout(cct, 7) << __FFL__ << " no session on con " << con << dendl;
     m->put();
     return;
   }
@@ -3482,7 +3482,7 @@ void Objecter::handle_osd_op_reply(MOSDOpReply *m)
       // this is here to keep previous users to *relied* on getting data
       // read into existing buffers happy.  Notably,
       // libradosstriper::RadosStriperImpl::aio_read().
-      ldout(cct,10) << __func__ << " copying resulting " << bl.length()
+      ldout(cct,10) << __FFL__ << " copying resulting " << bl.length()
 		    << " into existing ceph::buffer of length " << op->outbl->length()
 		    << dendl;
       ceph::buffer::list t;
@@ -3566,7 +3566,7 @@ void Objecter::handle_osd_op_reply(MOSDOpReply *m)
 
 void Objecter::handle_osd_backoff(MOSDBackoff *m)
 {
-  ldout(cct, 10) << __func__ << " " << *m << dendl;
+  ldout(cct, 10) << __FFL__ << " " << *m << dendl;
   shunique_lock sul(rwlock, ceph::acquire_shared);
   if (!initialized) {
     m->put();
@@ -3577,7 +3577,7 @@ void Objecter::handle_osd_backoff(MOSDBackoff *m)
   auto priv = con->get_priv();
   auto s = static_cast<OSDSession*>(priv.get());
   if (!s || s->con != con) {
-    ldout(cct, 7) << __func__ << " no session on con " << con << dendl;
+    ldout(cct, 7) << __FFL__ << " no session on con " << con << dendl;
     m->put();
     return;
   }
@@ -3616,13 +3616,13 @@ void Objecter::handle_osd_backoff(MOSDBackoff *m)
 	OSDBackoff *b = p->second;
 	if (b->begin != m->begin &&
 	    b->end != m->end) {
-	  lderr(cct) << __func__ << " got " << m->pgid << " id " << m->id
+	  lderr(cct) << __FFL__ << " got " << m->pgid << " id " << m->id
 		     << " unblock on ["
 		     << m->begin << "," << m->end << ") but backoff is ["
 		     << b->begin << "," << b->end << ")" << dendl;
 	  // hrmpf, unblock it anyway.
 	}
-	ldout(cct, 10) << __func__ << " unblock backoff " << b->pgid
+	ldout(cct, 10) << __FFL__ << " unblock backoff " << b->pgid
 		       << " id " << b->id
 		       << " [" << b->begin << "," << b->end
 		       << ")" << dendl;
@@ -3638,7 +3638,7 @@ void Objecter::handle_osd_backoff(MOSDBackoff *m)
 	for (auto& q : s->ops) {
 	  if (q.second->target.actual_pgid == m->pgid) {
 	    int r = q.second->target.contained_by(m->begin, m->end);
-	    ldout(cct, 20) << __func__ <<  " contained_by " << r << " on "
+	    ldout(cct, 20) << __FFL__ <<  " contained_by " << r << " on "
 			   << q.second->target.get_hobj() << dendl;
 	    if (r) {
 	      _send_op(q.second);
@@ -3646,7 +3646,7 @@ void Objecter::handle_osd_backoff(MOSDBackoff *m)
 	  }
 	}
       } else {
-	lderr(cct) << __func__ << " " << m->pgid << " id " << m->id
+	lderr(cct) << __FFL__ << " " << m->pgid << " id " << m->id
 		   << " unblock on ["
 		   << m->begin << "," << m->end << ") but backoff dne" << dendl;
       }
@@ -3654,7 +3654,7 @@ void Objecter::handle_osd_backoff(MOSDBackoff *m)
     break;
 
   default:
-    ldout(cct, 10) << __func__ << " unrecognized op " << (int)m->op << dendl;
+    ldout(cct, 10) << __FFL__ << " unrecognized op " << (int)m->op << dendl;
   }
 
   sul.unlock();
@@ -3670,7 +3670,7 @@ uint32_t Objecter::list_nobjects_seek(NListContext *list_context,
   shared_lock rl(rwlock);
   list_context->pos = hobject_t(object_t(), string(), CEPH_NOSNAP,
 				pos, list_context->pool_id, string());
-  ldout(cct, 10) << __func__ << " " << list_context
+  ldout(cct, 10) << __FFL__ << " " << list_context
 		 << " pos " << pos << " -> " << list_context->pos << dendl;
   pg_t actual = osdmap->raw_pg_to_pg(pg_t(pos, list_context->pool_id));
   list_context->current_pg = actual.ps();
@@ -3707,7 +3707,7 @@ void Objecter::list_nobjects_get_cursor(NListContext *list_context,
 
 void Objecter::list_nobjects(NListContext *list_context, Context *onfinish)
 {
-  ldout(cct, 10) << __func__ << " pool_id " << list_context->pool_id
+  ldout(cct, 10) << __FFL__ << " pool_id " << list_context->pool_id
 		 << " pool_snap_seq " << list_context->pool_snap_seq
 		 << " max_entries " << list_context->max_entries
 		 << " list_context " << list_context
@@ -3749,7 +3749,7 @@ void Objecter::list_nobjects(NListContext *list_context, Context *onfinish)
   }
 
   if (list_context->pos.is_max()) {
-    ldout(cct, 20) << __func__ << " end of pool, list "
+    ldout(cct, 20) << __FFL__ << " end of pool, list "
 		   << list_context->list << dendl;
     if (list_context->list.empty()) {
       list_context->at_end_of_pool = true;
@@ -3780,7 +3780,7 @@ void Objecter::list_nobjects(NListContext *list_context, Context *onfinish)
 void Objecter::_nlist_reply(NListContext *list_context, int r,
 			    Context *final_finish, epoch_t reply_epoch)
 {
-  ldout(cct, 10) << __func__ << " " << list_context << dendl;
+  ldout(cct, 10) << __FFL__ << " " << list_context << dendl;
 
   auto iter = list_context->bl.cbegin();
   pg_nls_response_t response;
@@ -4127,11 +4127,11 @@ int Objecter::pool_op_cancel(ceph_tid_t tid, int r)
 
   map<ceph_tid_t, PoolOp*>::iterator it = pool_ops.find(tid);
   if (it == pool_ops.end()) {
-    ldout(cct, 10) << __func__ << " tid " << tid << " dne" << dendl;
+    ldout(cct, 10) << __FFL__ << " tid " << tid << " dne" << dendl;
     return -ENOENT;
   }
 
-  ldout(cct, 10) << __func__ << " tid " << tid << dendl;
+  ldout(cct, 10) << __FFL__ << " tid " << tid << dendl;
 
   PoolOp *op = it->second;
   if (op->onfinish)
@@ -4235,11 +4235,11 @@ int Objecter::pool_stat_op_cancel(ceph_tid_t tid, int r)
 
   map<ceph_tid_t, PoolStatOp*>::iterator it = poolstat_ops.find(tid);
   if (it == poolstat_ops.end()) {
-    ldout(cct, 10) << __func__ << " tid " << tid << " dne" << dendl;
+    ldout(cct, 10) << __FFL__ << " tid " << tid << " dne" << dendl;
     return -ENOENT;
   }
 
-  ldout(cct, 10) << __func__ << " tid " << tid << dendl;
+  ldout(cct, 10) << __FFL__ << " tid " << tid << dendl;
 
   PoolStatOp *op = it->second;
   if (op->onfinish)
@@ -4335,11 +4335,11 @@ int Objecter::statfs_op_cancel(ceph_tid_t tid, int r)
 
   map<ceph_tid_t, StatfsOp*>::iterator it = statfs_ops.find(tid);
   if (it == statfs_ops.end()) {
-    ldout(cct, 10) << __func__ << " tid " << tid << " dne" << dendl;
+    ldout(cct, 10) << __FFL__ << " tid " << tid << " dne" << dendl;
     return -ENOENT;
   }
 
-  ldout(cct, 10) << __func__ << " tid " << tid << dendl;
+  ldout(cct, 10) << __FFL__ << " tid " << tid << dendl;
 
   StatfsOp *op = it->second;
   if (op->onfinish)
@@ -4739,7 +4739,7 @@ void Objecter::handle_command_reply(MCommandReply *m)
   auto priv = con->get_priv();
   auto s = static_cast<OSDSession*>(priv.get());
   if (!s || s->con != con) {
-    ldout(cct, 7) << __func__ << " no session on con " << con << dendl;
+    ldout(cct, 7) << __FFL__ << " no session on con " << con << dendl;
     m->put();
     return;
   }
@@ -4766,7 +4766,7 @@ void Objecter::handle_command_reply(MCommandReply *m)
     return;
   }
   if (m->r == -EAGAIN) {
-    ldout(cct,10) << __func__ << " tid " << m->get_tid()
+    ldout(cct,10) << __FFL__ << " tid " << m->get_tid()
 		  << " got EAGAIN, requesting map and resending" << dendl;
     // NOTE: This might resend twice... once now, and once again when
     // we get an updated osdmap and the PG is found to have moved.
@@ -4923,11 +4923,11 @@ int Objecter::command_op_cancel(OSDSession *s, ceph_tid_t tid, int r)
 
   map<ceph_tid_t, CommandOp*>::iterator it = s->command_ops.find(tid);
   if (it == s->command_ops.end()) {
-    ldout(cct, 10) << __func__ << " tid " << tid << " dne" << dendl;
+    ldout(cct, 10) << __FFL__ << " tid " << tid << " dne" << dendl;
     return -ENOENT;
   }
 
-  ldout(cct, 10) << __func__ << " tid " << tid << dendl;
+  ldout(cct, 10) << __FFL__ << " tid " << tid << dendl;
 
   CommandOp *op = it->second;
   _command_cancel_map_check(op);
@@ -5014,7 +5014,7 @@ void Objecter::set_epoch_barrier(epoch_t epoch)
 {
   unique_lock wl(rwlock);
 
-  ldout(cct, 7) << __func__ << ": barrier " << epoch << " (was "
+  ldout(cct, 7) << __FFL__ << ": barrier " << epoch << " (was "
 		<< epoch_barrier << ") current epoch " << osdmap->get_epoch()
 		<< dendl;
   if (epoch > epoch_barrier) {
@@ -5076,13 +5076,13 @@ void Objecter::enumerate_objects(
   ceph_assert(result);
 
   if (!end.is_max() && start > end) {
-    lderr(cct) << __func__ << ": start " << start << " > end " << end << dendl;
+    lderr(cct) << __FFL__ << ": start " << start << " > end " << end << dendl;
     on_finish->complete(-EINVAL);
     return;
   }
 
   if (max < 1) {
-    lderr(cct) << __func__ << ": result size may not be zero" << dendl;
+    lderr(cct) << __FFL__ << ": result size may not be zero" << dendl;
     on_finish->complete(-EINVAL);
     return;
   }
@@ -5096,13 +5096,13 @@ void Objecter::enumerate_objects(
   ceph_assert(osdmap->get_epoch());
   if (!osdmap->test_flag(CEPH_OSDMAP_SORTBITWISE)) {
     rl.unlock();
-    lderr(cct) << __func__ << ": SORTBITWISE cluster flag not set" << dendl;
+    lderr(cct) << __FFL__ << ": SORTBITWISE cluster flag not set" << dendl;
     on_finish->complete(-EOPNOTSUPP);
     return;
   }
   const pg_pool_t *p = osdmap->get_pg_pool(pool_id);
   if (!p) {
-    lderr(cct) << __func__ << ": pool " << pool_id << " DNE in osd epoch "
+    lderr(cct) << __FFL__ << ": pool " << pool_id << " DNE in osd epoch "
 	       << osdmap->get_epoch() << dendl;
     rl.unlock();
     on_finish->complete(-ENOENT);
@@ -5111,7 +5111,7 @@ void Objecter::enumerate_objects(
     rl.unlock();
   }
 
-  ldout(cct, 20) << __func__ << ": start=" << start << " end=" << end << dendl;
+  ldout(cct, 20) << __FFL__ << ": start=" << start << " end=" << end << dendl;
 
   // Stash completion state
   C_EnumerateReply *on_ack = new C_EnumerateReply(
@@ -5142,7 +5142,7 @@ void Objecter::_enumerate_reply(
   }
 
   if (r < 0) {
-    ldout(cct, 4) << __func__ << ": remote error " << r << dendl;
+    ldout(cct, 4) << __FFL__ << ": remote error " << r << dendl;
     on_finish->complete(r);
     return;
   }
@@ -5161,16 +5161,16 @@ void Objecter::_enumerate_reply(
     decode(legacy_extra_info, iter);
   }
 
-  ldout(cct, 10) << __func__ << ": got " << response.entries.size()
+  ldout(cct, 10) << __FFL__ << ": got " << response.entries.size()
 		 << " handle " << response.handle
 		 << " reply_epoch " << reply_epoch << dendl;
-  ldout(cct, 20) << __func__ << ": response.entries.size "
+  ldout(cct, 20) << __FFL__ << ": response.entries.size "
 		 << response.entries.size() << ", response.entries "
 		 << response.entries << dendl;
   if (response.handle <= end) {
     *next = response.handle;
   } else {
-    ldout(cct, 10) << __func__ << ": adjusted next down to end " << end
+    ldout(cct, 10) << __FFL__ << ": adjusted next down to end " << end
 		   << dendl;
     *next = end;
 
@@ -5197,7 +5197,7 @@ void Objecter::_enumerate_reply(
 		     response.entries.back().nspace);
       if (last < end)
 	break;
-      ldout(cct, 20) << __func__ << " dropping item " << last
+      ldout(cct, 20) << __FFL__ << " dropping item " << last
 		     << " >= end " << end << dendl;
       response.entries.pop_back();
     }

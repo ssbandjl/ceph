@@ -53,7 +53,7 @@ void CloseRequest<I>::send_block_image_watcher() {
   }
 
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   // prevent incoming requests from our peers
   m_image_ctx->image_watcher->block_notifies(create_context_callback<
@@ -63,7 +63,7 @@ void CloseRequest<I>::send_block_image_watcher() {
 template <typename I>
 void CloseRequest<I>::handle_block_image_watcher(int r) {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << r << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << r << dendl;
 
   send_shut_down_update_watchers();
 }
@@ -71,7 +71,7 @@ void CloseRequest<I>::handle_block_image_watcher(int r) {
 template <typename I>
 void CloseRequest<I>::send_shut_down_update_watchers() {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   m_image_ctx->state->shut_down_update_watchers(create_async_context_callback(
     *m_image_ctx, create_context_callback<
@@ -81,7 +81,7 @@ void CloseRequest<I>::send_shut_down_update_watchers() {
 template <typename I>
 void CloseRequest<I>::handle_shut_down_update_watchers(int r) {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << r << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << r << dendl;
 
   save_result(r);
   if (r < 0) {
@@ -95,7 +95,7 @@ void CloseRequest<I>::handle_shut_down_update_watchers(int r) {
 template <typename I>
 void CloseRequest<I>::send_shut_down_io_queue() {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   std::shared_lock owner_locker{m_image_ctx->owner_lock};
   m_image_ctx->io_work_queue->shut_down(create_context_callback<
@@ -105,7 +105,7 @@ void CloseRequest<I>::send_shut_down_io_queue() {
 template <typename I>
 void CloseRequest<I>::handle_shut_down_io_queue(int r) {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << r << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << r << dendl;
 
   send_shut_down_exclusive_lock();
 }
@@ -130,7 +130,7 @@ void CloseRequest<I>::send_shut_down_exclusive_lock() {
   }
 
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   // in-flight IO will be flushed and in-flight requests will be canceled
   // before releasing lock
@@ -141,7 +141,7 @@ void CloseRequest<I>::send_shut_down_exclusive_lock() {
 template <typename I>
 void CloseRequest<I>::handle_shut_down_exclusive_lock(int r) {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << r << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << r << dendl;
 
   {
     std::shared_lock owner_locker{m_image_ctx->owner_lock};
@@ -168,7 +168,7 @@ void CloseRequest<I>::handle_shut_down_exclusive_lock(int r) {
 template <typename I>
 void CloseRequest<I>::send_flush() {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   std::shared_lock owner_locker{m_image_ctx->owner_lock};
   auto ctx = create_context_callback<
@@ -184,7 +184,7 @@ void CloseRequest<I>::send_flush() {
 template <typename I>
 void CloseRequest<I>::handle_flush(int r) {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << r << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << r << dendl;
 
   if (r < 0) {
     lderr(cct) << "failed to flush IO: " << cpp_strerror(r) << dendl;
@@ -200,7 +200,7 @@ void CloseRequest<I>::send_unregister_image_watcher() {
   }
 
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   m_image_ctx->image_watcher->unregister_watch(create_context_callback<
     CloseRequest<I>, &CloseRequest<I>::handle_unregister_image_watcher>(this));
@@ -209,7 +209,7 @@ void CloseRequest<I>::send_unregister_image_watcher() {
 template <typename I>
 void CloseRequest<I>::handle_unregister_image_watcher(int r) {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << r << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << r << dendl;
 
   save_result(r);
   if (r < 0) {
@@ -223,7 +223,7 @@ void CloseRequest<I>::handle_unregister_image_watcher(int r) {
 template <typename I>
 void CloseRequest<I>::send_flush_readahead() {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   m_image_ctx->readahead.wait_for_pending(create_async_context_callback(
     *m_image_ctx, create_context_callback<
@@ -233,7 +233,7 @@ void CloseRequest<I>::send_flush_readahead() {
 template <typename I>
 void CloseRequest<I>::handle_flush_readahead(int r) {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << r << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << r << dendl;
 
   send_shut_down_object_dispatcher();
 }
@@ -241,7 +241,7 @@ void CloseRequest<I>::handle_flush_readahead(int r) {
 template <typename I>
 void CloseRequest<I>::send_shut_down_object_dispatcher() {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   m_image_ctx->io_object_dispatcher->shut_down(create_context_callback<
     CloseRequest<I>,
@@ -251,7 +251,7 @@ void CloseRequest<I>::send_shut_down_object_dispatcher() {
 template <typename I>
 void CloseRequest<I>::handle_shut_down_object_dispatcher(int r) {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << r << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << r << dendl;
 
   save_result(r);
   if (r < 0) {
@@ -264,7 +264,7 @@ void CloseRequest<I>::handle_shut_down_object_dispatcher(int r) {
 template <typename I>
 void CloseRequest<I>::send_flush_op_work_queue() {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   m_image_ctx->op_work_queue->queue(create_context_callback<
     CloseRequest<I>, &CloseRequest<I>::handle_flush_op_work_queue>(this), 0);
@@ -273,7 +273,7 @@ void CloseRequest<I>::send_flush_op_work_queue() {
 template <typename I>
 void CloseRequest<I>::handle_flush_op_work_queue(int r) {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << r << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << r << dendl;
   send_close_parent();
 }
 
@@ -285,7 +285,7 @@ void CloseRequest<I>::send_close_parent() {
   }
 
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   m_image_ctx->parent->state->close(create_async_context_callback(
     *m_image_ctx, create_context_callback<
@@ -295,7 +295,7 @@ void CloseRequest<I>::send_close_parent() {
 template <typename I>
 void CloseRequest<I>::handle_close_parent(int r) {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << r << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << r << dendl;
 
   delete m_image_ctx->parent;
   m_image_ctx->parent = nullptr;
@@ -320,7 +320,7 @@ void CloseRequest<I>::send_flush_image_watcher() {
 template <typename I>
 void CloseRequest<I>::handle_flush_image_watcher(int r) {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << r << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << r << dendl;
 
   if (r < 0) {
     lderr(cct) << "error flushing image watcher: " << cpp_strerror(r) << dendl;

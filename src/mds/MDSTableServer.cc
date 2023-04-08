@@ -95,7 +95,7 @@ void MDSTableServer::_prepare_logged(const cref_t<MMDSTableRequest> &req, versio
 
 void MDSTableServer::handle_notify_ack(const cref_t<MMDSTableRequest> &m)
 {
-  dout(7) << __func__ << " " << *m << dendl;
+  dout(7) << __FFL__ << " " << *m << dendl;
   mds_rank_t from = mds_rank_t(m->get_source().num());
   version_t tid = m->get_tid();
 
@@ -269,7 +269,7 @@ public:
 
 void MDSTableServer::_do_server_recovery()
 {
-  dout(7) << __func__ << " " << active_clients <<  dendl;
+  dout(7) << __FFL__ << " " << active_clients <<  dendl;
   map<mds_rank_t, uint64_t> next_reqids;
 
   for (auto p : pending_for_mds) {
@@ -295,7 +295,7 @@ void MDSTableServer::_do_server_recovery()
 
 void MDSTableServer::finish_recovery(set<mds_rank_t>& active)
 {
-  dout(7) << __func__ << dendl;
+  dout(7) << __FFL__ << dendl;
 
   active_clients = active;
 
@@ -342,7 +342,7 @@ void MDSTableServer::handle_mds_recovery(mds_rank_t who)
 
 void MDSTableServer::handle_mds_failure_or_stop(mds_rank_t who)
 {
-  dout(7) << __func__ << " mds." << who << dendl;
+  dout(7) << __FFL__ << " mds." << who << dendl;
 
   active_clients.erase(who);
 

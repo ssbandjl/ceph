@@ -116,7 +116,7 @@ int ConfFile::parse_file(const std::string &fname,
   clear();
   try {
     if (auto file_size = fs::file_size(fname); file_size > MAX_CONFIG_FILE_SZ) {
-      *warnings << __func__ << ": config file '" << fname
+      *warnings << __FFL__ << ": config file '" << fname
 		<< "' is " << file_size << " bytes, "
 		<< "but the maximum is " << MAX_CONFIG_FILE_SZ;
       return -EINVAL;
@@ -128,7 +128,7 @@ int ConfFile::parse_file(const std::string &fname,
       // /dev/null?
       return 0;
     } else {
-      *warnings << __func__ << ": " << e.what();
+      *warnings << __FFL__ << ": " << e.what();
       return -e.code().value();
     }
   }

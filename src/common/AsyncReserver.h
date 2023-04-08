@@ -64,7 +64,7 @@ class AsyncReserver {
     auto q = in_progress.find(preempt_by_prio.begin()->second);
     ceph_assert(q != in_progress.end());
     Reservation victim = q->second;
-    rdout(10) << __func__ << " preempt " << victim << dendl;
+    rdout(10) << __FFL__ << " preempt " << victim << dendl;
     f->queue(victim.preempt);
     victim.preempt = nullptr;
     in_progress.erase(q);
@@ -72,7 +72,7 @@ class AsyncReserver {
   }
 
   void do_queues() {
-    rdout(20) << __func__ << ":\n";
+    rdout(20) << __FFL__ << ":\n";
     JSONFormatter jf(true);
     jf.open_object_section("queue");
     _dump(&jf);
@@ -105,7 +105,7 @@ class AsyncReserver {
       }
       // grant
       Reservation p = it->second.front();
-      rdout(10) << __func__ << " grant " << p << dendl;
+      rdout(10) << __FFL__ << " grant " << p << dendl;
       queue_pointers.erase(p.item);
       it->second.pop_front();
       if (it->second.empty()) {
@@ -165,7 +165,7 @@ public:
       if (newprio == prio)
         return;
       Reservation r = *i->second.second;
-      rdout(10) << __func__ << " update " << r << " (was queued)" << dendl;
+      rdout(10) << __FFL__ << " update " << r << " (was queued)" << dendl;
       // Like cancel_reservation() without preempting
       queues[prio].erase(i->second.second);
       if (queues[prio].empty()) {
@@ -185,7 +185,7 @@ public:
       if (p != in_progress.end()) {
         if (p->second.prio == newprio)
           return;
-	rdout(10) << __func__ << " update " << p->second
+	rdout(10) << __FFL__ << " update " << p->second
 		  << " (in progress)" << dendl;
         // We want to preempt if priority goes down
         // and smaller then highest priority waiting
@@ -196,7 +196,7 @@ public:
             --it;
             ceph_assert(!it->second.empty());
             if (it->first > newprio) {
-	      rdout(10) << __func__ << " update " << p->second
+	      rdout(10) << __FFL__ << " update " << p->second
 		        << " lowered priority let do_queues() preempt it" << dendl;
             }
           }
@@ -207,7 +207,7 @@ public:
           p->second.prio = newprio;
         }
       } else {
-	rdout(10) << __func__ << " update " << item << " (not found)" << dendl;
+	rdout(10) << __FFL__ << " update " << item << " (not found)" << dendl;
       }
     }
     do_queues();
@@ -256,7 +256,7 @@ public:
     ) {
     std::lock_guard l(lock);
     Reservation r(item, prio, on_reserved, on_preempt);
-    rdout(10) << __func__ << " queue " << r << dendl;
+    rdout(10) << __FFL__ << " queue " << r << dendl;
     ceph_assert(!queue_pointers.count(item) &&
 	   !in_progress.count(item));
     queues[prio].push_back(r);
@@ -280,7 +280,7 @@ public:
     if (i != queue_pointers.end()) {
       unsigned prio = i->second.first;
       const Reservation& r = *i->second.second;
-      rdout(10) << __func__ << " cancel " << r << " (was queued)" << dendl;
+      rdout(10) << __FFL__ << " cancel " << r << " (was queued)" << dendl;
       delete r.grant;
       delete r.preempt;
       queues[prio].erase(i->second.second);
@@ -291,7 +291,7 @@ public:
     } else {
       auto p = in_progress.find(item);
       if (p != in_progress.end()) {
-	rdout(10) << __func__ << " cancel " << p->second
+	rdout(10) << __FFL__ << " cancel " << p->second
 		  << " (was in progress)" << dendl;
 	if (p->second.preempt) {
 	  preempt_by_prio.erase(make_pair(p->second.prio, p->second.item));
@@ -299,7 +299,7 @@ public:
 	}
 	in_progress.erase(p);
       } else {
-	rdout(10) << __func__ << " cancel " << item << " (not found)" << dendl;
+	rdout(10) << __FFL__ << " cancel " << item << " (not found)" << dendl;
       }
     }
     do_queues();

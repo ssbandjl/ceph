@@ -136,7 +136,7 @@ void DeterministicOpSequence::note_txn(coll_entry_t *entry,
   ghobject_t oid = get_txn_object(entry->m_cid);
   t->truncate(entry->m_cid, oid, 0);
   t->write(entry->m_cid, oid, 0, bl.length(), bl);
-  dout(10) << __func__ << " " << txn << dendl;
+  dout(10) << __FFL__ << " " << txn << dendl;
 }
 
 bool DeterministicOpSequence::do_touch(rngen_t& gen)

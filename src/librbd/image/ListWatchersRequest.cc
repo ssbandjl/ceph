@@ -15,7 +15,7 @@
 #define dout_subsys ceph_subsys_rbd
 #undef dout_prefix
 #define dout_prefix *_dout << "librbd::image::ListWatchersRequest: " << this \
-                           << " " << __func__ << ": "
+                           << " " << __FFL__ << ": "
 
 static std::ostream& operator<<(std::ostream& os, const obj_watch_t& watch) {
   os << "{addr=" << watch.addr << ", "

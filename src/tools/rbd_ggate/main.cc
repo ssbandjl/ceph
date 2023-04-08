@@ -38,7 +38,7 @@
 #define dout_context g_ceph_context
 #define dout_subsys ceph_subsys_rbd
 #undef dout_prefix
-#define dout_prefix *_dout << "rbd-ggate: " << __func__ << ": "
+#define dout_prefix *_dout << "rbd-ggate: " << __FFL__ << ": "
 
 static void usage() {
   std::cout << "Usage: rbd-ggate [options] map <image-or-snap-spec>  Map an image to ggate device\n"

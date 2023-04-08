@@ -213,7 +213,7 @@ void ObjectCacherWriteback::overwrite_extent(const object_t& oid, uint64_t off,
                                              ceph_tid_t new_journal_tid) {
   typedef std::vector<std::pair<uint64_t,uint64_t> > Extents;
 
-  ldout(m_ictx->cct, 20) << __func__ << ": " << oid << " "
+  ldout(m_ictx->cct, 20) << __FFL__ << ": " << oid << " "
                          << off << "~" << len << " "
                          << "journal_tid=" << original_journal_tid << ", "
                          << "new_journal_tid=" << new_journal_tid << dendl;

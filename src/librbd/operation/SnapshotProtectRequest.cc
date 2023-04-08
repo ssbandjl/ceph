@@ -46,7 +46,7 @@ template <typename I>
 bool SnapshotProtectRequest<I>::should_complete(int r) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": state=" << m_state << ", "
+  ldout(cct, 5) << this << " " << __FFL__ << ": state=" << m_state << ", "
                 << "r=" << r << dendl;
   if (r < 0) {
     if (r == -EBUSY) {
@@ -64,7 +64,7 @@ void SnapshotProtectRequest<I>::send_protect_snap() {
   ceph_assert(ceph_mutex_is_locked(image_ctx.owner_lock));
 
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
 
   int r = verify_and_send_protect_snap();
   if (r < 0) {

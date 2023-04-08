@@ -156,7 +156,7 @@ bool SnapMapper::check(const hobject_t &hoid) const
   if (hoid.match(mask_bits, match)) {
     return true;
   }
-  derr << __func__ << " " << hoid << " mask_bits " << mask_bits
+  derr << __FFL__ << " " << hoid << " mask_bits " << mask_bits
        << " match 0x" << std::hex << match << std::dec << " is false"
        << dendl;
   return false;
@@ -172,23 +172,23 @@ int SnapMapper::get_snaps(
   keys.insert(to_object_key(oid));
   int r = backend.get_keys(keys, &got);
   if (r < 0) {
-    dout(20) << __func__ << " " << oid << " got err " << r << dendl;
+    dout(20) << __FFL__ << " " << oid << " got err " << r << dendl;
     return r;
   }
   if (got.empty()) {
-    dout(20) << __func__ << " " << oid << " got.empty()" << dendl;
+    dout(20) << __FFL__ << " " << oid << " got.empty()" << dendl;
     return -ENOENT;
   }
   if (out) {
     auto bp = got.begin()->second.cbegin();
     decode(*out, bp);
-    dout(20) << __func__ << " " << oid << " " << out->snaps << dendl;
+    dout(20) << __FFL__ << " " << oid << " " << out->snaps << dendl;
     if (out->snaps.empty()) {
-      dout(1) << __func__ << " " << oid << " empty snapset" << dendl;
+      dout(1) << __FFL__ << " " << oid << " empty snapset" << dendl;
       ceph_assert(!cct->_conf->osd_debug_verify_snaps);
     }
   } else {
-    dout(20) << __func__ << " " << oid << " (out == NULL)" << dendl;
+    dout(20) << __FFL__ << " " << oid << " (out == NULL)" << dendl;
   }
   return 0;
 }
@@ -197,13 +197,13 @@ void SnapMapper::clear_snaps(
   const hobject_t &oid,
   MapCacher::Transaction<std::string, bufferlist> *t)
 {
-  dout(20) << __func__ << " " << oid << dendl;
+  dout(20) << __FFL__ << " " << oid << dendl;
   ceph_assert(check(oid));
   set<string> to_remove;
   to_remove.insert(to_object_key(oid));
   if (g_conf()->subsys.should_gather<ceph_subsys_osd, 20>()) {
     for (auto& i : to_remove) {
-      dout(20) << __func__ << " rm " << i << dendl;
+      dout(20) << __FFL__ << " rm " << i << dendl;
     }
   }
   backend.remove_keys(to_remove, t);
@@ -219,10 +219,10 @@ void SnapMapper::set_snaps(
   bufferlist bl;
   encode(in, bl);
   to_set[to_object_key(oid)] = bl;
-  dout(20) << __func__ << " " << oid << " " << in.snaps << dendl;
+  dout(20) << __FFL__ << " " << oid << " " << in.snaps << dendl;
   if (g_conf()->subsys.should_gather<ceph_subsys_osd, 20>()) {
     for (auto& i : to_set) {
-      dout(20) << __func__ << " set " << i.first << dendl;
+      dout(20) << __FFL__ << " set " << i.first << dendl;
     }
   }
   backend.set_keys(to_set, t);
@@ -234,7 +234,7 @@ int SnapMapper::update_snaps(
   const set<snapid_t> *old_snaps_check,
   MapCacher::Transaction<std::string, bufferlist> *t)
 {
-  dout(20) << __func__ << " " << oid << " " << new_snaps
+  dout(20) << __FFL__ << " " << oid << " " << new_snaps
 	   << " was " << (old_snaps_check ? *old_snaps_check : set<snapid_t>())
 	   << dendl;
   ceph_assert(check(oid));
@@ -262,7 +262,7 @@ int SnapMapper::update_snaps(
   }
   if (g_conf()->subsys.should_gather<ceph_subsys_osd, 20>()) {
     for (auto& i : to_remove) {
-      dout(20) << __func__ << " rm " << i << dendl;
+      dout(20) << __FFL__ << " rm " << i << dendl;
     }
   }
   backend.remove_keys(to_remove, t);
@@ -274,14 +274,14 @@ void SnapMapper::add_oid(
   const set<snapid_t>& snaps,
   MapCacher::Transaction<std::string, bufferlist> *t)
 {
-  dout(20) << __func__ << " " << oid << " " << snaps << dendl;
+  dout(20) << __FFL__ << " " << oid << " " << snaps << dendl;
   ceph_assert(!snaps.empty());
   ceph_assert(check(oid));
   {
     object_snaps out;
     int r = get_snaps(oid, &out);
     if (r != -ENOENT) {
-      derr << __func__ << " found existing snaps mapped on " << oid
+      derr << __FFL__ << " found existing snaps mapped on " << oid
 	   << ", removing" << dendl;
       ceph_assert(!cct->_conf->osd_debug_verify_snaps);
       remove_oid(oid, t);
@@ -299,7 +299,7 @@ void SnapMapper::add_oid(
   }
   if (g_conf()->subsys.should_gather<ceph_subsys_osd, 20>()) {
     for (auto& i : to_add) {
-      dout(20) << __func__ << " set " << i.first << dendl;
+      dout(20) << __FFL__ << " set " << i.first << dendl;
     }
   }
   backend.set_keys(to_add, t);
@@ -325,7 +325,7 @@ int SnapMapper::get_next_objects_to_trim(
     while (out->size() < max) {
       pair<string, bufferlist> next;
       r = backend.get_next(pos, &next);
-      dout(20) << __func__ << " get_next(" << pos << ") returns " << r
+      dout(20) << __FFL__ << " get_next(" << pos << ") returns " << r
 	       << " " << next << dendl;
       if (r != 0) {
 	break; // Done
@@ -338,7 +338,7 @@ int SnapMapper::get_next_objects_to_trim(
 
       ceph_assert(is_mapping(next.first));
 
-      dout(20) << __func__ << " " << next.first << dendl;
+      dout(20) << __FFL__ << " " << next.first << dendl;
       pair<snapid_t, hobject_t> next_decoded(from_raw(next));
       ceph_assert(next_decoded.first == snap);
       ceph_assert(check(next_decoded.second));
@@ -359,7 +359,7 @@ int SnapMapper::remove_oid(
   const hobject_t &oid,
   MapCacher::Transaction<std::string, bufferlist> *t)
 {
-  dout(20) << __func__ << " " << oid << dendl;
+  dout(20) << __FFL__ << " " << oid << dendl;
   ceph_assert(check(oid));
   return _remove_oid(oid, t);
 }
@@ -368,7 +368,7 @@ int SnapMapper::_remove_oid(
   const hobject_t &oid,
   MapCacher::Transaction<std::string, bufferlist> *t)
 {
-  dout(20) << __func__ << " " << oid << dendl;
+  dout(20) << __FFL__ << " " << oid << dendl;
   object_snaps out;
   int r = get_snaps(oid, &out);
   if (r < 0)
@@ -384,7 +384,7 @@ int SnapMapper::_remove_oid(
   }
   if (g_conf()->subsys.should_gather<ceph_subsys_osd, 20>()) {
     for (auto& i : to_remove) {
-      dout(20) << __func__ << " rm " << i << dendl;
+      dout(20) << __FFL__ << " rm " << i << dendl;
     }
   }
   backend.remove_keys(to_remove, t);
@@ -438,12 +438,12 @@ int SnapMapper::_lookup_purged_snap(
   auto it = store->get_omap_iterator(ch, hoid);
   it->lower_bound(k);
   if (!it->valid()) {
-    dout(20) << __func__ << " pool " << pool << " snap " << snap
+    dout(20) << __FFL__ << " pool " << pool << " snap " << snap
 	     << " key '" << k << "' lower_bound not found" << dendl;
     return -ENOENT;
   }
   if (it->key().find(PURGED_SNAP_PREFIX) != 0) {
-    dout(20) << __func__ << " pool " << pool << " snap " << snap
+    dout(20) << __FFL__ << " pool " << pool << " snap " << snap
 	     << " key '" << k << "' lower_bound got mismatched prefix '"
 	     << it->key() << "'" << dendl;
     return -ENOENT;
@@ -455,7 +455,7 @@ int SnapMapper::_lookup_purged_snap(
   decode(*begin, p);
   decode(*end, p);
   if (snap < *begin || snap >= *end) {
-    dout(20) << __func__ << " pool " << pool << " snap " << snap
+    dout(20) << __FFL__ << " pool " << pool << " snap " << snap
 	     << " found [" << *begin << "," << *end << "), no overlap" << dendl;
     return -ENOENT;
   }
@@ -470,7 +470,7 @@ void SnapMapper::record_purged_snaps(
   ObjectStore::Transaction *t,
   map<epoch_t,mempool::osdmap::map<int64_t,snap_interval_set_t>> purged_snaps)
 {
-  dout(10) << __func__ << " purged_snaps " << purged_snaps << dendl;
+  dout(10) << __FFL__ << " purged_snaps " << purged_snaps << dendl;
   map<string,bufferlist> m;
   set<string> rm;
   for (auto& [epoch, bypool] : purged_snaps) {
@@ -515,7 +515,7 @@ void SnapMapper::record_purged_snaps(
   }
   t->omap_rmkeys(ch->cid, hoid, rm);
   t->omap_setkeys(ch->cid, hoid, m);
-  dout(10) << __func__ << " rm " << rm.size() << " keys, set " << m.size()
+  dout(10) << __FFL__ << " rm " << rm.size() << " keys, set " << m.size()
 	   << " keys" << dendl;
 }
 
@@ -535,7 +535,7 @@ bool SnapMapper::Scrubber::_parse_p()
   ceph::decode(pool, p);
   ceph::decode(begin, p);
   ceph::decode(end, p);
-  dout(20) << __func__ << " purged_snaps pool " << pool
+  dout(20) << __FFL__ << " purged_snaps pool " << pool
 	   << " [" << begin << "," << end << ")" << dendl;
   psit->next();
   return true;
@@ -564,7 +564,7 @@ bool SnapMapper::Scrubber::_parse_m()
       shard = shard_id_t(sh);
     }
   }
-  dout(20) << __func__ << " mapping pool " << mapping.hoid.pool
+  dout(20) << __FFL__ << " mapping pool " << mapping.hoid.pool
 	   << " snap " << mapping.snap
 	   << " shard " << shard
 	   << " " << mapping.hoid << dendl;
@@ -574,7 +574,7 @@ bool SnapMapper::Scrubber::_parse_m()
 
 void SnapMapper::Scrubber::run()
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
 
   psit = store->get_omap_iterator(ch, purged_snaps_hoid);
   psit->upper_bound(PURGED_SNAP_PREFIX);
@@ -591,14 +591,14 @@ void SnapMapper::Scrubber::run()
       _parse_p();
     }
     if (pool < 0) {
-      dout(10) << __func__ << " passed final purged_snaps interval, rest ok"
+      dout(10) << __FFL__ << " passed final purged_snaps interval, rest ok"
 	       << dendl;
       break;
     }
     if (mapping.hoid.pool < pool ||
 	mapping.snap < begin) {
       // ok
-      dout(20) << __func__ << " ok " << mapping.hoid
+      dout(20) << __FFL__ << " ok " << mapping.hoid
 	       << " snap " << mapping.snap
 	       << " precedes pool " << pool
 	       << " purged_snaps [" << begin << "," << end << ")" << dendl;
@@ -607,7 +607,7 @@ void SnapMapper::Scrubber::run()
 	     mapping.snap < end &&
 	     mapping.hoid.pool == pool);
       // invalid
-      dout(10) << __func__ << " stray " << mapping.hoid
+      dout(10) << __FFL__ << " stray " << mapping.hoid
 	       << " snap " << mapping.snap
 	       << " in pool " << pool
 	       << " shard " << shard
@@ -619,7 +619,7 @@ void SnapMapper::Scrubber::run()
     }
   }
 
-  dout(10) << __func__ << " end, found " << stray.size() << " stray" << dendl;
+  dout(10) << __FFL__ << " end, found " << stray.size() << " stray" << dendl;
   psit = ObjectMap::ObjectMapIterator();
   mapit = ObjectMap::ObjectMapIterator();
 }
@@ -718,13 +718,13 @@ int SnapMapper::convert_legacy(
       if (!valid) {
 	break;
       }
-      dout(10) << __func__ << " converted " << n << " keys" << dendl;
+      dout(10) << __FFL__ << " converted " << n << " keys" << dendl;
     }
   }
 
   auto end = ceph::mono_clock::now();
 
-  dout(1) << __func__ << " converted " << n << " keys in "
+  dout(1) << __FFL__ << " converted " << n << " keys in "
 	  << timespan_str(end - start) << dendl;
 
   // remove the old keys

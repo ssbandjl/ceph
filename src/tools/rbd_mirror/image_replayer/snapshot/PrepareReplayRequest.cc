@@ -16,7 +16,7 @@
 #undef dout_prefix
 #define dout_prefix *_dout << "rbd::mirror::image_replayer::snapshot::" \
                            << "PrepareReplayRequest: " << this << " " \
-                           << __func__ << ": "
+                           << __FFL__ << ": "
 
 namespace rbd {
 namespace mirror {

@@ -41,7 +41,7 @@ using std::chrono::duration_cast;
 
 #define dout_context g_ceph_context
 #undef dout_prefix
-#define dout_prefix *_dout << "mds." << mds->get_nodeid() << ".bal " << __func__ << " "
+#define dout_prefix *_dout << "mds." << mds->get_nodeid() << ".bal " << __FFL__ << " "
 #undef dout
 #define dout(lvl) \
   do {\
@@ -518,7 +518,7 @@ double MDBalancer::try_match(balance_state_t& state, mds_rank_t ex, double& maxe
 
 void MDBalancer::queue_split(const CDir *dir, bool fast)
 {
-  dout(10) << __func__ << " enqueuing " << *dir
+  dout(10) << __FFL__ << " enqueuing " << *dir
                        << " (fast=" << fast << ")" << dendl;
 
   const dirfrag_t frag = dir->dirfrag();
@@ -544,7 +544,7 @@ void MDBalancer::queue_split(const CDir *dir, bool fast)
 
     // Pass on to MDCache: note that the split might still not
     // happen if the checks in MDCache::can_fragment fail.
-    dout(10) << __func__ << " splitting " << *split_dir << dendl;
+    dout(10) << __FFL__ << " splitting " << *split_dir << dendl;
     mds->mdcache->split_dir(split_dir, g_conf()->mds_bal_split_bits);
   };
 

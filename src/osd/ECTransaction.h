@@ -52,7 +52,7 @@ namespace ECTransaction {
 	  hinfo->get_projected_total_logical_size(sinfo);
 
 	if (i.second.deletes_first()) {
-	  ldpp_dout(dpp, 20) << __func__ << ": delete, setting projected size"
+	  ldpp_dout(dpp, 20) << __FFL__ << ": delete, setting projected size"
 			     << " to 0" << dendl;
 	  projected_size = 0;
 	}
@@ -75,7 +75,7 @@ namespace ECTransaction {
 	      sinfo.logical_to_prev_stripe_offset(i.second.truncate->first),
 	      sinfo.get_stripe_width());
 
-	    ldpp_dout(dpp, 20) << __func__ << ": unaligned truncate" << dendl;
+	    ldpp_dout(dpp, 20) << __FFL__ << ": unaligned truncate" << dendl;
 
 	    will_write.union_insert(
 	      sinfo.logical_to_prev_stripe_offset(i.second.truncate->first),
@@ -111,7 +111,7 @@ namespace ECTransaction {
 	      head_start < orig_size) {
 	    ceph_assert(head_finish <= orig_size);
 	    ceph_assert(head_finish - head_start == sinfo.get_stripe_width());
-	    ldpp_dout(dpp, 20) << __func__ << ": reading partial head stripe "
+	    ldpp_dout(dpp, 20) << __FFL__ << ": reading partial head stripe "
 			       << head_start << "~" << sinfo.get_stripe_width()
 			       << dendl;
 	    plan.to_read[i.first].union_insert(
@@ -129,7 +129,7 @@ namespace ECTransaction {
 	      tail_start < orig_size) {
 	    ceph_assert(tail_finish <= orig_size);
 	    ceph_assert(tail_finish - tail_start == sinfo.get_stripe_width());
-	    ldpp_dout(dpp, 20) << __func__ << ": reading partial tail stripe "
+	    ldpp_dout(dpp, 20) << __FFL__ << ": reading partial tail stripe "
 			       << tail_start << "~" << sinfo.get_stripe_width()
 			       << dendl;
 	    plan.to_read[i.first].union_insert(
@@ -154,7 +154,7 @@ namespace ECTransaction {
 	    i.second.truncate->second > projected_size) {
 	  uint64_t truncating_to =
 	    sinfo.logical_to_next_stripe_offset(i.second.truncate->second);
-	  ldpp_dout(dpp, 20) << __func__ << ": truncating out to "
+	  ldpp_dout(dpp, 20) << __FFL__ << ": truncating out to "
 			     <<  truncating_to
 			     << dendl;
 	  will_write.union_insert(projected_size,
@@ -162,7 +162,7 @@ namespace ECTransaction {
 	  projected_size = truncating_to;
 	}
 
-	ldpp_dout(dpp, 20) << __func__ << ": " << i.first
+	ldpp_dout(dpp, 20) << __FFL__ << ": " << i.first
 			   << " projected size "
 			   << projected_size
 			   << dendl;

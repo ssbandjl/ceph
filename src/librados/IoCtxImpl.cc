@@ -54,7 +54,7 @@ struct C_notify_Finish : public Context {
 
   void finish(int r) override
   {
-    ldout(cct, 10) << __func__ << " completed notify (linger op "
+    ldout(cct, 10) << __FFL__ << " completed notify (linger op "
                    << linger_op << "), r = " << r << dendl;
 
     // pass result back to user
@@ -172,7 +172,7 @@ struct C_aio_notify_Ack : public Context {
 
   void finish(int r) override
   {
-    ldout(cct, 10) << __func__ << " linger op " << oncomplete->linger_op << " "
+    ldout(cct, 10) << __FFL__ << " linger op " << oncomplete->linger_op << " "
                    << "acked (" << r << ")" << dendl;
     oncomplete->handle_ack(r);
   }
@@ -1593,7 +1593,7 @@ struct WatchInfo : public Objecter::WatchContext {
 		     uint64_t cookie,
 		     uint64_t notifier_id,
 		     bufferlist& bl) override {
-    ldout(ioctx->client->cct, 10) << __func__ << " " << notify_id
+    ldout(ioctx->client->cct, 10) << __FFL__ << " " << notify_id
 				  << " cookie " << cookie
 				  << " notifier_id " << notifier_id
 				  << " len " << bl.length()
@@ -1610,7 +1610,7 @@ struct WatchInfo : public Objecter::WatchContext {
     }
   }
   void handle_error(uint64_t cookie, int err) override {
-    ldout(ioctx->client->cct, 10) << __func__ << " cookie " << cookie
+    ldout(ioctx->client->cct, 10) << __FFL__ << " cookie " << cookie
 				  << " err " << err
 				  << dendl;
     if (ctx2)
@@ -1780,18 +1780,18 @@ int librados::IoCtxImpl::notify(const object_t& oid, bufferlist& bl,
 			  rd, snap_seq, inbl, NULL,
 			  &onack, &objver);
 
-  ldout(client->cct, 10) << __func__ << " issued linger op " << linger_op << dendl;
+  ldout(client->cct, 10) << __FFL__ << " issued linger op " << linger_op << dendl;
   int r = onack.wait();
-  ldout(client->cct, 10) << __func__ << " linger op " << linger_op
+  ldout(client->cct, 10) << __FFL__ << " linger op " << linger_op
 			 << " acked (" << r << ")" << dendl;
 
   if (r == 0) {
-    ldout(client->cct, 10) << __func__ << " waiting for watch_notify finish "
+    ldout(client->cct, 10) << __FFL__ << " waiting for watch_notify finish "
 			   << linger_op << dendl;
     r = notify_finish_cond.wait();
 
   } else {
-    ldout(client->cct, 10) << __func__ << " failed to initiate notify, r = "
+    ldout(client->cct, 10) << __FFL__ << " failed to initiate notify, r = "
 			   << r << dendl;
     notify_finish_cond.wait();
   }

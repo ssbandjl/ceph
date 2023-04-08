@@ -67,7 +67,7 @@ ObjectPlayer::~ObjectPlayer() {
 }
 
 void ObjectPlayer::fetch(Context *on_finish) {
-  ldout(m_cct, 10) << __func__ << ": " << m_oid << dendl;
+  ldout(m_cct, 10) << __FFL__ << ": " << m_oid << dendl;
 
   std::lock_guard locker{m_lock};
   ceph_assert(!m_fetch_in_progress);
@@ -86,7 +86,7 @@ void ObjectPlayer::fetch(Context *on_finish) {
 }
 
 void ObjectPlayer::watch(Context *on_fetch, double interval) {
-  ldout(m_cct, 20) << __func__ << ": " << m_oid << " watch" << dendl;
+  ldout(m_cct, 20) << __FFL__ << ": " << m_oid << " watch" << dendl;
 
   std::lock_guard timer_locker{m_timer_lock};
   m_watch_interval = interval;
@@ -98,7 +98,7 @@ void ObjectPlayer::watch(Context *on_fetch, double interval) {
 }
 
 void ObjectPlayer::unwatch() {
-  ldout(m_cct, 20) << __func__ << ": " << m_oid << " unwatch" << dendl;
+  ldout(m_cct, 20) << __FFL__ << ": " << m_oid << " unwatch" << dendl;
   Context *watch_ctx = nullptr;
   {
     std::lock_guard timer_locker{m_timer_lock};
@@ -134,7 +134,7 @@ void ObjectPlayer::pop_front() {
 
 int ObjectPlayer::handle_fetch_complete(int r, const bufferlist &bl,
                                         bool *refetch) {
-  ldout(m_cct, 10) << __func__ << ": " << m_oid << ", r=" << r << ", len="
+  ldout(m_cct, 10) << __FFL__ << ": " << m_oid << ", r=" << r << ", len="
                    << bl.length() << dendl;
 
   *refetch = false;
@@ -277,7 +277,7 @@ void ObjectPlayer::schedule_watch() {
     return;
   }
 
-  ldout(m_cct, 20) << __func__ << ": " << m_oid << " scheduling watch" << dendl;
+  ldout(m_cct, 20) << __FFL__ << ": " << m_oid << " scheduling watch" << dendl;
   ceph_assert(m_watch_task == nullptr);
   m_watch_task = m_timer.add_event_after(
     m_watch_interval,
@@ -288,7 +288,7 @@ void ObjectPlayer::schedule_watch() {
 
 bool ObjectPlayer::cancel_watch() {
   ceph_assert(ceph_mutex_is_locked(m_timer_lock));
-  ldout(m_cct, 20) << __func__ << ": " << m_oid << " cancelling watch" << dendl;
+  ldout(m_cct, 20) << __FFL__ << ": " << m_oid << " cancelling watch" << dendl;
   if (m_watch_task != nullptr) {
     bool canceled = m_timer.cancel_event(m_watch_task);
     ceph_assert(canceled);
@@ -302,7 +302,7 @@ bool ObjectPlayer::cancel_watch() {
 void ObjectPlayer::handle_watch_task() {
   ceph_assert(ceph_mutex_is_locked(m_timer_lock));
 
-  ldout(m_cct, 10) << __func__ << ": " << m_oid << " polling" << dendl;
+  ldout(m_cct, 10) << __FFL__ << ": " << m_oid << " polling" << dendl;
   ceph_assert(m_watch_ctx != nullptr);
   ceph_assert(m_watch_task != nullptr);
 
@@ -311,7 +311,7 @@ void ObjectPlayer::handle_watch_task() {
 }
 
 void ObjectPlayer::handle_watch_fetched(int r) {
-  ldout(m_cct, 10) << __func__ << ": " << m_oid << " poll complete, r=" << r
+  ldout(m_cct, 10) << __FFL__ << ": " << m_oid << " poll complete, r=" << r
                    << dendl;
 
   Context *watch_ctx = nullptr;

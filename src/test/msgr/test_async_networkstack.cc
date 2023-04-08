@@ -69,7 +69,7 @@ class NetworkWorkerTest : public ::testing::TestWithParam<const char*> {
 
   NetworkWorkerTest() {}
   void SetUp() override {
-    cerr << __func__ << " start set up " << GetParam() << std::endl;
+    cerr << __FFL__ << " start set up " << GetParam() << std::endl;
     if (strncmp(GetParam(), "dpdk", 4)) {
       g_ceph_context->_conf.set_val("ms_type", "async+posix");
       addr = "127.0.0.1:15000";

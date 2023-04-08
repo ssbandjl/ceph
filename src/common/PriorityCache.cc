@@ -281,7 +281,7 @@ namespace PriorityCache
 
     // Assign memory for each priority level
     for (int i = 0; i < Priority::LAST+1; i++) {
-      ldout(cct, 10) << __func__ << " assigning cache bytes for PRI: " << i << dendl;
+      ldout(cct, 10) << __FFL__ << " assigning cache bytes for PRI: " << i << dendl;
 
       auto pri = static_cast<Priority>(i);
       balance_priority(&mem_avail, pri);
@@ -343,7 +343,7 @@ namespace PriorityCache
         }
         int64_t fair_share = static_cast<int64_t>(*mem_avail * ratio);
 
-        ldout(cct, 10) << __func__ << " " << it->first
+        ldout(cct, 10) << __FFL__ << " " << it->first
                        << " pri: " << (int) pri
                        << " round: " << round
                        << " wanted: " << cache_wants

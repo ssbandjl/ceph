@@ -34,12 +34,12 @@ ConfigMonitor::ConfigMonitor(Monitor *m, Paxos *p, const string& service_name)
 
 void ConfigMonitor::init()
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
 }
 
 void ConfigMonitor::create_initial()
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   version = 0;
   pending.clear();
 }
@@ -50,7 +50,7 @@ void ConfigMonitor::update_from_paxos(bool *need_bootstrap)
     return;
   }
   version = get_last_committed();
-  dout(10) << __func__ << " " << version << dendl;
+  dout(10) << __FFL__ << " " << version << dendl;
   load_config();
   check_all_subs();
 }
@@ -69,7 +69,7 @@ void ConfigMonitor::encode_pending(MonitorDBStore::TransactionRef t)
 
   for (auto& [key, value] : pending_cleanup) {
     if (pending.count(key) == 0) {
-      derr << __func__ << " repair: adjusting config key '" << key << "'"
+      derr << __FFL__ << " repair: adjusting config key '" << key << "'"
 	   << dendl;
       pending[key] = value;
     }
@@ -97,11 +97,11 @@ void ConfigMonitor::encode_pending(MonitorDBStore::TransactionRef t)
       continue;
     }
     if (p.second) {
-      dout(20) << __func__ << " set " << key << dendl;
+      dout(20) << __FFL__ << " set " << key << dendl;
       t->put(CONFIG_PREFIX, key, *p.second);
       t->put(CONFIG_PREFIX, history + "+" + p.first, *p.second);
     } else {
-      dout(20) << __func__ << " rm " << key << dendl;
+      dout(20) << __FFL__ << " rm " << key << dendl;
       t->erase(CONFIG_PREFIX, key);
     }
   }
@@ -283,7 +283,7 @@ bool ConfigMonitor::preprocess_command(MonOpRequestRef op)
       if (c) {
 	device_class = c;
       }
-      dout(10) << __func__ << " crush_location " << crush_location
+      dout(10) << __FFL__ << " crush_location " << crush_location
 	       << " class " << device_class << dendl;
     }
 
@@ -445,7 +445,7 @@ bool ConfigMonitor::preprocess_command(MonOpRequestRef op)
 void ConfigMonitor::handle_get_config(MonOpRequestRef op)
 {
   auto m = op->get_req<MGetConfig>();
-  dout(10) << __func__ << " " << m->name << " host " << m->host << dendl;
+  dout(10) << __FFL__ << " " << m->name << " host " << m->host << dendl;
 
   const OSDMap& osdmap = mon->osdmon()->osdmap;
   map<string,string> crush_location;
@@ -598,7 +598,7 @@ bool ConfigMonitor::prepare_command(MonOpRequestRef op)
     bool updated = false;
     ostringstream newconf;
     for (auto& [section, s] : cf) {
-      dout(20) << __func__ << " [" << section << "]" << dendl;
+      dout(20) << __FFL__ << " [" << section << "]" << dendl;
       bool did_section = false;
       for (auto& [key, val] : s) {
 	Option::value_t real_value;
@@ -620,7 +620,7 @@ bool ConfigMonitor::prepare_command(MonOpRequestRef op)
 	// normalize
 	err = o->parse_value(val, &real_value, &errstr, &value);
 	if (err < 0) {
-	  dout(20) << __func__ << " failed to parse " << key << " = '"
+	  dout(20) << __FFL__ << " failed to parse " << key << " = '"
 		   << val << "'" << dendl;
 	  goto skip;
 	}
@@ -631,18 +631,18 @@ bool ConfigMonitor::prepare_command(MonOpRequestRef op)
 	    auto k = s->options.find(key);
 	    if (k != s->options.end()) {
 	      if (value != k->second.raw_value) {
-		dout(20) << __func__ << " have " << key
+		dout(20) << __FFL__ << " have " << key
 			 << " = " << k->second.raw_value
 			 << " (not " << value << ")" << dendl;
 		goto skip;
 	      }
-	      dout(20) << __func__ << " already have " << key
+	      dout(20) << __FFL__ << " already have " << key
 		       << " = " << k->second.raw_value << dendl;
 	      continue;
 	    }
 	  }
 	}
-	dout(20) << __func__ << "  add " << key << " = " << value
+	dout(20) << __FFL__ << "  add " << key << " = " << value
 		 << " (" << val << ")" << dendl;
 	{
 	  bufferlist bl;
@@ -653,7 +653,7 @@ bool ConfigMonitor::prepare_command(MonOpRequestRef op)
 	continue;
 
        skip:
-	dout(20) << __func__ << " skip " << key << " = " << value
+	dout(20) << __FFL__ << " skip " << key << " = " << value
 		 << " (" << val << ")" << dendl;
 	if (!did_section) {
 	  newconf << "\n[" << section << "]\n";
@@ -708,7 +708,7 @@ void ConfigMonitor::tick()
   if (!is_active() || !mon->is_leader()) {
     return;
   }
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   bool changed = false;
   if (!pending_cleanup.empty()) {
     changed = true;
@@ -755,7 +755,7 @@ void ConfigMonitor::load_config()
       opt = mon->mgrmon()->find_module_option(name);
     }
     if (!opt) {
-      dout(10) << __func__ << " unrecognized option '" << name << "'" << dendl;
+      dout(10) << __FFL__ << " unrecognized option '" << name << "'" << dendl;
       config_map.stray_options.push_back(
 	std::unique_ptr<Option>(
 	  new Option(name, Option::TYPE_STR, Option::LEVEL_UNKNOWN)));
@@ -765,7 +765,7 @@ void ConfigMonitor::load_config()
     string err;
     int r = opt->pre_validate(&value, &err);
     if (r < 0) {
-      dout(10) << __func__ << " pre-validate failed on '" << name << "' = '"
+      dout(10) << __FFL__ << " pre-validate failed on '" << name << "' = '"
 	       << value << "' for " << name << dendl;
     }
     
@@ -774,17 +774,17 @@ void ConfigMonitor::load_config()
     string section_name;
     if (who.size() &&
 	!ConfigMap::parse_mask(who, &section_name, &mopt.mask)) {
-      derr << __func__ << " invalid mask for key " << key << dendl;
+      derr << __FFL__ << " invalid mask for key " << key << dendl;
       pending_cleanup[key] = boost::none;
     } else if (opt->has_flag(Option::FLAG_NO_MON_UPDATE)) {
-      dout(10) << __func__ << " NO_MON_UPDATE option '"
+      dout(10) << __FFL__ << " NO_MON_UPDATE option '"
 	       << name << "' = '" << value << "' for " << name
 	       << dendl;
       pending_cleanup[key] = boost::none;
     } else {
       if (section_name.empty()) {
 	// we prefer global/$option instead of just $option
-	derr << __func__ << " adding global/ prefix to key '" << key << "'"
+	derr << __FFL__ << " adding global/ prefix to key '" << key << "'"
 	     << dendl;
 	pending_cleanup[key] = boost::none;
 	pending_cleanup["global/"s + key] = it->value();
@@ -802,7 +802,7 @@ void ConfigMonitor::load_config()
     }
     it->next();
   }
-  dout(10) << __func__ << " got " << num << " keys" << dendl;
+  dout(10) << __FFL__ << " got " << num << " keys" << dendl;
 
   // refresh our own config
   {
@@ -833,7 +833,7 @@ void ConfigMonitor::load_changeset(version_t v, ConfigChangeSet *ch)
 	decode(ch->name, p);
       }
       catch (buffer::error& e) {
-	derr << __func__ << " failure decoding changeset " << v << dendl;
+	derr << __FFL__ << " failure decoding changeset " << v << dendl;
       }
     } else {
       char op = it->key()[prefix.length()];
@@ -854,7 +854,7 @@ bool ConfigMonitor::refresh_config(MonSession *s)
   map<string,string> crush_location;
   if (s->remote_host.size()) {
     osdmap.crush->get_full_location(s->remote_host, &crush_location);
-    dout(10) << __func__ << " crush_location for remote_host " << s->remote_host
+    dout(10) << __FFL__ << " crush_location for remote_host " << s->remote_host
 	     << " is " << crush_location << dendl;
   }
 
@@ -863,11 +863,11 @@ bool ConfigMonitor::refresh_config(MonSession *s)
     const char *c = osdmap.crush->get_item_class(s->name.num());
     if (c) {
       device_class = c;
-      dout(10) << __func__ << " device_class " << device_class << dendl;
+      dout(10) << __FFL__ << " device_class " << device_class << dendl;
     }
   }
 
-  dout(20) << __func__ << " " << s->entity_name << " crush " << crush_location
+  dout(20) << __FFL__ << " " << s->entity_name << " crush " << crush_location
 	   << " device_class " << device_class << dendl;
   auto out = config_map.generate_entity_map(
     s->entity_name,
@@ -876,12 +876,12 @@ bool ConfigMonitor::refresh_config(MonSession *s)
     device_class);
 
   if (out == s->last_config && s->any_config) {
-    dout(20) << __func__ << " no change, " << out << dendl;
+    dout(20) << __FFL__ << " no change, " << out << dendl;
     return false;
   }
   // removing this to hide sensitive data going into logs
   // leaving this for debugging purposes
- //  dout(20) << __func__ << " " << out << dendl;
+ //  dout(20) << __FFL__ << " " << out << dendl;
   s->last_config = std::move(out);
   s->any_config = true;
   return true;
@@ -890,7 +890,7 @@ bool ConfigMonitor::refresh_config(MonSession *s)
 bool ConfigMonitor::maybe_send_config(MonSession *s)
 {
   bool changed = refresh_config(s);
-  dout(10) << __func__ << " to " << s->name << " "
+  dout(10) << __FFL__ << " to " << s->name << " "
 	   << (changed ? "(changed)" : "(unchanged)")
 	   << dendl;
   if (changed) {
@@ -901,7 +901,7 @@ bool ConfigMonitor::maybe_send_config(MonSession *s)
 
 void ConfigMonitor::send_config(MonSession *s)
 {
-  dout(10) << __func__ << " to " << s->name << dendl;
+  dout(10) << __FFL__ << " to " << s->name << dendl;
   auto m = new MConfig(s->last_config);
   s->con->send_message(m);
 }
@@ -909,7 +909,7 @@ void ConfigMonitor::send_config(MonSession *s)
 void ConfigMonitor::check_sub(MonSession *s)
 {
   if (!s->authenticated) {
-    dout(20) << __func__ << " not authenticated " << s->entity_name << dendl;
+    dout(20) << __FFL__ << " not authenticated " << s->entity_name << dendl;
     return;
   }
   auto p = s->sub_map.find("config");
@@ -937,7 +937,7 @@ void ConfigMonitor::check_sub(Subscription *sub)
 
 void ConfigMonitor::check_all_subs()
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   auto subs = mon->session_map.subs.find("config");
   if (subs == mon->session_map.subs.end()) {
     return;
@@ -952,5 +952,5 @@ void ConfigMonitor::check_all_subs()
       ++updated;
     }
   }
-  dout(10) << __func__ << " updated " << updated << " / " << total << dendl;
+  dout(10) << __FFL__ << " updated " << updated << " / " << total << dendl;
 }

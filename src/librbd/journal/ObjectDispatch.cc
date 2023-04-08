@@ -14,7 +14,7 @@
 #define dout_subsys ceph_subsys_rbd
 #undef dout_prefix
 #define dout_prefix *_dout << "librbd::journal::ObjectDispatch: " << this \
-                           << " " << __func__ << ": "
+                           << " " << __FFL__ << ": "
 
 namespace librbd {
 namespace journal {

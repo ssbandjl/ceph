@@ -38,7 +38,7 @@ CreateRequest<I>::CreateRequest(IoCtx &ioctx, const std::string &imageid,
 
 template<typename I>
 void CreateRequest<I>::send() {
-  ldout(m_cct, 20) << this << " " << __func__ << dendl;
+  ldout(m_cct, 20) << this << " " << __FFL__ << dendl;
 
   if (m_order > 64 || m_order < 12) {
     lderr(m_cct) << "order must be in the range [12, 64]" << dendl;
@@ -55,7 +55,7 @@ void CreateRequest<I>::send() {
 
 template<typename I>
 void CreateRequest<I>::get_pool_id() {
-  ldout(m_cct, 20) << this << " " << __func__ << dendl;
+  ldout(m_cct, 20) << this << " " << __FFL__ << dendl;
 
   if (m_object_pool.empty()) {
     create_journal();
@@ -80,7 +80,7 @@ void CreateRequest<I>::get_pool_id() {
 
 template<typename I>
 void CreateRequest<I>::create_journal() {
-  ldout(m_cct, 20) << this << " " << __func__ << dendl;
+  ldout(m_cct, 20) << this << " " << __FFL__ << dendl;
 
   ImageCtx::get_timer_instance(m_cct, &m_timer, &m_timer_lock);
   m_journaler = new Journaler(m_op_work_queue, m_timer, m_timer_lock, m_ioctx,
@@ -94,7 +94,7 @@ void CreateRequest<I>::create_journal() {
 
 template<typename I>
 Context *CreateRequest<I>::handle_create_journal(int *result) {
-  ldout(m_cct, 20) << __func__ << ": r=" << *result << dendl;
+  ldout(m_cct, 20) << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(m_cct) << "failed to create journal: " << cpp_strerror(*result) << dendl;
@@ -108,7 +108,7 @@ Context *CreateRequest<I>::handle_create_journal(int *result) {
 
 template<typename I>
 void CreateRequest<I>::allocate_journal_tag() {
-  ldout(m_cct, 20) << this << " " << __func__ << dendl;
+  ldout(m_cct, 20) << this << " " << __FFL__ << dendl;
 
   using klass = CreateRequest<I>;
   Context *ctx = create_context_callback<klass, &klass::handle_journal_tag>(this);
@@ -119,7 +119,7 @@ void CreateRequest<I>::allocate_journal_tag() {
 
 template<typename I>
 Context *CreateRequest<I>::handle_journal_tag(int *result) {
-  ldout(m_cct, 20) << __func__ << ": r=" << *result << dendl;
+  ldout(m_cct, 20) << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(m_cct) << "failed to allocate tag: " << cpp_strerror(*result) << dendl;
@@ -133,7 +133,7 @@ Context *CreateRequest<I>::handle_journal_tag(int *result) {
 
 template<typename I>
 void CreateRequest<I>::register_client() {
-  ldout(m_cct, 20) << this << " " << __func__ << dendl;
+  ldout(m_cct, 20) << this << " " << __FFL__ << dendl;
 
   m_bl.clear();
   encode(ClientData{ImageClientMeta{m_tag.tag_class}}, m_bl);
@@ -146,7 +146,7 @@ void CreateRequest<I>::register_client() {
 
 template<typename I>
 Context *CreateRequest<I>::handle_register_client(int *result) {
-  ldout(m_cct, 20) << __func__ << ": r=" << *result << dendl;
+  ldout(m_cct, 20) << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(m_cct) << "failed to register client: " << cpp_strerror(*result) << dendl;
@@ -158,7 +158,7 @@ Context *CreateRequest<I>::handle_register_client(int *result) {
 
 template<typename I>
 void CreateRequest<I>::shut_down_journaler(int r) {
-  ldout(m_cct, 20) << this << " " << __func__ << dendl;
+  ldout(m_cct, 20) << this << " " << __FFL__ << dendl;
 
   m_r_saved = r;
 
@@ -170,7 +170,7 @@ void CreateRequest<I>::shut_down_journaler(int r) {
 
 template<typename I>
 Context *CreateRequest<I>::handle_journaler_shutdown(int *result) {
-  ldout(m_cct, 20) << __func__ << ": r=" << *result << dendl;
+  ldout(m_cct, 20) << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(m_cct) << "failed to shut down journaler: " << cpp_strerror(*result) << dendl;
@@ -194,7 +194,7 @@ Context *CreateRequest<I>::handle_journaler_shutdown(int *result) {
 
 template<typename I>
 void CreateRequest<I>::remove_journal() {
-  ldout(m_cct, 20) << this << " " << __func__ << dendl;
+  ldout(m_cct, 20) << this << " " << __FFL__ << dendl;
 
   using klass = CreateRequest<I>;
   Context *ctx = create_context_callback<klass, &klass::handle_remove_journal>(this);
@@ -206,7 +206,7 @@ void CreateRequest<I>::remove_journal() {
 
 template<typename I>
 Context *CreateRequest<I>::handle_remove_journal(int *result) {
-  ldout(m_cct, 20) << __func__ << ": r=" << *result << dendl;
+  ldout(m_cct, 20) << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(m_cct) << "error cleaning up journal after creation failed: "
@@ -219,7 +219,7 @@ Context *CreateRequest<I>::handle_remove_journal(int *result) {
 
 template<typename I>
 void CreateRequest<I>::complete(int r) {
-  ldout(m_cct, 20) << this << " " << __func__ << dendl;
+  ldout(m_cct, 20) << this << " " << __FFL__ << dendl;
 
   if (r == 0) {
     ldout(m_cct, 20) << "done." << dendl;

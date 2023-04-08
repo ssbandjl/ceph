@@ -232,7 +232,7 @@ void JournalRecorder::handle_advance_object_set(int r) {
   Context *on_object_set_advanced = nullptr;
   {
     std::lock_guard locker{m_lock};
-    ldout(m_cct, 20) << __func__ << ": r=" << r << dendl;
+    ldout(m_cct, 20) << __FFL__ << ": r=" << r << dendl;
 
     ceph_assert(m_in_flight_advance_sets > 0);
     --m_in_flight_advance_sets;

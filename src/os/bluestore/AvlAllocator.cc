@@ -274,12 +274,12 @@ int AvlAllocator::_allocate(
     ceph_assert(align != 0);
     uint64_t* cursor = &lbas[cbits(align) - 1];
     start = _pick_block_after(cursor, size, unit);
-    dout(20) << __func__ << " first fit=" << start << " size=" << size << dendl;
+    dout(20) << __FFL__ << " first fit=" << start << " size=" << size << dendl;
   }
   if (start == -1ULL) {
     do {
       start = _pick_block_fits(size, unit);
-      dout(20) << __func__ << " best fit=" << start << " size=" << size << dendl;
+      dout(20) << __FFL__ << " best fit=" << start << " size=" << size << dendl;
       if (start != uint64_t(-1ULL)) {
         break;
       }
@@ -304,7 +304,7 @@ void AvlAllocator::_release(const interval_set<uint64_t>& release_set)
   for (auto p = release_set.begin(); p != release_set.end(); ++p) {
     const auto offset = p.get_start();
     const auto length = p.get_len();
-    ldout(cct, 10) << __func__ << std::hex
+    ldout(cct, 10) << __FFL__ << std::hex
       << " offset 0x" << offset
       << " length 0x" << length
       << std::dec << dendl;
@@ -314,7 +314,7 @@ void AvlAllocator::_release(const interval_set<uint64_t>& release_set)
 
 void AvlAllocator::_release(const PExtentVector& release_set) {
   for (auto& e : release_set) {
-    ldout(cct, 10) << __func__ << std::hex
+    ldout(cct, 10) << __FFL__ << std::hex
       << " offset 0x" << e.offset
       << " length 0x" << e.length
       << std::dec << dendl;
@@ -367,7 +367,7 @@ int64_t AvlAllocator::allocate(
   int64_t  hint, // unused, for now!
   PExtentVector* extents)
 {
-  ldout(cct, 10) << __func__ << std::hex
+  ldout(cct, 10) << __FFL__ << std::hex
                  << " want 0x" << want
                  << " unit 0x" << unit
                  << " max_alloc_size 0x" << max_alloc_size
@@ -412,7 +412,7 @@ void AvlAllocator::dump()
 
 void AvlAllocator::_dump() const
 {
-  ldout(cct, 0) << __func__ << " range_tree: " << dendl;
+  ldout(cct, 0) << __FFL__ << " range_tree: " << dendl;
   for (auto& rs : range_tree) {
     ldout(cct, 0) << std::hex
       << "0x" << rs.start << "~" << rs.end
@@ -420,7 +420,7 @@ void AvlAllocator::_dump() const
       << dendl;
   }
 
-  ldout(cct, 0) << __func__ << " range_size_tree: " << dendl;
+  ldout(cct, 0) << __FFL__ << " range_size_tree: " << dendl;
   for (auto& rs : range_size_tree) {
     ldout(cct, 0) << std::hex
       << "0x" << rs.start << "~" << rs.end
@@ -441,7 +441,7 @@ void AvlAllocator::init_add_free(uint64_t offset, uint64_t length)
   if (!length)
     return;
   std::lock_guard l(lock);
-  ldout(cct, 10) << __func__ << std::hex
+  ldout(cct, 10) << __FFL__ << std::hex
                  << " offset 0x" << offset
                  << " length 0x" << length
                  << std::dec << dendl;
@@ -453,7 +453,7 @@ void AvlAllocator::init_rm_free(uint64_t offset, uint64_t length)
   if (!length)
     return;
   std::lock_guard l(lock);
-  ldout(cct, 10) << __func__ << std::hex
+  ldout(cct, 10) << __FFL__ << std::hex
                  << " offset 0x" << offset
                  << " length 0x" << length
                  << std::dec << dendl;

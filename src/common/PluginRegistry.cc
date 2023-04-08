@@ -71,7 +71,7 @@ int PluginRegistry::remove(const std::string& type, const std::string& name)
   if (j == i->second.end())
     return -ENOENT;
 
-  ldout(cct, 1) << __func__ << " " << type << " " << name << dendl;
+  ldout(cct, 1) << __FFL__ << " " << type << " " << name << dendl;
   void *library = j->second->library;
   delete j->second;
   dlclose(library);
@@ -91,7 +91,7 @@ int PluginRegistry::add(const std::string& type,
       plugins[type].count(name)) {
     return -EEXIST;
   }
-  ldout(cct, 1) << __func__ << " " << type << " " << name
+  ldout(cct, 1) << __FFL__ << " " << type << " " << name
 		<< " " << plugin << dendl;
   plugins[type][name] = plugin;
   return 0;
@@ -127,7 +127,7 @@ Plugin *PluginRegistry::get(const std::string& type,
   ret = j->second;
 
  out:
-  ldout(cct, 1) << __func__ << " " << type << " " << name
+  ldout(cct, 1) << __FFL__ << " " << type << " " << name
 		<< " = " << ret << dendl;
   return ret;
 }
@@ -136,7 +136,7 @@ int PluginRegistry::load(const std::string &type,
 			 const std::string &name)
 {
   ceph_assert(ceph_mutex_is_locked(lock));
-  ldout(cct, 1) << __func__ << " " << type << " " << name << dendl;
+  ldout(cct, 1) << __FFL__ << " " << type << " " << name << dendl;
 
   // std::string fname = cct->_conf->plugin_dir + "/" + type + "/" PLUGIN_PREFIX
   //  + name + PLUGIN_SUFFIX;
@@ -161,11 +161,11 @@ int PluginRegistry::load(const std::string &type,
   const char * (*code_version)() =
     (const char *(*)())dlsym(library, PLUGIN_VERSION_FUNCTION);
   if (code_version == NULL) {
-    lderr(cct) << __func__ << " code_version == NULL" << dlerror() << dendl;
+    lderr(cct) << __FFL__ << " code_version == NULL" << dlerror() << dendl;
     return -EXDEV;
   }
   if (code_version() != string(CEPH_GIT_NICE_VER)) {
-    lderr(cct) << __func__ << " plugin " << fname << " version "
+    lderr(cct) << __FFL__ << " plugin " << fname << " version "
 	       << code_version() << " != expected "
 	       << CEPH_GIT_NICE_VER << dendl;
     dlclose(library);
@@ -181,7 +181,7 @@ int PluginRegistry::load(const std::string &type,
   if (code_init) {
     int r = code_init(cct, type, name);
     if (r != 0) {
-      lderr(cct) << __func__ << " " << fname << " "
+      lderr(cct) << __FFL__ << " " << fname << " "
 		 << PLUGIN_INIT_FUNCTION << "(" << cct
 		 << "," << type << "," << name << "): " << cpp_strerror(r)
 		 << dendl;
@@ -189,7 +189,7 @@ int PluginRegistry::load(const std::string &type,
       return r;
     }
   } else {
-    lderr(cct) << __func__ << " " << fname << " dlsym(" << PLUGIN_INIT_FUNCTION
+    lderr(cct) << __FFL__ << " " << fname << " dlsym(" << PLUGIN_INIT_FUNCTION
 	       << "): " << dlerror() << dendl;
     dlclose(library);
     return -ENOENT;
@@ -197,7 +197,7 @@ int PluginRegistry::load(const std::string &type,
 
   Plugin *plugin = get(type, name);
   if (plugin == 0) {
-    lderr(cct) << __func__ << " " << fname << " "
+    lderr(cct) << __FFL__ << " " << fname << " "
 	       << PLUGIN_INIT_FUNCTION << "()"
 	       << "did not register plugin type " << type << " name " << name
 	       << dendl;
@@ -207,7 +207,7 @@ int PluginRegistry::load(const std::string &type,
 
   plugin->library = library;
 
-  ldout(cct, 1) << __func__ << ": " << type << " " << name
+  ldout(cct, 1) << __FFL__ << ": " << type << " " << name
 		<< " loaded and registered" << dendl;
   return 0;
 }

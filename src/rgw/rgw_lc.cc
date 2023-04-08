@@ -359,7 +359,7 @@ static bool obj_has_expired(CephContext *cct, ceph::real_time mtime, int days,
     *expire_time = mtime + make_timespan(cmp);
   }
 
-  ldout(cct, 20) << __func__ << __func__
+  ldout(cct, 20) << __FFL__ << __func__
 		 << "(): mtime=" << mtime << " days=" << days
 		 << " base_time=" << base_time << " timediff=" << timediff
 		 << " cmp=" << cmp
@@ -879,7 +879,7 @@ int RGWLC::handle_multipart_expiration(
        ++prefix_iter) {
 
     if (worker_should_stop(stop_at, once)) {
-      ldout(cct, 5) << __func__ << " interval budget EXPIRED worker "
+      ldout(cct, 5) << __FFL__ << " interval budget EXPIRED worker "
 		     << worker->ix
 		     << dendl;
       return 0;
@@ -987,7 +987,7 @@ static int check_tags(lc_op_ctx& oc, bool *skip)
     }
 
     if (! has_all_tags(op, dest_obj_tags)) {
-      ldout(oc.cct, 20) << __func__ << "() skipping obj " << oc.obj
+      ldout(oc.cct, 20) << __FFL__ << "() skipping obj " << oc.obj
 			<< " as tags do not match in rule: "
 			<< op.id << " "
 			<< oc.wq->thr_name() << dendl;
@@ -1031,7 +1031,7 @@ public:
   bool check(lc_op_ctx& oc, ceph::real_time *exp_time) override {
     auto& o = oc.o;
     if (!o.is_current()) {
-      ldout(oc.cct, 20) << __func__ << "(): key=" << o.key
+      ldout(oc.cct, 20) << __FFL__ << "(): key=" << o.key
 			<< ": not current, skipping "
 			<< oc.wq->thr_name() << dendl;
       return false;
@@ -1040,12 +1040,12 @@ public:
       std::string nkn;
       if (oc.next_key_name) nkn = *oc.next_key_name;
       if (oc.next_has_same_name(o.key.name)) {
-	ldout(oc.cct, 7) << __func__ << "(): dm-check SAME: key=" << o.key
+	ldout(oc.cct, 7) << __FFL__ << "(): dm-check SAME: key=" << o.key
 		       << " next_key_name: %%" << nkn << "%% "
 		       << oc.wq->thr_name() << dendl;
 	return false;
       } else {
-	ldout(oc.cct, 7) << __func__ << "(): dm-check DELE: key=" << o.key
+	ldout(oc.cct, 7) << __FFL__ << "(): dm-check DELE: key=" << o.key
 			 << " next_key_name: %%" << nkn << "%% "
 			 << oc.wq->thr_name() << dendl;
         *exp_time = real_clock::now();
@@ -1058,7 +1058,7 @@ public:
     auto& op = oc.op;
     if (op.expiration <= 0) {
       if (op.expiration_date == boost::none) {
-        ldout(oc.cct, 20) << __func__ << "(): key=" << o.key
+        ldout(oc.cct, 20) << __FFL__ << "(): key=" << o.key
 			  << ": no expiration set in rule, skipping "
 			  << oc.wq->thr_name() << dendl;
         return false;
@@ -1070,7 +1070,7 @@ public:
       is_expired = obj_has_expired(oc.cct, mtime, op.expiration, exp_time);
     }
 
-    ldout(oc.cct, 20) << __func__ << "(): key=" << o.key << ": is_expired="
+    ldout(oc.cct, 20) << __FFL__ << "(): key=" << o.key << ": is_expired="
 		      << (int)is_expired << " "
 		      << oc.wq->thr_name() << dendl;
     return is_expired;
@@ -1120,7 +1120,7 @@ public:
   bool check(lc_op_ctx& oc, ceph::real_time *exp_time) override {
     auto& o = oc.o;
     if (o.is_current()) {
-      ldout(oc.cct, 20) << __func__ << "(): key=" << o.key
+      ldout(oc.cct, 20) << __FFL__ << "(): key=" << o.key
 			<< ": current version, skipping "
 			<< oc.wq->thr_name() << dendl;
       return false;
@@ -1130,7 +1130,7 @@ public:
     bool is_expired = obj_has_expired(oc.cct, oc.effective_mtime, expiration,
 				      exp_time);
 
-    ldout(oc.cct, 20) << __func__ << "(): key=" << o.key << ": is_expired="
+    ldout(oc.cct, 20) << __FFL__ << "(): key=" << o.key << ": is_expired="
 		      << is_expired << " "
 		      << oc.wq->thr_name() << dendl;
 
@@ -1166,13 +1166,13 @@ public:
   bool check(lc_op_ctx& oc, ceph::real_time *exp_time) override {
     auto& o = oc.o;
     if (!o.is_delete_marker()) {
-      ldout(oc.cct, 20) << __func__ << "(): key=" << o.key
+      ldout(oc.cct, 20) << __FFL__ << "(): key=" << o.key
 			<< ": not a delete marker, skipping "
 			<< oc.wq->thr_name() << dendl;
       return false;
     }
     if (oc.next_has_same_name(o.key.name)) {
-      ldout(oc.cct, 20) << __func__ << "(): key=" << o.key
+      ldout(oc.cct, 20) << __FFL__ << "(): key=" << o.key
 			<< ": next is same object, skipping "
 			<< oc.wq->thr_name() << dendl;
       return false;
@@ -1230,7 +1230,7 @@ public:
     bool is_expired;
     if (transition.days < 0) {
       if (transition.date == boost::none) {
-        ldout(oc.cct, 20) << __func__ << "(): key=" << o.key
+        ldout(oc.cct, 20) << __FFL__ << "(): key=" << o.key
 			  << ": no transition day/date set in rule, skipping "
 			  << oc.wq->thr_name() << dendl;
         return false;
@@ -1242,7 +1242,7 @@ public:
       is_expired = obj_has_expired(oc.cct, mtime, transition.days, exp_time);
     }
 
-    ldout(oc.cct, 20) << __func__ << "(): key=" << o.key << ": is_expired="
+    ldout(oc.cct, 20) << __FFL__ << "(): key=" << o.key << ": is_expired="
 		      << is_expired << " "
 		      << oc.wq->thr_name() << dendl;
 
@@ -1415,7 +1415,7 @@ int LCOpRule::process(rgw_bucket_dir_entry& o,
     }
 
     if (!cont) {
-      ldpp_dout(dpp, 20) << __func__ << "(): key=" << o.key
+      ldpp_dout(dpp, 20) << __FFL__ << "(): key=" << o.key
 			 << ": no rule match, skipping "
 			 << " " << wq->thr_name() << dendl;
       return 0;
@@ -1484,7 +1484,7 @@ int RGWLC::bucket_lc_process(string& shard_id, LCWorker* worker,
   try {
       config.decode(iter);
     } catch (const buffer::error& e) {
-      ldpp_dout(this, 0) << __func__ <<  "() decode life cycle config failed"
+      ldpp_dout(this, 0) << __FFL__ <<  "() decode life cycle config failed"
 			 << dendl;
       return -1;
     }
@@ -1495,7 +1495,7 @@ int RGWLC::bucket_lc_process(string& shard_id, LCWorker* worker,
     auto& [op_rule, o] = wt;
 
     ldpp_dout(wk->get_lc(), 20)
-      << __func__ << "(): key=" << o.key << wq->thr_name() 
+      << __FFL__ << "(): key=" << o.key << wq->thr_name() 
       << dendl;
     int ret = op_rule.process(o, wk->dpp, wq);
     if (ret < 0) {
@@ -1508,7 +1508,7 @@ int RGWLC::bucket_lc_process(string& shard_id, LCWorker* worker,
   worker->workpool->setf(pf);
 
   multimap<string, lc_op>& prefix_map = config.get_prefix_map();
-  ldpp_dout(this, 10) << __func__ <<  "() prefix_map size="
+  ldpp_dout(this, 10) << __FFL__ <<  "() prefix_map size="
 		      << prefix_map.size()
 		      << dendl;
 
@@ -1518,7 +1518,7 @@ int RGWLC::bucket_lc_process(string& shard_id, LCWorker* worker,
       ++prefix_iter) {
 
     if (worker_should_stop(stop_at, once)) {
-      ldout(cct, 5) << __func__ << " interval budget EXPIRED worker "
+      ldout(cct, 5) << __FFL__ << " interval budget EXPIRED worker "
 		     << worker->ix
 		     << dendl;
       return 0;
@@ -1528,7 +1528,7 @@ int RGWLC::bucket_lc_process(string& shard_id, LCWorker* worker,
     if (!is_valid_op(op)) {
       continue;
     }
-    ldpp_dout(this, 20) << __func__ << "(): prefix=" << prefix_iter->first
+    ldpp_dout(this, 20) << __FFL__ << "(): prefix=" << prefix_iter->first
 			<< dendl;
     if (prefix_iter != prefix_map.begin() && 
         (prefix_iter->first.compare(0, prev(prefix_iter)->first.length(),
@@ -1633,7 +1633,7 @@ int RGWLC::list_lc_progress(string& marker, uint32_t max_entries,
 		      max_entries, entries);
     if (ret < 0) {
       if (ret == -ENOENT) {
-        ldpp_dout(this, 10) << __func__ << "() ignoring unfound lc object="
+        ldpp_dout(this, 10) << __FFL__ << "() ignoring unfound lc object="
                              << obj_names[index] << dendl;
         continue;
       } else {
@@ -2254,7 +2254,7 @@ std::string s3_expiration_header(
       hdr = fmt::format("expiry-date=\"{0}\", rule-id=\"{1}\"", exp_buf,
 			*rule_id);
     } else {
-      ldpp_dout(dpp, 0) << __func__ <<
+      ldpp_dout(dpp, 0) << __FFL__ <<
 	"() strftime of life cycle expiration header failed"
 			<< dendl;
     }

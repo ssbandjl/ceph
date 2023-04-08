@@ -32,7 +32,7 @@ void RemoveRequest<I>::send() {
 template <typename I>
 void RemoveRequest<I>::send_remove_object_map() {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 20) << __func__ << dendl;
+  ldout(cct, 20) << __FFL__ << dendl;
 
   std::unique_lock image_locker{m_image_ctx->image_lock};
   std::vector<uint64_t> snap_ids;
@@ -60,7 +60,7 @@ void RemoveRequest<I>::send_remove_object_map() {
 template <typename I>
 Context *RemoveRequest<I>::handle_remove_object_map(int *result) {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 20) << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 20) << __FFL__ << ": r=" << *result << dendl;
 
   {
     std::lock_guard locker{m_lock};

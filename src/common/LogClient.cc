@@ -39,7 +39,7 @@ int parse_log_client_options(CephContext *cct,
     cct->_conf.get_val<string>("clog_to_monitors"), oss,
     &log_to_monitors, CLOG_CONFIG_DEFAULT_KEY);
   if (r < 0) {
-    lderr(cct) << __func__ << " error parsing 'clog_to_monitors'" << dendl;
+    lderr(cct) << __FFL__ << " error parsing 'clog_to_monitors'" << dendl;
     return r;
   }
 
@@ -47,7 +47,7 @@ int parse_log_client_options(CephContext *cct,
     cct->_conf.get_val<string>("clog_to_syslog"), oss,
                               &log_to_syslog, CLOG_CONFIG_DEFAULT_KEY);
   if (r < 0) {
-    lderr(cct) << __func__ << " error parsing 'clog_to_syslog'" << dendl;
+    lderr(cct) << __FFL__ << " error parsing 'clog_to_syslog'" << dendl;
     return r;
   }
 
@@ -55,7 +55,7 @@ int parse_log_client_options(CephContext *cct,
     cct->_conf.get_val<string>("clog_to_syslog_facility"), oss,
     &log_channels, CLOG_CONFIG_DEFAULT_KEY);
   if (r < 0) {
-    lderr(cct) << __func__ << " error parsing 'clog_to_syslog_facility'" << dendl;
+    lderr(cct) << __FFL__ << " error parsing 'clog_to_syslog_facility'" << dendl;
     return r;
   }
 
@@ -63,7 +63,7 @@ int parse_log_client_options(CephContext *cct,
     cct->_conf.get_val<string>("clog_to_syslog_level"), oss,
     &log_prios, CLOG_CONFIG_DEFAULT_KEY);
   if (r < 0) {
-    lderr(cct) << __func__ << " error parsing 'clog_to_syslog_level'" << dendl;
+    lderr(cct) << __FFL__ << " error parsing 'clog_to_syslog_level'" << dendl;
     return r;
   }
 
@@ -71,7 +71,7 @@ int parse_log_client_options(CephContext *cct,
     cct->_conf.get_val<string>("clog_to_graylog"), oss,
     &log_to_graylog, CLOG_CONFIG_DEFAULT_KEY);
   if (r < 0) {
-    lderr(cct) << __func__ << " error parsing 'clog_to_graylog'" << dendl;
+    lderr(cct) << __FFL__ << " error parsing 'clog_to_graylog'" << dendl;
     return r;
   }
 
@@ -79,7 +79,7 @@ int parse_log_client_options(CephContext *cct,
     cct->_conf.get_val<string>("clog_to_graylog_host"), oss,
     &log_to_graylog_host, CLOG_CONFIG_DEFAULT_KEY);
   if (r < 0) {
-    lderr(cct) << __func__ << " error parsing 'clog_to_graylog_host'" << dendl;
+    lderr(cct) << __FFL__ << " error parsing 'clog_to_graylog_host'" << dendl;
     return r;
   }
 
@@ -87,7 +87,7 @@ int parse_log_client_options(CephContext *cct,
     cct->_conf.get_val<string>("clog_to_graylog_port"), oss,
     &log_to_graylog_port, CLOG_CONFIG_DEFAULT_KEY);
   if (r < 0) {
-    lderr(cct) << __func__ << " error parsing 'clog_to_graylog_port'" << dendl;
+    lderr(cct) << __FFL__ << " error parsing 'clog_to_graylog_port'" << dendl;
     return r;
   }
 
@@ -146,7 +146,7 @@ void LogChannel::update_config(map<string,string> &log_to_monitors,
 			       uuid_d &fsid,
 			       string &host)
 {
-  ldout(cct, 20) << __func__ << " log_to_monitors " << log_to_monitors
+  ldout(cct, 20) << __FFL__ << " log_to_monitors " << log_to_monitors
 		 << " log_to_syslog " << log_to_syslog
 		 << " log_channels " << log_channels
 		 << " log_prios " << log_prios
@@ -235,13 +235,13 @@ void LogChannel::do_log(clog_type prio, const std::string& s)
 
   // log to syslog?
   if (do_log_to_syslog()) {
-    ldout(cct,0) << __func__ << " log to syslog"  << dendl;
+    ldout(cct,0) << __FFL__ << " log to syslog"  << dendl;
     e.log_to_syslog(get_log_prio(), get_syslog_facility());
   }
 
   // log to graylog?
   if (do_log_to_graylog()) {
-    ldout(cct,0) << __func__ << " log to graylog"  << dendl;
+    ldout(cct,0) << __FFL__ << " log to graylog"  << dendl;
     graylog->log_log_entry(&e);
   }
 }
@@ -313,7 +313,7 @@ void LogClient::_send_to_mon()
   ceph_assert(ceph_mutex_is_locked(log_lock));
   ceph_assert(is_mon);
   ceph_assert(messenger->get_myname().is_mon());
-  ldout(cct,10) << __func__ << " log to self" << dendl;
+  ldout(cct,10) << __FFL__ << " log to self" << dendl;
   auto log = _get_mon_log_message();
   messenger->get_loopback_connection()->send_message2(std::move(log));
 }

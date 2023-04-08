@@ -2083,7 +2083,7 @@ public:
     try {
       acl->decode(iter);
     } catch (buffer::error& err) {
-      ldout(cct, 0) << "ERROR: " << __func__ << "(): could not decode policy, caught buffer::error" << dendl;
+      ldout(cct, 0) << "ERROR: " << __FFL__ << "(): could not decode policy, caught buffer::error" << dendl;
       return -EIO;
     }
 
@@ -2201,7 +2201,7 @@ int RGWFetchObjFilter_Sync::filter(CephContext *cct,
       auto it = iter->second.cbegin();
       obj_tags.decode(it);
     } catch (buffer::error &err) {
-      ldout(cct, 0) << "ERROR: " << __func__ << ": caught buffer::error couldn't decode TagSet " << dendl;
+      ldout(cct, 0) << "ERROR: " << __FFL__ << ": caught buffer::error couldn't decode TagSet " << dendl;
     }
   }
 
@@ -2214,7 +2214,7 @@ int RGWFetchObjFilter_Sync::filter(CephContext *cct,
   if (verify_dest_params &&
       !(*verify_dest_params == params.dest)) {
     /* raced! original dest params were different, will need to retry */
-    ldout(cct, 0) << "WARNING: " << __func__ << ": pipe dest params are different than original params, must have raced with object rewrite, retrying" << dendl;
+    ldout(cct, 0) << "WARNING: " << __FFL__ << ": pipe dest params are different than original params, must have raced with object rewrite, retrying" << dendl;
     *need_retry = true;
     return -ECANCELED;
   }
@@ -2226,7 +2226,7 @@ int RGWFetchObjFilter_Sync::filter(CephContext *cct,
     if (!acl_translation_owner.empty()) {
       if (params.mode == rgw_sync_pipe_params::MODE_USER &&
           acl_translation_owner != dest_bucket_info.owner) {
-        ldout(cct, 0) << "ERROR: " << __func__ << ": acl translation was requested, but user (" << acl_translation_owner
+        ldout(cct, 0) << "ERROR: " << __FFL__ << ": acl translation was requested, but user (" << acl_translation_owner
           << ") is not dest bucket owner (" << dest_bucket_info.owner << ")" << dendl;
         return -EPERM;
       }
@@ -2235,7 +2235,7 @@ int RGWFetchObjFilter_Sync::filter(CephContext *cct,
   }
   if (params.mode == rgw_sync_pipe_params::MODE_USER) {
     if (!bucket_perms->verify_object_permission(obj_attrs, RGW_PERM_READ)) {
-      ldout(cct, 0) << "ERROR: " << __func__ << ": permission check failed: user not allowed to fetch object" << dendl;
+      ldout(cct, 0) << "ERROR: " << __FFL__ << ": permission check failed: user not allowed to fetch object" << dendl;
       return -EPERM;
     }
   }
@@ -2352,7 +2352,7 @@ public:
               auto it = iter->second.cbegin();
               obj_tags.decode(it);
             } catch (buffer::error &err) {
-              ldout(cct, 0) << "ERROR: " << __func__ << ": caught buffer::error couldn't decode TagSet " << dendl;
+              ldout(cct, 0) << "ERROR: " << __FFL__ << ": caught buffer::error couldn't decode TagSet " << dendl;
             }
           }
 
@@ -2371,14 +2371,14 @@ public:
 
         if (param_mode == rgw_sync_pipe_params::MODE_USER) {
           if (!param_user) {
-            ldout(cct, 20) << "ERROR: " << __func__ << ": user level sync but user param not set" << dendl;
+            ldout(cct, 20) << "ERROR: " << __FFL__ << ": user level sync but user param not set" << dendl;
             return set_cr_error(-EPERM);
           }
           user_perms.emplace(sync_env, *param_user);
 
           yield call(user_perms->init_cr());
           if (retcode < 0) {
-            ldout(cct, 20) << "ERROR: " << __func__ << ": failed to init user perms manager for uid=" << *param_user << dendl;
+            ldout(cct, 20) << "ERROR: " << __FFL__ << ": failed to init user perms manager for uid=" << *param_user << dendl;
             return set_cr_error(retcode);
           }
 
@@ -2387,12 +2387,12 @@ public:
                                           sync_pipe.dest_bucket_attrs,
                                           &dest_bucket_perms);
           if (r < 0) {
-            ldout(cct, 20) << "ERROR: " << __func__ << ": failed to init bucket perms manager for uid=" << *param_user << " bucket=" << sync_pipe.source_bucket_info.bucket.get_key() << dendl;
+            ldout(cct, 20) << "ERROR: " << __FFL__ << ": failed to init bucket perms manager for uid=" << *param_user << " bucket=" << sync_pipe.source_bucket_info.bucket.get_key() << dendl;
             return set_cr_error(retcode);
           }
 
           if (!dest_bucket_perms.verify_bucket_permission(RGW_PERM_WRITE)) {
-            ldout(cct, 0) << "ERROR: " << __func__ << ": permission check failed: user not allowed to write into bucket (bucket=" << sync_pipe.info.dest_bs.bucket.get_key() << ")" << dendl;
+            ldout(cct, 0) << "ERROR: " << __FFL__ << ": permission check failed: user not allowed to write into bucket (bucket=" << sync_pipe.info.dest_bs.bucket.get_key() << ")" << dendl;
             return -EPERM;
           }
 
@@ -2402,7 +2402,7 @@ public:
                                       sync_pipe.source_bucket_attrs,
                                       source_bucket_perms.get());
           if (r < 0) {
-            ldout(cct, 20) << "ERROR: " << __func__ << ": failed to init bucket perms manager for uid=" << *param_user << " bucket=" << sync_pipe.source_bucket_info.bucket.get_key() << dendl;
+            ldout(cct, 20) << "ERROR: " << __FFL__ << ": failed to init bucket perms manager for uid=" << *param_user << " bucket=" << sync_pipe.source_bucket_info.bucket.get_key() << dendl;
             return set_cr_error(retcode);
           }
         }
@@ -2435,7 +2435,7 @@ public:
         return set_cr_done();
       }
 
-      ldout(cct, 0) << "ERROR: " << __func__ << ": Too many retries trying to fetch object, possibly a bug: bucket=" << sync_pipe.source_bucket_info.bucket.get_key() << " key=" << key << dendl;
+      ldout(cct, 0) << "ERROR: " << __FFL__ << ": Too many retries trying to fetch object, possibly a bug: bucket=" << sync_pipe.source_bucket_info.bucket.get_key() << " key=" << key << dendl;
 
       return set_cr_error(-EIO);
     }
@@ -4160,21 +4160,21 @@ class RGWGetBucketPeersCR : public RGWCoroutine {
                       std::optional<rgw_bucket> source_bucket,
                       const map<rgw_zone_id, RGWBucketSyncFlowManager::pipe_set>& all_sources,
                       rgw_sync_pipe_info_set *result) {
-    ldpp_dout(sync_env->dpp, 20) << __func__ << ": source_zone=" << source_zone.value_or(rgw_zone_id("*")).id
+    ldpp_dout(sync_env->dpp, 20) << __FFL__ << ": source_zone=" << source_zone.value_or(rgw_zone_id("*")).id
                                 << " source_bucket=" << source_bucket.value_or(rgw_bucket())
                                 << " all_sources.size()=" << all_sources.size() << dendl;
     auto iters = get_pipe_iters(all_sources, source_zone);
     for (auto i = iters.first; i != iters.second; ++i) {
       for (auto& handler : i->second) {
         if (!handler.specific()) {
-          ldpp_dout(sync_env->dpp, 20) << __func__ << ": pipe_handler=" << handler << ": skipping" << dendl;
+          ldpp_dout(sync_env->dpp, 20) << __FFL__ << ": pipe_handler=" << handler << ": skipping" << dendl;
           continue;
         }
         if (source_bucket &&
             !source_bucket->match(*handler.source.bucket)) {
           continue;
         }
-        ldpp_dout(sync_env->dpp, 20) << __func__ << ": pipe_handler=" << handler << ": adding" << dendl;
+        ldpp_dout(sync_env->dpp, 20) << __FFL__ << ": pipe_handler=" << handler << ": adding" << dendl;
         result->insert(handler, source_bucket_info, target_bucket_info);
       }
     }
@@ -4184,7 +4184,7 @@ class RGWGetBucketPeersCR : public RGWCoroutine {
                       std::optional<rgw_bucket> target_bucket,
                       const map<rgw_zone_id, RGWBucketSyncFlowManager::pipe_set>& all_targets,
                       rgw_sync_pipe_info_set *result) {
-    ldpp_dout(sync_env->dpp, 20) << __func__ << ": target_zone=" << source_zone.value_or(rgw_zone_id("*")).id
+    ldpp_dout(sync_env->dpp, 20) << __FFL__ << ": target_zone=" << source_zone.value_or(rgw_zone_id("*")).id
                                 << " target_bucket=" << source_bucket.value_or(rgw_bucket())
                                 << " all_targets.size()=" << all_targets.size() << dendl;
     auto iters = get_pipe_iters(all_targets, target_zone);
@@ -4193,10 +4193,10 @@ class RGWGetBucketPeersCR : public RGWCoroutine {
         if (target_bucket &&
             handler.dest.bucket &&
             !target_bucket->match(*handler.dest.bucket)) {
-          ldpp_dout(sync_env->dpp, 20) << __func__ << ": pipe_handler=" << handler << ": skipping" << dendl;
+          ldpp_dout(sync_env->dpp, 20) << __FFL__ << ": pipe_handler=" << handler << ": skipping" << dendl;
           continue;
         }
-        ldpp_dout(sync_env->dpp, 20) << __func__ << ": pipe_handler=" << handler << ": adding" << dendl;
+        ldpp_dout(sync_env->dpp, 20) << __FFL__ << ": pipe_handler=" << handler << ": adding" << dendl;
         result->insert(handler, source_bucket_info, target_bucket_info);
       }
     }
@@ -4219,7 +4219,7 @@ class RGWGetBucketPeersCR : public RGWCoroutine {
                                                                 &targets,
                                                                 null_yield);
       if (r < 0) {
-        ldout(sync_env->cct, 0) << "ERROR: " << __func__ << "(): failed to fetch bucket sync hints for bucket=" << source_bucket << dendl;
+        ldout(sync_env->cct, 0) << "ERROR: " << __FFL__ << "(): failed to fetch bucket sync hints for bucket=" << source_bucket << dendl;
         return r;
       }
 
@@ -4289,15 +4289,15 @@ int RGWRunBucketSourcesSyncCR::operate()
       return set_cr_error(retcode);
     }
 
-    ldpp_dout(sync_env->dpp, 20) << __func__ << "(): requested source_bs=" << source_bs << " target_bs=" << target_bs << dendl;
+    ldpp_dout(sync_env->dpp, 20) << __FFL__ << "(): requested source_bs=" << source_bs << " target_bs=" << target_bs << dendl;
 
     if (pipes.empty()) {
-      ldpp_dout(sync_env->dpp, 20) << __func__ << "(): no relevant sync pipes found" << dendl;
+      ldpp_dout(sync_env->dpp, 20) << __FFL__ << "(): no relevant sync pipes found" << dendl;
     }
 
     for (siter = pipes.begin(); siter != pipes.end(); ++siter) {
       {
-        ldpp_dout(sync_env->dpp, 20) << __func__ << "(): sync pipe=" << *siter << dendl;
+        ldpp_dout(sync_env->dpp, 20) << __FFL__ << "(): sync pipe=" << *siter << dendl;
 
         source_num_shards = siter->source.get_bucket_info().num_shards;
         target_num_shards = siter->target.get_bucket_info().num_shards;
@@ -4319,7 +4319,7 @@ int RGWRunBucketSourcesSyncCR::operate()
         }
       }
 
-      ldpp_dout(sync_env->dpp, 20) << __func__ << "(): num shards=" << num_shards << " cur_shard=" << cur_shard << dendl;
+      ldpp_dout(sync_env->dpp, 20) << __FFL__ << "(): num shards=" << num_shards << " cur_shard=" << cur_shard << dendl;
 
       for (; num_shards > 0; --num_shards, ++cur_shard) {
         /*
@@ -4333,7 +4333,7 @@ int RGWRunBucketSourcesSyncCR::operate()
           sync_pair.dest_bs.shard_id = -1;
         }
 
-        ldpp_dout(sync_env->dpp, 20) << __func__ << "(): sync_pair=" << sync_pair << dendl;
+        ldpp_dout(sync_env->dpp, 20) << __FFL__ << "(): sync_pair=" << sync_pair << dendl;
 
         yield spawn(new RGWRunBucketSyncCoroutine(sc, sync_pair, tn), false);
         while (num_spawned() > BUCKET_SYNC_SPAWN_WINDOW) {

@@ -945,7 +945,7 @@ int RGWBucket::check_bad_index_multipart(RGWBucketAdminOpState& op_state,
   auto obj_ctx = store->svc()->sysobj->init_obj_ctx();
   int r = store->getRados()->get_bucket_instance_info(obj_ctx, bucket, bucket_info, nullptr, nullptr, null_yield);
   if (r < 0) {
-    ldout(store->ctx(), 0) << "ERROR: " << __func__ << "(): get_bucket_instance_info(bucket=" << bucket << ") returned r=" << r << dendl;
+    ldout(store->ctx(), 0) << "ERROR: " << __FFL__ << "(): get_bucket_instance_info(bucket=" << bucket << ") returned r=" << r << dendl;
     return r;
   }
 
@@ -3752,7 +3752,7 @@ int RGWBucketCtl::sync_user_stats(const rgw_user& user_id,
   }
   int r = svc.bi->read_stats(bucket_info, pent, null_yield);
   if (r < 0) {
-    ldout(cct, 20) << __func__ << "(): failed to read bucket stats (r=" << r << ")" << dendl;
+    ldout(cct, 20) << __FFL__ << "(): failed to read bucket stats (r=" << r << ")" << dendl;
     return r;
   }
 
@@ -3768,7 +3768,7 @@ int RGWBucketCtl::get_sync_policy_handler(std::optional<rgw_zone_id> zone,
     return svc.bucket_sync->get_policy_handler(ctx, zone, bucket, phandler, y);
   });
   if (r < 0) {
-    ldout(cct, 20) << __func__ << "(): failed to get policy handler for bucket=" << bucket << " (r=" << r << ")" << dendl;
+    ldout(cct, 20) << __FFL__ << "(): failed to get policy handler for bucket=" << bucket << " (r=" << r << ")" << dendl;
     return r;
   }
   return 0;

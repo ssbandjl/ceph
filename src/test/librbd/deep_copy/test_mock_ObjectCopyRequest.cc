@@ -90,7 +90,7 @@ void scribble(librbd::ImageCtx *image_ctx, int num_ops, size_t max_size,
   for (int i = 0; i < num_ops; i++) {
     uint64_t off = rand() % (object_size - max_size + 1);
     uint64_t len = 1 + rand() % max_size;
-    std::cout << __func__ << ": off=" << off << ", len=" << len << std::endl;
+    std::cout << __FFL__ << ": off=" << off << ", len=" << len << std::endl;
 
     bufferlist bl;
     bl.append(std::string(len, '1'));

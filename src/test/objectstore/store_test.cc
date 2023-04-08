@@ -4217,7 +4217,7 @@ public:
       len = srcdata.length() - srcoff;
     }
     if (0)
-      cout << __func__ << " from " << srcoff << "~" << len
+      cout << __FFL__ << " from " << srcoff << "~" << len
 	 << " (size " << srcdata.length() << ") to "
 	 << dstoff << "~" << len << std::endl;
 
@@ -5839,7 +5839,7 @@ void test_merge_skewed(ObjectStore *store,
 		       unsigned base, unsigned bits,
 		       unsigned anum, unsigned bnum)
 {
-  cout << __func__ << " 0x" << std::hex << base << std::dec
+  cout << __FFL__ << " 0x" << std::hex << base << std::dec
        << " bits " << bits
        << " anum " << anum << " bnum " << bnum << std::endl;
   /*

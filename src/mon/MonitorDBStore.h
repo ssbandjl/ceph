@@ -339,7 +339,7 @@ class MonitorDBStore
 	compact.push_back(make_pair(op.prefix, make_pair(op.key, op.endkey)));
 	break;
       default:
-	derr << __func__ << " unknown op type " << op.type << dendl;
+	derr << __FFL__ << " unknown op type " << op.type << dendl;
 	ceph_abort();
 	break;
       }
@@ -631,7 +631,7 @@ class MonitorDBStore
 					    kv_type,
 					    full_path);
     if (!db_ptr) {
-      derr << __func__ << " error initializing "
+      derr << __FFL__ << " error initializing "
 	   << kv_type << " db back storage in "
 	   << full_path << dendl;
       ceph_abort_msg("MonitorDBStore: error initializing keyvaluedb back storage");

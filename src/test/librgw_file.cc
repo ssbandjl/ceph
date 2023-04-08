@@ -156,7 +156,7 @@ TEST(LibRGW, LIST_OBJECTS) {
     std::vector<fid_type>& obj_vector = get<1>(fid_row); // objects in bucket
     struct rgw_file_handle *bucket_fh = get<2>(fid);
 
-    ldout(g_ceph_context, 0) << __func__ << " readdir on bucket " << get<0>(fid)
+    ldout(g_ceph_context, 0) << __FFL__ << " readdir on bucket " << get<0>(fid)
 			     << dendl;
 
     bool eof = false;

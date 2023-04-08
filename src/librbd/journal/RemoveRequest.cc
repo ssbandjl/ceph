@@ -32,14 +32,14 @@ RemoveRequest<I>::RemoveRequest(IoCtx &ioctx, const std::string &image_id,
 
 template<typename I>
 void RemoveRequest<I>::send() {
-  ldout(m_cct, 20) << this << " " << __func__ << dendl;
+  ldout(m_cct, 20) << this << " " << __FFL__ << dendl;
 
   stat_journal();
 }
 
 template<typename I>
 void RemoveRequest<I>::stat_journal() {
-  ldout(m_cct, 20) << this << " " << __func__ << dendl;
+  ldout(m_cct, 20) << this << " " << __FFL__ << dendl;
 
   ImageCtx::get_timer_instance(m_cct, &m_timer, &m_timer_lock);
   m_journaler = new Journaler(m_op_work_queue, m_timer, m_timer_lock, m_ioctx,
@@ -53,7 +53,7 @@ void RemoveRequest<I>::stat_journal() {
 
 template<typename I>
 Context *RemoveRequest<I>::handle_stat_journal(int *result) {
-  ldout(m_cct, 20) << __func__ << ": r=" << *result << dendl;
+  ldout(m_cct, 20) << __FFL__ << ": r=" << *result << dendl;
 
   if ((*result < 0) && (*result != -ENOENT)) {
     lderr(m_cct) << "failed to stat journal header: " << cpp_strerror(*result) << dendl;
@@ -72,7 +72,7 @@ Context *RemoveRequest<I>::handle_stat_journal(int *result) {
 
 template<typename I>
 void RemoveRequest<I>::init_journaler() {
-  ldout(m_cct, 20) << this << " " << __func__ << dendl;
+  ldout(m_cct, 20) << this << " " << __FFL__ << dendl;
 
   using klass = RemoveRequest<I>;
   Context *ctx = create_context_callback<klass, &klass::handle_init_journaler>(this);
@@ -82,7 +82,7 @@ void RemoveRequest<I>::init_journaler() {
 
 template<typename I>
 Context *RemoveRequest<I>::handle_init_journaler(int *result) {
-  ldout(m_cct, 20) << __func__ << ": r=" << *result << dendl;
+  ldout(m_cct, 20) << __FFL__ << ": r=" << *result << dendl;
 
   if ((*result < 0) && (*result != -ENOENT)) {
     lderr(m_cct) << "failed to init journaler: " << cpp_strerror(*result) << dendl;
@@ -96,7 +96,7 @@ Context *RemoveRequest<I>::handle_init_journaler(int *result) {
 
 template<typename I>
 void RemoveRequest<I>::remove_journal() {
-  ldout(m_cct, 20) << this << " " << __func__ << dendl;
+  ldout(m_cct, 20) << this << " " << __FFL__ << dendl;
 
   using klass = RemoveRequest<I>;
   Context *ctx = create_context_callback<klass, &klass::handle_remove_journal>(this);
@@ -106,7 +106,7 @@ void RemoveRequest<I>::remove_journal() {
 
 template<typename I>
 Context *RemoveRequest<I>::handle_remove_journal(int *result) {
-  ldout(m_cct, 20) << __func__ << ": r=" << *result << dendl;
+  ldout(m_cct, 20) << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(m_cct) << "failed to remove journal: " << cpp_strerror(*result) << dendl;
@@ -118,7 +118,7 @@ Context *RemoveRequest<I>::handle_remove_journal(int *result) {
 
 template<typename I>
 void RemoveRequest<I>::shut_down_journaler(int r) {
-  ldout(m_cct, 20) << this << " " << __func__ << dendl;
+  ldout(m_cct, 20) << this << " " << __FFL__ << dendl;
 
   m_r_saved = r;
 
@@ -130,7 +130,7 @@ void RemoveRequest<I>::shut_down_journaler(int r) {
 
 template<typename I>
 Context *RemoveRequest<I>::handle_journaler_shutdown(int *result) {
-  ldout(m_cct, 20) << __func__ << ": r=" << *result << dendl;
+  ldout(m_cct, 20) << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(m_cct) << "failed to shut down journaler: " << cpp_strerror(*result) << dendl;

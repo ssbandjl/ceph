@@ -46,7 +46,7 @@ struct C_GetClient : public Context {
   }
 
   void send_get_client() {
-    ldout(cct, 20) << "C_GetClient: " << __func__ << dendl;
+    ldout(cct, 20) << "C_GetClient: " << __FFL__ << dendl;
 
     librados::ObjectReadOperation op;
     client::get_client_start(&op, client_id);
@@ -61,7 +61,7 @@ struct C_GetClient : public Context {
   }
 
   void handle_get_client(int r) {
-    ldout(cct, 20) << "C_GetClient: " << __func__ << ": r=" << r << dendl;
+    ldout(cct, 20) << "C_GetClient: " << __FFL__ << ": r=" << r << dendl;
 
     if (r == 0) {
       auto it = out_bl.cbegin();
@@ -104,7 +104,7 @@ struct C_AllocateTag : public Context {
   }
 
   void send_get_next_tag_tid() {
-    ldout(cct, 20) << "C_AllocateTag: " << __func__ << dendl;
+    ldout(cct, 20) << "C_AllocateTag: " << __FFL__ << dendl;
 
     librados::ObjectReadOperation op;
     client::get_next_tag_tid_start(&op);
@@ -120,7 +120,7 @@ struct C_AllocateTag : public Context {
   }
 
   void handle_get_next_tag_tid(int r) {
-    ldout(cct, 20) << "C_AllocateTag: " << __func__ << ": r=" << r << dendl;
+    ldout(cct, 20) << "C_AllocateTag: " << __FFL__ << ": r=" << r << dendl;
 
     if (r == 0) {
       auto iter = out_bl.cbegin();
@@ -134,7 +134,7 @@ struct C_AllocateTag : public Context {
   }
 
   void send_tag_create() {
-    ldout(cct, 20) << "C_AllocateTag: " << __func__ << dendl;
+    ldout(cct, 20) << "C_AllocateTag: " << __FFL__ << dendl;
 
     librados::ObjectWriteOperation op;
     client::tag_create(&op, tag->tid, tag_class, tag->data);
@@ -149,7 +149,7 @@ struct C_AllocateTag : public Context {
   }
 
   void handle_tag_create(int r) {
-    ldout(cct, 20) << "C_AllocateTag: " << __func__ << ": r=" << r << dendl;
+    ldout(cct, 20) << "C_AllocateTag: " << __FFL__ << ": r=" << r << dendl;
 
     if (r == -ESTALE) {
       send_get_next_tag_tid();
@@ -163,7 +163,7 @@ struct C_AllocateTag : public Context {
   }
 
   void send_get_tag() {
-    ldout(cct, 20) << "C_AllocateTag: " << __func__ << dendl;
+    ldout(cct, 20) << "C_AllocateTag: " << __FFL__ << dendl;
 
     librados::ObjectReadOperation op;
     client::get_tag_start(&op, tag->tid);
@@ -179,7 +179,7 @@ struct C_AllocateTag : public Context {
   }
 
   void handle_get_tag(int r) {
-    ldout(cct, 20) << "C_AllocateTag: " << __func__ << ": r=" << r << dendl;
+    ldout(cct, 20) << "C_AllocateTag: " << __FFL__ << ": r=" << r << dendl;
 
     if (r == 0) {
       auto iter = out_bl.cbegin();
@@ -362,7 +362,7 @@ struct C_AssertActiveTag : public Context {
   }
 
   void send() {
-    ldout(cct, 20) << "C_AssertActiveTag: " << __func__ << dendl;
+    ldout(cct, 20) << "C_AssertActiveTag: " << __FFL__ << dendl;
 
     librados::ObjectReadOperation op;
     client::tag_list_start(&op, tag_tid, 2, client_id, boost::none);
@@ -377,7 +377,7 @@ struct C_AssertActiveTag : public Context {
   }
 
   void handle_send(int r) {
-    ldout(cct, 20) << "C_AssertActiveTag: " << __func__ << ": r=" << r << dendl;
+    ldout(cct, 20) << "C_AssertActiveTag: " << __FFL__ << ": r=" << r << dendl;
 
     std::set<cls::journal::Tag> tags;
     if (r == 0) {
@@ -432,7 +432,7 @@ void JournalMetadata::init(Context *on_finish) {
   on_finish = new C_ImmutableMetadata(this, on_finish);
   on_finish = new LambdaContext([this, on_finish](int r) {
       if (r < 0) {
-        lderr(m_cct) << __func__ << ": failed to watch journal"
+        lderr(m_cct) << __FFL__ << ": failed to watch journal"
                      << cpp_strerror(r) << dendl;
 	std::lock_guard locker{m_lock};
         m_watch_handle = 0;
@@ -452,7 +452,7 @@ void JournalMetadata::init(Context *on_finish) {
 
 void JournalMetadata::shut_down(Context *on_finish) {
 
-  ldout(m_cct, 20) << __func__ << dendl;
+  ldout(m_cct, 20) << __FFL__ << dendl;
 
   uint64_t watch_handle = 0;
   {
@@ -509,7 +509,7 @@ void JournalMetadata::get_mutable_metadata(uint64_t *minimum_set,
 
 void JournalMetadata::register_client(const bufferlist &data,
 				      Context *on_finish) {
-  ldout(m_cct, 10) << __func__ << ": " << m_client_id << dendl;
+  ldout(m_cct, 10) << __FFL__ << ": " << m_client_id << dendl;
   librados::ObjectWriteOperation op;
   client::client_register(&op, m_client_id, data);
 
@@ -525,7 +525,7 @@ void JournalMetadata::register_client(const bufferlist &data,
 
 void JournalMetadata::update_client(const bufferlist &data,
 				    Context *on_finish) {
-  ldout(m_cct, 10) << __func__ << ": " << m_client_id << dendl;
+  ldout(m_cct, 10) << __FFL__ << ": " << m_client_id << dendl;
   librados::ObjectWriteOperation op;
   client::client_update_data(&op, m_client_id, data);
 
@@ -541,7 +541,7 @@ void JournalMetadata::update_client(const bufferlist &data,
 void JournalMetadata::unregister_client(Context *on_finish) {
   ceph_assert(!m_client_id.empty());
 
-  ldout(m_cct, 10) << __func__ << ": " << m_client_id << dendl;
+  ldout(m_cct, 10) << __FFL__ << ": " << m_client_id << dendl;
   librados::ObjectWriteOperation op;
   client::client_unregister(&op, m_client_id);
 
@@ -605,7 +605,7 @@ void JournalMetadata::remove_listener(JournalMetadataListener *listener) {
 void JournalMetadata::set_minimum_set(uint64_t object_set) {
   std::lock_guard locker{m_lock};
 
-  ldout(m_cct, 20) << __func__ << ": current=" << m_minimum_set
+  ldout(m_cct, 20) << __FFL__ << ": current=" << m_minimum_set
                    << ", new=" << object_set << dendl;
   if (m_minimum_set >= object_set) {
     return;
@@ -633,7 +633,7 @@ int JournalMetadata::set_active_set(uint64_t object_set) {
 void JournalMetadata::set_active_set(uint64_t object_set, Context *on_finish) {
   std::lock_guard locker{m_lock};
 
-  ldout(m_cct, 20) << __func__ << ": current=" << m_active_set
+  ldout(m_cct, 20) << __FFL__ << ": current=" << m_active_set
                    << ", new=" << object_set << dendl;
   if (m_active_set >= object_set) {
     m_work_queue->queue(on_finish, 0);
@@ -664,7 +664,7 @@ void JournalMetadata::assert_active_tag(uint64_t tag_tid, Context *on_finish) {
 }
 
 void JournalMetadata::flush_commit_position() {
-  ldout(m_cct, 20) << __func__ << dendl;
+  ldout(m_cct, 20) << __FFL__ << dendl;
 
   C_SaferCond ctx;
   flush_commit_position(&ctx);
@@ -672,7 +672,7 @@ void JournalMetadata::flush_commit_position() {
 }
 
 void JournalMetadata::flush_commit_position(Context *on_safe) {
-  ldout(m_cct, 20) << __func__ << dendl;
+  ldout(m_cct, 20) << __FFL__ << dendl;
 
   std::scoped_lock locker{*m_timer_lock, m_lock};
   if (m_commit_position_ctx == nullptr && m_flush_commits_in_progress == 0) {
@@ -791,7 +791,7 @@ void JournalMetadata::handle_refresh_complete(C_Refresh *refresh, int r) {
 }
 
 void JournalMetadata::cancel_commit_task() {
-  ldout(m_cct, 20) << __func__ << dendl;
+  ldout(m_cct, 20) << __FFL__ << dendl;
 
   ceph_assert(ceph_mutex_is_locked(*m_timer_lock));
   ceph_assert(ceph_mutex_is_locked(m_lock));
@@ -802,7 +802,7 @@ void JournalMetadata::cancel_commit_task() {
 }
 
 void JournalMetadata::schedule_commit_task() {
-  ldout(m_cct, 20) << __func__ << dendl;
+  ldout(m_cct, 20) << __FFL__ << dendl;
 
   ceph_assert(ceph_mutex_is_locked(*m_timer_lock));
   ceph_assert(ceph_mutex_is_locked(m_lock));
@@ -817,7 +817,7 @@ void JournalMetadata::schedule_commit_task() {
 void JournalMetadata::handle_commit_position_task() {
   ceph_assert(ceph_mutex_is_locked(*m_timer_lock));
   ceph_assert(ceph_mutex_is_locked(m_lock));
-  ldout(m_cct, 20) << __func__ << ": "
+  ldout(m_cct, 20) << __FFL__ << ": "
                    << "client_id=" << m_client_id << ", "
                    << "commit_position=" << m_commit_position << dendl;
 
@@ -881,16 +881,16 @@ void JournalMetadata::handle_watch_reset() {
   int r = m_ioctx.watch2(m_oid, &m_watch_handle, &m_watch_ctx);
   if (r < 0) {
     if (r == -ENOENT) {
-      ldout(m_cct, 5) << __func__ << ": journal header not found" << dendl;
+      ldout(m_cct, 5) << __FFL__ << ": journal header not found" << dendl;
     } else if (r == -EBLACKLISTED) {
-      ldout(m_cct, 5) << __func__ << ": client blacklisted" << dendl;
+      ldout(m_cct, 5) << __FFL__ << ": client blacklisted" << dendl;
     } else {
-      lderr(m_cct) << __func__ << ": failed to watch journal: "
+      lderr(m_cct) << __FFL__ << ": failed to watch journal: "
                    << cpp_strerror(r) << dendl;
     }
     schedule_watch_reset();
   } else {
-    ldout(m_cct, 10) << __func__ << ": reset journal watch" << dendl;
+    ldout(m_cct, 10) << __FFL__ << ": reset journal watch" << dendl;
     refresh(NULL);
   }
 }
@@ -958,7 +958,7 @@ void JournalMetadata::overflow_commit_tid(uint64_t commit_tid,
   ceph_assert(it != m_pending_commit_tids.end());
   ceph_assert(it->second.object_num < object_num);
 
-  ldout(m_cct, 20) << __func__ << ": "
+  ldout(m_cct, 20) << __FFL__ << ": "
                    << "commit_tid=" << commit_tid << ", "
                    << "old_object_num=" << it->second.object_num << ", "
                    << "new_object_num=" << object_num << dendl;
@@ -1083,7 +1083,7 @@ void JournalMetadata::handle_notified(int r) {
 }
 
 void JournalMetadata::schedule_laggy_clients_disconnect(Context *on_finish) {
-  ldout(m_cct, 20) << __func__ << dendl;
+  ldout(m_cct, 20) << __FFL__ << dendl;
   if (m_settings.max_concurrent_object_sets <= 0) {
     on_finish->complete(0);
     return;
@@ -1106,11 +1106,11 @@ void JournalMetadata::schedule_laggy_clients_disconnect(Context *on_finish) {
       }
 
       if (m_active_set > object_set + m_settings.max_concurrent_object_sets) {
-        ldout(m_cct, 1) << __func__ << ": " << client_id
+        ldout(m_cct, 1) << __FFL__ << ": " << client_id
                         << ": scheduling disconnect" << dendl;
 
         ctx = new LambdaContext([this, client_id, ctx](int r1) {
-            ldout(m_cct, 10) << __func__ << ": " << client_id
+            ldout(m_cct, 10) << __FFL__ << ": " << client_id
                              << ": flagging disconnected" << dendl;
 
             librados::ObjectWriteOperation op;
@@ -1128,7 +1128,7 @@ void JournalMetadata::schedule_laggy_clients_disconnect(Context *on_finish) {
   }
 
   if (ctx == on_finish) {
-    ldout(m_cct, 20) << __func__ << ": no laggy clients to disconnect" << dendl;
+    ldout(m_cct, 20) << __FFL__ << ": no laggy clients to disconnect" << dendl;
   }
   ctx->complete(0);
 }

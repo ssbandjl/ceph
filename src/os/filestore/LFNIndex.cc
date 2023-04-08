@@ -178,7 +178,7 @@ int LFNIndex::fsync_dir(const vector<string> &path)
   int r = ::fsync(fd);
   maybe_inject_failure();
   if (r < 0) {
-    derr << __func__ << " fsync failed: " << cpp_strerror(errno) << dendl;
+    derr << __FFL__ << " fsync failed: " << cpp_strerror(errno) << dendl;
     ceph_abort();
   }
   return 0;
@@ -823,7 +823,7 @@ int LFNIndex::lfn_get_name(const vector<string> &path,
       if (st.st_nlink <= 1) {
 	// left over from incomplete unlink, remove
 	maybe_inject_failure();
-	dout(20) << __func__ << " found extra alt attr for " << candidate_path
+	dout(20) << __FFL__ << " found extra alt attr for " << candidate_path
 		 << ", long name " << string(bp.c_str(), bp.length()) << dendl;
 	rc = chain_removexattr(candidate_path.c_str(),
 			       get_alt_lfn_attr().c_str());
@@ -834,7 +834,7 @@ int LFNIndex::lfn_get_name(const vector<string> &path,
       }
       string lfn(bp.c_str(), bp.length());
       if (lfn == full_name) {
-	dout(20) << __func__ << " used alt attr for " << full_name << dendl;
+	dout(20) << __FFL__ << " used alt attr for " << full_name << dendl;
 	if (mangled_name)
 	  *mangled_name = candidate;
 	if (out_path)
@@ -868,7 +868,7 @@ int LFNIndex::lfn_created(const vector<string> &path,
   if (r > 0) {
     string lfn(bp.c_str(), bp.length());
     if (lfn != full_name) {
-      dout(20) << __func__ << " " << mangled_name
+      dout(20) << __FFL__ << " " << mangled_name
 	       << " moving old name to alt attr "
 	       << lfn
 	       << ", new name is " << full_name << dendl;
@@ -944,7 +944,7 @@ int LFNIndex::lfn_unlink(const vector<string> &path,
   int r = ::fstat(fd, &st);
   if (r == 0 && st.st_nlink > 0) {
     // remove alt attr
-    dout(20) << __func__ << " removing alt attr from " << full_path << dendl;
+    dout(20) << __FFL__ << " removing alt attr from " << full_path << dendl;
     fsync_dir(path);
     chain_fremovexattr(fd, get_alt_lfn_attr().c_str());
   }

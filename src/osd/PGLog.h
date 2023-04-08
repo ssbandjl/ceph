@@ -916,11 +916,11 @@ protected:
     LogEntryHandler *rollbacker,         ///< [in] optional rollbacker object
     const DoutPrefixProvider *dpp        ///< [in] logging provider
     ) {
-    ldpp_dout(dpp, 20) << __func__ << ": merging hoid " << hoid
+    ldpp_dout(dpp, 20) << __FFL__ << ": merging hoid " << hoid
 		       << " entries: " << orig_entries << dendl;
 
     if (hoid > info.last_backfill) {
-      ldpp_dout(dpp, 10) << __func__ << ": hoid " << hoid << " after last_backfill"
+      ldpp_dout(dpp, 10) << __FFL__ << ": hoid " << hoid << " after last_backfill"
 			 << dendl;
       return;
     }
@@ -957,15 +957,15 @@ protected:
 	ceph_assert(i->prior_version == last || i->is_error());
       }
       if (i->is_error()) {
-	ldpp_dout(dpp, 20) << __func__ << ": ignoring " << *i << dendl;
+	ldpp_dout(dpp, 20) << __FFL__ << ": ignoring " << *i << dendl;
       } else {
-	ldpp_dout(dpp, 20) << __func__ << ": keeping " << *i << dendl;
+	ldpp_dout(dpp, 20) << __FFL__ << ": keeping " << *i << dendl;
 	entries.push_back(*i);
 	last = i->version;
       }
     }
     if (entries.empty()) {
-      ldpp_dout(dpp, 10) << __func__ << ": no non-ERROR entries" << dendl;
+      ldpp_dout(dpp, 10) << __FFL__ << ": no non-ERROR entries" << dendl;
       return;
     }
 
@@ -975,9 +975,9 @@ protected:
     const bool object_not_in_store =
       !missing.is_missing(hoid) &&
       entries.rbegin()->is_delete();
-    ldpp_dout(dpp, 10) << __func__ << ": hoid " << " object_not_in_store: "
+    ldpp_dout(dpp, 10) << __FFL__ << ": hoid " << " object_not_in_store: "
                        << object_not_in_store << dendl;
-    ldpp_dout(dpp, 10) << __func__ << ": hoid " << hoid
+    ldpp_dout(dpp, 10) << __FFL__ << ": hoid " << hoid
 		       << " prior_version: " << prior_version
 		       << " first_divergent_update: " << first_divergent_update
 		       << " last_divergent_update: " << last_divergent_update
@@ -988,7 +988,7 @@ protected:
     if (objiter != log.objects.end() &&
 	objiter->second->version >= first_divergent_update) {
       /// Case 1)
-      ldpp_dout(dpp, 10) << __func__ << ": more recent entry found: "
+      ldpp_dout(dpp, 10) << __FFL__ << ": more recent entry found: "
 			 << *objiter->second << ", already merged" << dendl;
 
       ceph_assert(objiter->second->version > last_divergent_update);
@@ -1014,11 +1014,11 @@ protected:
       return;
     }
 
-    ldpp_dout(dpp, 10) << __func__ << ": hoid " << hoid
+    ldpp_dout(dpp, 10) << __FFL__ << ": hoid " << hoid
 		       <<" has no more recent entries in log" << dendl;
     if (prior_version == eversion_t() || entries.front().is_clone()) {
       /// Case 2)
-      ldpp_dout(dpp, 10) << __func__ << ": hoid " << hoid
+      ldpp_dout(dpp, 10) << __FFL__ << ": hoid " << hoid
 			 << " prior_version or op type indicates creation,"
 			 << " deleting"
 			 << dendl;
@@ -1037,22 +1037,22 @@ protected:
 
     if (missing.is_missing(hoid)) {
       /// Case 3)
-      ldpp_dout(dpp, 10) << __func__ << ": hoid " << hoid
+      ldpp_dout(dpp, 10) << __FFL__ << ": hoid " << hoid
 			 << " missing, " << missing.get_items().at(hoid)
 			 << " adjusting" << dendl;
 
       if (missing.get_items().at(hoid).have == prior_version) {
-	ldpp_dout(dpp, 10) << __func__ << ": hoid " << hoid
+	ldpp_dout(dpp, 10) << __FFL__ << ": hoid " << hoid
 			   << " missing.have is prior_version " << prior_version
 			   << " removing from missing" << dendl;
 	missing.rm(missing.get_items().find(hoid));
       } else {
-	ldpp_dout(dpp, 10) << __func__ << ": hoid " << hoid
+	ldpp_dout(dpp, 10) << __FFL__ << ": hoid " << hoid
 			   << " missing.have is " << missing.get_items().at(hoid).have
 			   << ", adjusting" << dendl;
 	missing.revise_need(hoid, prior_version, false);
 	if (prior_version <= info.log_tail) {
-	  ldpp_dout(dpp, 10) << __func__ << ": hoid " << hoid
+	  ldpp_dout(dpp, 10) << __FFL__ << ": hoid " << hoid
 			     << " prior_version " << prior_version
 			     << " <= info.log_tail "
 			     << info.log_tail << dendl;
@@ -1066,14 +1066,14 @@ protected:
       return;
     }
 
-    ldpp_dout(dpp, 10) << __func__ << ": hoid " << hoid
+    ldpp_dout(dpp, 10) << __FFL__ << ": hoid " << hoid
 		       << " must be rolled back or recovered,"
 		       << " attempting to rollback"
 		       << dendl;
     bool can_rollback = true;
     // We are going to make an important decision based on the
     // olog_can_rollback_to value we have received, better known it.
-    ldpp_dout(dpp, 10) << __func__ << ": hoid " << hoid
+    ldpp_dout(dpp, 10) << __FFL__ << ": hoid " << hoid
                        << " olog_can_rollback_to: "
                        << olog_can_rollback_to << dendl;
     /// Distinguish between 4) and 5)
@@ -1081,7 +1081,7 @@ protected:
 	 i != entries.rend();
 	 ++i) {
       if (!i->can_rollback() || i->version <= olog_can_rollback_to) {
-	ldpp_dout(dpp, 10) << __func__ << ": hoid " << hoid << " cannot rollback "
+	ldpp_dout(dpp, 10) << __FFL__ << ": hoid " << hoid << " cannot rollback "
 			   << *i << dendl;
 	can_rollback = false;
 	break;
@@ -1094,17 +1094,17 @@ protected:
 	   i != entries.rend();
 	   ++i) {
 	ceph_assert(i->can_rollback() && i->version > olog_can_rollback_to);
-	ldpp_dout(dpp, 10) << __func__ << ": hoid " << hoid
+	ldpp_dout(dpp, 10) << __FFL__ << ": hoid " << hoid
 			   << " rolling back " << *i << dendl;
 	if (rollbacker)
 	  rollbacker->rollback(*i);
       }
-      ldpp_dout(dpp, 10) << __func__ << ": hoid " << hoid
+      ldpp_dout(dpp, 10) << __FFL__ << ": hoid " << hoid
 			 << " rolled back" << dendl;
       return;
     } else {
       /// Case 5)
-      ldpp_dout(dpp, 10) << __func__ << ": hoid " << hoid << " cannot roll back, "
+      ldpp_dout(dpp, 10) << __FFL__ << ": hoid " << hoid << " cannot roll back, "
 			 << "removing and adding to missing" << dendl;
       if (rollbacker) {
 	if (!object_not_in_store)
@@ -1115,7 +1115,7 @@ protected:
       }
       missing.add(hoid, prior_version, eversion_t(), false);
       if (prior_version <= info.log_tail) {
-	ldpp_dout(dpp, 10) << __func__ << ": hoid " << hoid
+	ldpp_dout(dpp, 10) << __FFL__ << ": hoid " << hoid
 			   << " prior_version " << prior_version
 			   << " <= info.log_tail "
 			   << info.log_tail << dendl;
@@ -1511,7 +1511,7 @@ public:
 	    if (checked.count(i.first))
 	      continue;
 	    if (i.first > info.last_backfill) {
-	      ldpp_dout(dpp, -1) << __func__ << ": invalid missing set entry "
+	      ldpp_dout(dpp, -1) << __FFL__ << ": invalid missing set entry "
 				<< "found before last_backfill: "
 				<< i.first << " " << i.second
 				<< " last_backfill = " << info.last_backfill

@@ -60,7 +60,7 @@ public:
     int r = ::mkdir("kv_test_temp_dir", 0777);
     if (r < 0 && errno != EEXIST) {
       r = -errno;
-      cerr << __func__ << ": unable to create kv_test_temp_dir: "
+      cerr << __FFL__ << ": unable to create kv_test_temp_dir: "
 	   << cpp_strerror(r) << std::endl;
       return;
     }

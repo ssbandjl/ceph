@@ -205,7 +205,7 @@ TEST(LibRGW, LIST_OBJECTS) {
     /* list objects via readdir, bucketwise */
     using std::get;
 
-    ldout(g_ceph_context, 0) << __func__ << " readdir on bucket "
+    ldout(g_ceph_context, 0) << __FFL__ << " readdir on bucket "
 			     << bucket_name << dendl;
     bool eof = false;
     uint64_t offset = 0;

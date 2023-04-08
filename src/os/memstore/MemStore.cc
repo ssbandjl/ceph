@@ -59,13 +59,13 @@ int MemStore::umount()
 
 int MemStore::_save()
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   dump_all();
   set<coll_t> collections;
   for (ceph::unordered_map<coll_t,CollectionRef>::iterator p = coll_map.begin();
        p != coll_map.end();
        ++p) {
-    dout(20) << __func__ << " coll " << p->first << " " << p->second << dendl;
+    dout(20) << __FFL__ << " coll " << p->first << " " << p->second << dendl;
     collections.insert(p->first);
     bufferlist bl;
     ceph_assert(p->second);
@@ -137,7 +137,7 @@ void MemStore::dump(Formatter *f)
 
 int MemStore::_load()
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   bufferlist bl;
   string fn = path + "/collections";
   string err;
@@ -197,11 +197,11 @@ int MemStore::mkfs()
     r = write_meta("fsid", fsid_str);
     if (r < 0)
       return r;
-    dout(1) << __func__ << " new fsid " << fsid_str << dendl;
+    dout(1) << __FFL__ << " new fsid " << fsid_str << dendl;
   } else if (r < 0) {
     return r;
   } else {  
-    dout(1) << __func__ << " had fsid " << fsid_str << dendl;
+    dout(1) << __FFL__ << " had fsid " << fsid_str << dendl;
   }
 
   string fn = path + "/collections";
@@ -222,14 +222,14 @@ int MemStore::mkfs()
 
 int MemStore::statfs(struct store_statfs_t *st, osd_alert_list_t* alerts)
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   if (alerts) {
     alerts->clear(); // returns nothing for now
   }
   st->reset();
   st->total = cct->_conf->memstore_device_bytes;
   st->available = std::max<int64_t>(st->total - used_bytes, 0);
-  dout(10) << __func__ << ": used_bytes: " << used_bytes
+  dout(10) << __FFL__ << ": used_bytes: " << used_bytes
 	   << "/" << cct->_conf->memstore_device_bytes << dendl;
   return 0;
 }
@@ -270,7 +270,7 @@ ObjectStore::CollectionHandle MemStore::create_new_collection(const coll_t& cid)
 bool MemStore::exists(CollectionHandle &c_, const ghobject_t& oid)
 {
   Collection *c = static_cast<Collection*>(c_.get());
-  dout(10) << __func__ << " " << c->get_cid() << " " << oid << dendl;
+  dout(10) << __FFL__ << " " << c->get_cid() << " " << oid << dendl;
   if (!c->exists)
     return false;
 
@@ -286,7 +286,7 @@ int MemStore::stat(
   bool allow_eio)
 {
   Collection *c = static_cast<Collection*>(c_.get());
-  dout(10) << __func__ << " " << c->cid << " " << oid << dendl;
+  dout(10) << __FFL__ << " " << c->cid << " " << oid << dendl;
   if (!c->exists)
     return -ENOENT;
   ObjectRef o = c->get_object(oid);
@@ -315,7 +315,7 @@ int MemStore::read(
   uint32_t op_flags)
 {
   Collection *c = static_cast<Collection*>(c_.get());
-  dout(10) << __func__ << " " << c->cid << " " << oid << " "
+  dout(10) << __FFL__ << " " << c->cid << " " << oid << " "
 	   << offset << "~" << len << dendl;
   if (!c->exists)
     return -ENOENT;
@@ -346,7 +346,7 @@ int MemStore::fiemap(CollectionHandle& ch, const ghobject_t& oid,
 int MemStore::fiemap(CollectionHandle& ch, const ghobject_t& oid,
 		     uint64_t offset, size_t len, map<uint64_t, uint64_t>& destmap)
 {
-  dout(10) << __func__ << " " << ch->cid << " " << oid << " " << offset << "~"
+  dout(10) << __FFL__ << " " << ch->cid << " " << oid << " " << offset << "~"
 	   << len << dendl;
   Collection *c = static_cast<Collection*>(ch.get());
   if (!c)
@@ -369,7 +369,7 @@ int MemStore::getattr(CollectionHandle &c_, const ghobject_t& oid,
 		      const char *name, bufferptr& value)
 {
   Collection *c = static_cast<Collection*>(c_.get());
-  dout(10) << __func__ << " " << c->cid << " " << oid << " " << name << dendl;
+  dout(10) << __FFL__ << " " << c->cid << " " << oid << " " << name << dendl;
   if (!c->exists)
     return -ENOENT;
   ObjectRef o = c->get_object(oid);
@@ -388,7 +388,7 @@ int MemStore::getattrs(CollectionHandle &c_, const ghobject_t& oid,
 		       map<string,bufferptr>& aset)
 {
   Collection *c = static_cast<Collection*>(c_.get());
-  dout(10) << __func__ << " " << c->cid << " " << oid << dendl;
+  dout(10) << __FFL__ << " " << c->cid << " " << oid << dendl;
   if (!c->exists)
     return -ENOENT;
 
@@ -402,7 +402,7 @@ int MemStore::getattrs(CollectionHandle &c_, const ghobject_t& oid,
 
 int MemStore::list_collections(vector<coll_t>& ls)
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   std::shared_lock l{coll_lock};
   for (ceph::unordered_map<coll_t,CollectionRef>::iterator p = coll_map.begin();
        p != coll_map.end();
@@ -414,14 +414,14 @@ int MemStore::list_collections(vector<coll_t>& ls)
 
 bool MemStore::collection_exists(const coll_t& cid)
 {
-  dout(10) << __func__ << " " << cid << dendl;
+  dout(10) << __FFL__ << " " << cid << dendl;
   std::shared_lock l{coll_lock};
   return coll_map.count(cid);
 }
 
 int MemStore::collection_empty(CollectionHandle& ch, bool *empty)
 {
-  dout(10) << __func__ << " " << ch->cid << dendl;
+  dout(10) << __FFL__ << " " << ch->cid << dendl;
   CollectionRef c = static_cast<Collection*>(ch.get());
   std::shared_lock l{c->lock};
   *empty = c->object_map.empty();
@@ -430,7 +430,7 @@ int MemStore::collection_empty(CollectionHandle& ch, bool *empty)
 
 int MemStore::collection_bits(CollectionHandle& ch)
 {
-  dout(10) << __func__ << " " << ch->cid << dendl;
+  dout(10) << __FFL__ << " " << ch->cid << dendl;
   Collection *c = static_cast<Collection*>(ch.get());
   std::shared_lock l{c->lock};
   return c->bits;
@@ -445,7 +445,7 @@ int MemStore::collection_list(CollectionHandle& ch,
   Collection *c = static_cast<Collection*>(ch.get());
   std::shared_lock l{c->lock};
 
-  dout(10) << __func__ << " cid " << ch->cid << " start " << start
+  dout(10) << __FFL__ << " cid " << ch->cid << " start " << start
 	   << " end " << end << dendl;
   map<ghobject_t,ObjectRef>::iterator p = c->object_map.lower_bound(start);
   while (p != c->object_map.end() &&
@@ -460,7 +460,7 @@ int MemStore::collection_list(CollectionHandle& ch,
     else
       *next = p->first;
   }
-  dout(10) << __func__ << " cid " << ch->cid << " got " << ls->size() << dendl;
+  dout(10) << __FFL__ << " cid " << ch->cid << " got " << ls->size() << dendl;
   return 0;
 }
 
@@ -471,7 +471,7 @@ int MemStore::omap_get(
   map<string, bufferlist> *out /// < [out] Key to value map
   )
 {
-  dout(10) << __func__ << " " << ch->cid << " " << oid << dendl;
+  dout(10) << __FFL__ << " " << ch->cid << " " << oid << dendl;
   Collection *c = static_cast<Collection*>(ch.get());
 
   ObjectRef o = c->get_object(oid);
@@ -490,7 +490,7 @@ int MemStore::omap_get_header(
   bool allow_eio ///< [in] don't assert on eio
   )
 {
-  dout(10) << __func__ << " " << ch->cid << " " << oid << dendl;
+  dout(10) << __FFL__ << " " << ch->cid << " " << oid << dendl;
   Collection *c = static_cast<Collection*>(ch.get());
   ObjectRef o = c->get_object(oid);
   if (!o)
@@ -506,7 +506,7 @@ int MemStore::omap_get_keys(
   set<string> *keys      ///< [out] Keys defined on oid
   )
 {
-  dout(10) << __func__ << " " << ch->cid << " " << oid << dendl;
+  dout(10) << __FFL__ << " " << ch->cid << " " << oid << dendl;
   Collection *c = static_cast<Collection*>(ch.get());
   ObjectRef o = c->get_object(oid);
   if (!o)
@@ -526,7 +526,7 @@ int MemStore::omap_get_values(
   map<string, bufferlist> *out ///< [out] Returned keys and values
   )
 {
-  dout(10) << __func__ << " " << ch->cid << " " << oid << dendl;
+  dout(10) << __FFL__ << " " << ch->cid << " " << oid << dendl;
   Collection *c = static_cast<Collection*>(ch.get());
   ObjectRef o = c->get_object(oid);
   if (!o)
@@ -549,7 +549,7 @@ int MemStore::omap_check_keys(
   set<string> *out         ///< [out] Subset of keys defined on oid
   )
 {
-  dout(10) << __func__ << " " << ch->cid << " " << oid << dendl;
+  dout(10) << __FFL__ << " " << ch->cid << " " << oid << dendl;
   Collection *c = static_cast<Collection*>(ch.get());
   ObjectRef o = c->get_object(oid);
   if (!o)
@@ -614,7 +614,7 @@ ObjectMap::ObjectMapIterator MemStore::get_omap_iterator(
   CollectionHandle& ch,
   const ghobject_t& oid)
 {
-  dout(10) << __func__ << " " << ch->cid << " " << oid << dendl;
+  dout(10) << __FFL__ << " " << ch->cid << " " << oid << dendl;
   Collection *c = static_cast<Collection*>(ch.get());
   ObjectRef o = c->get_object(oid);
   if (!o)
@@ -1025,7 +1025,7 @@ void MemStore::_do_transaction(Transaction& t)
 
 int MemStore::_touch(const coll_t& cid, const ghobject_t& oid)
 {
-  dout(10) << __func__ << " " << cid << " " << oid << dendl;
+  dout(10) << __FFL__ << " " << cid << " " << oid << dendl;
   CollectionRef c = get_collection(cid);
   if (!c)
     return -ENOENT;
@@ -1038,7 +1038,7 @@ int MemStore::_write(const coll_t& cid, const ghobject_t& oid,
 		     uint64_t offset, size_t len, const bufferlist& bl,
 		     uint32_t fadvise_flags)
 {
-  dout(10) << __func__ << " " << cid << " " << oid << " "
+  dout(10) << __FFL__ << " " << cid << " " << oid << " "
 	   << offset << "~" << len << dendl;
   ceph_assert(len == bl.length());
 
@@ -1059,7 +1059,7 @@ int MemStore::_write(const coll_t& cid, const ghobject_t& oid,
 int MemStore::_zero(const coll_t& cid, const ghobject_t& oid,
 		    uint64_t offset, size_t len)
 {
-  dout(10) << __func__ << " " << cid << " " << oid << " " << offset << "~"
+  dout(10) << __FFL__ << " " << cid << " " << oid << " " << offset << "~"
 	   << len << dendl;
   bufferlist bl;
   bl.append_zero(len);
@@ -1068,7 +1068,7 @@ int MemStore::_zero(const coll_t& cid, const ghobject_t& oid,
 
 int MemStore::_truncate(const coll_t& cid, const ghobject_t& oid, uint64_t size)
 {
-  dout(10) << __func__ << " " << cid << " " << oid << " " << size << dendl;
+  dout(10) << __FFL__ << " " << cid << " " << oid << " " << size << dendl;
   CollectionRef c = get_collection(cid);
   if (!c)
     return -ENOENT;
@@ -1086,7 +1086,7 @@ int MemStore::_truncate(const coll_t& cid, const ghobject_t& oid, uint64_t size)
 
 int MemStore::_remove(const coll_t& cid, const ghobject_t& oid)
 {
-  dout(10) << __func__ << " " << cid << " " << oid << dendl;
+  dout(10) << __FFL__ << " " << cid << " " << oid << dendl;
   CollectionRef c = get_collection(cid);
   if (!c)
     return -ENOENT;
@@ -1105,7 +1105,7 @@ int MemStore::_remove(const coll_t& cid, const ghobject_t& oid)
 int MemStore::_setattrs(const coll_t& cid, const ghobject_t& oid,
 			map<string,bufferptr>& aset)
 {
-  dout(10) << __func__ << " " << cid << " " << oid << dendl;
+  dout(10) << __FFL__ << " " << cid << " " << oid << dendl;
   CollectionRef c = get_collection(cid);
   if (!c)
     return -ENOENT;
@@ -1121,7 +1121,7 @@ int MemStore::_setattrs(const coll_t& cid, const ghobject_t& oid,
 
 int MemStore::_rmattr(const coll_t& cid, const ghobject_t& oid, const char *name)
 {
-  dout(10) << __func__ << " " << cid << " " << oid << " " << name << dendl;
+  dout(10) << __FFL__ << " " << cid << " " << oid << " " << name << dendl;
   CollectionRef c = get_collection(cid);
   if (!c)
     return -ENOENT;
@@ -1139,7 +1139,7 @@ int MemStore::_rmattr(const coll_t& cid, const ghobject_t& oid, const char *name
 
 int MemStore::_rmattrs(const coll_t& cid, const ghobject_t& oid)
 {
-  dout(10) << __func__ << " " << cid << " " << oid << dendl;
+  dout(10) << __FFL__ << " " << cid << " " << oid << dendl;
   CollectionRef c = get_collection(cid);
   if (!c)
     return -ENOENT;
@@ -1155,7 +1155,7 @@ int MemStore::_rmattrs(const coll_t& cid, const ghobject_t& oid)
 int MemStore::_clone(const coll_t& cid, const ghobject_t& oldoid,
 		     const ghobject_t& newoid)
 {
-  dout(10) << __func__ << " " << cid << " " << oldoid
+  dout(10) << __FFL__ << " " << cid << " " << oldoid
 	   << " -> " << newoid << dendl;
   CollectionRef c = get_collection(cid);
   if (!c)
@@ -1184,7 +1184,7 @@ int MemStore::_clone_range(const coll_t& cid, const ghobject_t& oldoid,
 			   const ghobject_t& newoid,
 			   uint64_t srcoff, uint64_t len, uint64_t dstoff)
 {
-  dout(10) << __func__ << " " << cid << " "
+  dout(10) << __FFL__ << " " << cid << " "
 	   << oldoid << " " << srcoff << "~" << len << " -> "
 	   << newoid << " " << dstoff << "~" << len
 	   << dendl;
@@ -1210,7 +1210,7 @@ int MemStore::_clone_range(const coll_t& cid, const ghobject_t& oldoid,
 
 int MemStore::_omap_clear(const coll_t& cid, const ghobject_t &oid)
 {
-  dout(10) << __func__ << " " << cid << " " << oid << dendl;
+  dout(10) << __FFL__ << " " << cid << " " << oid << dendl;
   CollectionRef c = get_collection(cid);
   if (!c)
     return -ENOENT;
@@ -1227,7 +1227,7 @@ int MemStore::_omap_clear(const coll_t& cid, const ghobject_t &oid)
 int MemStore::_omap_setkeys(const coll_t& cid, const ghobject_t &oid,
 			    bufferlist& aset_bl)
 {
-  dout(10) << __func__ << " " << cid << " " << oid << dendl;
+  dout(10) << __FFL__ << " " << cid << " " << oid << dendl;
   CollectionRef c = get_collection(cid);
   if (!c)
     return -ENOENT;
@@ -1250,7 +1250,7 @@ int MemStore::_omap_setkeys(const coll_t& cid, const ghobject_t &oid,
 int MemStore::_omap_rmkeys(const coll_t& cid, const ghobject_t &oid,
 			   bufferlist& keys_bl)
 {
-  dout(10) << __func__ << " " << cid << " " << oid << dendl;
+  dout(10) << __FFL__ << " " << cid << " " << oid << dendl;
   CollectionRef c = get_collection(cid);
   if (!c)
     return -ENOENT;
@@ -1273,7 +1273,7 @@ int MemStore::_omap_rmkeys(const coll_t& cid, const ghobject_t &oid,
 int MemStore::_omap_rmkeyrange(const coll_t& cid, const ghobject_t &oid,
 			       const string& first, const string& last)
 {
-  dout(10) << __func__ << " " << cid << " " << oid << " " << first
+  dout(10) << __FFL__ << " " << cid << " " << oid << " " << first
 	   << " " << last << dendl;
   CollectionRef c = get_collection(cid);
   if (!c)
@@ -1292,7 +1292,7 @@ int MemStore::_omap_rmkeyrange(const coll_t& cid, const ghobject_t &oid,
 int MemStore::_omap_setheader(const coll_t& cid, const ghobject_t &oid,
 			      const bufferlist &bl)
 {
-  dout(10) << __func__ << " " << cid << " " << oid << dendl;
+  dout(10) << __FFL__ << " " << cid << " " << oid << dendl;
   CollectionRef c = get_collection(cid);
   if (!c)
     return -ENOENT;
@@ -1307,7 +1307,7 @@ int MemStore::_omap_setheader(const coll_t& cid, const ghobject_t &oid,
 
 int MemStore::_create_collection(const coll_t& cid, int bits)
 {
-  dout(10) << __func__ << " " << cid << dendl;
+  dout(10) << __FFL__ << " " << cid << dendl;
   std::lock_guard l{coll_lock};
   auto result = coll_map.insert(std::make_pair(cid, CollectionRef()));
   if (!result.second)
@@ -1322,7 +1322,7 @@ int MemStore::_create_collection(const coll_t& cid, int bits)
 
 int MemStore::_destroy_collection(const coll_t& cid)
 {
-  dout(10) << __func__ << " " << cid << dendl;
+  dout(10) << __FFL__ << " " << cid << dendl;
   std::lock_guard l{coll_lock};
   ceph::unordered_map<coll_t,CollectionRef>::iterator cp = coll_map.find(cid);
   if (cp == coll_map.end())
@@ -1340,7 +1340,7 @@ int MemStore::_destroy_collection(const coll_t& cid)
 
 int MemStore::_collection_add(const coll_t& cid, const coll_t& ocid, const ghobject_t& oid)
 {
-  dout(10) << __func__ << " " << cid << " " << ocid << " " << oid << dendl;
+  dout(10) << __FFL__ << " " << cid << " " << ocid << " " << oid << dendl;
   CollectionRef c = get_collection(cid);
   if (!c)
     return -ENOENT;
@@ -1364,7 +1364,7 @@ int MemStore::_collection_add(const coll_t& cid, const coll_t& ocid, const ghobj
 int MemStore::_collection_move_rename(const coll_t& oldcid, const ghobject_t& oldoid,
 				      coll_t cid, const ghobject_t& oid)
 {
-  dout(10) << __func__ << " " << oldcid << " " << oldoid << " -> "
+  dout(10) << __FFL__ << " " << oldcid << " " << oldoid << " -> "
 	   << cid << " " << oid << dendl;
   CollectionRef c = get_collection(cid);
   if (!c)
@@ -1394,7 +1394,7 @@ int MemStore::_collection_move_rename(const coll_t& oldcid, const ghobject_t& ol
 int MemStore::_split_collection(const coll_t& cid, uint32_t bits, uint32_t match,
 				coll_t dest)
 {
-  dout(10) << __func__ << " " << cid << " " << bits << " " << match << " "
+  dout(10) << __FFL__ << " " << cid << " " << bits << " " << match << " "
 	   << dest << dendl;
   CollectionRef sc = get_collection(cid);
   if (!sc)
@@ -1427,7 +1427,7 @@ int MemStore::_split_collection(const coll_t& cid, uint32_t bits, uint32_t match
 
 int MemStore::_merge_collection(const coll_t& cid, uint32_t bits, coll_t dest)
 {
-  dout(10) << __func__ << " " << cid << " " << bits << " "
+  dout(10) << __FFL__ << " " << cid << " " << bits << " "
 	   << dest << dendl;
   CollectionRef sc = get_collection(cid);
   if (!sc)

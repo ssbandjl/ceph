@@ -682,7 +682,7 @@ int RGWAsyncRemoveObj::_send_request()
 
   rgw_obj obj(bucket_info.bucket, key);
 
-  ldout(store->ctx(), 0) << __func__ << "(): deleting obj=" << obj << dendl;
+  ldout(store->ctx(), 0) << __FFL__ << "(): deleting obj=" << obj << dendl;
 
   obj_ctx.set_atomic(obj);
 
@@ -690,13 +690,13 @@ int RGWAsyncRemoveObj::_send_request()
 
   int ret = store->getRados()->get_obj_state(&obj_ctx, bucket_info, obj, &state, null_yield);
   if (ret < 0) {
-    ldout(store->ctx(), 20) << __func__ << "(): get_obj_state() obj=" << obj << " returned ret=" << ret << dendl;
+    ldout(store->ctx(), 20) << __FFL__ << "(): get_obj_state() obj=" << obj << " returned ret=" << ret << dendl;
     return ret;
   }
 
   /* has there been any racing object write? */
   if (del_if_older && (state->mtime > timestamp)) {
-    ldout(store->ctx(), 20) << __func__ << "(): skipping object removal obj=" << obj << " (obj mtime=" << state->mtime << ", request timestamp=" << timestamp << ")" << dendl;
+    ldout(store->ctx(), 20) << __FFL__ << "(): skipping object removal obj=" << obj << " (obj mtime=" << state->mtime << ", request timestamp=" << timestamp << ")" << dendl;
     return 0;
   }
 
@@ -735,7 +735,7 @@ int RGWAsyncRemoveObj::_send_request()
 
   ret = del_op.delete_obj(null_yield);
   if (ret < 0) {
-    ldout(store->ctx(), 20) << __func__ << "(): delete_obj() obj=" << obj << " returned ret=" << ret << dendl;
+    ldout(store->ctx(), 20) << __FFL__ << "(): delete_obj() obj=" << obj << " returned ret=" << ret << dendl;
   }
   return ret;
 }

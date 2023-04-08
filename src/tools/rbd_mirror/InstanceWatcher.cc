@@ -64,13 +64,13 @@ struct C_RemoveInstanceRequest : public Context {
   }
 
   void send() {
-    dout(10) << "C_RemoveInstanceRequest: " << this << " " << __func__ << dendl;
+    dout(10) << "C_RemoveInstanceRequest: " << this << " " << __FFL__ << dendl;
 
     instance_watcher.remove(this);
   }
 
   void finish(int r) override {
-    dout(10) << "C_RemoveInstanceRequest: " << this << " " << __func__ << ": r="
+    dout(10) << "C_RemoveInstanceRequest: " << this << " " << __FFL__ << ": r="
              << r << dendl;
     ceph_assert(r == 0);
 
@@ -119,7 +119,7 @@ struct InstanceWatcher<I>::C_NotifyInstanceRequest : public Context {
   }
 
   void send() {
-    dout(10) << "C_NotifyInstanceRequest: " << this << " " << __func__ << dendl;
+    dout(10) << "C_NotifyInstanceRequest: " << this << " " << __FFL__ << dendl;
 
     ceph_assert(ceph_mutex_is_locked(instance_watcher->m_lock));
 
@@ -162,7 +162,7 @@ struct InstanceWatcher<I>::C_NotifyInstanceRequest : public Context {
   }
 
   void cancel() {
-    dout(10) << "C_NotifyInstanceRequest: " << this << " " << __func__ << dendl;
+    dout(10) << "C_NotifyInstanceRequest: " << this << " " << __FFL__ << dendl;
 
     ceph_assert(ceph_mutex_is_locked(instance_watcher->m_lock));
 
@@ -171,7 +171,7 @@ struct InstanceWatcher<I>::C_NotifyInstanceRequest : public Context {
   }
 
   void finish(int r) override {
-    dout(10) << "C_NotifyInstanceRequest: " << this << " " << __func__ << ": r="
+    dout(10) << "C_NotifyInstanceRequest: " << this << " " << __FFL__ << ": r="
              << r << dendl;
 
     if (r == 0 || r == -ETIMEDOUT) {
@@ -260,12 +260,12 @@ struct InstanceWatcher<I>::C_SyncRequest : public Context {
                 const std::string &sync_id, Context *on_start)
     : instance_watcher(instance_watcher), sync_id(sync_id),
       on_start(on_start) {
-    dout(10) << "C_SyncRequest: " << this << " " << __func__ << ": sync_id="
+    dout(10) << "C_SyncRequest: " << this << " " << __FFL__ << ": sync_id="
              << sync_id << dendl;
   }
 
   void finish(int r) override {
-    dout(10) << "C_SyncRequest: " << this << " " << __func__ << ": r="
+    dout(10) << "C_SyncRequest: " << this << " " << __FFL__ << ": r="
              << r << dendl;
 
     if (on_start != nullptr) {
@@ -284,7 +284,7 @@ struct InstanceWatcher<I>::C_SyncRequest : public Context {
 
 #undef dout_prefix
 #define dout_prefix *_dout << "rbd::mirror::InstanceWatcher: " \
-                           << this << " " << __func__ << ": "
+                           << this << " " << __FFL__ << ": "
 template <typename I>
 void InstanceWatcher<I>::get_instances(librados::IoCtx &io_ctx,
                                        std::vector<std::string> *instance_ids,

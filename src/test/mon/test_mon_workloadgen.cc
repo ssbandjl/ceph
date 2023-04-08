@@ -95,7 +95,7 @@ class TestStub : public Dispatcher
     TestStub *s;
     explicit C_Tick(TestStub *stub) : s(stub) {}
     void finish(int r) override {
-      generic_dout(20) << "C_Tick::" << __func__ << dendl;
+      generic_dout(20) << "C_Tick::" << __FFL__ << dendl;
       if (r == -ECANCELED) {
 	generic_dout(20) << "C_Tick::" << __func__
 			<< " shutdown" << dendl;
@@ -120,7 +120,7 @@ class TestStub : public Dispatcher
       stop_ticking();
       return;
     }
-    dout(20) << __func__ << " adding tick timer" << dendl;
+    dout(20) << __FFL__ << " adding tick timer" << dendl;
     timer.add_event_after(tick_seconds, new C_Tick(this));
   }
   // If we have a function to start ticking that the stubs can
@@ -131,15 +131,15 @@ class TestStub : public Dispatcher
   // the bat; instead, we wait for the next tick to kick in and
   // disable itself.
   void stop_ticking() {
-    dout(20) << __func__ << " disable tick" << dendl;
+    dout(20) << __FFL__ << " disable tick" << dendl;
     tick_seconds = 0;
   }
 
  public:
   void tick() {
-    std::cout << __func__ << std::endl;
+    std::cout << __FFL__ << std::endl;
     if (do_shutdown || (tick_seconds <= 0)) {
-      std::cout << __func__ << " "
+      std::cout << __FFL__ << " "
 		<< (do_shutdown ? "shutdown" : "stop ticking")
 		<< std::endl;
       return;
@@ -156,7 +156,7 @@ class TestStub : public Dispatcher
     do_shutdown = true;
     int r = _shutdown();
     if (r < 0) {
-      dout(10) << __func__ << " error shutting down: "
+      dout(10) << __FFL__ << " error shutting down: "
 	       << cpp_strerror(-r) << dendl;
       return r;
     }
@@ -192,7 +192,7 @@ class ClientStub : public TestStub
  protected:
   bool ms_dispatch(Message *m) override {
     std::lock_guard l{lock};
-    dout(1) << "client::" << __func__ << " " << *m << dendl;
+    dout(1) << "client::" << __FFL__ << " " << *m << dendl;
     switch (m->get_type()) {
     case CEPH_MSG_OSD_MAP:
       objecter->handle_osd_map((MOSDMap*)m);
@@ -203,19 +203,19 @@ class ClientStub : public TestStub
   }
 
   void ms_handle_connect(Connection *con) override {
-    dout(1) << "client::" << __func__ << " " << con << dendl;
+    dout(1) << "client::" << __FFL__ << " " << con << dendl;
     std::lock_guard l{lock};
     objecter->ms_handle_connect(con);
   }
 
   void ms_handle_remote_reset(Connection *con) override {
-    dout(1) << "client::" << __func__ << " " << con << dendl;
+    dout(1) << "client::" << __FFL__ << " " << con << dendl;
     std::lock_guard l{lock};
     objecter->ms_handle_remote_reset(con);
   }
 
   bool ms_handle_reset(Connection *con) override {
-    dout(1) << "client::" << __func__ << dendl;
+    dout(1) << "client::" << __FFL__ << dendl;
     std::lock_guard l{lock};
     objecter->ms_handle_reset(con);
     return false;
@@ -246,7 +246,7 @@ class ClientStub : public TestStub
     int err;
     err = monc.build_initial_monmap();
     if (err < 0) {
-      derr << "ClientStub::" << __func__ << " ERROR: build initial monmap: "
+      derr << "ClientStub::" << __FFL__ << " ERROR: build initial monmap: "
 	   << cpp_strerror(err) << dendl;
       return err;
     }
@@ -256,7 +256,7 @@ class ClientStub : public TestStub
 
     messenger->set_default_policy(
 	Messenger::Policy::lossy_client(CEPH_FEATURE_OSDREPLYMUX));
-    dout(10) << "ClientStub::" << __func__ << " starting messenger at "
+    dout(10) << "ClientStub::" << __FFL__ << " starting messenger at "
 	    << messenger->get_myaddrs() << dendl;
 
     objecter.reset(new Objecter(cct, messenger.get(), &monc, NULL));
@@ -271,14 +271,14 @@ class ClientStub : public TestStub
 
     err = monc.init();
     if (err < 0) {
-      derr << "ClientStub::" << __func__ << " monc init error: "
+      derr << "ClientStub::" << __FFL__ << " monc init error: "
 	   << cpp_strerror(-err) << dendl;
       return err;
     }
 
     err = monc.authenticate();
     if (err < 0) {
-      derr << "ClientStub::" << __func__ << " monc authenticate error: "
+      derr << "ClientStub::" << __FFL__ << " monc authenticate error: "
 	   << cpp_strerror(-err) << dendl;
       monc.shutdown();
       return err;
@@ -296,7 +296,7 @@ class ClientStub : public TestStub
 
     objecter->wait_for_osd_map();
 
-    dout(10) << "ClientStub::" << __func__ << " done" << dendl;
+    dout(10) << "ClientStub::" << __FFL__ << " done" << dendl;
     return 0;
   }
 };
@@ -340,7 +340,7 @@ class OSDStub : public TestStub
 			<< " shutdown" << dendl;
 	return;
       }
-      generic_dout(20) << "C_CreatePGs::" << __func__ << dendl;
+      generic_dout(20) << "C_CreatePGs::" << __FFL__ << dendl;
       s->auto_create_pgs();
     }
   };
@@ -352,7 +352,7 @@ class OSDStub : public TestStub
       gen(whoami),
       mon_osd_rng(STUB_MON_OSD_FIRST, STUB_MON_OSD_LAST)
   {
-    dout(20) << __func__ << " auth supported: "
+    dout(20) << __FFL__ << " auth supported: "
 	     << cct->_conf->auth_supported << dendl;
     stringstream ss;
     ss << "client-osd" << whoami;
@@ -375,7 +375,7 @@ class OSDStub : public TestStub
     messenger->set_policy(entity_name_t::TYPE_OSD,
 	Messenger::Policy::stateless_server(0));
 
-    dout(10) << __func__ << " public addr " << g_conf()->public_addr << dendl;
+    dout(10) << __FFL__ << " public addr " << g_conf()->public_addr << dendl;
     int err = messenger->bind(g_conf()->public_addr);
     if (err < 0)
       exit(1);
@@ -388,12 +388,12 @@ class OSDStub : public TestStub
   }
 
   int init() override {
-    dout(10) << __func__ << dendl;
+    dout(10) << __FFL__ << dendl;
     std::lock_guard l{lock};
 
-    dout(1) << __func__ << " fsid " << monc.monmap.fsid
+    dout(1) << __FFL__ << " fsid " << monc.monmap.fsid
 	    << " osd_fsid " << g_conf()->osd_uuid << dendl;
-    dout(1) << __func__ << " name " << g_conf()->name << dendl;
+    dout(1) << __FFL__ << " name " << g_conf()->name << dendl;
 
     timer.init();
     messenger->add_dispatcher_head(this);
@@ -401,14 +401,14 @@ class OSDStub : public TestStub
 
     int err = monc.init();
     if (err < 0) {
-      derr << __func__ << " monc init error: "
+      derr << __FFL__ << " monc init error: "
 	   << cpp_strerror(-err) << dendl;
       return err;
     }
 
     err = monc.authenticate();
     if (err < 0) {
-      derr << __func__ << " monc authenticate error: "
+      derr << __FFL__ << " monc authenticate error: "
 	   << cpp_strerror(-err) << dendl;
       monc.shutdown();
       return err;
@@ -418,13 +418,13 @@ class OSDStub : public TestStub
     monc.wait_auth_rotating(30.0);
 
 
-    dout(10) << __func__ << " creating osd superblock" << dendl;
+    dout(10) << __FFL__ << " creating osd superblock" << dendl;
     sb.cluster_fsid = monc.monmap.fsid;
     sb.osd_fsid.generate_random();
     sb.whoami = whoami;
     sb.compat_features = CompatSet();
-    dout(20) << __func__ << " " << sb << dendl;
-    dout(20) << __func__ << " osdmap " << osdmap << dendl;
+    dout(20) << __FFL__ << " " << sb << dendl;
+    dout(20) << __FFL__ << " osdmap " << osdmap << dendl;
 
     update_osd_stat();
 
@@ -441,16 +441,16 @@ class OSDStub : public TestStub
   }
 
   void boot() {
-    dout(1) << __func__ << " boot?" << dendl;
+    dout(1) << __FFL__ << " boot?" << dendl;
 
     utime_t now = ceph_clock_now();
     if ((last_boot_attempt > 0.0)
 	&& ((now - last_boot_attempt)) <= STUB_BOOT_INTERVAL) {
-      dout(1) << __func__ << " backoff and try again later." << dendl;
+      dout(1) << __FFL__ << " backoff and try again later." << dendl;
       return;
     }
 
-    dout(1) << __func__ << " boot!" << dendl;
+    dout(1) << __FFL__ << " boot!" << dendl;
     MOSDBoot *mboot = new MOSDBoot;
     mboot->sb = sb;
     last_boot_attempt = now;
@@ -560,12 +560,12 @@ class OSDStub : public TestStub
       *_dout << dendl;
 
     }
-    dout(10) << __func__ << " send " << *mstats << dendl;
+    dout(10) << __FFL__ << " send " << *mstats << dendl;
     monc.send_mon_message(mstats);
   }
 
   void modify_pg(pg_t pgid) {
-    dout(10) << __func__ << " pg " << pgid << dendl;
+    dout(10) << __FFL__ << " pg " << pgid << dendl;
     ceph_assert(pgs.count(pgid) > 0);
 
     pg_stat_t &s = pgs[pgid];
@@ -587,7 +587,7 @@ class OSDStub : public TestStub
   }
 
   void modify_pgs() {
-    dout(10) << __func__ << dendl;
+    dout(10) << __FFL__ << dendl;
 
     if (pgs.empty()) {
       dout(1) << __func__
@@ -608,7 +608,7 @@ class OSDStub : public TestStub
     int pgs_at = 0;
     while (pos_it != pgs_pos.end()) {
       int at = *pos_it;
-      dout(20) << __func__ << " pg at pos " << at << dendl;
+      dout(20) << __FFL__ << " pg at pos " << at << dendl;
       while ((pgs_at != at) && (it != pgs.end())) {
 	++it;
 	++pgs_at;
@@ -622,40 +622,40 @@ class OSDStub : public TestStub
   }
 
   void op_alive() {
-    dout(10) << __func__ << dendl;
+    dout(10) << __FFL__ << dendl;
     if (!osdmap.exists(whoami)) {
-      dout(0) << __func__ << " I'm not in the osdmap!!\n";
+      dout(0) << __FFL__ << " I'm not in the osdmap!!\n";
       JSONFormatter f(true);
       osdmap.dump(&f);
       f.flush(*_dout);
       *_dout << dendl;
     }
     if (osdmap.get_epoch() == 0) {
-      dout(1) << __func__ << " wait for osdmap" << dendl;
+      dout(1) << __FFL__ << " wait for osdmap" << dendl;
       return;
     }
     epoch_t up_thru = osdmap.get_up_thru(whoami);
-    dout(10) << __func__ << "up_thru: " << osdmap.get_up_thru(whoami) << dendl;
+    dout(10) << __FFL__ << "up_thru: " << osdmap.get_up_thru(whoami) << dendl;
 
     monc.send_mon_message(new MOSDAlive(osdmap.get_epoch(), up_thru));
   }
 
   void op_pgtemp() {
     if (osdmap.get_epoch() == 0) {
-      dout(1) << __func__ << " wait for osdmap" << dendl;
+      dout(1) << __FFL__ << " wait for osdmap" << dendl;
       return;
     }
-    dout(10) << __func__ << dendl;
+    dout(10) << __FFL__ << dendl;
     MOSDPGTemp *m = new MOSDPGTemp(osdmap.get_epoch());
     monc.send_mon_message(m);
   }
 
   void op_failure() {
-    dout(10) << __func__ << dendl;
+    dout(10) << __FFL__ << dendl;
   }
 
   void op_pgstats() {
-    dout(10) << __func__ << dendl;
+    dout(10) << __FFL__ << dendl;
 
     modify_pgs();
     if (!pgs_changes.empty())
@@ -663,7 +663,7 @@ class OSDStub : public TestStub
     monc.sub_want("osd_pg_creates", 0, CEPH_SUBSCRIBE_ONETIME);
     monc.renew_subs();
 
-    dout(20) << __func__ << " pg pools:\n";
+    dout(20) << __FFL__ << " pg pools:\n";
 
     JSONFormatter f(true);
     f.open_array_section("pools");
@@ -684,7 +684,7 @@ class OSDStub : public TestStub
   }
 
   void op_log() {
-    dout(10) << __func__ << dendl;
+    dout(10) << __FFL__ << dendl;
 
     MLog *m = new MLog(monc.get_fsid());
 
@@ -711,7 +711,7 @@ class OSDStub : public TestStub
 
   void _tick() override {
     if (!osdmap.exists(whoami)) {
-      std::cout << __func__ << " not in the cluster; boot!" << std::endl;
+      std::cout << __FFL__ << " not in the cluster; boot!" << std::endl;
       boot();
       return;
     }
@@ -742,7 +742,7 @@ class OSDStub : public TestStub
   void handle_pg_create(MOSDPGCreate *m) {
     ceph_assert(m != NULL);
     if (m->epoch < osdmap.get_epoch()) {
-      std::cout << __func__ << " epoch " << m->epoch << " < "
+      std::cout << __FFL__ << " epoch " << m->epoch << " < "
 	       << osdmap.get_epoch() << "; dropping" << std::endl;
       m->put();
       return;
@@ -751,11 +751,11 @@ class OSDStub : public TestStub
     for (map<pg_t,pg_create_t>::iterator it = m->mkpg.begin();
 	 it != m->mkpg.end(); ++it) {
       pg_create_t &c = it->second;
-      std::cout << __func__ << " pg " << it->first
+      std::cout << __FFL__ << " pg " << it->first
 	      << " created " << c.created
 	      << " parent " << c.parent << std::endl;
       if (pgs.count(it->first)) {
-	std::cout << __func__ << " pg " << it->first
+	std::cout << __FFL__ << " pg " << it->first
 		 << " exists; skipping" << std::endl;
 	continue;
       }
@@ -767,12 +767,12 @@ class OSDStub : public TestStub
   }
 
   void handle_osd_map(MOSDMap *m) {
-    dout(1) << __func__ << dendl;
+    dout(1) << __FFL__ << dendl;
     if (m->fsid != monc.get_fsid()) {
       dout(0) << __func__
               << " message fsid " << m->fsid << " != " << monc.get_fsid()
               << dendl;
-      dout(0) << __func__ << " " << m
+      dout(0) << __FFL__ << " " << m
               << " from " << m->get_source_inst()
               << dendl;
       dout(0) << monc.get_monmap() << dendl;
@@ -786,7 +786,7 @@ class OSDStub : public TestStub
 	    << " current " << osdmap.get_epoch() << dendl;
 
     if (last <= osdmap.get_epoch()) {
-      dout(5) << __func__ << " no new maps here; dropping" << dendl;
+      dout(5) << __FFL__ << " no new maps here; dropping" << dendl;
       m->put();
       return;
     }
@@ -841,7 +841,7 @@ class OSDStub : public TestStub
 	ceph_abort_msg("error applying incremental");
       }
     }
-    dout(30) << __func__ << "\nosdmap:\n";
+    dout(30) << __FFL__ << "\nosdmap:\n";
     JSONFormatter f(true);
     osdmap.dump(&f);
     f.flush(*_dout);
@@ -860,12 +860,12 @@ class OSDStub : public TestStub
       monc.renew_subs();
     }
 
-    dout(10) << __func__ << " done" << dendl;
+    dout(10) << __FFL__ << " done" << dendl;
     m->put();
   }
 
   bool ms_dispatch(Message *m) override {
-    dout(1) << __func__ << " " << *m << dendl;
+    dout(1) << __FFL__ << " " << *m << dendl;
 
     switch (m->get_type()) {
     case MSG_OSD_PG_CREATE:
@@ -882,16 +882,16 @@ class OSDStub : public TestStub
   }
 
   void ms_handle_connect(Connection *con) override {
-    dout(1) << __func__ << " " << con << dendl;
+    dout(1) << __FFL__ << " " << con << dendl;
     if (con->get_peer_type() == CEPH_ENTITY_TYPE_MON) {
-      dout(10) << __func__ << " on mon" << dendl;
+      dout(10) << __FFL__ << " on mon" << dendl;
     }
   }
 
   void ms_handle_remote_reset(Connection *con) override {}
 
   bool ms_handle_reset(Connection *con) override {
-    dout(1) << __func__ << dendl;
+    dout(1) << __FFL__ << dendl;
     return con->get_priv().get();
   }
 
@@ -1043,7 +1043,7 @@ int main(int argc, const char *argv[])
   for (set<int>::iterator i = stub_ids.begin(); i != stub_ids.end(); ++i) {
     int whoami = *i;
 
-    std::cout << __func__ << " starting stub." << whoami << std::endl;
+    std::cout << __FFL__ << " starting stub." << whoami << std::endl;
     OSDStub *stub = new OSDStub(whoami, g_ceph_context);
     int err = stub->init();
     if (err < 0) {
@@ -1053,7 +1053,7 @@ int main(int argc, const char *argv[])
     stubs.push_back(stub);
   }
 
-  std::cout << __func__ << " starting client stub" << std::endl;
+  std::cout << __FFL__ << " starting client stub" << std::endl;
   ClientStub *cstub = new ClientStub(g_ceph_context);
   int err = cstub->init();
   if (err < 0) {
@@ -1083,14 +1083,14 @@ int main(int argc, const char *argv[])
   unregister_async_signal_handler(SIGINT, handle_test_signal);
   unregister_async_signal_handler(SIGTERM, handle_test_signal);
 
-  std::cout << __func__ << " waiting for stubs to finish" << std::endl;
+  std::cout << __FFL__ << " waiting for stubs to finish" << std::endl;
   vector<TestStub*>::iterator it;
   int i;
   for (i = 0, it = stubs.begin(); it != stubs.end(); ++it, ++i) {
     if (*it != NULL) {
       (*it)->shutdown();
       (*it)->wait();
-      std::cout << __func__ << " finished " << (*it)->get_name() << std::endl;
+      std::cout << __FFL__ << " finished " << (*it)->get_name() << std::endl;
       delete (*it);
       (*it) = NULL;
     }

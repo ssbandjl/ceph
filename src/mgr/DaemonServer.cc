@@ -42,7 +42,7 @@
 #define dout_context g_ceph_context
 #define dout_subsys ceph_subsys_mgr
 #undef dout_prefix
-#define dout_prefix *_dout << "mgr.server " << __func__ << " "
+#define dout_prefix *_dout << "mgr.server " << __FFL__ << " "
 using namespace TOPNSPC::common;
 namespace {
   template <typename Map>
@@ -135,7 +135,7 @@ int DaemonServer::init(uint64_t gid, entity_addrvec_t client_addrs)
   if (r < 0) {
     return r;
   }
-  dout(20) << __func__ << " will bind to " << addrs << dendl;
+  dout(20) << __FFL__ << " will bind to " << addrs << dendl;
   r = msgr->bindv(addrs);
   if (r < 0) {
     derr << "unable to bind mgr to " << addrs << dendl;
@@ -173,7 +173,7 @@ int DaemonServer::ms_handle_authentication(Connection *con)
   con->set_priv(s);
   s->inst.addr = con->get_peer_addr();
   s->entity_name = con->peer_name;
-  dout(10) << __func__ << " new session " << s << " con " << con
+  dout(10) << __FFL__ << " new session " << s << " con " << con
 	   << " entity " << con->peer_name
 	   << " addr " << con->get_peer_addrs()
 	   << dendl;
@@ -773,7 +773,7 @@ public:
     if (r == 0) {
       dout(20) << "success" << dendl;
     } else {
-      derr << __func__ << " " << cpp_strerror(r) << " " << rs << dendl;
+      derr << __FFL__ << " " << cpp_strerror(r) << " " << rs << dendl;
     }
     if (con) {
       if (m_tell) {
@@ -2455,7 +2455,7 @@ void DaemonServer::send_report()
         if (acc == accumulated.end()) {
           auto collector = DaemonHealthMetricCollector::create(metric.get_type());
           if (!collector) {
-            derr << __func__ << " " << key
+            derr << __FFL__ << " " << key
 		 << " sent me an unknown health metric: "
 		 << std::hex << static_cast<uint8_t>(metric.get_type())
 		 << std::dec << dendl;

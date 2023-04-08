@@ -75,7 +75,7 @@ void signal_shutdown()
   int val = 0;
   int ret = write(signal_fd[0], (char *)&val, sizeof(val));
   if (ret < 0) {
-    derr << "ERROR: " << __func__ << ": write() returned "
+    derr << "ERROR: " << __FFL__ << ": write() returned "
          << cpp_strerror(errno) << dendl;
   }
 }
@@ -102,7 +102,7 @@ static void signal_fd_finalize()
 
 static void handle_sigterm(int signum)
 {
-  dout(1) << __func__ << dendl;
+  dout(1) << __FFL__ << dendl;
 #if defined(WITH_RADOSGW_FCGI_FRONTEND)
   FCGX_ShutdownPending();
 #endif
@@ -117,7 +117,7 @@ static void handle_sigterm(int signum)
     uint64_t secs = g_ceph_context->_conf->rgw_exit_timeout_secs;
     if (secs)
       alarm(secs);
-    dout(1) << __func__ << " set alarm for " << secs << dendl;
+    dout(1) << __FFL__ << " set alarm for " << secs << dendl;
   }
 
 }
@@ -257,18 +257,18 @@ int radosgw_Main(int argc, const char **argv)
   if (numa_node >= 0) {
     int r = get_numa_node_cpu_set(numa_node, &numa_cpu_set_size, &numa_cpu_set);
     if (r < 0) {
-      dout(1) << __func__ << " unable to determine rgw numa node " << numa_node
+      dout(1) << __FFL__ << " unable to determine rgw numa node " << numa_node
               << " CPUs" << dendl;
       numa_node = -1;
     } else {
       r = set_cpu_affinity_all_threads(numa_cpu_set_size, &numa_cpu_set);
       if (r < 0) {
-        derr << __func__ << " failed to set numa affinity: " << cpp_strerror(r)
+        derr << __FFL__ << " failed to set numa affinity: " << cpp_strerror(r)
         << dendl;
       }
     }
   } else {
-    dout(1) << __func__ << " not setting numa affinity" << dendl;
+    dout(1) << __FFL__ << " not setting numa affinity" << dendl;
   }
 
   // maintain existing region root pool for new multisite objects

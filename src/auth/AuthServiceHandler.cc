@@ -55,7 +55,7 @@ int AuthServiceHandler::start_session(const EntityName& entity_name,
   ceph_assert(!this->entity_name.get_type() && !this->global_id &&
 	      global_id_status == global_id_status_t::NONE);
 
-  ldout(cct, 10) << __func__ << " entity_name=" << entity_name
+  ldout(cct, 10) << __FFL__ << " entity_name=" << entity_name
 		 << " global_id=" << global_id << " is_new_global_id="
 		 << is_new_global_id << dendl;
   this->entity_name = entity_name;

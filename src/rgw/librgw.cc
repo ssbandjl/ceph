@@ -69,7 +69,7 @@ bool global_stop = false;
 
 static void handle_sigterm(int signum)
 {
-  dout(20) << __func__ << " SIGUSR1 ignored" << dendl;
+  dout(20) << __FFL__ << " SIGUSR1 ignored" << dendl;
 }
 
 namespace rgw {

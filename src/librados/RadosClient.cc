@@ -206,7 +206,7 @@ int librados::RadosClient::ping_monitor(const string mon_id, string *result)
    * build a monmap.
    */
   if (state != CONNECTED) {
-    ldout(cct, 10) << __func__ << " build monmap" << dendl;
+    ldout(cct, 10) << __FFL__ << " build monmap" << dendl;
     err = monclient.build_initial_monmap();
   }
   if (err < 0) {
@@ -304,7 +304,7 @@ int librados::RadosClient::connect()
   monclient.renew_subs();
 
   if (service_daemon) {
-    ldout(cct, 10) << __func__ << " registering as " << service_name << "."
+    ldout(cct, 10) << __FFL__ << " registering as " << service_name << "."
 		   << daemon_name << dendl;
     mgrclient.service_daemon_register(service_name, daemon_name,
 				      daemon_metadata);
@@ -383,7 +383,7 @@ void librados::RadosClient::shutdown()
 
 int librados::RadosClient::watch_flush()
 {
-  ldout(cct, 10) << __func__ << " enter" << dendl;
+  ldout(cct, 10) << __FFL__ << " enter" << dendl;
   ceph::mutex mylock = ceph::make_mutex("RadosClient::watch_flush::mylock");
   ceph::condition_variable cond;
   bool done;
@@ -391,7 +391,7 @@ int librados::RadosClient::watch_flush()
 
   std::unique_lock l{mylock};
   cond.wait(l, [&done] { return done; });
-  ldout(cct, 10) << __func__ << " exit" << dendl;
+  ldout(cct, 10) << __FFL__ << " exit" << dendl;
   return 0;
 }
 
@@ -420,10 +420,10 @@ struct C_aio_watch_flush_Complete : public Context {
 
 int librados::RadosClient::async_watch_flush(AioCompletionImpl *c)
 {
-  ldout(cct, 10) << __func__ << " enter" << dendl;
+  ldout(cct, 10) << __FFL__ << " enter" << dendl;
   Context *oncomplete = new C_aio_watch_flush_Complete(this, c);
   objecter->linger_callback_flush(oncomplete);
-  ldout(cct, 10) << __func__ << " exit" << dendl;
+  ldout(cct, 10) << __FFL__ << " exit" << dendl;
   return 0;
 }
 
@@ -574,7 +574,7 @@ int librados::RadosClient::wait_for_osdmap()
 
     ceph::timespan timeout = rados_mon_op_timeout;
     if (objecter->with_osdmap(std::mem_fn(&OSDMap::get_epoch)) == 0) {
-      ldout(cct, 10) << __func__ << " waiting" << dendl;
+      ldout(cct, 10) << __FFL__ << " waiting" << dendl;
       while (objecter->with_osdmap(std::mem_fn(&OSDMap::get_epoch)) == 0) {
         if (timeout == timeout.zero()) {
           cond.wait(l);
@@ -586,7 +586,7 @@ int librados::RadosClient::wait_for_osdmap()
           }
         }
       }
-      ldout(cct, 10) << __func__ << " done waiting" << dendl;
+      ldout(cct, 10) << __FFL__ << " done waiting" << dendl;
     }
     return 0;
   } else {
@@ -986,7 +986,7 @@ int librados::RadosClient::monitor_log(const string& level,
 
   if (cb == NULL && cb2 == NULL) {
     // stop watch
-    ldout(cct, 10) << __func__ << " removing cb " << (void*)log_cb
+    ldout(cct, 10) << __FFL__ << " removing cb " << (void*)log_cb
 		   << " " << (void*)log_cb2 << dendl;
     monclient.sub_unwant(log_watch);
     log_watch.clear();
@@ -1008,7 +1008,7 @@ int librados::RadosClient::monitor_log(const string& level,
   } else if (level == "sec") {
     watch_level = "log-sec";
   } else {
-    ldout(cct, 10) << __func__ << " invalid level " << level << dendl;
+    ldout(cct, 10) << __FFL__ << " invalid level " << level << dendl;
     return -EINVAL;
   }
 
@@ -1016,7 +1016,7 @@ int librados::RadosClient::monitor_log(const string& level,
     monclient.sub_unwant(log_watch);
 
   // (re)start watch
-  ldout(cct, 10) << __func__ << " add cb " << (void*)cb << " " << (void*)cb2
+  ldout(cct, 10) << __FFL__ << " add cb " << (void*)cb << " " << (void*)cb2
 		 << " level " << level << dendl;
   monclient.sub_want(watch_level, 0, 0);
 
@@ -1031,7 +1031,7 @@ int librados::RadosClient::monitor_log(const string& level,
 void librados::RadosClient::handle_log(MLog *m)
 {
   ceph_assert(ceph_mutex_is_locked(lock));
-  ldout(cct, 10) << __func__ << " version " << m->version << dendl;
+  ldout(cct, 10) << __FFL__ << " version " << m->version << dendl;
 
   if (log_last_version < m->version) {
     log_last_version = m->version;
@@ -1048,7 +1048,7 @@ void librados::RadosClient::handle_log(MLog *m)
         struct timespec stamp;
         e.stamp.to_timespec(&stamp);
 
-        ldout(cct, 20) << __func__ << " delivering " << ss.str() << dendl;
+        ldout(cct, 20) << __FFL__ << " delivering " << ss.str() << dendl;
 	if (log_cb)
 	  log_cb(log_cb_arg, line.c_str(), who.c_str(),
 		 stamp.tv_sec, stamp.tv_nsec,
@@ -1090,7 +1090,7 @@ int librados::RadosClient::service_daemon_register(
 
   collect_sys_info(&daemon_metadata, cct);
 
-  ldout(cct,10) << __func__ << " " << service << "." << name << dendl;
+  ldout(cct,10) << __FFL__ << " " << service << "." << name << dendl;
   service_daemon = true;
   service_name = service;
   daemon_name = name;

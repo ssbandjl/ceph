@@ -123,7 +123,7 @@ private:
 
 #undef dout_prefix
 #define dout_prefix *_dout << "rbd::mirror::PriCache: " << this << " " \
-                           << m_name << " " << __func__ << ": "
+                           << m_name << " " << __FFL__ << ": "
 
 struct PriCache : public PriorityCache::PriCache {
   std::string m_name;
@@ -264,7 +264,7 @@ struct PriCache : public PriorityCache::PriCache {
 
 #undef dout_prefix
 #define dout_prefix *_dout << "rbd::mirror::Mirror: " << this << " " \
-                           << __func__ << ": "
+                           << __FFL__ << ": "
 
 class MirrorAdminSocketHook : public AdminSocketHook {
 public:

@@ -1065,7 +1065,7 @@ namespace rgw {
       get<0>(fhr) = fh;
       if (fh) {
 	    lsubdout(get_context(), rgw, 17)
-	      << __func__ << " 1 " << *fh
+	      << __FFL__ << " 1 " << *fh
 	      << dendl;
       }
       return fhr;
@@ -1093,7 +1093,7 @@ namespace rgw {
       fh_key fhk = parent->make_fhk(obj_name);
 
       lsubdout(get_context(), rgw, 10)
-	<< __func__ << " called on "
+	<< __FFL__ << " called on "
 	<< parent->object_name() << " for " << key_name
 	<< " (" << obj_name << ")"
 	<< " -> " << fhk
@@ -1166,7 +1166,7 @@ namespace rgw {
       get<0>(fhr) = fh;
       if (fh) {
 	    lsubdout(get_context(), rgw, 17)
-	      << __func__ << " 2 " << *fh
+	      << __FFL__ << " 2 " << *fh
 	      << dendl;
       }
       return fhr;
@@ -1248,7 +1248,7 @@ namespace rgw {
 	  goto out;
 	}
 	lsubdout(get_context(), rgw, 0)
-	  << __func__ << " handle lookup failed " << fhk
+	  << __FFL__ << " handle lookup failed " << fhk
 	  << dendl;
 	goto out;
       }
@@ -1703,7 +1703,7 @@ public:
 	  auto obj_entry = *(di.get_obj_iter());
 
 	  lsubdout(cct, rgw, 15) << "RGWReaddirRequest "
-				 << __func__ << " "
+				 << __FFL__ << " "
 				 << "list uri=" << s->relative_uri << " "
 				 << " prefix=" << prefix << " "
 				 << " obj path=" << obj_entry.key.name
@@ -1732,7 +1732,7 @@ public:
 	  auto sref = di.get_cp_sref();
 
 	  lsubdout(cct, rgw, 15) << "RGWReaddirRequest "
-				 << __func__ << " "
+				 << __FFL__ << " "
 				 << "list uri=" << s->relative_uri << " "
 				 << " prefix=" << prefix << " "
 				 << " cpref=" << sref
@@ -2481,7 +2481,7 @@ public:
     for (const auto& iter : objs) {
       auto& name = iter.key.name;
       lsubdout(cct, rgw, 15) << "RGWStatLeafRequest "
-			     << __func__ << " "
+			     << __FFL__ << " "
 			     << "list uri=" << s->relative_uri << " "
 			     << " prefix=" << prefix << " "
 			     << " obj path=" << name << ""
@@ -2497,7 +2497,7 @@ public:
     for (auto& iter : common_prefixes) {
       auto& name = iter.first;
       lsubdout(cct, rgw, 15) << "RGWStatLeafRequest "
-			     << __func__ << " "
+			     << __FFL__ << " "
 			     << "list uri=" << s->relative_uri << " "
 			     << " prefix=" << prefix << " "
 			     << " pref path=" << name << " (not chomped)"

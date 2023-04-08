@@ -69,7 +69,7 @@ public:
 
 
   int post_init() {
-    dout(1) << __func__ << dendl;
+    dout(1) << __FFL__ << dendl;
     if (!msg)
       return -EINVAL;
     msg->add_dispatcher_tail(this);
@@ -77,25 +77,25 @@ public:
   }
 
   int init_messenger() {
-    dout(1) << __func__ << dendl;
+    dout(1) << __FFL__ << dendl;
 
     std::string public_msgr_type = cct->_conf->ms_public_type.empty() ? cct->_conf.get_val<std::string>("ms_type") : cct->_conf->ms_public_type;
     msg = Messenger::create(cct, public_msgr_type, entity_name_t::CLIENT(-1),
                             "test-mon-msg", 0, 0);
     ceph_assert(msg != NULL);
     msg->set_default_policy(Messenger::Policy::lossy_client(0));
-    dout(0) << __func__ << " starting messenger at "
+    dout(0) << __FFL__ << " starting messenger at "
             << msg->get_myaddrs() << dendl;
     msg->start();
     return 0;
   }
 
   int init_monc() {
-    dout(1) << __func__ << dendl;
+    dout(1) << __FFL__ << dendl;
     ceph_assert(msg != NULL);
     int err = monc.build_initial_monmap();
     if (err < 0) {
-      derr << __func__ << " error building monmap: "
+      derr << __FFL__ << " error building monmap: "
            << cpp_strerror(err) << dendl;
       return err;
     }
@@ -106,42 +106,42 @@ public:
     monc.set_want_keys(CEPH_ENTITY_TYPE_MON);
     err = monc.init();
     if (err < 0) {
-      derr << __func__ << " monc init failed: "
+      derr << __FFL__ << " monc init failed: "
            << cpp_strerror(err) << dendl;
       goto fail;
     }
 
     err = monc.authenticate();
     if (err < 0) {
-      derr << __func__ << " monc auth failed: "
+      derr << __FFL__ << " monc auth failed: "
            << cpp_strerror(err) << dendl;
       goto fail_monc;
     }
     monc.wait_auth_rotating(30.0);
     monc.renew_subs();
-    dout(0) << __func__ << " finished" << dendl;
+    dout(0) << __FFL__ << " finished" << dendl;
     return 0;
 
 fail_monc:
-    derr << __func__ << " failing monc" << dendl;
+    derr << __FFL__ << " failing monc" << dendl;
     monc.shutdown();
 fail:
     return err;
   }
 
   void shutdown_messenger() {
-    dout(0) << __func__ << dendl;
+    dout(0) << __FFL__ << dendl;
     msg->shutdown();
     msg->wait();
   }
 
   void shutdown_monc() {
-    dout(0) << __func__ << dendl;
+    dout(0) << __FFL__ << dendl;
     monc.shutdown();
   }
 
   void shutdown() {
-    dout(0) << __func__ << dendl;
+    dout(0) << __FFL__ << dendl;
     shutdown_monc();
     shutdown_messenger();
   }
@@ -172,9 +172,9 @@ fail:
   virtual void handle_wanted(Message *m) { }
 
   bool handle_message(Message *m) {
-    dout(1) << __func__ << " " << *m << dendl;
+    dout(1) << __FFL__ << " " << *m << dendl;
     if (!is_wanted(m)) {
-      dout(10) << __func__ << " not wanted" << dendl;
+      dout(10) << __FFL__ << " not wanted" << dendl;
       return false;
     }
     handle_wanted(m);
@@ -192,22 +192,22 @@ fail:
   bool ms_handle_refused(Connection *con) override { return false; }
 
   bool is_wanted(Message *m) {
-    dout(20) << __func__ << " " << *m << " type " << m->get_type() << dendl;
+    dout(20) << __FFL__ << " " << *m << " type " << m->get_type() << dendl;
     return (wanted.find(m->get_type()) != wanted.end());
   }
 
   void add_wanted(int t) {
-    dout(20) << __func__ << " type " << t << dendl;
+    dout(20) << __FFL__ << " type " << t << dendl;
     wanted.insert(t);
   }
 
   void rm_wanted(int t) {
-    dout(20) << __func__ << " type " << t << dendl;
+    dout(20) << __FFL__ << " type " << t << dendl;
     wanted.erase(t);
   }
 
   void send_message(Message *m) {
-    dout(15) << __func__ << " " << *m << dendl;
+    dout(15) << __FFL__ << " " << *m << dendl;
     monc.send_mon_message(m);
   }
 
@@ -263,21 +263,21 @@ public:
       utime_t s = ceph_clock_now();
       status = cond.wait_for(l, ceph::make_timespan(timeout));
       utime_t e = ceph_clock_now();
-      dout(20) << __func__ << " took " << (e-s) << " seconds" << dendl;
+      dout(20) << __FFL__ << " took " << (e-s) << " seconds" << dendl;
     } else {
       cond.wait(l);
     }
     rm_wanted(t);
     l.unlock();
     if (status == std::cv_status::timeout) {
-      dout(20) << __func__ << " error: " << cpp_strerror(ETIMEDOUT) << dendl;
+      dout(20) << __FFL__ << " error: " << cpp_strerror(ETIMEDOUT) << dendl;
       return (Message*)((long)-ETIMEDOUT);
     }
 
     if (!reply_msg)
-      dout(20) << __func__ << " reply_msg is nullptr" << dendl;
+      dout(20) << __FFL__ << " reply_msg is nullptr" << dendl;
     else
-      dout(20) << __func__ << " reply_msg " << *reply_msg << dendl;
+      dout(20) << __FFL__ << " reply_msg " << *reply_msg << dendl;
     return reply_msg;
   }
 };

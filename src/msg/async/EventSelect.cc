@@ -36,7 +36,7 @@ int SelectDriver::init(EventCenter *c, int nevent)
 
 int SelectDriver::add_event(int fd, int cur_mask, int add_mask)
 {
-  ldout(cct, 10) << __func__ << " add event to fd=" << fd << " mask=" << add_mask
+  ldout(cct, 10) << __FFL__ << " add event to fd=" << fd << " mask=" << add_mask
                  << dendl;
 
   int mask = cur_mask | add_mask;
@@ -52,7 +52,7 @@ int SelectDriver::add_event(int fd, int cur_mask, int add_mask)
 
 int SelectDriver::del_event(int fd, int cur_mask, int delmask)
 {
-  ldout(cct, 10) << __func__ << " del event fd=" << fd << " cur mask=" << cur_mask
+  ldout(cct, 10) << __FFL__ << " del event fd=" << fd << " cur mask=" << cur_mask
                  << dendl;
 
   if (delmask & EVENT_READABLE)

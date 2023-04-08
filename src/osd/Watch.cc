@@ -167,7 +167,7 @@ void Notify::complete_watcher(WatchRef watch, bufferlist& reply_bl)
 void Notify::complete_watcher_remove(WatchRef watch)
 {
   std::lock_guard l(lock);
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   if (is_discarded())
     return;
   ceph_assert(watchers.count(watch));
@@ -361,10 +361,10 @@ void Watch::got_ping(utime_t t)
 void Watch::connect(ConnectionRef con, bool _will_ping)
 {
   if (is_connected(con.get())) {
-    dout(10) << __func__ << " con " << con << " - already connected" << dendl;
+    dout(10) << __FFL__ << " con " << con << " - already connected" << dendl;
     return;
   }
-  dout(10) << __func__ << " con " << con << dendl;
+  dout(10) << __FFL__ << " con " << con << dendl;
   conn = con;
   will_ping = _will_ping;
   auto priv = con->get_priv();
@@ -453,7 +453,7 @@ void Watch::start_notify(NotifyRef notif)
     utime_t cutoff = ceph_clock_now();
     cutoff.sec_ref() -= timeout;
     if (last_ping < cutoff) {
-      dout(10) << __func__ << " " << notif->notify_id
+      dout(10) << __FFL__ << " " << notif->notify_id
 	       << " last_ping " << last_ping << " < cutoff " << cutoff
 	       << ", disconnecting" << dendl;
       disconnect();
@@ -533,7 +533,7 @@ void WatchConState::reset(Connection *con)
       if ((*i)->is_connected(con)) {
 	(*i)->disconnect();
       } else {
-	lgeneric_derr(cct) << __func__ << " not still connected to " << (*i) << dendl;
+	lgeneric_derr(cct) << __FFL__ << " not still connected to " << (*i) << dendl;
       }
     }
     pg->unlock();

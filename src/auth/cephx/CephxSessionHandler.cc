@@ -74,7 +74,7 @@ int CephxSessionHandler::_calc_signature(Message *m, uint64_t *psig)
       };
       key.encrypt(cct, in, out);
     } catch (std::exception& e) {
-      lderr(cct) << __func__ << " failed to encrypt signature block" << dendl;
+      lderr(cct) << __FFL__ << " failed to encrypt signature block" << dendl;
       return -1;
     }
 
@@ -114,7 +114,7 @@ int CephxSessionHandler::_calc_signature(Message *m, uint64_t *psig)
       };
       key.encrypt(cct, in, out);
     } catch (std::exception& e) {
-      lderr(cct) << __func__ << " failed to encrypt signature block" << dendl;
+      lderr(cct) << __FFL__ << " failed to encrypt signature block" << dendl;
       return -1;
     }
 
@@ -124,7 +124,7 @@ int CephxSessionHandler::_calc_signature(Message *m, uint64_t *psig)
     *psig = penc->a ^ penc->b ^ penc->c ^ penc->d;
   }
 
-  ldout(cct, 10) << __func__ << " seq " << m->get_seq()
+  ldout(cct, 10) << __FFL__ << " seq " << m->get_seq()
 		 << " front_crc_ = " << footer.front_crc
 		 << " middle_crc = " << footer.middle_crc
 		 << " data_crc = " << footer.data_crc

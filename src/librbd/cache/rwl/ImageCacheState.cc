@@ -60,14 +60,14 @@ void ImageCacheState<I>::write_image_cache_state(Context *on_finish) {
   f.flush(oss);
   std::string image_state_json = oss.str();
 
-  ldout(m_image_ctx->cct, 20) << __func__ << " Store state: " << image_state_json << dendl;
+  ldout(m_image_ctx->cct, 20) << __FFL__ << " Store state: " << image_state_json << dendl;
   m_image_ctx->operations->execute_metadata_set(image_cache_state.c_str(), image_state_json, on_finish);
 }
 
 template <typename I>
 void ImageCacheState<I>::clear_image_cache_state(Context *on_finish) {
   std::shared_lock owner_lock{m_image_ctx->owner_lock};
-  ldout(m_image_ctx->cct, 20) << __func__ << " Remove state: " << dendl;
+  ldout(m_image_ctx->cct, 20) << __FFL__ << " Remove state: " << dendl;
   m_image_ctx->operations->execute_metadata_remove(image_cache_state.c_str(), on_finish);
 }
 

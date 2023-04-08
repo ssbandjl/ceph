@@ -19,7 +19,7 @@ public:
     // Called back via Timer, which takes client_lock for us
     ceph_assert(ceph_mutex_is_locked_by_me(client->client_lock));
 
-    lsubdout(client->cct, client, 0) << __func__ <<
+    lsubdout(client->cct, client, 0) << __FFL__ <<
 	  ": delegation return timeout for inode 0x" <<
 	  std::hex << in->ino << ". Forcibly unmounting client. "<<
 	  client << std::dec << dendl;

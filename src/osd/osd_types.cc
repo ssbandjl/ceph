@@ -4092,7 +4092,7 @@ bool PastIntervals::check_new_interval(
 	num_acting >= old_pg_pool.min_size &&
         could_have_gone_active(old_acting_shards)) {
       if (out)
-	*out << __func__ << " " << i
+	*out << __FFL__ << " " << i
 	     << " up_thru " << lastmap->get_up_thru(i.primary)
 	     << " up_from " << lastmap->get_up_from(i.primary)
 	     << " last_epoch_clean " << last_epoch_clean;
@@ -4132,7 +4132,7 @@ bool PastIntervals::check_new_interval(
     } else {
       i.maybe_went_rw = false;
       if (out)
-	*out << __func__ << " " << i << " : acting set is too small" << std::endl;
+	*out << __FFL__ << " " << i << " : acting set is too small" << std::endl;
     }
     past_intervals->past_intervals->add_interval(old_pg_pool.is_erasure(), i);
     return true;
@@ -5072,7 +5072,7 @@ void pg_log_t::copy_after(CephContext* cct, const pg_log_t &other, eversion_t v)
   can_rollback_to = other.can_rollback_to;
   head = other.head;
   tail = other.tail;
-  lgeneric_subdout(cct, osd, 20) << __func__ << " v " << v << dendl;
+  lgeneric_subdout(cct, osd, 20) << __FFL__ << " v " << v << dendl;
   for (auto i = other.log.crbegin(); i != other.log.crend(); ++i) {
     ceph_assert(i->version > other.tail);
     if (i->version <= v) {
@@ -5080,7 +5080,7 @@ void pg_log_t::copy_after(CephContext* cct, const pg_log_t &other, eversion_t v)
       tail = i->version;
       break;
     }
-    lgeneric_subdout(cct, osd, 20) << __func__ << " copy log version " << i->version << dendl;
+    lgeneric_subdout(cct, osd, 20) << __FFL__ << " copy log version " << i->version << dendl;
     log.push_front(*i);
   }
   _handle_dups(cct, *this, other, cct->_conf->osd_pg_log_dups_tracked);
@@ -5092,14 +5092,14 @@ void pg_log_t::copy_up_to(CephContext* cct, const pg_log_t &other, int max)
   int n = 0;
   head = other.head;
   tail = other.tail;
-  lgeneric_subdout(cct, osd, 20) << __func__ << " max " << max << dendl;
+  lgeneric_subdout(cct, osd, 20) << __FFL__ << " max " << max << dendl;
   for (auto i = other.log.crbegin(); i != other.log.crend(); ++i) {
     ceph_assert(i->version > other.tail);
     if (n++ >= max) {
       tail = i->version;
       break;
     }
-    lgeneric_subdout(cct, osd, 20) << __func__ << " copy log version " << i->version << dendl;
+    lgeneric_subdout(cct, osd, 20) << __FFL__ << " copy log version " << i->version << dendl;
     log.push_front(*i);
   }
   _handle_dups(cct, *this, other, cct->_conf->osd_pg_log_dups_tracked);
@@ -6875,7 +6875,7 @@ int prepare_info_keymap(
       return 0;
     }
     if (dpp) {
-      ldpp_dout(dpp, 30) << __func__ << " fastinfo failed, info:\n";
+      ldpp_dout(dpp, 30) << __FFL__ << " fastinfo failed, info:\n";
       {
 	JSONFormatter jf(true);
 	jf.dump_object("info", info);

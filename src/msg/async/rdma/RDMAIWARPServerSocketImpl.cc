@@ -18,21 +18,21 @@ RDMAIWARPServerSocketImpl::RDMAIWARPServerSocketImpl(
 int RDMAIWARPServerSocketImpl::listen(entity_addr_t &sa,
 				      const SocketOptions &opt)
 {
-  ldout(cct, 20) << __func__ << " bind to rdma point" << dendl;
+  ldout(cct, 20) << __FFL__ << " bind to rdma point" << dendl;
   cm_channel = rdma_create_event_channel();
   rdma_create_id(cm_channel, &cm_id, NULL, RDMA_PS_TCP);
-  ldout(cct, 20) << __func__ << " successfully created cm id: " << cm_id << dendl;
+  ldout(cct, 20) << __FFL__ << " successfully created cm id: " << cm_id << dendl;
   int rc = rdma_bind_addr(cm_id, const_cast<struct sockaddr*>(sa.get_sockaddr()));
   if (rc < 0) {
     rc = -errno;
-    ldout(cct, 10) << __func__ << " unable to bind to " << sa.get_sockaddr()
+    ldout(cct, 10) << __FFL__ << " unable to bind to " << sa.get_sockaddr()
                    << " on port " << sa.get_port() << ": " << cpp_strerror(errno) << dendl;
     goto err;
   }
   rc = rdma_listen(cm_id, 128);
   if (rc < 0) {
     rc = -errno;
-    ldout(cct, 10) << __func__ << " unable to listen to " << sa.get_sockaddr()
+    ldout(cct, 10) << __FFL__ << " unable to listen to " << sa.get_sockaddr()
                    << " on port " << sa.get_port() << ": " << cpp_strerror(errno) << dendl;
     goto err;
   }
@@ -41,7 +41,7 @@ int RDMAIWARPServerSocketImpl::listen(entity_addr_t &sa,
   if (rc < 0) {
     goto err;
   }
-  ldout(cct, 20) << __func__ << " fd of cm_channel is " << server_setup_socket << dendl;
+  ldout(cct, 20) << __FFL__ << " fd of cm_channel is " << server_setup_socket << dendl;
   return 0;
 
 err:
@@ -54,7 +54,7 @@ err:
 int RDMAIWARPServerSocketImpl::accept(ConnectedSocket *sock, const SocketOptions &opt,
     entity_addr_t *out, Worker *w)
 {
-  ldout(cct, 15) << __func__ << dendl;
+  ldout(cct, 15) << __FFL__ << dendl;
 
   ceph_assert(sock);
   struct pollfd pfd = {
@@ -69,13 +69,13 @@ int RDMAIWARPServerSocketImpl::accept(ConnectedSocket *sock, const SocketOptions
 
   struct rdma_cm_event *cm_event;
   rdma_get_cm_event(cm_channel, &cm_event);
-  ldout(cct, 20) << __func__ << " event name: " << rdma_event_str(cm_event->event) << dendl;
+  ldout(cct, 20) << __FFL__ << " event name: " << rdma_event_str(cm_event->event) << dendl;
 
   struct rdma_cm_id *event_cm_id = cm_event->id;
   struct rdma_event_channel *event_channel = rdma_create_event_channel();
 
   if (net.set_nonblock(event_channel->fd) < 0) {
-      lderr(cct) << __func__ << " failed to switch event channel to non-block, close event channel " << dendl;
+      lderr(cct) << __FFL__ << " failed to switch event channel to non-block, close event channel " << dendl;
       rdma_destroy_event_channel(event_channel);
       rdma_ack_cm_event(cm_event);
       return -errno;
@@ -98,7 +98,7 @@ int RDMAIWARPServerSocketImpl::accept(ConnectedSocket *sock, const SocketOptions
     return -EAGAIN;
   }
   server->activate();
-  ldout(cct, 20) << __func__ << " accepted a new QP" << dendl;
+  ldout(cct, 20) << __FFL__ << " accepted a new QP" << dendl;
 
   rdma_ack_cm_event(cm_event);
 

@@ -15,7 +15,7 @@
 #define dout_subsys ceph_subsys_rbd
 #undef dout_prefix
 #define dout_prefix *_dout << "librbd::journal::OpenRequest: " << this << " " \
-                           << __func__ << ": "
+                           << __FFL__ << ": "
 
 namespace librbd {
 namespace journal {
@@ -85,13 +85,13 @@ void OpenRequest<I>::handle_init(int r) {
   journal::ImageClientMeta *image_client_meta =
     boost::get<journal::ImageClientMeta>(&client_data.client_meta);
   if (image_client_meta == nullptr) {
-    lderr(cct) << this << " " << __func__ << ": "
+    lderr(cct) << this << " " << __FFL__ << ": "
                << "failed to extract client meta data" << dendl;
     finish(-EINVAL);
     return;
   }
 
-  ldout(cct, 20) << this << " " << __func__ << ": "
+  ldout(cct, 20) << this << " " << __FFL__ << ": "
                  << "client: " << client << ", "
                  << "image meta: " << *image_client_meta << dendl;
 
@@ -122,7 +122,7 @@ void OpenRequest<I>::handle_get_tags(int r) {
   ldout(cct, 20) << "r=" << r << dendl;
 
   if (r < 0) {
-    lderr(cct) << this << " " << __func__ << ": "
+    lderr(cct) << this << " " << __FFL__ << ": "
                << "failed to decode journal tags: " << cpp_strerror(r) << dendl;
   }
 

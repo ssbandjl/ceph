@@ -55,16 +55,16 @@ MonitorDBStore *Paxos::get_store()
 void Paxos::read_and_prepare_transactions(MonitorDBStore::TransactionRef tx,
 					  version_t first, version_t last)
 {
-  dout(10) << __func__ << " first " << first << " last " << last << dendl;
+  dout(10) << __FFL__ << " first " << first << " last " << last << dendl;
   for (version_t v = first; v <= last; ++v) {
-    dout(30) << __func__ << " apply version " << v << dendl;
+    dout(30) << __FFL__ << " apply version " << v << dendl;
     bufferlist bl;
     int err = get_store()->get(get_name(), v, bl);
     ceph_assert(err == 0);
     ceph_assert(bl.length());
     decode_append_transaction(tx, bl);
   }
-  dout(15) << __func__ << " total versions " << (last-first) << dendl;
+  dout(15) << __FFL__ << " total versions " << (last-first) << dendl;
 }
 
 void Paxos::init()
@@ -75,7 +75,7 @@ void Paxos::init()
   last_committed = get_store()->get(get_name(), "last_committed");
   first_committed = get_store()->get(get_name(), "first_committed");
 
-  dout(10) << __func__ << " last_pn: " << last_pn << " accepted_pn: "
+  dout(10) << __FFL__ << " last_pn: " << last_pn << " accepted_pn: "
 	   << accepted_pn << " last_committed: " << last_committed
 	   << " first_committed: " << first_committed << dendl;
 
@@ -257,7 +257,7 @@ void Paxos::handle_collect(MonOpRequestRef op)
     auto t(std::make_shared<MonitorDBStore::Transaction>());
     t->put(get_name(), "accepted_pn", accepted_pn);
 
-    dout(30) << __func__ << " transaction dump:\n";
+    dout(30) << __FFL__ << " transaction dump:\n";
     JSONFormatter f(true);
     t->dump(&f);
     f.flush(*_dout);
@@ -424,7 +424,7 @@ bool Paxos::store_state(MMonPaxos *m)
     }
   }
   if (!t->empty()) {
-    dout(30) << __func__ << " transaction dump:\n";
+    dout(30) << __FFL__ << " transaction dump:\n";
     JSONFormatter f(true);
     t->dump(&f);
     f.flush(*_dout);
@@ -645,7 +645,7 @@ void Paxos::begin(bufferlist& v)
   t->put(get_name(), "pending_v", last_committed + 1);
   t->put(get_name(), "pending_pn", accepted_pn);
 
-  dout(30) << __func__ << " transaction dump:\n";
+  dout(30) << __FFL__ << " transaction dump:\n";
   JSONFormatter f(true);
   t->dump(&f);
   f.flush(*_dout);
@@ -737,7 +737,7 @@ void Paxos::handle_begin(MonOpRequestRef op)
   t->put(get_name(), "pending_v", v);
   t->put(get_name(), "pending_pn", accepted_pn);
 
-  dout(30) << __func__ << " transaction dump:\n";
+  dout(30) << __FFL__ << " transaction dump:\n";
   JSONFormatter f(true);
   t->dump(&f);
   f.flush(*_dout);
@@ -839,7 +839,7 @@ void Paxos::abort_commit()
 
 void Paxos::commit_start()
 {
-  dout(10) << __func__ << " " << (last_committed+1) << dendl;
+  dout(10) << __FFL__ << " " << (last_committed+1) << dendl;
 
   ceph_assert(g_conf()->paxos_kill_at != 7);
 
@@ -852,7 +852,7 @@ void Paxos::commit_start()
   // this value can now be read from last_committed.
   decode_append_transaction(t, new_value);
 
-  dout(30) << __func__ << " transaction dump:\n";
+  dout(30) << __FFL__ << " transaction dump:\n";
   JSONFormatter f(true);
   t->dump(&f);
   f.flush(*_dout);
@@ -882,7 +882,7 @@ void Paxos::commit_start()
 
 void Paxos::commit_finish()
 {
-  dout(20) << __func__ << " " << (last_committed+1) << dendl;
+  dout(20) << __FFL__ << " " << (last_committed+1) << dendl;
   utime_t end = ceph_clock_now();
   logger->tinc(l_paxos_commit_latency, end - commit_start_stamp);
 
@@ -1057,7 +1057,7 @@ bool Paxos::do_refresh()
 
 void Paxos::commit_proposal()
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   ceph_assert(mon->is_leader());
   ceph_assert(is_refresh());
 
@@ -1066,20 +1066,20 @@ void Paxos::commit_proposal()
 
 void Paxos::finish_round()
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   ceph_assert(mon->is_leader());
 
   // ok, now go active!
   state = STATE_ACTIVE;
 
-  dout(20) << __func__ << " waiting_for_acting" << dendl;
+  dout(20) << __FFL__ << " waiting_for_acting" << dendl;
   finish_contexts(g_ceph_context, waiting_for_active);
-  dout(20) << __func__ << " waiting_for_readable" << dendl;
+  dout(20) << __FFL__ << " waiting_for_readable" << dendl;
   finish_contexts(g_ceph_context, waiting_for_readable);
-  dout(20) << __func__ << " waiting_for_writeable" << dendl;
+  dout(20) << __FFL__ << " waiting_for_writeable" << dendl;
   finish_contexts(g_ceph_context, waiting_for_writeable);
   
-  dout(10) << __func__ << " done w/ waiters, state " << get_statename(state) << dendl;
+  dout(10) << __FFL__ << " done w/ waiters, state " << get_statename(state) << dendl;
 
   if (should_trim()) {
     trim();
@@ -1269,7 +1269,7 @@ version_t Paxos::get_new_proposal_number(version_t gt)
   auto t(std::make_shared<MonitorDBStore::Transaction>());
   t->put(get_name(), "last_pn", last_pn);
 
-  dout(30) << __func__ << " transaction dump:\n";
+  dout(30) << __FFL__ << " transaction dump:\n";
   JSONFormatter f(true);
   t->dump(&f);
   f.flush(*_dout);
@@ -1314,7 +1314,7 @@ void Paxos::cancel_events()
 
 void Paxos::shutdown()
 {
-  dout(10) << __func__ << " cancel all contexts" << dendl;
+  dout(10) << __FFL__ << " cancel all contexts" << dendl;
 
   state = STATE_SHUTDOWN;
 
@@ -1390,11 +1390,11 @@ void Paxos::restart()
   new_value.clear();
 
   if (is_writing() || is_writing_previous()) {
-    dout(10) << __func__ << " flushing" << dendl;
+    dout(10) << __FFL__ << " flushing" << dendl;
     mon->lock.unlock();
     mon->store->flush();
     mon->lock.lock();
-    dout(10) << __func__ << " flushed" << dendl;
+    dout(10) << __FFL__ << " flushed" << dendl;
   }
   state = STATE_RECOVERING;
 
@@ -1481,7 +1481,7 @@ bool Paxos::is_readable(version_t v)
       (mon->is_peon() || mon->is_leader()) &&
       (is_active() || is_updating() || is_writing()) &&
       last_committed > 0 && is_lease_valid(); // must have a value alone, or have lease
-  dout(5) << __func__ << " = " << (int)ret
+  dout(5) << __FFL__ << " = " << (int)ret
 	  << " - now=" << ceph_clock_now()
 	  << " lease_expire=" << lease_expire
 	  << " has v" << v << " lc " << last_committed
@@ -1530,9 +1530,9 @@ void Paxos::propose_pending()
   bufferlist bl;
   pending_proposal->encode(bl);
 
-  dout(10) << __func__ << " " << (last_committed + 1)
+  dout(10) << __FFL__ << " " << (last_committed + 1)
 	   << " " << bl.length() << " bytes" << dendl;
-  dout(30) << __func__ << " transaction dump:\n";
+  dout(30) << __FFL__ << " transaction dump:\n";
   JSONFormatter f(true);
   pending_proposal->dump(&f);
   f.flush(*_dout);
@@ -1547,7 +1547,7 @@ void Paxos::propose_pending()
 
 void Paxos::queue_pending_finisher(Context *onfinished)
 {
-  dout(5) << __func__ << " " << onfinished << dendl;
+  dout(5) << __FFL__ << " " << onfinished << dendl;
   ceph_assert(onfinished);
   pending_finishers.push_back(onfinished);
 }
@@ -1565,14 +1565,14 @@ MonitorDBStore::TransactionRef Paxos::get_pending_transaction()
 bool Paxos::trigger_propose()
 {
   if (plugged) {
-    dout(10) << __func__ << " plugged, not proposing now" << dendl;
+    dout(10) << __FFL__ << " plugged, not proposing now" << dendl;
     return false;
   } else if (is_active()) {
-    dout(10) << __func__ << " active, proposing now" << dendl;
+    dout(10) << __FFL__ << " active, proposing now" << dendl;
     propose_pending();
     return true;
   } else {
-    dout(10) << __func__ << " not active, will propose later" << dendl;
+    dout(10) << __FFL__ << " not active, will propose later" << dendl;
     return false;
   }
 }

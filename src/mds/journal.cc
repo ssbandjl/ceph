@@ -3220,12 +3220,12 @@ bool EMetaBlob::rewrite_truncate_finish(MDSRank const *mds,
   for (const auto& p : truncate_finish) {
     auto q = old_to_new.find(p.second);
     if (q != old_to_new.end()) {
-      dout(20) << __func__ << " applying segment seq mapping "
+      dout(20) << __FFL__ << " applying segment seq mapping "
         << p.second << " -> " << q->second << dendl;
       new_trunc_finish.emplace(p.first, q->second);
       modified = true;
     } else {
-      dout(20) << __func__ << " no segment seq mapping found for "
+      dout(20) << __FFL__ << " no segment seq mapping found for "
         << p.second << dendl;
       new_trunc_finish.insert(p);
     }

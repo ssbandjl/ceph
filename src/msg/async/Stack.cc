@@ -43,16 +43,16 @@ std::function<void ()> NetworkStack::add_thread(unsigned worker_id)
       ceph_pthread_setname(pthread_self(), tp_name);
       const unsigned EventMaxWaitUs = 30000000;
       w->center.set_owner();
-      ldout(cct, 10) << __func__ << " starting" << dendl;
+      ldout(cct, 10) << __FFL__ << " starting" << dendl;
       w->initialize();
       w->init_done();
       while (!w->done) {
-        ldout(cct, 30) << __func__ << " calling event process" << dendl;
+        ldout(cct, 30) << __FFL__ << " calling event process" << dendl;
 
         ceph::timespan dur;
         int r = w->center.process_events(EventMaxWaitUs, &dur);
         if (r < 0) {
-          ldout(cct, 20) << __func__ << " process events failed: "
+          ldout(cct, 20) << __FFL__ << " process events failed: "
                          << cpp_strerror(errno) << dendl;
           // TODO do something?
         }
@@ -76,7 +76,7 @@ std::shared_ptr<NetworkStack> NetworkStack::create(CephContext *c, const string 
     return std::make_shared<DPDKStack>(c, t);
 #endif
 
-  lderr(c) << __func__ << " ms_async_transport_type " << t <<
+  lderr(c) << __FFL__ << " ms_async_transport_type " << t <<
     " is not supported! " << dendl;
   ceph_abort();
   return nullptr;
@@ -95,7 +95,7 @@ Worker* NetworkStack::create_worker(CephContext *c, const string &type, unsigned
     return new DPDKWorker(c, worker_id);
 #endif
 
-  lderr(c) << __func__ << " ms_async_transport_type " << type <<
+  lderr(c) << __FFL__ << " ms_async_transport_type " << type <<
     " is not supported! " << dendl;
   ceph_abort();
   return nullptr;
@@ -108,7 +108,7 @@ NetworkStack::NetworkStack(CephContext *c, const string &t): type(t), started(fa
   const int InitEventNumber = 5000;
   num_workers = cct->_conf->ms_async_op_threads;
   if (num_workers >= EventCenter::MAX_EVENTCENTER) {
-    ldout(cct, 0) << __func__ << " max thread limit is "
+    ldout(cct, 0) << __FFL__ << " max thread limit is "
                   << EventCenter::MAX_EVENTCENTER << ", switching to this now. "
                   << "Higher thread values are unnecessary and currently unsupported."
                   << dendl;
@@ -147,7 +147,7 @@ void NetworkStack::start()
 
 Worker* NetworkStack::get_worker()
 {
-  ldout(cct, 30) << __func__ << dendl;
+  ldout(cct, 30) << __FFL__ << dendl;
 
    // start with some reasonably large number
   unsigned min_load = std::numeric_limits<int>::max();
@@ -203,7 +203,7 @@ class C_drain : public EventCallback {
 
 void NetworkStack::drain()
 {
-  ldout(cct, 30) << __func__ << " started." << dendl;
+  ldout(cct, 30) << __FFL__ << " started." << dendl;
   pthread_t cur = pthread_self();
   pool_spin.lock();
   C_drain drain(num_workers);
@@ -213,5 +213,5 @@ void NetworkStack::drain()
   }
   pool_spin.unlock();
   drain.wait();
-  ldout(cct, 30) << __func__ << " end." << dendl;
+  ldout(cct, 30) << __FFL__ << " end." << dendl;
 }

@@ -53,7 +53,7 @@ void CreateRequest<I>::send() {
 template <typename I>
 void CreateRequest<I>::send_object_map_resize() {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 20) << __func__ << dendl;
+  ldout(cct, 20) << __FFL__ << dendl;
 
   Context *ctx = create_context_callback<
     CreateRequest<I>, &CreateRequest<I>::handle_object_map_resize>(this);
@@ -79,7 +79,7 @@ void CreateRequest<I>::send_object_map_resize() {
 template <typename I>
 Context *CreateRequest<I>::handle_object_map_resize(int *result) {
   CephContext *cct = m_image_ctx->cct;
-  ldout(cct, 20) << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 20) << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "object map resize failed: " << cpp_strerror(*result)

@@ -127,7 +127,7 @@ int ReplicatedBackend::recover_object(
   RecoveryHandle *_h
   )
 {
-  dout(10) << __func__ << ": " << hoid << dendl;
+  dout(10) << __FFL__ << ": " << hoid << dendl;
   RPGHandle *h = static_cast<RPGHandle *>(_h);
   if (get_parent()->get_local_missing().is_missing(hoid)) {
     ceph_assert(!obc);
@@ -174,7 +174,7 @@ void ReplicatedBackend::check_recovery_sources(const OSDMapRef& osdmap)
 
 bool ReplicatedBackend::can_handle_while_inactive(OpRequestRef op)
 {
-  dout(10) << __func__ << ": " << op << dendl;
+  dout(10) << __FFL__ << ": " << op << dendl;
   switch (op->get_req()->get_type()) {
   case MSG_OSD_PG_PULL:
     return true;
@@ -187,7 +187,7 @@ bool ReplicatedBackend::_handle_message(
   OpRequestRef op
   )
 {
-  dout(10) << __func__ << ": " << op << dendl;
+  dout(10) << __FFL__ << ": " << op << dendl;
   switch (op->get_req()->get_type()) {
   case MSG_OSD_PG_PUSH:
     do_push(op);
@@ -236,7 +236,7 @@ void ReplicatedBackend::clear_recovery_state()
 
 void ReplicatedBackend::on_change()
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   for (auto& op : in_progress_ops) {
     delete op.second->on_commit;
     op.second->on_commit = nullptr;
@@ -540,7 +540,7 @@ void ReplicatedBackend::op_commit(const ceph::ref_t<InProgressOp>& op)
 
   FUNCTRACE(cct);
   OID_EVENT_TRACE_WITH_MSG((op && op->op) ? op->op->get_req() : NULL, "OP_COMMIT_BEGIN", true);
-  dout(10) << __func__ << ": " << op->tid << dendl;
+  dout(10) << __FFL__ << ": " << op->tid << dendl;
   if (op->op) {
     op->op->mark_event("op_commit");
     op->op->pg_trace.event("op commit");
@@ -575,12 +575,12 @@ void ReplicatedBackend::do_repop_reply(OpRequestRef op)
       m = ip_op.op->get_req<MOSDOp>();
 
     if (m)
-      dout(7) << __func__ << ": tid " << ip_op.tid << " op " //<< *m
+      dout(7) << __FFL__ << ": tid " << ip_op.tid << " op " //<< *m
 	      << " ack_type " << (int)r->ack_type
 	      << " from " << from
 	      << dendl;
     else
-      dout(7) << __func__ << ": tid " << ip_op.tid << " (no op) "
+      dout(7) << __FFL__ << ": tid " << ip_op.tid << " (no op) "
 	      << " ack_type " << (int)r->ack_type
 	      << " from " << from
 	      << dendl;
@@ -617,7 +617,7 @@ int ReplicatedBackend::be_deep_scrub(
   ScrubMapBuilder &pos,
   ScrubMap::object &o)
 {
-  dout(10) << __func__ << " " << poid << " pos " << pos << dendl;
+  dout(10) << __FFL__ << " " << poid << " pos " << pos << dendl;
   int r;
   uint32_t fadvise_flags = CEPH_OSD_OP_FLAG_FADVISE_SEQUENTIAL |
                            CEPH_OSD_OP_FLAG_FADVISE_DONTNEED |
@@ -626,7 +626,7 @@ int ReplicatedBackend::be_deep_scrub(
   utime_t sleeptime;
   sleeptime.set_from_double(cct->_conf->osd_debug_deep_scrub_sleep);
   if (sleeptime != utime_t()) {
-    lgeneric_derr(cct) << __func__ << " sleeping for " << sleeptime << dendl;
+    lgeneric_derr(cct) << __FFL__ << " sleeping for " << sleeptime << dendl;
     sleeptime.sleep();
   }
 
@@ -645,7 +645,7 @@ int ReplicatedBackend::be_deep_scrub(
       cct->_conf->osd_deep_scrub_stride, bl,
       fadvise_flags);
     if (r < 0) {
-      dout(20) << __func__ << "  " << poid << " got "
+      dout(20) << __FFL__ << "  " << poid << " got "
 	       << r << " on read, read_error" << dendl;
       o.read_error = true;
       return 0;
@@ -655,7 +655,7 @@ int ReplicatedBackend::be_deep_scrub(
     }
     pos.data_pos += r;
     if (r == cct->_conf->osd_deep_scrub_stride) {
-      dout(20) << __func__ << "  " << poid << " more data, digest so far 0x"
+      dout(20) << __FFL__ << "  " << poid << " more data, digest so far 0x"
 	       << std::hex << pos.data_hash.digest() << std::dec << dendl;
       return -EINPROGRESS;
     }
@@ -663,7 +663,7 @@ int ReplicatedBackend::be_deep_scrub(
     pos.data_pos = -1;
     o.digest = pos.data_hash.digest();
     o.digest_present = true;
-    dout(20) << __func__ << "  " << poid << " done with data, digest 0x"
+    dout(20) << __FFL__ << "  " << poid << " done with data, digest 0x"
 	     << std::hex << o.digest << std::dec << dendl;
   }
 
@@ -678,7 +678,7 @@ int ReplicatedBackend::be_deep_scrub(
 	poid, ghobject_t::NO_GEN, get_parent()->whoami_shard().shard),
       &hdrbl, true);
     if (r == -EIO) {
-      dout(20) << __func__ << "  " << poid << " got "
+      dout(20) << __FFL__ << "  " << poid << " got "
 	       << r << " on omap header read, read_error" << dendl;
       o.read_error = true;
       return 0;
@@ -719,7 +719,7 @@ int ReplicatedBackend::be_deep_scrub(
       return -EINPROGRESS;
     }
     if (iter->status() < 0) {
-      dout(25) << __func__ << "  " << poid
+      dout(25) << __FFL__ << "  " << poid
 	       << " on omap scan, db status error" << dendl;
       o.read_error = true;
       return 0;
@@ -730,7 +730,7 @@ int ReplicatedBackend::be_deep_scrub(
 	osd_deep_scrub_large_omap_object_key_threshold ||
       pos.omap_bytes > cct->_conf->
 	osd_deep_scrub_large_omap_object_value_sum_threshold) {
-    dout(25) << __func__ << " " << poid
+    dout(25) << __FFL__ << " " << poid
 	     << " large omap object detected. Object has " << pos.omap_keys
 	     << " keys and size " << pos.omap_bytes << " bytes" << dendl;
     o.large_omap_object_found = true;
@@ -741,12 +741,12 @@ int ReplicatedBackend::be_deep_scrub(
 
   o.omap_digest = pos.omap_hash.digest();
   o.omap_digest_present = true;
-  dout(20) << __func__ << " done with " << poid << " omap_digest "
+  dout(20) << __FFL__ << " done with " << poid << " omap_digest "
 	   << std::hex << o.omap_digest << std::dec << dendl;
 
   // Sum up omap usage
   if (pos.omap_keys > 0 || pos.omap_bytes > 0) {
-    dout(25) << __func__ << " adding " << pos.omap_keys << " keys and "
+    dout(25) << __FFL__ << " adding " << pos.omap_keys << " keys and "
              << pos.omap_bytes << " bytes to pg_stats sums" << dendl;
     map.has_omap_keys = true;
     o.object_omap_bytes = pos.omap_bytes;
@@ -768,7 +768,7 @@ void ReplicatedBackend::_do_push(OpRequestRef op)
   vector<PushReplyOp> replies;
   ObjectStore::Transaction t;
   if (get_parent()->check_failsafe_full()) {
-    dout(10) << __func__ << " Out of space (failsafe) processing push request." << dendl;
+    dout(10) << __FFL__ << " Out of space (failsafe) processing push request." << dendl;
     ceph_abort();
   }
   for (vector<PushOp>::const_iterator i = m->pushes.begin();
@@ -834,7 +834,7 @@ void ReplicatedBackend::_do_pull_response(OpRequestRef op)
 
   vector<PullOp> replies(1);
   if (get_parent()->check_failsafe_full()) {
-    dout(10) << __func__ << " Out of space (failsafe) processing pull response (push)." << dendl;
+    dout(10) << __FFL__ << " Out of space (failsafe) processing pull response (push)." << dendl;
     ceph_abort();
   }
 
@@ -1037,7 +1037,7 @@ void ReplicatedBackend::do_repop(OpRequestRef op)
 
   const hobject_t& soid = m->poid;
 
-  dout(10) << __func__ << " " << soid
+  dout(10) << __FFL__ << " " << soid
            << " v " << m->version
 	   << (m->logbl.length() ? " (transaction)" : " (parallel exec")
 	   << " " << m->logbl.length()
@@ -1046,7 +1046,7 @@ void ReplicatedBackend::do_repop(OpRequestRef op)
   // sanity checks
   ceph_assert(m->map_epoch >= get_info().history.same_interval_since);
 
-  dout(30) << __func__ << " missing before " << get_parent()->get_log().get_missing().get_items() << dendl;
+  dout(30) << __FFL__ << " missing before " << get_parent()->get_log().get_missing().get_items() << dendl;
   parent->maybe_preempt_replica_scrub(soid);
 
   int ackerosd = m->get_source().num();
@@ -1067,13 +1067,13 @@ void ReplicatedBackend::do_repop(OpRequestRef op)
   decode(rm->opt, p);
 
   if (m->new_temp_oid != hobject_t()) {
-    dout(20) << __func__ << " start tracking temp " << m->new_temp_oid << dendl;
+    dout(20) << __FFL__ << " start tracking temp " << m->new_temp_oid << dendl;
     add_temp_obj(m->new_temp_oid);
   }
   if (m->discard_temp_oid != hobject_t()) {
-    dout(20) << __func__ << " stop tracking temp " << m->discard_temp_oid << dendl;
+    dout(20) << __FFL__ << " stop tracking temp " << m->discard_temp_oid << dendl;
     if (rm->opt.empty()) {
-      dout(10) << __func__ << ": removing object " << m->discard_temp_oid
+      dout(10) << __FFL__ << ": removing object " << m->discard_temp_oid
 	       << " since we won't get the transaction" << dendl;
       rm->localt.remove(coll, ghobject_t(m->discard_temp_oid));
     }
@@ -1098,7 +1098,7 @@ void ReplicatedBackend::do_repop(OpRequestRef op)
   pg_missing_tracker_t pmissing = get_parent()->get_local_missing();
   if (pmissing.is_missing(soid)) {
     async = true;
-    dout(30) << __func__ << " is_missing " << pmissing.is_missing(soid) << dendl;
+    dout(30) << __FFL__ << " is_missing " << pmissing.is_missing(soid) << dendl;
     for (auto &&e: log) {
       dout(30) << " add_next_event entry " << e << dendl;
       get_parent()->add_local_next_event(e);
@@ -1126,7 +1126,7 @@ void ReplicatedBackend::do_repop(OpRequestRef op)
   tls.push_back(std::move(rm->opt));
   parent->queue_transactions(tls, op);
   // op is cleaned up by oncommit/onapply when both are executed
-  dout(30) << __func__ << " missing after" << get_parent()->get_log().get_missing().get_items() << dendl;
+  dout(30) << __FFL__ << " missing after" << get_parent()->get_log().get_missing().get_items() << dendl;
 }
 
 void ReplicatedBackend::repop_commit(RepModifyRef rm)
@@ -1138,7 +1138,7 @@ void ReplicatedBackend::repop_commit(RepModifyRef rm)
   // send commit.
   auto m = rm->op->get_req<MOSDRepOp>();
   ceph_assert(m->get_type() == MSG_OSD_REPOP);
-  dout(10) << __func__ << " on op " << *m
+  dout(10) << __FFL__ << " on op " << *m
 	   << ", sending commit to osd." << rm->ackerosd
 	   << dendl;
   ceph_assert(get_osdmap()->is_up(rm->ackerosd));
@@ -1185,7 +1185,7 @@ void ReplicatedBackend::calc_head_subsets(
   }
 
   if (get_parent()->get_pool().allow_incomplete_clones()) {
-    dout(10) << __func__ << ": caching (was) enabled, skipping clone subsets" << dendl;
+    dout(10) << __FFL__ << ": caching (was) enabled, skipping clone subsets" << dendl;
     return;
   }
 
@@ -1255,7 +1255,7 @@ void ReplicatedBackend::calc_clone_subsets(
     data_subset.insert(0, size);
 
   if (get_parent()->get_pool().allow_incomplete_clones()) {
-    dout(10) << __func__ << ": caching (was) enabled, skipping clone subsets" << dendl;
+    dout(10) << __FFL__ << ": caching (was) enabled, skipping clone subsets" << dendl;
     return;
   }
 
@@ -1457,7 +1457,7 @@ int ReplicatedBackend::prep_push_to_replica(
   const object_info_t& oi = obc->obs.oi;
   uint64_t size = obc->obs.oi.size;
 
-  dout(10) << __func__ << ": " << soid << " v" << oi.version
+  dout(10) << __FFL__ << ": " << soid << " v" << oi.version
 	   << " size " << size << " to osd." << peer << dendl;
 
   map<hobject_t, interval_set<uint64_t>> clone_subsets;
@@ -1594,7 +1594,7 @@ void ReplicatedBackend::submit_push_data(
     target_oid = get_parent()->get_temp_recovery_object(recovery_info.soid,
 							recovery_info.version);
     if (first) {
-      dout(10) << __func__ << ": Adding oid "
+      dout(10) << __FFL__ << ": Adding oid "
 	       << target_oid << " in the temp collection" << dendl;
       add_temp_obj(target_oid);
     }
@@ -1642,7 +1642,7 @@ void ReplicatedBackend::submit_push_data(
       if (size != recovery_info.oi.size) {
         get_parent()->pg_add_local_num_bytes((int64_t)recovery_info.oi.size - (int64_t)size);
         get_parent()->pg_add_num_bytes((int64_t)recovery_info.oi.size - (int64_t)size);
-        dout(10) << __func__ << " " << recovery_info.soid
+        dout(10) << __FFL__ << " " << recovery_info.soid
                << " backfill size " << recovery_info.oi.size
                << " previous size " << size
                << " net size " << recovery_info.oi.size - size
@@ -1681,7 +1681,7 @@ void ReplicatedBackend::submit_push_data(
     assert(intervals_included.subset_of(data_zeros));
     data_zeros.subtract(intervals_included);
 
-    dout(20) << __func__ <<" recovering object " << recovery_info.soid
+    dout(20) << __FFL__ <<" recovering object " << recovery_info.soid
              << " copy_subset: " << recovery_info.copy_subset
              << " intervals_included: " << intervals_included
              << " data_zeros: " << data_zeros << dendl;
@@ -1706,7 +1706,7 @@ void ReplicatedBackend::submit_push_data(
 
   if (complete) {
     if (!first) {
-      dout(10) << __func__ << ": Removing oid "
+      dout(10) << __FFL__ << ": Removing oid "
                << target_oid << " from the temp collection" << dendl;
       clear_temp_obj(target_oid);
       t->remove(coll, ghobject_t(recovery_info.soid));
@@ -1922,7 +1922,7 @@ void ReplicatedBackend::handle_push(
   if (complete) {
     if (is_repair) {
       get_parent()->inc_osd_stat_repaired();
-      dout(20) << __func__ << " repair complete" << dendl;
+      dout(20) << __FFL__ << " repair complete" << dendl;
     }
     get_parent()->on_local_recover(
       pop.recovery_info.soid,
@@ -1959,7 +1959,7 @@ void ReplicatedBackend::send_pushes(int prio, map<pg_shard_t, vector<PushOp> > &
 	    cost < cct->_conf->osd_max_push_cost &&
 	    pushes < cct->_conf->osd_max_push_objects) ;
 	   ++j) {
-	dout(20) << __func__ << ": sending push " << *j
+	dout(20) << __FFL__ << ": sending push " << *j
 		 << " to osd." << i->first << dendl;
 	cost += j->cost(cct);
 	pushes += 1;
@@ -1981,7 +1981,7 @@ void ReplicatedBackend::send_pulls(int prio, map<pg_shard_t, vector<PullOp> > &p
       get_osdmap_epoch());
     if (!con)
       continue;
-    dout(20) << __func__ << ": sending pulls " << i->second
+    dout(20) << __FFL__ << ": sending pulls " << i->second
 	     << " to osd." << i->first << dendl;
     MOSDPGPull *msg = new MOSDPGPull();
     msg->from = parent->whoami_shard();
@@ -2008,7 +2008,7 @@ int ReplicatedBackend::build_push_op(const ObjectRecoveryInfo &recovery_info,
   ObjectRecoveryProgress &new_progress = *out_progress;
   new_progress = progress;
 
-  dout(7) << __func__ << " " << recovery_info.soid
+  dout(7) << __FFL__ << " " << recovery_info.soid
 	  << " v " << recovery_info.version
 	  << " size " << recovery_info.size
 	  << " recovery_info: " << recovery_info
@@ -2019,12 +2019,12 @@ int ReplicatedBackend::build_push_op(const ObjectRecoveryInfo &recovery_info,
   if (progress.first) {
     int r = store->omap_get_header(ch, ghobject_t(recovery_info.soid), &out_op->omap_header);
     if(r < 0) {
-      dout(1) << __func__ << " get omap header failed: " << cpp_strerror(-r) << dendl; 
+      dout(1) << __FFL__ << " get omap header failed: " << cpp_strerror(-r) << dendl; 
       return r;
     }
     r = store->getattrs(ch, ghobject_t(recovery_info.soid), out_op->attrset);
     if(r < 0) {
-      dout(1) << __func__ << " getattrs failed: " << cpp_strerror(-r) << dendl;
+      dout(1) << __FFL__ << " getattrs failed: " << cpp_strerror(-r) << dendl;
       return r;
     }
 
@@ -2034,7 +2034,7 @@ int ReplicatedBackend::build_push_op(const ObjectRecoveryInfo &recovery_info,
      auto bliter = bv.cbegin();
      decode(oi, bliter);
     } catch (...) {
-      dout(0) << __func__ << ": bad object_info_t: " << recovery_info.soid << dendl;
+      dout(0) << __FFL__ << ": bad object_info_t: " << recovery_info.soid << dendl;
       return -EINVAL;
     }
 
@@ -2115,14 +2115,14 @@ int ReplicatedBackend::build_push_op(const ObjectRecoveryInfo &recovery_info,
                        cache_dont_need ? CEPH_OSD_OP_FLAG_FADVISE_DONTNEED: 0);
   if (cct->_conf->osd_debug_random_push_read_error &&
         (rand() % (int)(cct->_conf->osd_debug_random_push_read_error * 100.0)) == 0) {
-    dout(0) << __func__ << ": inject EIO " << recovery_info.soid << dendl;
+    dout(0) << __FFL__ << ": inject EIO " << recovery_info.soid << dendl;
     r = -EIO;
   }
   if (r < 0) {
     return r;
   }
   if (out_op->data_included.size() != origin_size) {
-    dout(10) << __func__ << " some extents get pruned "
+    dout(10) << __FFL__ << " some extents get pruned "
              << out_op->data_included.size() << "/" << origin_size
              << dendl;
     new_progress.data_complete = true;
@@ -2133,7 +2133,7 @@ int ReplicatedBackend::build_push_op(const ObjectRecoveryInfo &recovery_info,
       out_op->data.length() == oi.size && oi.is_data_digest()) {
     uint32_t crc = out_op->data.crc32c(-1);
     if (oi.data_digest != crc) {
-      dout(0) << __func__ << " " << coll << std::hex
+      dout(0) << __FFL__ << " " << coll << std::hex
                          << " full-object read crc 0x" << crc
                          << " != expected 0x" << oi.data_digest
                          << std::dec << " on " << recovery_info.soid << dendl;
@@ -2207,7 +2207,7 @@ bool ReplicatedBackend::handle_push_reply(
       // Handle the case of a read error right after we wrote, which is
       // hopefully extremely rare.
       if (r < 0) {
-        dout(5) << __func__ << ": oid " << soid << " error " << r << dendl;
+        dout(5) << __FFL__ << ": oid " << soid << " error " << r << dendl;
 
 	error = true;
 	goto done;
@@ -2326,7 +2326,7 @@ void ReplicatedBackend::trim_pushed_data(
 
 void ReplicatedBackend::_failed_pull(pg_shard_t from, const hobject_t &soid)
 {
-  dout(20) << __func__ << ": " << soid << " from " << from << dendl;
+  dout(20) << __FFL__ << ": " << soid << " from " << from << dendl;
   auto it = pulling.find(soid);
   assert(it != pulling.end());
   get_parent()->on_failed_pull(
@@ -2364,7 +2364,7 @@ int ReplicatedBackend::start_pushes(
 {
   list< map<pg_shard_t, pg_missing_t>::const_iterator > shards;
 
-  dout(20) << __func__ << " soid " << soid << dendl;
+  dout(20) << __FFL__ << " soid " << soid << dendl;
   // who needs it?
   ceph_assert(get_parent()->get_acting_recovery_backfill_shards().size() > 0);
   for (set<pg_shard_t>::iterator i =
@@ -2393,7 +2393,7 @@ int ReplicatedBackend::start_pushes(
       // Back out all failed reads
       for (auto k : shards) {
 	pg_shard_t p = k->first;
-	dout(10) << __func__ << " clean up peer " << p << dendl;
+	dout(10) << __FFL__ << " clean up peer " << p << dendl;
 	h->pushes[p].pop_back();
 	if (p == peer) break;
       }

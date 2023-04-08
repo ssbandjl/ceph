@@ -36,12 +36,12 @@ RDMAIWARPConnectedSocketImpl::RDMAIWARPConnectedSocketImpl(CephContext *cct, sha
     cm_channel = rdma_create_event_channel();
     rdma_create_id(cm_channel, &cm_id, NULL, RDMA_PS_TCP);
     status = RDMA_ID_CREATED;
-    ldout(cct, 20) << __func__ << " successfully created cm id: " << cm_id << dendl;
+    ldout(cct, 20) << __FFL__ << " successfully created cm id: " << cm_id << dendl;
   }
 }
 
 RDMAIWARPConnectedSocketImpl::~RDMAIWARPConnectedSocketImpl() {
-  ldout(cct, 20) << __func__ << " destruct." << dendl;
+  ldout(cct, 20) << __FFL__ << " destruct." << dendl;
   std::unique_lock l(close_mtx);
   close_condition.wait(l, [&] { return closed; });
   if (status >= RDMA_ID_CREATED) {
@@ -54,7 +54,7 @@ int RDMAIWARPConnectedSocketImpl::try_connect(const entity_addr_t& peer_addr, co
   worker->center.create_file_event(cm_channel->fd, EVENT_READABLE, cm_con_handler);
   status = CHANNEL_FD_CREATED;
   if (rdma_resolve_addr(cm_id, NULL, const_cast<struct sockaddr*>(peer_addr.get_sockaddr()), TIMEOUT_MS)) {
-    lderr(cct) << __func__ << " failed to resolve addr" << dendl;
+    lderr(cct) << __FFL__ << " failed to resolve addr" << dendl;
     return -1;
   }
   return 0;
@@ -77,14 +77,14 @@ void RDMAIWARPConnectedSocketImpl::shutdown() {
 void RDMAIWARPConnectedSocketImpl::handle_cm_connection() {
   struct rdma_cm_event *event;
   rdma_get_cm_event(cm_channel, &event);
-  ldout(cct, 20) << __func__ << " event name: " << rdma_event_str(event->event)
+  ldout(cct, 20) << __FFL__ << " event name: " << rdma_event_str(event->event)
                              << " (cm id: " << cm_id << ")" << dendl;
   struct rdma_conn_param cm_params;
   switch (event->event) {
     case RDMA_CM_EVENT_ADDR_RESOLVED:
       status = ADDR_RESOLVED;
       if (rdma_resolve_route(cm_id, TIMEOUT_MS)) {
-        lderr(cct) << __func__ << " failed to resolve rdma addr" << dendl;
+        lderr(cct) << __FFL__ << " failed to resolve rdma addr" << dendl;
         notify();
       }
       break;
@@ -92,7 +92,7 @@ void RDMAIWARPConnectedSocketImpl::handle_cm_connection() {
     case RDMA_CM_EVENT_ROUTE_RESOLVED:
       status = ROUTE_RESOLVED;
       if (alloc_resource()) {
-        lderr(cct) << __func__ << " failed to alloc resource while resolving the route" << dendl;
+        lderr(cct) << __FFL__ << " failed to alloc resource while resolving the route" << dendl;
         connected = -ECONNREFUSED;
         notify();
         break;
@@ -103,14 +103,14 @@ void RDMAIWARPConnectedSocketImpl::handle_cm_connection() {
       cm_params.retry_count = RETRY_COUNT;
       cm_params.qp_num = local_qpn;
       if (rdma_connect(cm_id, &cm_params)) {
-        lderr(cct) << __func__ << " failed to connect remote rdma port" << dendl;
+        lderr(cct) << __FFL__ << " failed to connect remote rdma port" << dendl;
         connected = -ECONNREFUSED;
         notify();
       }
       break;
 
     case RDMA_CM_EVENT_ESTABLISHED:
-      ldout(cct, 20) << __func__ << " qp_num=" << cm_id->qp->qp_num << dendl;
+      ldout(cct, 20) << __FFL__ << " qp_num=" << cm_id->qp->qp_num << dendl;
       status = CONNECTED;
       if (!is_server) {
         peer_qpn = event->param.conn.qp_num;
@@ -126,7 +126,7 @@ void RDMAIWARPConnectedSocketImpl::handle_cm_connection() {
     case RDMA_CM_EVENT_CONNECT_ERROR:
     case RDMA_CM_EVENT_UNREACHABLE:
     case RDMA_CM_EVENT_REJECTED:
-      lderr(cct) << __func__ << " rdma connection rejected" << dendl;
+      lderr(cct) << __FFL__ << " rdma connection rejected" << dendl;
       connected = -ECONNREFUSED;
       notify();
       break;
@@ -151,13 +151,13 @@ void RDMAIWARPConnectedSocketImpl::handle_cm_connection() {
 }
 
 void RDMAIWARPConnectedSocketImpl::activate() {
-  ldout(cct, 30) << __func__ << dendl;
+  ldout(cct, 30) << __FFL__ << dendl;
   active = true;
   connected = 1;
 }
 
 int RDMAIWARPConnectedSocketImpl::alloc_resource() {
-  ldout(cct, 30) << __func__ << dendl;
+  ldout(cct, 30) << __FFL__ << dendl;
   qp = ib->create_queue_pair(cct, dispatcher->get_tx_cq(),
       dispatcher->get_rx_cq(), IBV_QPT_RC, cm_id);
   if (!qp) {
@@ -171,7 +171,7 @@ int RDMAIWARPConnectedSocketImpl::alloc_resource() {
 }
 
 void RDMAIWARPConnectedSocketImpl::close_notify() {
-  ldout(cct, 30) << __func__ << dendl;
+  ldout(cct, 30) << __FFL__ << dendl;
   if (status >= CHANNEL_FD_CREATED) {
     worker->center.delete_file_event(cm_channel->fd, EVENT_READABLE);
   }

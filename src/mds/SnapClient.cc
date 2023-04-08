@@ -42,7 +42,7 @@ void SnapClient::resend_queries()
 
 void SnapClient::handle_query_result(const cref_t<MMDSTableRequest> &m)
 {
-  dout(10) << __func__ << " " << *m << dendl;
+  dout(10) << __FFL__ << " " << *m << dendl;
 
   char type;
   using ceph::decode;
@@ -113,7 +113,7 @@ void SnapClient::handle_query_result(const cref_t<MMDSTableRequest> &m)
 
 void SnapClient::handle_notify_prep(const cref_t<MMDSTableRequest> &m)
 {
-  dout(10) << __func__ << " " << *m << dendl;
+  dout(10) << __FFL__ << " " << *m << dendl;
   handle_query_result(m);
   auto ack = make_message<MMDSTableRequest>(table, TABLESERVER_OP_NOTIFY_ACK, 0, m->get_tid());
   mds->send_message(ack, m->get_connection());
@@ -121,7 +121,7 @@ void SnapClient::handle_notify_prep(const cref_t<MMDSTableRequest> &m)
 
 void SnapClient::notify_commit(version_t tid)
 {
-  dout(10) << __func__ << " tid " << tid << dendl;
+  dout(10) << __FFL__ << " tid " << tid << dendl;
 
   ceph_assert(cached_version == 0 || cached_version >= tid);
   if (cached_version == 0) {
@@ -143,7 +143,7 @@ void SnapClient::notify_commit(version_t tid)
 
 void SnapClient::refresh(version_t want, MDSContext *onfinish)
 {
-  dout(10) << __func__ << " want " << want << dendl;
+  dout(10) << __FFL__ << " want " << want << dendl;
 
   ceph_assert(want >= cached_version);
   if (onfinish)
@@ -163,7 +163,7 @@ void SnapClient::refresh(version_t want, MDSContext *onfinish)
 
 void SnapClient::sync(MDSContext *onfinish)
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
 
   refresh(std::max<version_t>(cached_version, 1), onfinish);
   synced = false;
@@ -215,7 +215,7 @@ set<snapid_t> SnapClient::filter(const set<snapid_t>& snaps) const
       result.erase(r->second.first);
   }
 
-  dout(10) << __func__ << " " << snaps << " -> " << result <<  dendl;
+  dout(10) << __FFL__ << " " << snaps << " -> " << result <<  dendl;
   return result;
 }
 
@@ -242,7 +242,7 @@ const SnapInfo* SnapClient::get_snap_info(snapid_t snapid) const
     }
   }
 
-  dout(10) << __func__ << " snapid " << snapid << " -> " << result <<  dendl;
+  dout(10) << __FFL__ << " snapid " << snapid << " -> " << result <<  dendl;
   return result;
 }
 

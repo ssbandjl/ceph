@@ -119,7 +119,7 @@ void MgrMonitor::create_initial()
   }
   pending_map.always_on_modules = always_on_modules;
   pending_command_descs = mgr_commands;
-  dout(10) << __func__ << " initial modules " << pending_map.modules
+  dout(10) << __FFL__ << " initial modules " << pending_map.modules
 	   << ", always on modules " << pending_map.get_always_on_modules()
            << ", " << pending_command_descs.size() << " commands"
 	   << dendl;
@@ -239,7 +239,7 @@ void MgrMonitor::update_from_paxos(bool *need_bootstrap)
 
 void MgrMonitor::prime_mgr_client()
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   mon->mgr_client.ms_dispatch2(make_message<MMgrMap>(map));
 }
 
@@ -299,18 +299,18 @@ void MgrMonitor::post_paxos_update()
 
 void MgrMonitor::encode_pending(MonitorDBStore::TransactionRef t)
 {
-  dout(10) << __func__ << " " << pending_map << dendl;
+  dout(10) << __FFL__ << " " << pending_map << dendl;
   bufferlist bl;
   pending_map.encode(bl, mon->get_quorum_con_features());
   put_version(t, pending_map.epoch, bl);
   put_last_committed(t, pending_map.epoch);
 
   for (auto& p : pending_metadata) {
-    dout(10) << __func__ << " set metadata for " << p.first << dendl;
+    dout(10) << __FFL__ << " set metadata for " << p.first << dendl;
     t->put(MGR_METADATA_PREFIX, p.first, p.second);
   }
   for (auto& name : pending_metadata_rm) {
-    dout(10) << __func__ << " rm metadata for " << name << dendl;
+    dout(10) << __FFL__ << " rm metadata for " << name << dendl;
     t->erase(MGR_METADATA_PREFIX, name);
   }
   pending_metadata.clear();
@@ -322,7 +322,7 @@ void MgrMonitor::encode_pending(MonitorDBStore::TransactionRef t)
     if (level != HEALTH_OK) {
       next.add("MGR_DOWN", level, "no active mgr", 0);
     } else {
-      dout(10) << __func__ << " no health warning (never active and new cluster)"
+      dout(10) << __FFL__ << " no health warning (never active and new cluster)"
 	       << dendl;
     }
   } else {
@@ -331,7 +331,7 @@ void MgrMonitor::encode_pending(MonitorDBStore::TransactionRef t)
   encode_health(next, t);
 
   if (pending_command_descs.size()) {
-    dout(4) << __func__ << " encoding " << pending_command_descs.size()
+    dout(4) << __FFL__ << " encoding " << pending_command_descs.size()
             << " command_descs" << dendl;
     for (auto& p : pending_command_descs) {
       p.set_flag(MonCommand::FLAG_MGR);
@@ -350,11 +350,11 @@ bool MgrMonitor::check_caps(MonOpRequestRef op, const uuid_d& fsid)
   if (!session)
     return false;
   if (!session->is_capable("mgr", MON_CAP_X)) {
-    dout(1) << __func__ << " insufficient caps " << session->caps << dendl;
+    dout(1) << __FFL__ << " insufficient caps " << session->caps << dendl;
     return false;
   }
   if (fsid != mon->monmap->fsid) {
-    dout(1) << __func__ << " op fsid " << fsid
+    dout(1) << __FFL__ << " op fsid " << fsid
 	    << " != " << mon->monmap->fsid << dendl;
     return false;
   }
@@ -453,7 +453,7 @@ bool MgrMonitor::prepare_beacon(MonOpRequestRef op)
     mon->clog->info() << "Active manager daemon " << m->get_name()
                       << " restarted";
     if (!mon->osdmon()->is_writeable()) {
-      dout(1) << __func__ << ":  waiting for osdmon writeable to"
+      dout(1) << __FFL__ << ":  waiting for osdmon writeable to"
                  " blacklist old instance." << dendl;
       mon->osdmon()->wait_for_writeable(op, new C_RetryMessage(this, op));
       return false;
@@ -639,10 +639,10 @@ void MgrMonitor::send_digests()
     // if paxos is currently not active, don't send a digest but reenable timer
     goto timer;
   }
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
 
   for (auto sub : *(mon->session_map.subs[type])) {
-    dout(10) << __func__ << " sending digest to subscriber " << sub->session->con
+    dout(10) << __FFL__ << " sending digest to subscriber " << sub->session->con
 	     << " " << sub->session->con->get_peer_addr() << dendl;
     auto mdigest = make_message<MMgrDigest>();
 
@@ -713,7 +713,7 @@ void MgrMonitor::tick()
     // This case handles either local slowness (calls being delayed
     // for whatever reason) or cluster election slowness (a long gap
     // between calls while an election happened)
-    dout(4) << __func__ << ": resetting beacon timeouts due to mon delay "
+    dout(4) << __FFL__ << ": resetting beacon timeouts due to mon delay "
             "(slow election?) of " << now - last_tick << " seconds" << dendl;
     for (auto &i : last_beacon) {
       i.second = now;
@@ -1169,7 +1169,7 @@ bool MgrMonitor::prepare_command(MonOpRequestRef op)
   }
 
 out:
-  dout(4) << __func__ << " done, r=" << r << dendl;
+  dout(4) << __FFL__ << " done, r=" << r << dendl;
   /* Compose response */
   string rs;
   getline(ss, rs);

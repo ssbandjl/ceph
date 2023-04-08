@@ -61,7 +61,7 @@ template <typename I>
 bool SnapshotRenameRequest<I>::should_complete(int r) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": state=" << m_state << ", "
+  ldout(cct, 5) << this << " " << __FFL__ << ": state=" << m_state << ", "
                 << "r=" << r << dendl;
   if (r < 0) {
     if (r == -EEXIST) {
@@ -80,7 +80,7 @@ void SnapshotRenameRequest<I>::send_rename_snap() {
   std::shared_lock image_locker{image_ctx.image_lock};
 
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
 
   librados::ObjectWriteOperation op;
   if (image_ctx.old_format) {

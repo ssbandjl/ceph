@@ -513,12 +513,12 @@ int mark_pg_for_removal(ObjectStore *fs, spg_t pgid, ObjectStore::Transaction *t
   epoch_t map_epoch = 0;
   int r = PG::peek_map_epoch(fs, pgid, &map_epoch);
   if (r < 0)
-    cerr << __func__ << " warning: peek_map_epoch reported error" << std::endl;
+    cerr << __FFL__ << " warning: peek_map_epoch reported error" << std::endl;
   PastIntervals past_intervals;
   __u8 struct_v;
   r = PG::read_info(fs, pgid, coll, info, past_intervals, struct_v);
   if (r < 0) {
-    cerr << __func__ << " error on read_info " << cpp_strerror(r) << std::endl;
+    cerr << __FFL__ << " error on read_info " << cpp_strerror(r) << std::endl;
     return r;
   }
   ceph_assert(struct_v >= 8);
@@ -602,7 +602,7 @@ int write_pg(ObjectStore::Transaction &t, epoch_t epoch, pg_info_t &info,
 	     divergent_priors_t &divergent,
 	     pg_missing_t &missing)
 {
-  cout << __func__ << " epoch " << epoch << " info " << info << std::endl;
+  cout << __FFL__ << " epoch " << epoch << " info " << info << std::endl;
   int ret = write_info(t, epoch, info, past_intervals);
   if (ret)
     return ret;
@@ -1059,7 +1059,7 @@ int get_pg_num_history(ObjectStore *store, pool_pg_num_history_t *h)
     auto p = bl.cbegin();
     decode(*h, p);
   }
-  cout << __func__ << " pg_num_history " << *h << std::endl;
+  cout << __FFL__ << " pg_num_history " << *h << std::endl;
   return 0;
 }
 
@@ -1882,7 +1882,7 @@ int ObjectStoreTool::do_import(ObjectStore *store, OSDSuperblock& sb,
       return ret;
 
     if (debug) {
-      cout << __func__ << ": Section type " << std::to_string(type) << std::endl;
+      cout << __FFL__ << ": Section type " << std::to_string(type) << std::endl;
     }
     if (type >= END_OF_TYPES) {
       cout << "Skipping unknown section type" << std::endl;

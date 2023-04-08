@@ -108,7 +108,7 @@ int RGWObjExpStore::objexp_hint_add(const ceph::real_time& delete_at,
   auto obj = rados_svc->obj(rgw_raw_obj(zone_svc->get_zone_params().log_pool, shard_name));
   int r = obj.open();
   if (r < 0) {
-    ldout(cct, 0) << "ERROR: " << __func__ << "(): failed to open obj=" << obj << " (r=" << r << ")" << dendl;
+    ldout(cct, 0) << "ERROR: " << __FFL__ << "(): failed to open obj=" << obj << " (r=" << r << ")" << dendl;
     return r;
   }
   return obj.operate(&op, null_yield);
@@ -130,7 +130,7 @@ int RGWObjExpStore::objexp_hint_list(const string& oid,
   auto obj = rados_svc->obj(rgw_raw_obj(zone_svc->get_zone_params().log_pool, oid));
   int r = obj.open();
   if (r < 0) {
-    ldout(cct, 0) << "ERROR: " << __func__ << "(): failed to open obj=" << obj << " (r=" << r << ")" << dendl;
+    ldout(cct, 0) << "ERROR: " << __FFL__ << "(): failed to open obj=" << obj << " (r=" << r << ")" << dendl;
     return r;
   }
   bufferlist obl;
@@ -177,7 +177,7 @@ int RGWObjExpStore::objexp_hint_trim(const string& oid,
   auto obj = rados_svc->obj(rgw_raw_obj(zone_svc->get_zone_params().log_pool, oid));
   int r = obj.open();
   if (r < 0) {
-    ldout(cct, 0) << "ERROR: " << __func__ << "(): failed to open obj=" << obj << " (r=" << r << ")" << dendl;
+    ldout(cct, 0) << "ERROR: " << __FFL__ << "(): failed to open obj=" << obj << " (r=" << r << ")" << dendl;
     return r;
   }
   auto& ref = obj.get_ref();
@@ -319,7 +319,7 @@ bool RGWObjectExpirer::process_single_shard(const string& shard,
 
   int ret = l.lock_exclusive(&store->getRados()->objexp_pool_ctx, shard);
   if (ret == -EBUSY) { /* already locked by another processor */
-    dout(5) << __func__ << "(): failed to acquire lock on " << shard << dendl;
+    dout(5) << __FFL__ << "(): failed to acquire lock on " << shard << dendl;
     return false;
   }
 

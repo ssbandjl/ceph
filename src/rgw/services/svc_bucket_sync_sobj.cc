@@ -590,7 +590,7 @@ int RGWSI_BS_SObj_HintIndexObj::read(optional_yield y) {
       decode(info, iter);
       has_data = true;
     } catch (buffer::error& err) {
-      ldout(cct, 0) << "ERROR: " << __func__ << "(): failed to decode entries, ignoring" << dendl;
+      ldout(cct, 0) << "ERROR: " << __FFL__ << "(): failed to decode entries, ignoring" << dendl;
       info.clear();
     }
   } else {
@@ -803,15 +803,15 @@ int RGWSI_Bucket_Sync_SObj::handle_bi_update(RGWBucketInfo& bucket_info,
   std::vector<rgw_bucket> removed_sources;
   std::vector<rgw_bucket> added_sources;
   bool found = diff_sets(orig_sources, sources, &added_sources, &removed_sources);
-  ldout(cct, 20) << __func__ << "(): bucket=" << bucket_info.bucket << ": orig_sources=" << orig_sources << " new_sources=" << sources << dendl;
-  ldout(cct, 20) << __func__ << "(): bucket=" << bucket_info.bucket << ":  potential sources added=" << added_sources << " removed=" << removed_sources << dendl;
+  ldout(cct, 20) << __FFL__ << "(): bucket=" << bucket_info.bucket << ": orig_sources=" << orig_sources << " new_sources=" << sources << dendl;
+  ldout(cct, 20) << __FFL__ << "(): bucket=" << bucket_info.bucket << ":  potential sources added=" << added_sources << " removed=" << removed_sources << dendl;
   
   std::vector<rgw_bucket> removed_dests;
   std::vector<rgw_bucket> added_dests;
   found = found || diff_sets(orig_dests, dests, &added_dests, &removed_dests);
 
-  ldout(cct, 20) << __func__ << "(): bucket=" << bucket_info.bucket << ": orig_dests=" << orig_dests << " new_dests=" << dests << dendl;
-  ldout(cct, 20) << __func__ << "(): bucket=" << bucket_info.bucket << ":  potential dests added=" << added_dests << " removed=" << removed_dests << dendl;
+  ldout(cct, 20) << __FFL__ << "(): bucket=" << bucket_info.bucket << ": orig_dests=" << orig_dests << " new_dests=" << dests << dendl;
+  ldout(cct, 20) << __FFL__ << "(): bucket=" << bucket_info.bucket << ":  potential dests added=" << added_dests << " removed=" << removed_dests << dendl;
 
   if (!found) {
     return 0;

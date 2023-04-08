@@ -520,7 +520,7 @@ RGWHandler_REST* RGWRESTMgr_PubSub::get_handler(struct req_state* const s,
     }
   }
   
-  ldout(s->cct, 20) << __func__ << " handler=" << (handler ? typeid(*handler).name() : "<null>") << dendl;
+  ldout(s->cct, 20) << __FFL__ << " handler=" << (handler ? typeid(*handler).name() : "<null>") << dendl;
 
   return handler;
 }

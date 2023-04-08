@@ -68,7 +68,7 @@ std::string MemDB::_get_data_fn()
 void MemDB::_save()
 {
   std::lock_guard<std::mutex> l(m_lock);
-  dout(10) << __func__ << " Saving MemDB to file: "<< _get_data_fn().c_str() << dendl;
+  dout(10) << __FFL__ << " Saving MemDB to file: "<< _get_data_fn().c_str() << dendl;
   int mode = 0644;
   int fd = TEMP_FAILURE_RETRY(::open(_get_data_fn().c_str(),
                                      O_WRONLY|O_CREAT|O_TRUNC|O_CLOEXEC, mode));
@@ -81,7 +81,7 @@ void MemDB::_save()
   bufferlist bl;
   mdb_iter_t iter = m_map.begin();
   while (iter != m_map.end()) {
-    dout(10) << __func__ << " Key:"<< iter->first << dendl;
+    dout(10) << __FFL__ << " Key:"<< iter->first << dendl;
     _encode(iter, bl);
     ++iter;
   }
@@ -93,7 +93,7 @@ void MemDB::_save()
 int MemDB::_load()
 {
   std::lock_guard<std::mutex> l(m_lock);
-  dout(10) << __func__ << " Reading MemDB from file: "<< _get_data_fn().c_str() << dendl;
+  dout(10) << __FFL__ << " Reading MemDB from file: "<< _get_data_fn().c_str() << dendl;
   /*
    * Open file and read it in single shot.
    */
@@ -124,7 +124,7 @@ int MemDB::_load()
     bytes_done += ::decode_file(fd, key);
     bytes_done += ::decode_file(fd, datap);
 
-    dout(10) << __func__ << " Key:"<< key << dendl;
+    dout(10) << __FFL__ << " Key:"<< key << dendl;
     m_map[key] = datap;
     m_total_bytes += datap.length();
   }
@@ -135,13 +135,13 @@ int MemDB::_load()
 int MemDB::_init(bool create)
 {
   int r;
-  dout(1) << __func__ << dendl;
+  dout(1) << __FFL__ << dendl;
   if (create) {
     r = ::mkdir(m_db_path.c_str(), 0700);
     if (r < 0) {
       r = -errno;
       if (r != -EEXIST) {
-	derr << __func__ << " mkdir failed: " << cpp_strerror(r) << dendl;
+	derr << __FFL__ << " mkdir failed: " << cpp_strerror(r) << dendl;
 	return r;
       }
       r = 0; // ignore EEXIST
@@ -194,7 +194,7 @@ int MemDB::create_and_open(ostream &out, const vector<ColumnFamily>& cfs) {
 MemDB::~MemDB()
 {
   close();
-  dout(10) << __func__ << " Destroying MemDB instance: "<< dendl;
+  dout(10) << __FFL__ << " Destroying MemDB instance: "<< dendl;
 }
 
 void MemDB::close()
@@ -213,7 +213,7 @@ int MemDB::submit_transaction(KeyValueDB::Transaction t)
 
   MDBTransactionImpl* mt =  static_cast<MDBTransactionImpl*>(t.get());
 
-  dtrace << __func__ << " " << mt->get_ops().size() << dendl;
+  dtrace << __FFL__ << " " << mt->get_ops().size() << dendl;
   for(auto& op : mt->get_ops()) {
     if(op.first == MDBTransactionImpl::WRITE) {
       ms_op_t set_op = op.second;
@@ -237,7 +237,7 @@ int MemDB::submit_transaction(KeyValueDB::Transaction t)
 
 int MemDB::submit_transaction_sync(KeyValueDB::Transaction tsync)
 {
-  dtrace << __func__ << " " << dendl;
+  dtrace << __FFL__ << " " << dendl;
   submit_transaction(tsync);
   return 0;
 }
@@ -252,7 +252,7 @@ int MemDB::transaction_rollback(KeyValueDB::Transaction t)
 void MemDB::MDBTransactionImpl::set(
   const string &prefix, const string &k, const bufferlist &to_set_bl)
 {
-  dtrace << __func__ << " " << prefix << " " << k << dendl;
+  dtrace << __FFL__ << " " << prefix << " " << k << dendl;
   ops.push_back(make_pair(WRITE, std::make_pair(std::make_pair(prefix, k),
                   to_set_bl)));
 }
@@ -260,7 +260,7 @@ void MemDB::MDBTransactionImpl::set(
 void MemDB::MDBTransactionImpl::rmkey(const string &prefix,
     const string &k)
 {
-  dtrace << __func__ << " " << prefix << " " << k << dendl;
+  dtrace << __FFL__ << " " << prefix << " " << k << dendl;
   ops.push_back(make_pair(DELETE,
                           std::make_pair(std::make_pair(prefix, k),
                           bufferlist())));
@@ -291,7 +291,7 @@ void MemDB::MDBTransactionImpl::merge(
   const std::string &prefix, const std::string &key, const bufferlist  &value)
 {
 
-  dtrace << __func__ << " " << prefix << " " << key << dendl;
+  dtrace << __FFL__ << " " << prefix << " " << key << dendl;
   ops.push_back(make_pair(MERGE, make_pair(std::make_pair(prefix, key), value)));
   return;
 }
@@ -344,7 +344,7 @@ std::shared_ptr<KeyValueDB::MergeOperator> MemDB::_find_merge_op(const std::stri
     }
   }
 
-  dtrace << __func__ << " No merge op for " << prefix << dendl;
+  dtrace << __FFL__ << " No merge op for " << prefix << dendl;
   return NULL;
 }
 
@@ -510,7 +510,7 @@ MemDB::MDBWholeSpaceIteratorImpl::free_last()
 
 string MemDB::MDBWholeSpaceIteratorImpl::key()
 {
-  dtrace << __func__ << " " << m_key_value.first << dendl;
+  dtrace << __FFL__ << " " << m_key_value.first << dendl;
   string prefix, key;
   split_key(m_key_value.first, &prefix, &key);
   return key;
@@ -533,7 +533,7 @@ bool MemDB::MDBWholeSpaceIteratorImpl::raw_key_is_prefixed(
 
 bufferlist MemDB::MDBWholeSpaceIteratorImpl::value()
 {
-  dtrace << __func__ << " " << m_key_value << dendl;
+  dtrace << __FFL__ << " " << m_key_value << dendl;
   return m_key_value.second;
 }
 

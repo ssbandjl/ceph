@@ -60,7 +60,7 @@ static PyObject *osdmap_new_incremental(BasePyOSDMap *self, PyObject *obj)
   // actually use this map in the real world (and even if we did it would
   // be a no-op).
   self->osdmap->crush->encode(inc->crush, CEPH_FEATURES_ALL);
-  dout(10) << __func__ << " " << inc << dendl;
+  dout(10) << __FFL__ << " " << inc << dendl;
 
   return construct_with_capsule("mgr_module", "OSDMapIncremental",
                                 (void*)(inc));
@@ -79,7 +79,7 @@ static PyObject *osdmap_apply_incremental(BasePyOSDMap *self,
   OSDMap *next = new OSDMap;
   next->decode(bl);
   next->apply_incremental(*(incobj->inc));
-  dout(10) << __func__ << " map " << self->osdmap << " inc " << incobj->inc
+  dout(10) << __FFL__ << " map " << self->osdmap << " inc " << incobj->inc
 	   << " next " << next << dendl;
 
   return construct_with_capsule("mgr_module", "OSDMap", (void*)next);
@@ -122,27 +122,27 @@ static PyObject *osdmap_calc_pg_upmaps(BasePyOSDMap* self, PyObject *args)
     return nullptr;
   }
   if (!PyList_CheckExact(pool_list)) {
-    derr << __func__ << " pool_list not a list" << dendl;
+    derr << __FFL__ << " pool_list not a list" << dendl;
     return nullptr;
   }
   set<int64_t> pools;
   for (auto i = 0; i < PyList_Size(pool_list); ++i) {
     PyObject *pool_name = PyList_GET_ITEM(pool_list, i);
     if (!PyUnicode_Check(pool_name)) {
-      derr << __func__ << " " << pool_name << " not a string" << dendl;
+      derr << __FFL__ << " " << pool_name << " not a string" << dendl;
       return nullptr;
     }
     auto pool_id = self->osdmap->lookup_pg_pool_name(
       PyUnicode_AsUTF8(pool_name));
     if (pool_id < 0) {
-      derr << __func__ << " pool '" << PyUnicode_AsUTF8(pool_name)
+      derr << __FFL__ << " pool '" << PyUnicode_AsUTF8(pool_name)
            << "' does not exist" << dendl;
       return nullptr;
     }
     pools.insert(pool_id);
   }
 
-  dout(10) << __func__ << " osdmap " << self->osdmap << " inc " << incobj->inc
+  dout(10) << __FFL__ << " osdmap " << self->osdmap << " inc " << incobj->inc
 	   << " max_deviation " << max_deviation
 	   << " max_iterations " << max_iterations
 	   << " pools " << pools
@@ -154,7 +154,7 @@ static PyObject *osdmap_calc_pg_upmaps(BasePyOSDMap* self, PyObject *args)
 				 pools,
 				 incobj->inc);
   PyEval_RestoreThread(tstate);
-  dout(10) << __func__ << " r = " << r << dendl;
+  dout(10) << __FFL__ << " r = " << r << dendl;
   return PyLong_FromLong(r);
 }
 
@@ -394,14 +394,14 @@ static int get_int_float_map(PyObject *obj, map<int,double> *out)
   for (int j = 0; j < PyList_Size(ls); ++j) {
     PyObject *pair = PyList_GET_ITEM(ls, j);
     if (!PyTuple_Check(pair)) {
-      derr << __func__ << " item " << j << " not a tuple" << dendl;
+      derr << __FFL__ << " item " << j << " not a tuple" << dendl;
       Py_DECREF(ls);
       return -1;
     }
     int k;
     double v;
     if (!PyArg_ParseTuple(pair, "id:pair", &k, &v)) {
-      derr << __func__ << " item " << j << " not a size 2 tuple" << dendl;
+      derr << __FFL__ << " item " << j << " not a size 2 tuple" << dendl;
       Py_DECREF(ls);
       return -1;
     }

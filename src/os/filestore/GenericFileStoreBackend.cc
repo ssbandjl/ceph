@@ -76,7 +76,7 @@ GenericFileStoreBackend::GenericFileStoreBackend(FileStore *fs):
     }
     BlkDev blkdev(fd);
     m_rotational = blkdev.is_rotational();
-    dout(20) << __func__ << " basedir " << fn
+    dout(20) << __FFL__ << " basedir " << fn
 	     << " rotational " << (int)m_rotational << dendl;
     ::close(fd);
   }
@@ -90,7 +90,7 @@ GenericFileStoreBackend::GenericFileStoreBackend(FileStore *fs):
     }
     BlkDev blkdev(fd);
     m_journal_rotational = blkdev.is_rotational();
-    dout(20) << __func__ << " journal filename " << fn.c_str()
+    dout(20) << __FFL__ << " journal filename " << fn.c_str()
 	     << " journal rotational " << (int)m_journal_rotational << dendl;
     ::close(fd);
   }
@@ -198,7 +198,7 @@ int GenericFileStoreBackend::detect_features()
   //splice detection
 #ifdef CEPH_HAVE_SPLICE
   if (!m_filestore_splice) {
-    dout(0) << __func__ << ": splice() is disabled via 'filestore splice' config option" << dendl;
+    dout(0) << __FFL__ << ": splice() is disabled via 'filestore splice' config option" << dendl;
     use_splice = false;
   } else {
     int pipefd[2];
@@ -390,7 +390,7 @@ int GenericFileStoreBackend::_crc_load_or_init(int fd, SloppyCRCMap *cm)
     r = -EIO;
   }
   if (r < 0)
-    derr << __func__ << " got " << cpp_strerror(r) << dendl;
+    derr << __FFL__ << " got " << cpp_strerror(r) << dendl;
   return r;
 }
 
@@ -400,7 +400,7 @@ int GenericFileStoreBackend::_crc_save(int fd, SloppyCRCMap *cm)
   encode(*cm, bl);
   int r = chain_fsetxattr(fd, SLOPPY_CRC_XATTR, bl.c_str(), bl.length());
   if (r < 0)
-    derr << __func__ << " got " << cpp_strerror(r) << dendl;
+    derr << __FFL__ << " got " << cpp_strerror(r) << dendl;
   return r;
 }
 
@@ -412,7 +412,7 @@ int GenericFileStoreBackend::_crc_update_write(int fd, loff_t off, size_t len, c
     return r;
   ostringstream ss;
   scm.write(off, len, bl, &ss);
-  dout(30) << __func__ << "\n" << ss.str() << dendl;
+  dout(30) << __FFL__ << "\n" << ss.str() << dendl;
   r = _crc_save(fd, &scm);
   return r;
 }
@@ -452,7 +452,7 @@ int GenericFileStoreBackend::_crc_update_clone_range(int srcfd, int destfd,
     return r;
   ostringstream ss;
   scm_dst.clone_range(srcoff, len, dstoff, scm_src, &ss);
-  dout(30) << __func__ << "\n" << ss.str() << dendl;
+  dout(30) << __FFL__ << "\n" << ss.str() << dendl;
   r = _crc_save(destfd, &scm_dst);
   return r;
 }

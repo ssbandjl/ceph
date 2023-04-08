@@ -135,14 +135,14 @@ std::ostream &operator<<(std::ostream &os,
 /* Called when the write log operation is appending and its log position is guaranteed */
 void GenericWriteLogOperation::appending() {
   Context *on_append = nullptr;
-  ldout(m_cct, 20) << __func__ << " " << this << dendl;
+  ldout(m_cct, 20) << __FFL__ << " " << this << dendl;
   {
     std::lock_guard locker(m_lock);
     on_append = on_write_append;
     on_write_append = nullptr;
   }
   if (on_append) {
-    ldout(m_cct, 20) << __func__ << " " << this << " on_append=" << on_append << dendl;
+    ldout(m_cct, 20) << __FFL__ << " " << this << " on_append=" << on_append << dendl;
     on_append->complete(0);
   }
 }
@@ -151,14 +151,14 @@ void GenericWriteLogOperation::appending() {
 void GenericWriteLogOperation::complete(int result) {
   appending();
   Context *on_persist = nullptr;
-  ldout(m_cct, 20) << __func__ << " " << this << dendl;
+  ldout(m_cct, 20) << __FFL__ << " " << this << dendl;
   {
     std::lock_guard locker(m_lock);
     on_persist = on_write_persist;
     on_write_persist = nullptr;
   }
   if (on_persist) {
-    ldout(m_cct, 20) << __func__ << " " << this << " on_persist=" << on_persist << dendl;
+    ldout(m_cct, 20) << __FFL__ << " " << this << " on_persist=" << on_persist << dendl;
     on_persist->complete(result);
   }
 }
@@ -240,7 +240,7 @@ WriteLogOperationSet::WriteLogOperationSet(utime_t dispatched, PerfCounters *per
   extent_ops_persist =
     new C_Gather(m_cct,
                  new LambdaContext( [this](int r) {
-                     ldout(this->m_cct,20) << __func__ << " " << this << " m_extent_ops_persist completed" << dendl;
+                     ldout(this->m_cct,20) << __FFL__ << " " << this << " m_extent_ops_persist completed" << dendl;
                      if (on_ops_persist) {
                        on_ops_persist->complete(r);
                      }
@@ -250,7 +250,7 @@ WriteLogOperationSet::WriteLogOperationSet(utime_t dispatched, PerfCounters *per
   extent_ops_appending =
     new C_Gather(m_cct,
                  new LambdaContext( [this, appending_persist_sub](int r) {
-                     ldout(this->m_cct, 20) << __func__ << " " << this << " m_extent_ops_appending completed" << dendl;
+                     ldout(this->m_cct, 20) << __FFL__ << " " << this << " m_extent_ops_appending completed" << dendl;
                      on_ops_appending->complete(r);
                      appending_persist_sub->complete(r);
                    }));

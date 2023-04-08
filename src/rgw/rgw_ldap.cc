@@ -21,7 +21,7 @@ std::string parse_rgw_ldap_bindpw(CephContext* ctx)
 
   if (ldap_secret.empty()) {
     ldout(ctx, 10)
-      << __func__ << " LDAP auth no rgw_ldap_secret file found in conf"
+      << __FFL__ << " LDAP auth no rgw_ldap_secret file found in conf"
       << dendl;
     } else {
       // FIPS zeroization audit 20191116: this memset is not intended to
@@ -79,7 +79,7 @@ namespace rgw {
       }
     }
     ldout(g_ceph_context, 12)
-      << __func__ << " search filter: " << filter
+      << __FFL__ << " search filter: " << filter
       << dendl;
     char *attrs[] = { const_cast<char*>(dnattr.c_str()), nullptr };
     LDAPMessage *answer = nullptr, *entry = nullptr;
@@ -97,21 +97,21 @@ namespace rgw {
 	ret = simple_bind(dn, pwd);
 	if (ret != LDAP_SUCCESS) {
 	  ldout(g_ceph_context, 10)
-	    << __func__ << " simple_bind failed uid=" << uid
+	    << __FFL__ << " simple_bind failed uid=" << uid
 	    << "ldap err=" << ret
 	    << dendl;
 	}
 	ldap_memfree(dn);
       } else {
 	ldout(g_ceph_context, 12)
-	  << __func__ << " ldap_search_s no user matching uid=" << uid
+	  << __FFL__ << " ldap_search_s no user matching uid=" << uid
 	  << dendl;
 	ret = LDAP_NO_SUCH_ATTRIBUTE; // fixup result
       }
       ldap_msgfree(answer);
     } else {
       ldout(g_ceph_context, 5)
-	<< __func__ << " ldap_search_s error uid=" << uid
+	<< __FFL__ << " ldap_search_s error uid=" << uid
 	<< " ldap err=" << ret
 	<< dendl;
       /* search should never fail--try to rebind */

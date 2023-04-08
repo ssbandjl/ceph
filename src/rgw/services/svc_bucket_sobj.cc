@@ -505,7 +505,7 @@ int RGWSI_Bucket_SObj::store_bucket_instance_info(RGWSI_Bucket_BI_Ctx& ctx,
                                        nullptr, boost::none);
     if (r < 0) {
       if (r != -ENOENT) {
-        ldout(cct, 0) << "ERROR: " << __func__ << "(): read_bucket_instance_info() of key=" << key << " returned r=" << r << dendl;
+        ldout(cct, 0) << "ERROR: " << __FFL__ << "(): read_bucket_instance_info() of key=" << key << " returned r=" << r << dendl;
         return r;
       }
     } else {
@@ -516,7 +516,7 @@ int RGWSI_Bucket_SObj::store_bucket_instance_info(RGWSI_Bucket_BI_Ctx& ctx,
   if (orig_info && *orig_info && !exclusive) {
     int r = svc.bi->handle_overwrite(info, *(orig_info.value()));
     if (r < 0) {
-      ldout(cct, 0) << "ERROR: " << __func__ << "(): svc.bi->handle_overwrite() of key=" << key << " returned r=" << r << dendl;
+      ldout(cct, 0) << "ERROR: " << __FFL__ << "(): svc.bi->handle_overwrite() of key=" << key << " returned r=" << r << dendl;
       return r;
     }
   }
@@ -588,7 +588,7 @@ int RGWSI_Bucket_SObj::read_bucket_stats(const RGWBucketInfo& bucket_info,
 
   int r = svc.bi->read_stats(bucket_info, ent, y);
   if (r < 0) {
-    ldout(cct, 0) << "ERROR: " << __func__ << "(): read_stats returned r=" << r << dendl;
+    ldout(cct, 0) << "ERROR: " << __FFL__ << "(): read_stats returned r=" << r << dendl;
     return r;
   }
 
@@ -618,7 +618,7 @@ int RGWSI_Bucket_SObj::read_buckets_stats(RGWSI_Bucket_X_Ctx& ctx,
     RGWBucketEnt& ent = iter->second;
     int r = read_bucket_stats(ctx, ent.bucket, &ent, y);
     if (r < 0) {
-      ldout(cct, 0) << "ERROR: " << __func__ << "(): read_bucket_stats returned r=" << r << dendl;
+      ldout(cct, 0) << "ERROR: " << __FFL__ << "(): read_bucket_stats returned r=" << r << dendl;
       return r;
     }
   }

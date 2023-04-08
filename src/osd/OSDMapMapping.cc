@@ -147,7 +147,7 @@ void ParallelPGMapper::Job::finish_one()
 
 void ParallelPGMapper::WQ::_process(Item *i, ThreadPool::TPHandle &h)
 {
-  ldout(m->cct, 20) << __func__ << " " << i->job << " pool " << i->pool
+  ldout(m->cct, 20) << __FFL__ << " " << i->job << " pool " << i->pool
                     << " [" << i->begin << "," << i->end << ")"
                     << " pgs " << i->pgs
                     << dendl;
@@ -196,7 +196,7 @@ void ParallelPGMapper::queue(
       unsigned ps_end = std::min(ps + pgs_per_item, p.second.get_pg_num());
       job->start_one();
       wq.queue(new Item(job, p.first, ps, ps_end));
-      ldout(cct, 20) << __func__ << " " << job << " " << p.first << " [" << ps
+      ldout(cct, 20) << __FFL__ << " " << job << " " << p.first << " [" << ps
 		     << "," << ps_end << ")" << dendl;
       any = true;
     }

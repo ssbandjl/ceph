@@ -242,7 +242,7 @@ int PosixWorker::listen(entity_addr_t &sa,
   r = ::bind(listen_sd, sa.get_sockaddr(), sa.get_sockaddr_len());
   if (r < 0) {
     r = -errno;
-    ldout(cct, 10) << __func__ << " unable to bind to " << sa.get_sockaddr()
+    ldout(cct, 10) << __FFL__ << " unable to bind to " << sa.get_sockaddr()
                    << ": " << cpp_strerror(r) << dendl;
     ::close(listen_sd);
     return r;
@@ -251,7 +251,7 @@ int PosixWorker::listen(entity_addr_t &sa,
   r = ::listen(listen_sd, cct->_conf->ms_tcp_listen_backlog);
   if (r < 0) {
     r = -errno;
-    lderr(cct) << __func__ << " unable to listen on " << sa << ": " << cpp_strerror(r) << dendl;
+    lderr(cct) << __FFL__ << " unable to listen on " << sa << ": " << cpp_strerror(r) << dendl;
     ::close(listen_sd);
     return r;
   }

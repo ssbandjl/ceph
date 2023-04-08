@@ -25,7 +25,7 @@
 #define dout_context g_ceph_context
 #define dout_subsys ceph_subsys_mds
 #undef dout_prefix
-#define dout_prefix *_dout << __func__ << ": "
+#define dout_prefix *_dout << __FFL__ << ": "
 
 void TableTool::usage()
 {
@@ -300,7 +300,7 @@ int TableTool::main(std::vector<const char*> &argv)
 {
   int r;
 
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
 
   // RADOS init
   // ==========

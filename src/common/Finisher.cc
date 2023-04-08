@@ -9,13 +9,13 @@
 
 void Finisher::start()
 {
-  ldout(cct, 10) << __func__ << dendl;
+  ldout(cct, 10) << __FFL__ << dendl;
   finisher_thread.create(thread_name.c_str());
 }
 
 void Finisher::stop()
 {
-  ldout(cct, 10) << __func__ << dendl;
+  ldout(cct, 10) << __FFL__ << dendl;
   finisher_lock.lock();
   finisher_stop = true;
   // we don't have any new work to do, but we want the worker to wake up anyway
@@ -23,7 +23,7 @@ void Finisher::stop()
   finisher_cond.notify_all();
   finisher_lock.unlock();
   finisher_thread.join(); // wait until the worker exits completely
-  ldout(cct, 10) << __func__ << " finish" << dendl;
+  ldout(cct, 10) << __FFL__ << " finish" << dendl;
 }
 
 void Finisher::wait_for_empty()

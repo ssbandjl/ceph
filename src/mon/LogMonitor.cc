@@ -38,7 +38,7 @@ using namespace TOPNSPC::common;
 
 string LogMonitor::log_channel_info::get_log_file(const string &channel)
 {
-  dout(25) << __func__ << " for channel '"
+  dout(25) << __FFL__ << " for channel '"
 	   << channel << "'" << dendl;
 
   if (expanded_log_file.count(channel) == 0) {
@@ -47,7 +47,7 @@ string LogMonitor::log_channel_info::get_log_file(const string &channel)
       channel);
     expanded_log_file[channel] = fname;
 
-    dout(20) << __func__ << " for channel '"
+    dout(20) << __FFL__ << " for channel '"
 	     << channel << "' expanded to '"
 	     << fname << "'" << dendl;
   }
@@ -57,11 +57,11 @@ string LogMonitor::log_channel_info::get_log_file(const string &channel)
 
 void LogMonitor::log_channel_info::expand_channel_meta(map<string,string> &m)
 {
-  dout(20) << __func__ << " expand map: " << m << dendl;
+  dout(20) << __FFL__ << " expand map: " << m << dendl;
   for (map<string,string>::iterator p = m.begin(); p != m.end(); ++p) {
     m[p->first] = expand_channel_meta(p->second, p->first);
   }
-  dout(20) << __func__ << " expanded map: " << m << dendl;
+  dout(20) << __FFL__ << " expanded map: " << m << dendl;
 }
 
 string LogMonitor::log_channel_info::expand_channel_meta(
@@ -76,7 +76,7 @@ string LogMonitor::log_channel_info::expand_channel_meta(
       tmp += s.substr(pos+LOG_META_CHANNEL.length());
     s = tmp;
   }
-  dout(20) << __func__ << " from '" << input
+  dout(20) << __FFL__ << " from '" << input
 	   << "' to '" << s << "'" << dendl;
 
   return s;
@@ -112,7 +112,7 @@ bool LogMonitor::log_channel_info::do_log_to_syslog(const string &channel) {
 ceph::logging::Graylog::Ref LogMonitor::log_channel_info::get_graylog(
     const string &channel)
 {
-  dout(25) << __func__ << " for channel '"
+  dout(25) << __FFL__ << " for channel '"
 	   << channel << "'" << dendl;
 
   if (graylogs.count(channel) == 0) {
@@ -126,7 +126,7 @@ ceph::logging::Graylog::Ref LogMonitor::log_channel_info::get_graylog(
 						  &CLOG_CONFIG_DEFAULT_KEY).c_str()));
 
     graylogs[channel] = graylog;
-    dout(20) << __func__ << " for channel '"
+    dout(20) << __FFL__ << " for channel '"
 	     << channel << "' to graylog host '"
 	     << log_to_graylog_host[channel] << ":"
 	     << log_to_graylog_port[channel]
@@ -179,9 +179,9 @@ void LogMonitor::create_initial()
 
 void LogMonitor::update_from_paxos(bool *need_bootstrap)
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   version_t version = get_last_committed();
-  dout(10) << __func__ << " version " << version
+  dout(10) << __FFL__ << " version " << version
            << " summary v " << summary.version << dendl;
   if (version == summary.version)
     return;
@@ -190,15 +190,15 @@ void LogMonitor::update_from_paxos(bool *need_bootstrap)
   map<string,bufferlist> channel_blog;
 
   version_t latest_full = get_version_latest_full();
-  dout(10) << __func__ << " latest full " << latest_full << dendl;
+  dout(10) << __FFL__ << " latest full " << latest_full << dendl;
   if ((latest_full > 0) && (latest_full > summary.version)) {
     bufferlist latest_bl;
     get_version_full(latest_full, latest_bl);
     ceph_assert(latest_bl.length() != 0);
-    dout(7) << __func__ << " loading summary e" << latest_full << dendl;
+    dout(7) << __FFL__ << " loading summary e" << latest_full << dendl;
     auto p = latest_bl.cbegin();
     decode(summary, p);
-    dout(7) << __func__ << " loaded summary e" << summary.version << dendl;
+    dout(7) << __FFL__ << " loaded summary e" << summary.version << dendl;
   }
 
   // walk through incrementals
@@ -228,7 +228,7 @@ void LogMonitor::update_from_paxos(bool *need_bootstrap)
         string level = channels.get_level(channel);
         string facility = channels.get_facility(channel);
         if (level.empty() || facility.empty()) {
-          derr << __func__ << " unable to log to syslog -- level or facility"
+          derr << __FFL__ << " unable to log to syslog -- level or facility"
                << " not defined (level: " << level << ", facility: "
                << facility << ")" << dendl;
           continue;
@@ -248,13 +248,13 @@ void LogMonitor::update_from_paxos(bool *need_bootstrap)
 
       if (g_conf()->mon_cluster_log_to_file) {
 	string log_file = channels.get_log_file(channel);
-	dout(20) << __func__ << " logging for channel '" << channel
+	dout(20) << __FFL__ << " logging for channel '" << channel
 		 << "' to file '" << log_file << "'" << dendl;
 
 	if (!log_file.empty()) {
 	  string log_file_level = channels.get_log_file_level(channel);
 	  if (log_file_level.empty()) {
-	    dout(1) << __func__ << " warning: log file level not defined for"
+	    dout(1) << __FFL__ << " warning: log file level not defined for"
 		    << " channel '" << channel << "' yet a log file is --"
 		    << " will assume lowest level possible" << dendl;
 	  }
@@ -278,17 +278,17 @@ void LogMonitor::update_from_paxos(bool *need_bootstrap)
     summary.prune(g_conf()->mon_log_max_summary);
   }
 
-  dout(15) << __func__ << " logging for "
+  dout(15) << __FFL__ << " logging for "
            << channel_blog.size() << " channels" << dendl;
   for(map<string,bufferlist>::iterator p = channel_blog.begin();
       p != channel_blog.end(); ++p) {
     if (!p->second.length()) {
-      dout(15) << __func__ << " channel '" << p->first
+      dout(15) << __FFL__ << " channel '" << p->first
                << "': nothing to log" << dendl;
       continue;
     }
 
-    dout(15) << __func__ << " channel '" << p->first
+    dout(15) << __FFL__ << " channel '" << p->first
              << "' logging " << p->second.length() << " bytes" << dendl;
     string log_file = channels.get_log_file(p->first);
 
@@ -321,7 +321,7 @@ void LogMonitor::encode_pending(MonitorDBStore::TransactionRef t)
 {
   version_t version = get_last_committed() + 1;
   bufferlist bl;
-  dout(10) << __func__ << " v" << version << dendl;
+  dout(10) << __FFL__ << " v" << version << dendl;
   __u8 v = 1;
   encode(v, bl);
   multimap<utime_t,LogEntry>::iterator p;
@@ -334,7 +334,7 @@ void LogMonitor::encode_pending(MonitorDBStore::TransactionRef t)
 
 void LogMonitor::encode_full(MonitorDBStore::TransactionRef t)
 {
-  dout(10) << __func__ << " log v " << summary.version << dendl;
+  dout(10) << __FFL__ << " log v " << summary.version << dendl;
   ceph_assert(get_last_committed() == summary.version);
 
   bufferlist summary_bl;
@@ -710,7 +710,7 @@ int LogMonitor::sub_name_to_id(const string& n)
 
 void LogMonitor::check_subs()
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   for (map<string, xlist<Subscription*>*>::iterator i = mon->session_map.subs.begin();
        i != mon->session_map.subs.end();
        ++i) {
@@ -723,14 +723,14 @@ void LogMonitor::check_subs()
 
 void LogMonitor::check_sub(Subscription *s)
 {
-  dout(10) << __func__ << " client wants " << s->type << " ver " << s->next << dendl;
+  dout(10) << __FFL__ << " client wants " << s->type << " ver " << s->next << dendl;
 
   int sub_level = sub_name_to_id(s->type);
   ceph_assert(sub_level >= 0);
 
   version_t summary_version = summary.version;
   if (s->next > summary_version) {
-    dout(10) << __func__ << " client " << s->session->name
+    dout(10) << __FFL__ << " client " << s->session->name
 	    << " requested version (" << s->next << ") is greater than ours (" 
 	    << summary_version << "), which means we already sent him" 
 	    << " everything we have." << dendl;
@@ -747,7 +747,7 @@ void LogMonitor::check_sub(Subscription *s)
     _create_sub_incremental(mlog, sub_level, s->next);
   }
 
-  dout(10) << __func__ << " sending message to " << s->session->name
+  dout(10) << __FFL__ << " sending message to " << s->session->name
 	  << " with " << mlog->entries.size() << " entries"
 	  << " (version " << mlog->version << ")" << dendl;
   
@@ -772,11 +772,11 @@ void LogMonitor::check_sub(Subscription *s)
  */
 void LogMonitor::_create_sub_incremental(MLog *mlog, int level, version_t sv)
 {
-  dout(10) << __func__ << " level " << level << " ver " << sv 
+  dout(10) << __FFL__ << " level " << level << " ver " << sv 
 	  << " cur summary ver " << summary.version << dendl; 
 
   if (sv < get_first_committed()) {
-    dout(10) << __func__ << " skipped from " << sv
+    dout(10) << __FFL__ << " skipped from " << sv
 	     << " to first_committed " << get_first_committed() << dendl;
     LogEntry le;
     le.stamp = ceph_clock_now();
@@ -802,7 +802,7 @@ void LogMonitor::_create_sub_incremental(MLog *mlog, int level, version_t sv)
       le.decode(p);
 
       if (le.prio < level) {
-	dout(20) << __func__ << " requested " << level 
+	dout(20) << __FFL__ << " requested " << level 
 		 << " entry " << le.prio << dendl;
 	continue;
       }
@@ -812,7 +812,7 @@ void LogMonitor::_create_sub_incremental(MLog *mlog, int level, version_t sv)
     mlog->version = sv++;
   }
 
-  dout(10) << __func__ << " incremental message ready (" 
+  dout(10) << __FFL__ << " incremental message ready (" 
 	   << mlog->entries.size() << " entries)" << dendl;
 }
 
@@ -827,7 +827,7 @@ void LogMonitor::update_log_channels()
     oss, &channels.log_to_syslog,
     CLOG_CONFIG_DEFAULT_KEY);
   if (r < 0) {
-    derr << __func__ << " error parsing 'mon_cluster_log_to_syslog'" << dendl;
+    derr << __FFL__ << " error parsing 'mon_cluster_log_to_syslog'" << dendl;
     return;
   }
 
@@ -836,7 +836,7 @@ void LogMonitor::update_log_channels()
     oss, &channels.syslog_level,
     CLOG_CONFIG_DEFAULT_KEY);
   if (r < 0) {
-    derr << __func__ << " error parsing 'mon_cluster_log_to_syslog_level'"
+    derr << __FFL__ << " error parsing 'mon_cluster_log_to_syslog_level'"
          << dendl;
     return;
   }
@@ -846,7 +846,7 @@ void LogMonitor::update_log_channels()
     oss, &channels.syslog_facility,
     CLOG_CONFIG_DEFAULT_KEY);
   if (r < 0) {
-    derr << __func__ << " error parsing 'mon_cluster_log_to_syslog_facility'"
+    derr << __FFL__ << " error parsing 'mon_cluster_log_to_syslog_facility'"
          << dendl;
     return;
   }
@@ -856,7 +856,7 @@ void LogMonitor::update_log_channels()
     &channels.log_file,
     CLOG_CONFIG_DEFAULT_KEY);
   if (r < 0) {
-    derr << __func__ << " error parsing 'mon_cluster_log_file'" << dendl;
+    derr << __FFL__ << " error parsing 'mon_cluster_log_file'" << dendl;
     return;
   }
 
@@ -865,7 +865,7 @@ void LogMonitor::update_log_channels()
     &channels.log_file_level,
     CLOG_CONFIG_DEFAULT_KEY);
   if (r < 0) {
-    derr << __func__ << " error parsing 'mon_cluster_log_file_level'"
+    derr << __FFL__ << " error parsing 'mon_cluster_log_file_level'"
          << dendl;
     return;
   }
@@ -875,7 +875,7 @@ void LogMonitor::update_log_channels()
     &channels.log_to_graylog,
     CLOG_CONFIG_DEFAULT_KEY);
   if (r < 0) {
-    derr << __func__ << " error parsing 'mon_cluster_log_to_graylog'"
+    derr << __FFL__ << " error parsing 'mon_cluster_log_to_graylog'"
          << dendl;
     return;
   }
@@ -885,7 +885,7 @@ void LogMonitor::update_log_channels()
     &channels.log_to_graylog_host,
     CLOG_CONFIG_DEFAULT_KEY);
   if (r < 0) {
-    derr << __func__ << " error parsing 'mon_cluster_log_to_graylog_host'"
+    derr << __FFL__ << " error parsing 'mon_cluster_log_to_graylog_host'"
          << dendl;
     return;
   }
@@ -895,7 +895,7 @@ void LogMonitor::update_log_channels()
     &channels.log_to_graylog_port,
     CLOG_CONFIG_DEFAULT_KEY);
   if (r < 0) {
-    derr << __func__ << " error parsing 'mon_cluster_log_to_graylog_port'"
+    derr << __FFL__ << " error parsing 'mon_cluster_log_to_graylog_port'"
          << dendl;
     return;
   }

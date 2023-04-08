@@ -21,7 +21,7 @@
 #define dout_subsys ceph_subsys_rbd
 #undef dout_prefix
 #define dout_prefix *_dout << "librbd::exclusive_lock::PostAcquireRequest: " \
-                           << this << " " << __func__ << ": "
+                           << this << " " << __FFL__ << ": "
 
 namespace librbd {
 namespace exclusive_lock {

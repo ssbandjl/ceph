@@ -309,7 +309,7 @@ int RocksDBStore::create_db_dir()
     if (r < 0)
       r = -errno;
     if (r < 0 && r != -EEXIST) {
-      derr << __func__ << " failed to create " << path << ": " << cpp_strerror(r)
+      derr << __FFL__ << " failed to create " << path << ": " << cpp_strerror(r)
 	   << dendl;
       return r;
     }
@@ -374,7 +374,7 @@ int RocksDBStore::load_rocksdb_options(bool create_if_missing, rocksdb::Options&
       for (auto& p : paths) {
 	size_t pos = p.find(',');
 	if (pos == std::string::npos) {
-	  derr << __func__ << " invalid db path item " << p << " in "
+	  derr << __FFL__ << " invalid db path item " << p << " in "
 	       << kv_options["db_paths"] << dendl;
 	  return -EINVAL;
 	}
@@ -382,12 +382,12 @@ int RocksDBStore::load_rocksdb_options(bool create_if_missing, rocksdb::Options&
 	string size_str = p.substr(pos + 1);
 	uint64_t size = atoll(size_str.c_str());
 	if (!size) {
-	  derr << __func__ << " invalid db path item " << p << " in "
+	  derr << __FFL__ << " invalid db path item " << p << " in "
 	       << kv_options["db_paths"] << dendl;
 	  return -EINVAL;
 	}
 	opt.db_paths.push_back(rocksdb::DbPath(path, size));
-	dout(10) << __func__ << " db_path " << path << " size " << size << dendl;
+	dout(10) << __FFL__ << " db_path " << path << " size " << size << dendl;
       }
     }
   } catch (const std::system_error& e) {
@@ -399,7 +399,7 @@ int RocksDBStore::load_rocksdb_options(bool create_if_missing, rocksdb::Options&
   }
 
   if (priv) {
-    dout(10) << __func__ << " using custom Env " << priv << dendl;
+    dout(10) << __FFL__ << " using custom Env " << priv << dendl;
     opt.env = static_cast<rocksdb::Env*>(priv);
   }
 
@@ -443,7 +443,7 @@ int RocksDBStore::load_rocksdb_options(bool create_if_missing, rocksdb::Options&
 				     g_conf()->rocksdb_cache_shard_bits);
   uint64_t bloom_bits = g_conf().get_val<uint64_t>("rocksdb_bloom_bits_per_key");
   if (bloom_bits > 0) {
-    dout(10) << __func__ << " set bloom filter bits per key to "
+    dout(10) << __FFL__ << " set bloom filter bits per key to "
 	     << bloom_bits << dendl;
     bbt_opts.filter_policy.reset(rocksdb::NewBloomFilterPolicy(bloom_bits));
   }
@@ -473,7 +473,7 @@ int RocksDBStore::load_rocksdb_options(bool create_if_missing, rocksdb::Options&
     bbt_opts.metadata_block_size = g_conf().get_val<Option::size_t>("rocksdb_metadata_block_size");
 
   opt.table_factory.reset(rocksdb::NewBlockBasedTableFactory(bbt_opts));
-  dout(10) << __func__ << " block size " << g_conf()->rocksdb_block_size
+  dout(10) << __FFL__ << " block size " << g_conf()->rocksdb_block_size
            << ", block_cache size " << byte_u_t(block_cache_size)
 	   << ", row_cache size " << byte_u_t(row_cache_size)
 	   << "; shards "
@@ -495,7 +495,7 @@ int RocksDBStore::do_open(ostream &out,
   rocksdb::Options opt;
   int r = load_rocksdb_options(create_if_missing, opt);
   if (r) {
-    dout(1) << __func__ << " load rocksdb options failed" << dendl;
+    dout(1) << __FFL__ << " load rocksdb options failed" << dendl;
     return r;
   }
   rocksdb::Status status;
@@ -515,7 +515,7 @@ int RocksDBStore::do_open(ostream &out,
 	status = rocksdb::GetColumnFamilyOptionsFromString(
 	  cf_opt, p.option, &cf_opt);
 	if (!status.ok()) {
-	  derr << __func__ << " invalid db column family option string for CF: "
+	  derr << __FFL__ << " invalid db column family option string for CF: "
 	       << p.name << dendl;
 	  return -EINVAL;
 	}
@@ -523,7 +523,7 @@ int RocksDBStore::do_open(ostream &out,
 	rocksdb::ColumnFamilyHandle *cf;
 	status = db->CreateColumnFamily(cf_opt, p.name, &cf);
 	if (!status.ok()) {
-	  derr << __func__ << " Failed to create rocksdb column family: "
+	  derr << __FFL__ << " Failed to create rocksdb column family: "
 	       << p.name << dendl;
 	  return -EINVAL;
 	}
@@ -538,7 +538,7 @@ int RocksDBStore::do_open(ostream &out,
       rocksdb::DBOptions(opt),
       path,
       &existing_cfs);
-    dout(1) << __func__ << " column families: " << existing_cfs << dendl;
+    dout(1) << __FFL__ << " column families: " << existing_cfs << dendl;
     if (existing_cfs.empty()) {
       // no column families
       if (open_readonly) {
@@ -567,7 +567,7 @@ int RocksDBStore::do_open(ostream &out,
 	      status = rocksdb::GetColumnFamilyOptionsFromString(
 		cf_opt, i.option, &cf_opt);
 	      if (!status.ok()) {
-		derr << __func__ << " invalid db column family options for CF '"
+		derr << __FFL__ << " invalid db column family options for CF '"
 		     << i.name << "': " << i.option << dendl;
 		return -EINVAL;
 	      }
@@ -579,7 +579,7 @@ int RocksDBStore::do_open(ostream &out,
 	}
 	column_families.push_back(rocksdb::ColumnFamilyDescriptor(n, cf_opt));
 	if (!found && n != rocksdb::kDefaultColumnFamilyName) {
-	  dout(1) << __func__ << " column family '" << n
+	  dout(1) << __FFL__ << " column family '" << n
 		  << "' exists but not expected" << dendl;
 	}
       }
@@ -675,12 +675,12 @@ void RocksDBStore::close()
   // stop compaction thread
   compact_queue_lock.lock();
   if (compact_thread.is_started()) {
-    dout(1) << __func__ << " waiting for compaction thread to stop" << dendl;
+    dout(1) << __FFL__ << " waiting for compaction thread to stop" << dendl;
     compact_queue_stop = true;
     compact_queue_cond.notify_all();
     compact_queue_lock.unlock();
     compact_thread.join();
-    dout(1) << __func__ << " compaction thread to stopped" << dendl;    
+    dout(1) << __FFL__ << " compaction thread to stopped" << dendl;    
   } else {
     compact_queue_lock.unlock();
   }
@@ -694,7 +694,7 @@ int RocksDBStore::repair(std::ostream &out)
   rocksdb::Options opt;
   int r = load_rocksdb_options(false, opt);
   if (r) {
-    dout(1) << __func__ << " load rocksdb options failed" << dendl;
+    dout(1) << __FFL__ << " load rocksdb options failed" << dendl;
     out << "load rocksdb options failed" << std::endl;
     return r;
   }
@@ -748,7 +748,7 @@ int64_t RocksDBStore::estimate_prefix_size(const string& prefix,
 void RocksDBStore::get_statistics(Formatter *f)
 {
   if (!g_conf()->rocksdb_perf)  {
-    dout(20) << __func__ << " RocksDB perf is disabled, can't probe for stats"
+    dout(20) << __FFL__ << " RocksDB perf is disabled, can't probe for stats"
 	     << dendl;
     return;
   }
@@ -824,7 +824,7 @@ int RocksDBStore::submit_common(rocksdb::WriteOptions& woptions, KeyValueDB::Tra
   if (!s.ok()) {
     RocksWBHandler rocks_txc;
     _t->bat.Iterate(&rocks_txc);
-    derr << __func__ << " error: " << s.ToString() << " code = " << s.code()
+    derr << __FFL__ << " error: " << s.ToString() << " code = " << s.code()
          << " Rocksdb transaction: " << rocks_txc.seen << dendl;
   }
 
@@ -1232,7 +1232,7 @@ void RocksDBStore::compact()
 void RocksDBStore::compact_thread_entry()
 {
   std::unique_lock l{compact_queue_lock};
-  dout(10) << __func__ << " enter" << dendl;
+  dout(10) << __FFL__ << " enter" << dendl;
   while (!compact_queue_stop) {
     if (!compact_queue.empty()) {
       pair<string,string> range = compact_queue.front();
@@ -1248,10 +1248,10 @@ void RocksDBStore::compact_thread_entry()
       l.lock();
       continue;
     }
-    dout(10) << __func__ << " waiting" << dendl;
+    dout(10) << __FFL__ << " waiting" << dendl;
     compact_queue_cond.wait(l);
   }
-  dout(10) << __func__ << " exit" << dendl;
+  dout(10) << __FFL__ << " exit" << dendl;
 }
 
 void RocksDBStore::compact_range_async(const string& start, const string& end)

@@ -32,7 +32,7 @@ template <typename I>
 void LockRequest<I>::send_lock() {
   CephContext *cct = m_image_ctx.cct;
   std::string oid(ObjectMap<>::object_map_name(m_image_ctx.id, CEPH_NOSNAP));
-  ldout(cct, 10) << this << " " << __func__ << ": oid=" << oid << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": oid=" << oid << dendl;
 
   librados::ObjectWriteOperation op;
   rados::cls::lock::lock(&op, RBD_LOCK_NAME, LOCK_EXCLUSIVE, "", "", "",
@@ -49,7 +49,7 @@ void LockRequest<I>::send_lock() {
 template <typename I>
 Context *LockRequest<I>::handle_lock(int *ret_val) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *ret_val << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *ret_val << dendl;
 
   if (*ret_val == 0) {
     return m_on_finish;
@@ -72,7 +72,7 @@ template <typename I>
 void LockRequest<I>::send_get_lock_info() {
   CephContext *cct = m_image_ctx.cct;
   std::string oid(ObjectMap<>::object_map_name(m_image_ctx.id, CEPH_NOSNAP));
-  ldout(cct, 10) << this << " " << __func__ << ": oid=" << oid << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": oid=" << oid << dendl;
 
   librados::ObjectReadOperation op;
   rados::cls::lock::get_lock_info_start(&op, RBD_LOCK_NAME);
@@ -88,7 +88,7 @@ void LockRequest<I>::send_get_lock_info() {
 template <typename I>
 Context *LockRequest<I>::handle_get_lock_info(int *ret_val) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *ret_val << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *ret_val << dendl;
 
   if (*ret_val == -ENOENT) {
     send_lock();
@@ -117,7 +117,7 @@ template <typename I>
 void LockRequest<I>::send_break_locks() {
   CephContext *cct = m_image_ctx.cct;
   std::string oid(ObjectMap<>::object_map_name(m_image_ctx.id, CEPH_NOSNAP));
-  ldout(cct, 10) << this << " " << __func__ << ": oid=" << oid << ", "
+  ldout(cct, 10) << this << " " << __FFL__ << ": oid=" << oid << ", "
                  << "num_lockers=" << m_lockers.size() << dendl;
 
   librados::ObjectWriteOperation op;
@@ -137,7 +137,7 @@ void LockRequest<I>::send_break_locks() {
 template <typename I>
 Context *LockRequest<I>::handle_break_locks(int *ret_val) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *ret_val << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *ret_val << dendl;
 
   m_broke_lock = true;
   if (*ret_val == 0 || *ret_val == -ENOENT) {

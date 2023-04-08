@@ -43,7 +43,7 @@ void DisableFeaturesRequest<I>::send_op() {
   CephContext *cct = image_ctx.cct;
   ceph_assert(ceph_mutex_is_locked(image_ctx.owner_lock));
 
-  ldout(cct, 20) << this << " " << __func__ << ": features=" << m_features
+  ldout(cct, 20) << this << " " << __FFL__ << ": features=" << m_features
 		 << dendl;
 
   send_prepare_lock();
@@ -53,7 +53,7 @@ template <typename I>
 bool DisableFeaturesRequest<I>::should_complete(int r) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << " r=" << r << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << " r=" << r << dendl;
 
   if (r < 0) {
     lderr(cct) << "encountered error: " << cpp_strerror(r) << dendl;
@@ -65,7 +65,7 @@ template <typename I>
 void DisableFeaturesRequest<I>::send_prepare_lock() {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << dendl;
 
   image_ctx.state->prepare_lock(create_async_context_callback(
     image_ctx, create_context_callback<
@@ -77,7 +77,7 @@ template <typename I>
 Context *DisableFeaturesRequest<I>::handle_prepare_lock(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to lock image: " << cpp_strerror(*result) << dendl;
@@ -92,7 +92,7 @@ template <typename I>
 void DisableFeaturesRequest<I>::send_block_writes() {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << dendl;
 
   std::unique_lock locker{image_ctx.owner_lock};
   image_ctx.io_work_queue->block_writes(create_context_callback<
@@ -104,7 +104,7 @@ template <typename I>
 Context *DisableFeaturesRequest<I>::handle_block_writes(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to block writes: " << cpp_strerror(*result) << dendl;
@@ -131,7 +131,7 @@ template <typename I>
 Context *DisableFeaturesRequest<I>::send_acquire_exclusive_lock(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << dendl;
 
   {
     std::unique_lock locker{image_ctx.owner_lock};
@@ -157,7 +157,7 @@ template <typename I>
 Context *DisableFeaturesRequest<I>::handle_acquire_exclusive_lock(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   image_ctx.owner_lock.lock_shared();
   if (*result < 0) {
@@ -224,7 +224,7 @@ void DisableFeaturesRequest<I>::send_get_mirror_mode() {
     return;
   }
 
-  ldout(cct, 20) << this << " " << __func__ << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << dendl;
 
   librados::ObjectReadOperation op;
   cls_client::mirror_mode_get_start(&op);
@@ -242,7 +242,7 @@ template <typename I>
 Context *DisableFeaturesRequest<I>::handle_get_mirror_mode(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result == 0) {
     auto it = m_out_bl.cbegin();
@@ -255,7 +255,7 @@ Context *DisableFeaturesRequest<I>::handle_get_mirror_mode(int *result) {
     return handle_finish(*result);
   }
 
-  ldout(cct, 20) << this << " " << __func__ << ": m_mirror_mode="
+  ldout(cct, 20) << this << " " << __FFL__ << ": m_mirror_mode="
                  << m_mirror_mode << dendl;
 
   send_get_mirror_image();
@@ -272,7 +272,7 @@ void DisableFeaturesRequest<I>::send_get_mirror_image() {
     return;
   }
 
-  ldout(cct, 20) << this << " " << __func__ << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << dendl;
 
   librados::ObjectReadOperation op;
   cls_client::mirror_image_get_start(&op, image_ctx.id);
@@ -290,7 +290,7 @@ template <typename I>
 Context *DisableFeaturesRequest<I>::handle_get_mirror_image(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << dendl;
 
   cls::rbd::MirrorImage mirror_image;
 
@@ -327,7 +327,7 @@ void DisableFeaturesRequest<I>::send_disable_mirror_image() {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
 
-  ldout(cct, 20) << this << " " << __func__ << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << dendl;
 
   Context *ctx = create_context_callback<
     DisableFeaturesRequest<I>,
@@ -342,7 +342,7 @@ template <typename I>
 Context *DisableFeaturesRequest<I>::handle_disable_mirror_image(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to disable image mirroring: " << cpp_strerror(*result)
@@ -362,7 +362,7 @@ void DisableFeaturesRequest<I>::send_close_journal() {
   {
     std::unique_lock locker{image_ctx.owner_lock};
     if (image_ctx.journal != nullptr) {
-      ldout(cct, 20) << this << " " << __func__ << dendl;
+      ldout(cct, 20) << this << " " << __FFL__ << dendl;
 
       std::swap(m_journal, image_ctx.journal);
       Context *ctx = create_context_callback<
@@ -381,7 +381,7 @@ template <typename I>
 Context *DisableFeaturesRequest<I>::handle_close_journal(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to close image journal: " << cpp_strerror(*result)
@@ -400,7 +400,7 @@ template <typename I>
 void DisableFeaturesRequest<I>::send_remove_journal() {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << dendl;
 
   Context *ctx = create_context_callback<
     DisableFeaturesRequest<I>,
@@ -417,7 +417,7 @@ template <typename I>
 Context *DisableFeaturesRequest<I>::handle_remove_journal(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to remove image journal: " << cpp_strerror(*result)
@@ -440,14 +440,14 @@ void DisableFeaturesRequest<I>::send_append_op_event() {
     send_remove_object_map();
   }
 
-  ldout(cct, 20) << this << " " << __func__ << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << dendl;
 }
 
 template <typename I>
 Context *DisableFeaturesRequest<I>::handle_append_op_event(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to commit journal entry: " << cpp_strerror(*result)
@@ -463,7 +463,7 @@ template <typename I>
 void DisableFeaturesRequest<I>::send_remove_object_map() {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << dendl;
 
   if ((m_features & RBD_FEATURE_OBJECT_MAP) == 0) {
     send_set_features();
@@ -483,7 +483,7 @@ template <typename I>
 Context *DisableFeaturesRequest<I>::handle_remove_object_map(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0 && *result != -ENOENT) {
     lderr(cct) << "failed to remove object map: " << cpp_strerror(*result) << dendl;
@@ -498,7 +498,7 @@ template <typename I>
 void DisableFeaturesRequest<I>::send_set_features() {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << ": new_features="
+  ldout(cct, 20) << this << " " << __FFL__ << ": new_features="
 		 << m_new_features << ", features_mask=" << m_features_mask
 		 << dendl;
 
@@ -517,7 +517,7 @@ template <typename I>
 Context *DisableFeaturesRequest<I>::handle_set_features(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result == -EINVAL && (m_features_mask & RBD_FEATURE_JOURNALING) != 0) {
     // NOTE: infernalis OSDs will not accept a mask with new features, so
@@ -548,7 +548,7 @@ void DisableFeaturesRequest<I>::send_update_flags() {
     return;
   }
 
-  ldout(cct, 20) << this << " " << __func__ << ": disable_flags="
+  ldout(cct, 20) << this << " " << __FFL__ << ": disable_flags="
 		 << m_disable_flags << dendl;
 
   Context *ctx = create_context_callback<
@@ -564,7 +564,7 @@ template <typename I>
 Context *DisableFeaturesRequest<I>::handle_update_flags(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to update image flags: " << cpp_strerror(*result)
@@ -580,7 +580,7 @@ template <typename I>
 void DisableFeaturesRequest<I>::send_notify_update() {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << dendl;
 
   Context *ctx = create_context_callback<
     DisableFeaturesRequest<I>,
@@ -593,7 +593,7 @@ template <typename I>
 Context *DisableFeaturesRequest<I>::handle_notify_update(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (image_ctx.exclusive_lock == nullptr || !m_acquired_lock) {
     return handle_finish(*result);
@@ -607,7 +607,7 @@ template <typename I>
 void DisableFeaturesRequest<I>::send_release_exclusive_lock() {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << dendl;
 
   Context *ctx = create_context_callback<
     DisableFeaturesRequest<I>,
@@ -621,7 +621,7 @@ template <typename I>
 Context *DisableFeaturesRequest<I>::handle_release_exclusive_lock(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   return handle_finish(*result);
 }
@@ -630,7 +630,7 @@ template <typename I>
 Context *DisableFeaturesRequest<I>::handle_finish(int r) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << ": r=" << r << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << ": r=" << r << dendl;
 
   {
     std::unique_lock locker{image_ctx.owner_lock};

@@ -72,7 +72,7 @@ int rgw_init_ioctx(librados::Rados *rados, const rgw_pool& pool,
 	stringify(bias) + "\"}",
 	inbl, NULL, NULL);
       if (r < 0) {
-	dout(10) << __func__ << " warning: failed to set pg_autoscale_bias on "
+	dout(10) << __FFL__ << " warning: failed to set pg_autoscale_bias on "
 		 << pool.name << dendl;
       }
       // set pg_num_min
@@ -83,7 +83,7 @@ int rgw_init_ioctx(librados::Rados *rados, const rgw_pool& pool,
 	stringify(min) + "\"}",
 	inbl, NULL, NULL);
       if (r < 0) {
-	dout(10) << __func__ << " warning: failed to set pg_num_min on "
+	dout(10) << __FFL__ << " warning: failed to set pg_num_min on "
 		 << pool.name << dendl;
       }
       // set recovery_priority
@@ -94,7 +94,7 @@ int rgw_init_ioctx(librados::Rados *rados, const rgw_pool& pool,
 	stringify(p) + "\"}",
 	inbl, NULL, NULL);
       if (r < 0) {
-	dout(10) << __func__ << " warning: failed to set recovery_priority on "
+	dout(10) << __FFL__ << " warning: failed to set recovery_priority on "
 		 << pool.name << dendl;
       }
     }
@@ -359,7 +359,7 @@ static int ext_mime_map_init(CephContext *cct, const char *ext_map)
   int ret;
   if (fd < 0) {
     ret = -errno;
-    ldout(cct, 0) << __func__ << " failed to open file=" << ext_map
+    ldout(cct, 0) << __FFL__ << " failed to open file=" << ext_map
                   << " : " << cpp_strerror(-ret) << dendl;
     return ret;
   }
@@ -368,7 +368,7 @@ static int ext_mime_map_init(CephContext *cct, const char *ext_map)
   ret = fstat(fd, &st);
   if (ret < 0) {
     ret = -errno;
-    ldout(cct, 0) << __func__ << " failed to stat file=" << ext_map
+    ldout(cct, 0) << __FFL__ << " failed to stat file=" << ext_map
                   << " : " << cpp_strerror(-ret) << dendl;
     goto done;
   }
@@ -376,14 +376,14 @@ static int ext_mime_map_init(CephContext *cct, const char *ext_map)
   buf = (char *)malloc(st.st_size + 1);
   if (!buf) {
     ret = -ENOMEM;
-    ldout(cct, 0) << __func__ << " failed to allocate buf" << dendl;
+    ldout(cct, 0) << __FFL__ << " failed to allocate buf" << dendl;
     goto done;
   }
 
   ret = safe_read(fd, buf, st.st_size + 1);
   if (ret != st.st_size) {
     // huh? file size has changed?
-    ldout(cct, 0) << __func__ << " raced! will retry.." << dendl;
+    ldout(cct, 0) << __FFL__ << " raced! will retry.." << dendl;
     free(buf);
     close(fd);
     return ext_mime_map_init(cct, ext_map);

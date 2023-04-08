@@ -112,12 +112,12 @@ struct ExecuteOp : public Context {
   void finish(int r) override {
     CephContext *cct = image_ctx.cct;
     if (r < 0) {
-      lderr(cct) << ": ExecuteOp::" << __func__ << ": r=" << r << dendl;
+      lderr(cct) << ": ExecuteOp::" << __FFL__ << ": r=" << r << dendl;
       on_op_complete->complete(r);
       return;
     }
 
-    ldout(cct, 20) << ": ExecuteOp::" << __func__ << dendl;
+    ldout(cct, 20) << ": ExecuteOp::" << __FFL__ << dendl;
     std::shared_lock owner_locker{image_ctx.owner_lock};
 
     if (image_ctx.exclusive_lock == nullptr ||
@@ -149,13 +149,13 @@ struct C_RefreshIfRequired : public Context {
     on_finish = nullptr;
 
     if (r < 0) {
-      lderr(cct) << ": C_RefreshIfRequired::" << __func__ << ": r=" << r << dendl;
+      lderr(cct) << ": C_RefreshIfRequired::" << __FFL__ << ": r=" << r << dendl;
       image_ctx.op_work_queue->queue(ctx, r);
       return;
     }
 
     if (image_ctx.state->is_refresh_required()) {
-      ldout(cct, 20) << ": C_RefreshIfRequired::" << __func__ << ": "
+      ldout(cct, 20) << ": C_RefreshIfRequired::" << __FFL__ << ": "
                      << "refresh required" << dendl;
       image_ctx.state->refresh(ctx);
       return;

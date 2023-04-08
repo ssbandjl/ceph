@@ -33,12 +33,12 @@ int DPDKDriver::init(EventCenter *c, int nevent)
 
 int DPDKDriver::add_event(int fd, int cur_mask, int add_mask)
 {
-	ldout(cct, 20) << __func__ << " add event fd=" << fd << " cur_mask=" << cur_mask
+	ldout(cct, 20) << __FFL__ << " add event fd=" << fd << " cur_mask=" << cur_mask
 								 << " add_mask=" << add_mask << dendl;
 
 	int r = manager.listen(fd, add_mask);
 	if (r < 0) {
-		lderr(cct) << __func__ << " add fd=" << fd << " failed. "
+		lderr(cct) << __FFL__ << " add fd=" << fd << " failed. "
 		           << cpp_strerror(-r) << dendl;
 		return -errno;
 	}
@@ -48,13 +48,13 @@ int DPDKDriver::add_event(int fd, int cur_mask, int add_mask)
 
 int DPDKDriver::del_event(int fd, int cur_mask, int delmask)
 {
-	ldout(cct, 20) << __func__ << " del event fd=" << fd << " cur_mask=" << cur_mask
+	ldout(cct, 20) << __FFL__ << " del event fd=" << fd << " cur_mask=" << cur_mask
 								 << " delmask=" << delmask << dendl;
 	int r = 0;
 
 	if (delmask != EVENT_NONE) {
 		if ((r = manager.unlisten(fd, delmask)) < 0) {
-			lderr(cct) << __func__ << " delete fd=" << fd << " delmask=" << delmask
+			lderr(cct) << __FFL__ << " delete fd=" << fd << " delmask=" << delmask
 								 << " failed." << cpp_strerror(-r) << dendl;
 			return r;
 		}

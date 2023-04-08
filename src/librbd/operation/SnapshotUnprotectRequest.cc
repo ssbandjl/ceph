@@ -165,7 +165,7 @@ template <typename I>
 bool SnapshotUnprotectRequest<I>::should_complete(int r) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": state=" << m_state << ", "
+  ldout(cct, 5) << this << " " << __FFL__ << ": state=" << m_state << ", "
                 << "r=" << r << dendl;
   if (r < 0) {
     if (r == -EINVAL) {
@@ -207,7 +207,7 @@ bool SnapshotUnprotectRequest<I>::should_complete_error() {
   I &image_ctx = this->m_image_ctx;
   std::shared_lock owner_locker{image_ctx.owner_lock};
   CephContext *cct = image_ctx.cct;
-  lderr(cct) << this << " " << __func__ << ": "
+  lderr(cct) << this << " " << __FFL__ << ": "
              << "ret_val=" << m_ret_val << dendl;
 
   bool finished = true;
@@ -225,7 +225,7 @@ void SnapshotUnprotectRequest<I>::send_unprotect_snap_start() {
   ceph_assert(ceph_mutex_is_locked(image_ctx.owner_lock));
 
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
 
   int r = verify_and_send_unprotect_snap_start();
   if (r < 0) {
@@ -240,7 +240,7 @@ void SnapshotUnprotectRequest<I>::send_scan_pool_children() {
   ceph_assert(ceph_mutex_is_locked(image_ctx.owner_lock));
 
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
   m_state = STATE_SCAN_POOL_CHILDREN;
 
   // search all pools for children depending on this snapshot
@@ -273,7 +273,7 @@ void SnapshotUnprotectRequest<I>::send_unprotect_snap_finish() {
   ceph_assert(ceph_mutex_is_locked(image_ctx.owner_lock));
 
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
 
   m_state = STATE_UNPROTECT_SNAP_FINISH;
 
@@ -293,7 +293,7 @@ void SnapshotUnprotectRequest<I>::send_unprotect_snap_rollback() {
   ceph_assert(ceph_mutex_is_locked(image_ctx.owner_lock));
 
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
 
   m_state = STATE_UNPROTECT_SNAP_ROLLBACK;
 

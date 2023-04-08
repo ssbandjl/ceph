@@ -43,7 +43,7 @@ void RefreshRequest<I>::send() {
 
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << ": "
+  ldout(cct, 20) << this << " " << __FFL__ << ": "
                  << "object_count=" << m_object_count << dendl;
   send_lock();
 }
@@ -74,7 +74,7 @@ void RefreshRequest<I>::send_lock() {
   }
 
   std::string oid(ObjectMap<>::object_map_name(m_image_ctx.id, m_snap_id));
-  ldout(cct, 10) << this << " " << __func__ << ": oid=" << oid << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": oid=" << oid << dendl;
 
   using klass = RefreshRequest<I>;
   Context *ctx = create_context_callback<
@@ -87,7 +87,7 @@ void RefreshRequest<I>::send_lock() {
 template <typename I>
 Context *RefreshRequest<I>::handle_lock(int *ret_val) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   ceph_assert(*ret_val == 0);
   send_load();
@@ -98,7 +98,7 @@ template <typename I>
 void RefreshRequest<I>::send_load() {
   CephContext *cct = m_image_ctx.cct;
   std::string oid(ObjectMap<>::object_map_name(m_image_ctx.id, m_snap_id));
-  ldout(cct, 10) << this << " " << __func__ << ": oid=" << oid << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": oid=" << oid << dendl;
 
   librados::ObjectReadOperation op;
   cls_client::object_map_load_start(&op);
@@ -115,7 +115,7 @@ void RefreshRequest<I>::send_load() {
 template <typename I>
 Context *RefreshRequest<I>::handle_load(int *ret_val) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *ret_val << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *ret_val << dendl;
 
   if (*ret_val == 0) {
     auto bl_it = m_out_bl.cbegin();
@@ -161,7 +161,7 @@ Context *RefreshRequest<I>::handle_load(int *ret_val) {
 template <typename I>
 void RefreshRequest<I>::send_invalidate() {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   m_on_disk_object_map.clear();
   object_map::ResizeRequest::resize(&m_on_disk_object_map, m_object_count,
@@ -181,7 +181,7 @@ void RefreshRequest<I>::send_invalidate() {
 template <typename I>
 Context *RefreshRequest<I>::handle_invalidate(int *ret_val) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *ret_val << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *ret_val << dendl;
 
   if (*ret_val < 0) {
     lderr(cct) << "failed to invalidate object map: " << cpp_strerror(*ret_val)
@@ -195,7 +195,7 @@ Context *RefreshRequest<I>::handle_invalidate(int *ret_val) {
 template <typename I>
 void RefreshRequest<I>::send_resize_invalidate() {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   m_on_disk_object_map.clear();
   object_map::ResizeRequest::resize(&m_on_disk_object_map, m_object_count,
@@ -215,7 +215,7 @@ void RefreshRequest<I>::send_resize_invalidate() {
 template <typename I>
 Context *RefreshRequest<I>::handle_resize_invalidate(int *ret_val) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *ret_val << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *ret_val << dendl;
 
   if (*ret_val < 0) {
     lderr(cct) << "failed to invalidate object map: " << cpp_strerror(*ret_val)
@@ -232,7 +232,7 @@ template <typename I>
 void RefreshRequest<I>::send_resize() {
   CephContext *cct = m_image_ctx.cct;
   std::string oid(ObjectMap<>::object_map_name(m_image_ctx.id, m_snap_id));
-  ldout(cct, 10) << this << " " << __func__ << ": oid=" << oid << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": oid=" << oid << dendl;
 
   librados::ObjectWriteOperation op;
   if (m_snap_id == CEPH_NOSNAP) {
@@ -254,7 +254,7 @@ void RefreshRequest<I>::send_resize() {
 template <typename I>
 Context *RefreshRequest<I>::handle_resize(int *ret_val) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *ret_val << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *ret_val << dendl;
 
   if (*ret_val < 0) {
     lderr(cct) << "failed to adjust object map size: " << cpp_strerror(*ret_val)
@@ -269,7 +269,7 @@ Context *RefreshRequest<I>::handle_resize(int *ret_val) {
 template <typename I>
 void RefreshRequest<I>::send_invalidate_and_close() {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   using klass = RefreshRequest<I>;
   Context *ctx = create_context_callback<
@@ -286,7 +286,7 @@ void RefreshRequest<I>::send_invalidate_and_close() {
 template <typename I>
 Context *RefreshRequest<I>::handle_invalidate_and_close(int *ret_val) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *ret_val << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *ret_val << dendl;
 
   if (*ret_val < 0) {
     lderr(cct) << "failed to invalidate object map: " << cpp_strerror(*ret_val)

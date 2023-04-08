@@ -131,11 +131,11 @@ int interface::dispatch_packet(EventCenter *center, Packet p) {
     auto i = _proto_map.find(ntoh(eh->eth_proto));
     auto hwrss = p.rss_hash();
     if (hwrss) {
-      ldout(cct, 10) << __func__ << " === rx === proto " << std::hex << ::ntoh(eh->eth_proto)
+      ldout(cct, 10) << __FFL__ << " === rx === proto " << std::hex << ::ntoh(eh->eth_proto)
                      << " "<< eh->src_mac.ntoh() << " -> " << eh->dst_mac.ntoh()
                      << " length " << std::dec << p.len() << " rss_hash " << *p.rss_hash() << dendl;
     } else {
-      ldout(cct, 10) << __func__ << " === rx === proto " << std::hex << ::ntoh(eh->eth_proto)
+      ldout(cct, 10) << __FFL__ << " === rx === proto " << std::hex << ::ntoh(eh->eth_proto)
                      << " "<< eh->src_mac.ntoh() << " -> " << eh->dst_mac.ntoh()
                      << " length " << std::dec << p.len() << dendl;
     }
@@ -154,7 +154,7 @@ int interface::dispatch_packet(EventCenter *center, Packet p) {
         }
       });
       if (fw != center->get_id()) {
-        ldout(cct, 1) << __func__ << " forward to " << fw << dendl;
+        ldout(cct, 1) << __FFL__ << " forward to " << fw << dendl;
         forward(center, fw, std::move(p));
       } else {
         auto h = eh->ntoh();

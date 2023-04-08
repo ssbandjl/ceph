@@ -16,7 +16,7 @@
 
 #define dout_subsys ceph_subsys_rbd
 #undef dout_prefix
-#define dout_prefix *_dout << "librbd::api::Snapshot: " << __func__ << ": "
+#define dout_prefix *_dout << "librbd::api::Snapshot: " << __FFL__ << ": "
 
 using librados::snap_t;
 

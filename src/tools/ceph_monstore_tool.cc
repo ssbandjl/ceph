@@ -513,7 +513,7 @@ static int update_mkfs(MonitorDBStore& st,
 {
   MonMap monmap;
   if (!monmap_path.empty()) {
-    cout << __func__ << " pulling initial monmap from " << monmap_path << std::endl;
+    cout << __FFL__ << " pulling initial monmap from " << monmap_path << std::endl;
     bufferlist bl;
     string err;
     int r = bl.read_file(monmap_path.c_str(), &err);
@@ -524,7 +524,7 @@ static int update_mkfs(MonitorDBStore& st,
     }
     monmap.decode(bl);
   } else {
-    cout << __func__ << " generating seed initial monmap" << std::endl;
+    cout << __FFL__ << " generating seed initial monmap" << std::endl;
     int r = monmap.build_initial(g_ceph_context, true, cerr);
     if (r) {
       cerr << "no initial monitors" << std::endl;

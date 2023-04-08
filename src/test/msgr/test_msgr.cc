@@ -70,7 +70,7 @@ class MessengerTest : public ::testing::TestWithParam<const char*> {
     dummy_auth.auth_registry.refresh_config();
   }
   void SetUp() override {
-    lderr(g_ceph_context) << __func__ << " start set up " << GetParam() << dendl;
+    lderr(g_ceph_context) << __FFL__ << " start set up " << GetParam() << dendl;
     server_msgr = Messenger::create(g_ceph_context, string(GetParam()), entity_name_t::OSD(0), "server", getpid(), 0);
     client_msgr = Messenger::create(g_ceph_context, string(GetParam()), entity_name_t::CLIENT(-1), "client", getpid(), 0);
     server_msgr->set_default_policy(Messenger::Policy::stateless_server(0));
@@ -128,12 +128,12 @@ class FakeDispatcher : public Dispatcher {
 
   void ms_handle_fast_connect(Connection *con) override {
     std::scoped_lock l{lock};
-    lderr(g_ceph_context) << __func__ << " " << con << dendl;
+    lderr(g_ceph_context) << __FFL__ << " " << con << dendl;
     auto s = con->get_priv();
     if (!s) {
       auto session = new Session(con);
       con->set_priv(RefCountedPtr{session, false});
-      lderr(g_ceph_context) << __func__ << " con: " << con
+      lderr(g_ceph_context) << __FFL__ << " con: " << con
 			    << " count: " << session->count << dendl;
     }
     got_connect = true;
@@ -157,7 +157,7 @@ class FakeDispatcher : public Dispatcher {
       m->get_connection()->set_priv(priv);
     }
     s->count++;
-    lderr(g_ceph_context) << __func__ << " conn: " << m->get_connection() << " session " << s << " count: " << s->count << dendl;
+    lderr(g_ceph_context) << __FFL__ << " conn: " << m->get_connection() << " session " << s << " count: " << s->count << dendl;
     if (is_server) {
       reply_message(m);
     }
@@ -169,7 +169,7 @@ class FakeDispatcher : public Dispatcher {
   }
   bool ms_handle_reset(Connection *con) override {
     std::lock_guard l{lock};
-    lderr(g_ceph_context) << __func__ << " " << con << dendl;
+    lderr(g_ceph_context) << __FFL__ << " " << con << dendl;
     auto priv = con->get_priv();
     if (auto s = static_cast<Session*>(priv.get()); s) {
       s->con.reset();  // break con <-> session ref cycle
@@ -179,7 +179,7 @@ class FakeDispatcher : public Dispatcher {
   }
   void ms_handle_remote_reset(Connection *con) override {
     std::lock_guard l{lock};
-    lderr(g_ceph_context) << __func__ << " " << con << dendl;
+    lderr(g_ceph_context) << __FFL__ << " " << con << dendl;
     auto priv = con->get_priv();
     if (auto s = static_cast<Session*>(priv.get()); s) {
       s->con.reset();  // break con <-> session ref cycle
@@ -200,7 +200,7 @@ class FakeDispatcher : public Dispatcher {
       m->get_connection()->set_priv(priv);
     }
     s->count++;
-    lderr(g_ceph_context) << __func__ << " conn: " << m->get_connection() << " session " << s << " count: " << s->count << dendl;
+    lderr(g_ceph_context) << __FFL__ << " conn: " << m->get_connection() << " session " << s << " count: " << s->count << dendl;
     if (is_server) {
       if (loopback)
         ceph_assert(m->get_source().is_osd());
@@ -301,7 +301,7 @@ struct TestInterceptor : public Interceptor {
   }
 
   ACTION intercept(Connection *conn, uint32_t step) override {
-    lderr(g_ceph_context) << __func__ << " conn(" << conn 
+    lderr(g_ceph_context) << __FFL__ << " conn(" << conn 
                           << ") intercept called on step=" << step << dendl;
 
     {
@@ -316,7 +316,7 @@ struct TestInterceptor : public Interceptor {
     std::unique_lock<std::mutex> l(lock);
     ACTION decision = ACTION::CONTINUE;
     if (breakpoints.find(step) != breakpoints.end()) {
-      lderr(g_ceph_context) << __func__ << " conn(" << conn 
+      lderr(g_ceph_context) << __FFL__ << " conn(" << conn 
                             << ") pausing on step=" << step << dendl;
       decision = wait_for_decision(step, l);
     } else {
@@ -324,7 +324,7 @@ struct TestInterceptor : public Interceptor {
         decision = *(decisions[step]);
       }
     }
-    lderr(g_ceph_context) << __func__ << " conn(" << conn 
+    lderr(g_ceph_context) << __FFL__ << " conn(" << conn 
                           << ") resuming step=" << step << " with decision=" 
                           << decision << dendl;
     decisions[step].reset();
@@ -1683,7 +1683,7 @@ class SyntheticDispatcher : public Dispatcher {
     auto p = m->get_data().cbegin();
     decode(pl, p);
     if (pl.who == Payload::PING) {
-      lderr(g_ceph_context) << __func__ << " conn=" << m->get_connection() << pl << dendl;
+      lderr(g_ceph_context) << __FFL__ << " conn=" << m->get_connection() << pl << dendl;
       reply_message(m, pl);
       m->put();
       std::lock_guard l{lock};
@@ -1692,7 +1692,7 @@ class SyntheticDispatcher : public Dispatcher {
     } else {
       std::lock_guard l{lock};
       if (sent.count(pl.seq)) {
-	lderr(g_ceph_context) << __func__ << " conn=" << m->get_connection() << pl << dendl;
+	lderr(g_ceph_context) << __FFL__ << " conn=" << m->get_connection() << pl << dendl;
 	ASSERT_EQ(conn_sent[m->get_connection()].front(), pl.seq);
 	ASSERT_TRUE(pl.data.contents_equal(sent[pl.seq]));
 	conn_sent[m->get_connection()].pop_front();
@@ -1715,7 +1715,7 @@ class SyntheticDispatcher : public Dispatcher {
     MPing *rm = new MPing();
     rm->set_data(bl);
     m->get_connection()->send_message(rm);
-    lderr(g_ceph_context) << __func__ << " conn=" << m->get_connection() << " reply m=" << m << " i=" << pl.seq << dendl;
+    lderr(g_ceph_context) << __FFL__ << " conn=" << m->get_connection() << " reply m=" << m << " i=" << pl.seq << dendl;
   }
 
   void send_message_wrap(ConnectionRef con, const bufferlist& data) {
@@ -1729,7 +1729,7 @@ class SyntheticDispatcher : public Dispatcher {
       sent[pl.seq] = pl.data;
       conn_sent[con].push_back(pl.seq);
     }
-    lderr(g_ceph_context) << __func__ << " conn=" << con.get() << " send m=" << m << " i=" << pl.seq << dendl;
+    lderr(g_ceph_context) << __FFL__ << " conn=" << con.get() << " send m=" << m << " i=" << pl.seq << dendl;
     ASSERT_EQ(0, con->send_message(m));
   }
 
@@ -1750,7 +1750,7 @@ class SyntheticDispatcher : public Dispatcher {
   void print() {
     for (auto && p : conn_sent) {
       if (!p.second.empty()) {
-        lderr(g_ceph_context) << __func__ << " " << p.first << " wait " << p.second.size() << dendl;
+        lderr(g_ceph_context) << __FFL__ << " " << p.first << " wait " << p.second.size() << dendl;
       }
     }
   }
@@ -2212,7 +2212,7 @@ class MarkdownDispatcher : public Dispatcher {
   }
 
   void ms_handle_fast_connect(Connection *con) override {
-    lderr(g_ceph_context) << __func__ << " " << con << dendl;
+    lderr(g_ceph_context) << __FFL__ << " " << con << dendl;
     std::lock_guard l{lock};
     conns.insert(con);
   }
@@ -2221,7 +2221,7 @@ class MarkdownDispatcher : public Dispatcher {
     conns.insert(con);
   }
   bool ms_dispatch(Message *m) override {
-    lderr(g_ceph_context) << __func__ << " conn: " << m->get_connection() << dendl;
+    lderr(g_ceph_context) << __FFL__ << " conn: " << m->get_connection() << dendl;
     std::lock_guard l{lock};
     count++;
     conns.insert(m->get_connection());
@@ -2245,7 +2245,7 @@ class MarkdownDispatcher : public Dispatcher {
     return true;
   }
   bool ms_handle_reset(Connection *con) override {
-    lderr(g_ceph_context) << __func__ << " " << con << dendl;
+    lderr(g_ceph_context) << __FFL__ << " " << con << dendl;
     std::lock_guard l{lock};
     conns.erase(con);
     usleep(rand() % 500);
@@ -2254,7 +2254,7 @@ class MarkdownDispatcher : public Dispatcher {
   void ms_handle_remote_reset(Connection *con) override {
     std::lock_guard l{lock};
     conns.erase(con);
-    lderr(g_ceph_context) << __func__ << " " << con << dendl;
+    lderr(g_ceph_context) << __FFL__ << " " << con << dendl;
   }
   bool ms_handle_refused(Connection *con) override {
     return false;
@@ -2308,7 +2308,7 @@ TEST_P(MessengerTest, MarkdownTest) {
     ASSERT_EQ(conn2->send_message(m), 0);
     CHECK_AND_WAIT_TRUE(srv_dispatcher.count > last + 1);
     if (srv_dispatcher.count == last) {
-      lderr(g_ceph_context) << __func__ << " last is " << last << dendl;
+      lderr(g_ceph_context) << __FFL__ << " last is " << last << dendl;
       equal = true;
       equal_count++;
     } else {

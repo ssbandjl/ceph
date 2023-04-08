@@ -47,7 +47,7 @@ void PGBackend::recover_delete_object(const hobject_t &oid, eversion_t v,
     if (shard == get_parent()->whoami_shard())
       continue;
     if (get_parent()->get_shard_missing(shard).is_missing(oid)) {
-      dout(20) << __func__ << " will remove " << oid << " " << v << " from "
+      dout(20) << __FFL__ << " will remove " << oid << " " << v << " from "
 	       << shard << dendl;
       h->deletes[shard].push_back(make_pair(oid, v));
       get_parent()->begin_peer_recover(shard, oid);
@@ -82,7 +82,7 @@ void PGBackend::send_recovery_deletes(int prio,
       while (it != objects.end() &&
 	     cost < cct->_conf->osd_max_push_cost &&
 	     deletes < cct->_conf->osd_max_push_objects) {
-	dout(20) << __func__ << ": sending recovery delete << " << it->first
+	dout(20) << __FFL__ << ": sending recovery delete << " << it->first
 		 << " " << it->second << " to osd." << shard << dendl;
 	msg->objects.push_back(*it);
 	cost += cct->_conf->osd_push_per_object_cost;
@@ -118,7 +118,7 @@ void PGBackend::handle_recovery_delete(OpRequestRef op)
 {
   auto m = op->get_req<MOSDPGRecoveryDelete>();
   ceph_assert(m->get_type() == MSG_OSD_PG_RECOVERY_DELETE);
-  dout(20) << __func__ << " " << op << dendl;
+  dout(20) << __FFL__ << " " << op << dendl;
 
   op->mark_started();
 
@@ -151,7 +151,7 @@ void PGBackend::handle_recovery_delete_reply(OpRequestRef op)
 {
   auto m = op->get_req<MOSDPGRecoveryDeleteReply>();
   ceph_assert(m->get_type() == MSG_OSD_PG_RECOVERY_DELETE_REPLY);
-  dout(20) << __func__ << " " << op << dendl;
+  dout(20) << __FFL__ << " " << op << dendl;
 
   for (const auto &p : m->objects) {
     ObjectRecoveryInfo recovery_info;
@@ -163,14 +163,14 @@ void PGBackend::handle_recovery_delete_reply(OpRequestRef op)
       if (shard == get_parent()->whoami_shard())
 	continue;
       if (get_parent()->get_shard_missing(shard).is_missing(oid)) {
-	dout(20) << __func__ << " " << oid << " still missing on at least "
+	dout(20) << __FFL__ << " " << oid << " still missing on at least "
 		 << shard << dendl;
 	peers_recovered = false;
 	break;
       }
     }
     if (peers_recovered && !get_parent()->get_local_missing().is_missing(oid)) {
-      dout(20) << __func__ << " completed recovery, local_missing = "
+      dout(20) << __FFL__ << " completed recovery, local_missing = "
 	       << get_parent()->get_local_missing() << dendl;
       object_stat_sum_t stat_diff;
       stat_diff.num_objects_recovered = 1;
@@ -274,7 +274,7 @@ void PGBackend::rollforward(
   ObjectStore::Transaction *t)
 {
   auto dpp = get_parent()->get_dpp();
-  ldpp_dout(dpp, 20) << __func__ << ": entry=" << entry << dendl;
+  ldpp_dout(dpp, 20) << __FFL__ << ": entry=" << entry << dendl;
   if (!entry.can_rollback())
     return;
   Trimmer trimmer(entry.soid, this, t);
@@ -314,12 +314,12 @@ void PGBackend::remove(
 
 void PGBackend::on_change_cleanup(ObjectStore::Transaction *t)
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   // clear temp
   for (set<hobject_t>::iterator i = temp_contents.begin();
        i != temp_contents.end();
        ++i) {
-    dout(10) << __func__ << ": Removing oid "
+    dout(10) << __FFL__ << ": Removing oid "
 	     << *i << " from the temp collection" << dendl;
     t->remove(
       coll,
@@ -369,7 +369,7 @@ int PGBackend::objects_list_partial(
         &_next);
     }
     if (r != 0) {
-      derr << __func__ << " list collection " << ch << " got: " << cpp_strerror(r) << dendl;
+      derr << __FFL__ << " list collection " << ch << " got: " << cpp_strerror(r) << dendl;
       break;
     }
     for (vector<ghobject_t>::iterator i = objects.begin();
@@ -595,7 +595,7 @@ int PGBackend::be_scan_list(
   ScrubMap &map,
   ScrubMapBuilder &pos)
 {
-  dout(10) << __func__ << " " << pos << dendl;
+  dout(10) << __FFL__ << " " << pos << dendl;
   ceph_assert(!pos.done());
   ceph_assert(pos.pos < pos.ls.size());
   hobject_t& poid = pos.ls[pos.pos];
@@ -620,17 +620,17 @@ int PGBackend::be_scan_list(
     if (pos.deep) {
       r = be_deep_scrub(poid, map, pos, o);
     }
-    dout(25) << __func__ << "  " << poid << dendl;
+    dout(25) << __FFL__ << "  " << poid << dendl;
   } else if (r == -ENOENT) {
-    dout(25) << __func__ << "  " << poid << " got " << r
+    dout(25) << __FFL__ << "  " << poid << " got " << r
 	     << ", skipping" << dendl;
   } else if (r == -EIO) {
-    dout(25) << __func__ << "  " << poid << " got " << r
+    dout(25) << __FFL__ << "  " << poid << " got " << r
 	     << ", stat_error" << dendl;
     ScrubMap::object &o = map.objects[poid];
     o.stat_error = true;
   } else {
-    derr << __func__ << " got: " << cpp_strerror(r) << dendl;
+    derr << __FFL__ << " got: " << cpp_strerror(r) << dendl;
     ceph_abort();
   }
   if (r == -EINPROGRESS) {
@@ -1008,7 +1008,7 @@ map<pg_shard_t, ScrubMap *>::const_iterator
         && i->second.digest_present
         && auth->second->objects[obj].digest != i->second.digest) {
       digest_match = false;
-      dout(10) << __func__ << " digest_match = false, " << obj << " data_digest 0x" << std::hex << i->second.digest
+      dout(10) << __FFL__ << " digest_match = false, " << obj << " data_digest 0x" << std::hex << i->second.digest
 		    << " != data_digest 0x" << auth->second->objects[obj].digest << std::dec
 		    << dendl;
     }
@@ -1031,7 +1031,7 @@ out:
 		    << " : " << shard_errorstream.str() << "\n";
     // Keep scanning other shards
   }
-  dout(10) << __func__ << ": selecting osd " << auth->first
+  dout(10) << __FFL__ << ": selecting osd " << auth->first
 	   << " for obj " << obj
 	   << " with oi " << *auth_oi
 	   << dendl;
@@ -1106,7 +1106,7 @@ void PGBackend::be_compare_scrubmaps(
 				   ss,
 				   k->has_snapset());
 
-	dout(20) << __func__ << (repair ? " repair " : " ") << (parent->get_pool().is_replicated() ? "replicated " : "")
+	dout(20) << __FFL__ << (repair ? " repair " : " ") << (parent->get_pool().is_replicated() ? "replicated " : "")
 	 << (j == auth ? "auth" : "") << "shards " << shard_map.size() << (digest_match ? " digest_match " : " ")
 	 << (shard_map[j->first].only_data_digest_mismatch_info() ? "'info mismatch info'" : "")
 	 << dendl;
@@ -1200,11 +1200,11 @@ void PGBackend::be_compare_scrubmaps(
       } update = NO;
 
       if (auth_object.digest_present && !auth_oi.is_data_digest()) {
-	dout(20) << __func__ << " missing data digest on " << *k << dendl;
+	dout(20) << __FFL__ << " missing data digest on " << *k << dendl;
 	update = MAYBE;
       }
       if (auth_object.omap_digest_present && !auth_oi.is_omap_digest()) {
-	dout(20) << __func__ << " missing omap digest on " << *k << dendl;
+	dout(20) << __FFL__ << " missing omap digest on " << *k << dendl;
 	update = MAYBE;
       }
 
@@ -1237,15 +1237,15 @@ void PGBackend::be_compare_scrubmaps(
           std::optional<uint32_t> data_digest, omap_digest;
           if (auth_object.digest_present) {
             data_digest = auth_object.digest;
-	    dout(20) << __func__ << " will update data digest on " << *k << dendl;
+	    dout(20) << __FFL__ << " will update data digest on " << *k << dendl;
           }
           if (auth_object.omap_digest_present) {
             omap_digest = auth_object.omap_digest;
-	    dout(20) << __func__ << " will update omap digest on " << *k << dendl;
+	    dout(20) << __FFL__ << " will update omap digest on " << *k << dendl;
           }
 	  missing_digest[*k] = make_pair(data_digest, omap_digest);
 	} else {
-	  dout(20) << __func__ << " missing digest but age " << age
+	  dout(20) << __FFL__ << " missing digest but age " << age
 		   << " < " << cct->_conf->osd_deep_scrub_update_digest_min_age
 		   << " on " << *k << dendl;
 	}

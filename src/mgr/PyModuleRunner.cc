@@ -98,7 +98,7 @@ void PyModuleRunner::log(const std::string &record)
 #define dout_prefix *_dout
   dout(0) << record << dendl;
 #undef dout_prefix
-#define dout_prefix *_dout << "mgr " << __func__ << " "
+#define dout_prefix *_dout << "mgr " << __FFL__ << " "
 }
 
 void* PyModuleRunner::PyModuleRunnerThread::entry()

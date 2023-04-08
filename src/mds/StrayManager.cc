@@ -91,7 +91,7 @@ void StrayManager::purge(CDentry *dn)
 {
   CDentry::linkage_t *dnl = dn->get_projected_linkage();
   CInode *in = dnl->get_inode();
-  dout(10) << __func__ << " " << *dn << " " << *in << dendl;
+  dout(10) << __FFL__ << " " << *dn << " " << *in << dendl;
   ceph_assert(!dn->is_replicated());
 
   // CHEAT.  there's no real need to journal our intent to purge, since
@@ -292,7 +292,7 @@ void StrayManager::enqueue(CDentry *dn, bool trunc)
     }
   }
 
-  dout(20) << __func__ << ": purging dn: " << *dn << dendl;
+  dout(20) << __FFL__ << ": purging dn: " << *dn << dendl;
 
   if (!dn->state_test(CDentry::STATE_PURGINGPINNED)) {
     dn->get(CDentry::PIN_PURGING);
@@ -305,7 +305,7 @@ void StrayManager::enqueue(CDentry *dn, bool trunc)
   // Resources are available, acquire them and execute the purge
   _enqueue(dn, trunc);
 
-  dout(10) << __func__ << ": purging this dentry immediately: "
+  dout(10) << __FFL__ << ": purging this dentry immediately: "
     << *dn << dendl;
 }
 
@@ -367,7 +367,7 @@ void StrayManager::advance_delayed()
     if (dn->get_projected_linkage()->is_null()) {
       /* A special case: a stray dentry can go null if its inode is being
        * re-linked into another MDS's stray dir during a shutdown migration. */
-      dout(4) << __func__ << ": delayed dentry is now null: " << *dn << dendl;
+      dout(4) << __FFL__ << ": delayed dentry is now null: " << *dn << dendl;
       continue;
     }
 
@@ -535,7 +535,7 @@ bool StrayManager::_eval_stray(CDentry *dn)
 
 void StrayManager::activate()
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   started = true;
   purge_queue.activate();
 }
@@ -554,19 +554,19 @@ bool StrayManager::eval_stray(CDentry *dn)
 
 void StrayManager::eval_remote(CDentry *remote_dn)
 {
-  dout(10) << __func__ << " " << *remote_dn << dendl;
+  dout(10) << __FFL__ << " " << *remote_dn << dendl;
 
   CDentry::linkage_t *dnl = remote_dn->get_projected_linkage();
   ceph_assert(dnl->is_remote());
   CInode *in = dnl->get_inode();
 
   if (!in) {
-    dout(20) << __func__ << ": no inode, cannot evaluate" << dendl;
+    dout(20) << __FFL__ << ": no inode, cannot evaluate" << dendl;
     return;
   }
 
   if (remote_dn->last != CEPH_NOSNAP) {
-    dout(20) << __func__ << ": snap dentry, cannot evaluate" << dendl;
+    dout(20) << __FFL__ << ": snap dentry, cannot evaluate" << dendl;
     return;
   }
 
@@ -576,7 +576,7 @@ void StrayManager::eval_remote(CDentry *remote_dn)
   if (primary_dn->get_dir()->get_inode()->is_stray()) {
     _eval_stray_remote(primary_dn, remote_dn);
   } else {
-    dout(20) << __func__ << ": inode's primary dn not stray" << dendl;
+    dout(20) << __FFL__ << ": inode's primary dn not stray" << dendl;
   }
 }
 
@@ -596,7 +596,7 @@ class C_RetryEvalRemote : public StrayManagerContext {
 
 void StrayManager::_eval_stray_remote(CDentry *stray_dn, CDentry *remote_dn)
 {
-  dout(20) << __func__ << " " << *stray_dn << dendl;
+  dout(20) << __FFL__ << " " << *stray_dn << dendl;
   ceph_assert(stray_dn != NULL);
   ceph_assert(stray_dn->get_dir()->get_inode()->is_stray());
   CDentry::linkage_t *stray_dnl = stray_dn->get_projected_linkage();
@@ -621,7 +621,7 @@ void StrayManager::_eval_stray_remote(CDentry *stray_dn, CDentry *remote_dn)
       }
     }
     if (!remote_dn) {
-      dout(20) << __func__ << ": not reintegrating (no remote parents in cache)" << dendl;
+      dout(20) << __FFL__ << ": not reintegrating (no remote parents in cache)" << dendl;
       return;
     }
   }
@@ -633,24 +633,24 @@ void StrayManager::_eval_stray_remote(CDentry *stray_dn, CDentry *remote_dn)
 	reintegrate_stray(stray_dn, remote_dn);
       } else {
 	remote_dn->dir->add_waiter(CDir::WAIT_UNFREEZE, new C_RetryEvalRemote(this, remote_dn));
-	dout(20) << __func__ << ": not reintegrating (can't authpin remote parent)" << dendl;
+	dout(20) << __FFL__ << ": not reintegrating (can't authpin remote parent)" << dendl;
       }
 
     } else if (!remote_dn->is_auth() && stray_dn->is_auth()) {
       migrate_stray(stray_dn, remote_dn->authority().first);
     } else {
-      dout(20) << __func__ << ": not reintegrating" << dendl;
+      dout(20) << __FFL__ << ": not reintegrating" << dendl;
     }
   } else {
     // don't do anything if the remote parent is projected, or we may
     // break user-visible semantics!
-    dout(20) << __func__ << ": not reintegrating (projected)" << dendl;
+    dout(20) << __FFL__ << ": not reintegrating (projected)" << dendl;
   }
 }
 
 void StrayManager::reintegrate_stray(CDentry *straydn, CDentry *rdn)
 {
-  dout(10) << __func__ << " " << *straydn << " to " << *rdn << dendl;
+  dout(10) << __FFL__ << " " << *straydn << " to " << *rdn << dendl;
 
   logger->inc(l_mdc_strays_reintegrated);
   
@@ -668,7 +668,7 @@ void StrayManager::reintegrate_stray(CDentry *straydn, CDentry *rdn)
  
 void StrayManager::migrate_stray(CDentry *dn, mds_rank_t to)
 {
-  dout(10) << __func__ << " " << *dn << " to mds." << to << dendl;
+  dout(10) << __FFL__ << " " << *dn << " to mds." << to << dendl;
 
   logger->inc(l_mdc_strays_migrated);
 
@@ -699,7 +699,7 @@ void StrayManager::truncate(CDentry *dn)
   const CDentry::linkage_t *dnl = dn->get_projected_linkage();
   const CInode *in = dnl->get_inode();
   ceph_assert(in);
-  dout(10) << __func__ << ": " << *dn << " " << *in << dendl;
+  dout(10) << __FFL__ << ": " << *dn << " " << *in << dendl;
   ceph_assert(!dn->is_replicated());
 
   const SnapRealm *realm = in->find_snaprealm();
@@ -732,7 +732,7 @@ void StrayManager::_truncate_stray_logged(CDentry *dn, LogSegment *ls)
 {
   CInode *in = dn->get_projected_linkage()->get_inode();
 
-  dout(10) << __func__ << ": " << *dn << " " << *in << dendl;
+  dout(10) << __FFL__ << ": " << *dn << " " << *in << dendl;
 
   in->pop_and_dirty_projected_inode(ls);
 

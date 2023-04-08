@@ -125,7 +125,7 @@ static int parse_fn(CephContext* cct, const char *path, coll_t *cid,
     if (!*p)
       break;
   }
-  ldout(cct, 10) << __func__ << " path " << path << " -> " << v << dendl;
+  ldout(cct, 10) << __FFL__ << " path " << path << " -> " << v << dendl;
 
   if (v.empty())
     return FN_ROOT;
@@ -239,7 +239,7 @@ static int os_getattr(const char *path, struct stat *stbuf
 {
   fuse_context *fc = fuse_get_context();
   FuseStore *fs = static_cast<FuseStore*>(fc->private_data);
-  ldout(fs->store->cct, 10) << __func__ << " " << path << dendl;
+  ldout(fs->store->cct, 10) << __FFL__ << " " << path << dendl;
   coll_t cid;
   ghobject_t oid;
   string key;
@@ -400,7 +400,7 @@ static int os_readdir(const char *path,
 {
   fuse_context *fc = fuse_get_context();
   FuseStore *fs = static_cast<FuseStore*>(fc->private_data);
-  ldout(fs->store->cct, 10) << __func__ << " " << path << " offset " << offset
+  ldout(fs->store->cct, 10) << __FFL__ << " " << path << " offset " << offset
 		     << dendl;
   coll_t cid;
   ghobject_t oid;
@@ -486,7 +486,7 @@ static int os_readdir(const char *path,
       } else {
 	last = ghobject_t::get_max();
       }
-      ldout(fs->store->cct, 10) << __func__ << std::hex
+      ldout(fs->store->cct, 10) << __FFL__ << std::hex
 			 << " offset " << offset << " hash "
 			 << hobject_t::_reverse_bits(hash_value)
 			 << std::dec
@@ -568,7 +568,7 @@ static int os_open(const char *path, struct fuse_file_info *fi)
 {
   fuse_context *fc = fuse_get_context();
   FuseStore *fs = static_cast<FuseStore*>(fc->private_data);
-  ldout(fs->store->cct, 10) << __func__ << " " << path << dendl;
+  ldout(fs->store->cct, 10) << __FFL__ << " " << path << dendl;
   coll_t cid;
   ghobject_t oid;
   string key;
@@ -731,7 +731,7 @@ static int os_mkdir(const char *path, mode_t mode)
 {
   fuse_context *fc = fuse_get_context();
   FuseStore *fs = static_cast<FuseStore*>(fc->private_data);
-  ldout(fs->store->cct, 10) << __func__ << " " << path << dendl;
+  ldout(fs->store->cct, 10) << __FFL__ << " " << path << dendl;
   coll_t cid;
   ghobject_t oid;
   string key;
@@ -799,7 +799,7 @@ static int os_chmod(const char *path, mode_t mode
 {
   fuse_context *fc = fuse_get_context();
   FuseStore *fs = static_cast<FuseStore*>(fc->private_data);
-  ldout(fs->store->cct, 10) << __func__ << " " << path << dendl;
+  ldout(fs->store->cct, 10) << __FFL__ << " " << path << dendl;
   return 0;
 }
 
@@ -807,7 +807,7 @@ static int os_create(const char *path, mode_t mode, struct fuse_file_info *fi)
 {
   fuse_context *fc = fuse_get_context();
   FuseStore *fs = static_cast<FuseStore*>(fc->private_data);
-  ldout(fs->store->cct, 10) << __func__ << " " << path << dendl;
+  ldout(fs->store->cct, 10) << __FFL__ << " " << path << dendl;
   coll_t cid;
   ghobject_t oid;
   string key;
@@ -879,11 +879,11 @@ static int os_release(const char *path, struct fuse_file_info *fi)
 {
   fuse_context *fc = fuse_get_context();
   FuseStore *fs = static_cast<FuseStore*>(fc->private_data);
-  ldout(fs->store->cct, 10) << __func__ << " " << path << dendl;
+  ldout(fs->store->cct, 10) << __FFL__ << " " << path << dendl;
   std::lock_guard<std::mutex> l(fs->lock);
   FuseStore::OpenFile *o = reinterpret_cast<FuseStore::OpenFile*>(fi->fh);
   if (--o->ref == 0) {
-    ldout(fs->store->cct, 10) << __func__ << " closing last " << o->path << dendl;
+    ldout(fs->store->cct, 10) << __FFL__ << " closing last " << o->path << dendl;
     fs->open_files.erase(o->path);
     delete o;
   }
@@ -895,7 +895,7 @@ static int os_read(const char *path, char *buf, size_t size, off_t offset,
 {
   fuse_context *fc = fuse_get_context();
   FuseStore *fs = static_cast<FuseStore*>(fc->private_data);
-  ldout(fs->store->cct, 10) << __func__ << " " << path << " offset " << offset
+  ldout(fs->store->cct, 10) << __FFL__ << " " << path << " offset " << offset
 		     << " size " << size << dendl;
   std::lock_guard<std::mutex> l(fs->lock);
   FuseStore::OpenFile *o = reinterpret_cast<FuseStore::OpenFile*>(fi->fh);
@@ -916,7 +916,7 @@ static int os_write(const char *path, const char *buf, size_t size,
 {
   fuse_context *fc = fuse_get_context();
   FuseStore *fs = static_cast<FuseStore*>(fc->private_data);
-  ldout(fs->store->cct, 10) << __func__ << " " << path << " offset " << offset
+  ldout(fs->store->cct, 10) << __FFL__ << " " << path << " offset " << offset
 		     << " size " << size << dendl;
   std::lock_guard<std::mutex> l(fs->lock);
   FuseStore::OpenFile *o = reinterpret_cast<FuseStore::OpenFile*>(fi->fh);
@@ -948,7 +948,7 @@ int os_flush(const char *path, struct fuse_file_info *fi)
 {
   fuse_context *fc = fuse_get_context();
   FuseStore *fs = static_cast<FuseStore*>(fc->private_data);
-  ldout(fs->store->cct, 10) << __func__ << " " << path << dendl;
+  ldout(fs->store->cct, 10) << __FFL__ << " " << path << dendl;
   coll_t cid;
   ghobject_t oid;
   string key;
@@ -1004,7 +1004,7 @@ static int os_unlink(const char *path)
 {
   fuse_context *fc = fuse_get_context();
   FuseStore *fs = static_cast<FuseStore*>(fc->private_data);
-  ldout(fs->store->cct, 10) << __func__ << " " << path << dendl;
+  ldout(fs->store->cct, 10) << __FFL__ << " " << path << dendl;
   coll_t cid;
   ghobject_t oid;
   string key;
@@ -1074,7 +1074,7 @@ static int os_truncate(const char *path, off_t size
 {
   fuse_context *fc = fuse_get_context();
   FuseStore *fs = static_cast<FuseStore*>(fc->private_data);
-  ldout(fs->store->cct, 10) << __func__ << " " << path << " size " << size << dendl;
+  ldout(fs->store->cct, 10) << __FFL__ << " " << path << " size " << size << dendl;
   coll_t cid;
   ghobject_t oid;
   string key;
@@ -1116,7 +1116,7 @@ static int os_statfs(const char *path, struct statvfs *stbuf)
 {
   fuse_context *fc = fuse_get_context();
   FuseStore *fs = static_cast<FuseStore*>(fc->private_data);
-  ldout(fs->store->cct, 10) << __func__ << " " << path << dendl;
+  ldout(fs->store->cct, 10) << __FFL__ << " " << path << dendl;
   std::lock_guard<std::mutex> l(fs->lock);
 
   struct store_statfs_t s;
@@ -1128,7 +1128,7 @@ static int os_statfs(const char *path, struct statvfs *stbuf)
   stbuf->f_bavail = s.available / 4096;
   stbuf->f_bfree = stbuf->f_bavail;
 
-  ldout(fs->store->cct, 10) << __func__ << " " << path << ": " 
+  ldout(fs->store->cct, 10) << __FFL__ << " " << path << ": " 
     << stbuf->f_bavail << "/" << stbuf->f_blocks << dendl;
   return 0;
 }
@@ -1190,7 +1190,7 @@ int FuseStore::main()
 
 int FuseStore::start()
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
 
   memset(&info->args, 0, sizeof(info->args));
   const char *v[] = {
@@ -1214,7 +1214,7 @@ int FuseStore::start()
 #else
   if (fuse_parse_cmdline(&info->args, &info->mountpoint, NULL, NULL) == -1) {
 #endif
-    derr << __func__ << " failed to parse args" << dendl;
+    derr << __FFL__ << " failed to parse args" << dendl;
     return -EINVAL;
   }
 
@@ -1222,19 +1222,19 @@ int FuseStore::start()
   info->mountpoint = opts.mountpoint;
   info->f = fuse_new(&info->args, &fs_oper, sizeof(fs_oper), (void*)this);
   if (!info->f) {
-    derr << __func__ << " fuse_new failed" << dendl;
+    derr << __FFL__ << " fuse_new failed" << dendl;
     return -EIO;
   }
 
   rc = fuse_mount(info->f, info->mountpoint);
   if (rc != 0) {
-    derr << __func__ << " fuse_mount failed" << dendl;
+    derr << __FFL__ << " fuse_mount failed" << dendl;
     return -EIO;
   }
 #else
   info->ch = fuse_mount(info->mountpoint, &info->args);
   if (!info->ch) {
-    derr << __func__ << " fuse_mount failed" << dendl;
+    derr << __FFL__ << " fuse_mount failed" << dendl;
     return -EIO;
   }
 
@@ -1242,29 +1242,29 @@ int FuseStore::start()
 		     (void*)this);
   if (!info->f) {
     fuse_unmount(info->mountpoint, info->ch);
-    derr << __func__ << " fuse_new failed" << dendl;
+    derr << __FFL__ << " fuse_new failed" << dendl;
     return -EIO;
   }
 #endif
 
   fuse_thread.create("fusestore");
-  dout(10) << __func__ << " done" << dendl;
+  dout(10) << __FFL__ << " done" << dendl;
   return 0;
 }
 
 int FuseStore::loop()
 {
-  dout(10) << __func__ << " enter" << dendl;
+  dout(10) << __FFL__ << " enter" << dendl;
   int r = fuse_loop(info->f);
   if (r)
-    derr << __func__ << " got " << cpp_strerror(r) << dendl;
-  dout(10) << __func__ << " exit" << dendl;
+    derr << __FFL__ << " got " << cpp_strerror(r) << dendl;
+  dout(10) << __FFL__ << " exit" << dendl;
   return r;
 }
 
 int FuseStore::stop()
 {
-  dout(10) << __func__ << " enter" << dendl;
+  dout(10) << __FFL__ << " enter" << dendl;
 #if FUSE_VERSION >= FUSE_MAKE_VERSION(3, 0)
   fuse_unmount(info->f);
 #else
@@ -1272,6 +1272,6 @@ int FuseStore::stop()
 #endif
   fuse_thread.join();
   fuse_destroy(info->f);
-  dout(10) << __func__ << " exit" << dendl;
+  dout(10) << __FFL__ << " exit" << dendl;
   return 0;
 }

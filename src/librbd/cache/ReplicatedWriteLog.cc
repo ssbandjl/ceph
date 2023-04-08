@@ -1052,7 +1052,7 @@ void ReplicatedWriteLog<I>::complete_op_log_entries(GenericLogOperations &&ops,
 {
   GenericLogEntries dirty_entries;
   int published_reserves = 0;
-  ldout(m_image_ctx.cct, 20) << __func__ << ": completing" << dendl;
+  ldout(m_image_ctx.cct, 20) << __FFL__ << ": completing" << dendl;
   for (auto &op : ops) {
     utime_t now = ceph_clock_now();
     auto log_entry = op->get_log_entry();

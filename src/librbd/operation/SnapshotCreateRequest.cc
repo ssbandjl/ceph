@@ -53,7 +53,7 @@ template <typename I>
 void SnapshotCreateRequest<I>::send_suspend_requests() {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
 
   // TODO suspend (shrink) resize to ensure consistent RBD mirror
   send_suspend_aio();
@@ -63,7 +63,7 @@ template <typename I>
 Context *SnapshotCreateRequest<I>::handle_suspend_requests(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   // TODO
   send_suspend_aio();
@@ -76,7 +76,7 @@ void SnapshotCreateRequest<I>::send_suspend_aio() {
   ceph_assert(ceph_mutex_is_locked(image_ctx.owner_lock));
 
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
 
   image_ctx.io_work_queue->block_writes(create_context_callback<
     SnapshotCreateRequest<I>,
@@ -87,7 +87,7 @@ template <typename I>
 Context *SnapshotCreateRequest<I>::handle_suspend_aio(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to block writes: " << cpp_strerror(*result) << dendl;
@@ -110,14 +110,14 @@ void SnapshotCreateRequest<I>::send_append_op_event() {
   }
 
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
 }
 
 template <typename I>
 Context *SnapshotCreateRequest<I>::handle_append_op_event(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     image_ctx.io_work_queue->unblock_writes();
@@ -134,7 +134,7 @@ template <typename I>
 void SnapshotCreateRequest<I>::send_allocate_snap_id() {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
 
   librados::AioCompletion *rados_completion = create_rados_callback<
     SnapshotCreateRequest<I>,
@@ -147,7 +147,7 @@ template <typename I>
 Context *SnapshotCreateRequest<I>::handle_allocate_snap_id(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": r=" << *result << ", "
+  ldout(cct, 5) << this << " " << __FFL__ << ": r=" << *result << ", "
                 << "snap_id=" << m_snap_id << dendl;
 
   if (*result < 0) {
@@ -166,7 +166,7 @@ template <typename I>
 void SnapshotCreateRequest<I>::send_create_snap() {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
 
   std::shared_lock owner_locker{image_ctx.owner_lock};
   std::shared_lock image_locker{image_ctx.image_lock};
@@ -199,7 +199,7 @@ template <typename I>
 Context *SnapshotCreateRequest<I>::handle_create_snap(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result == -ESTALE) {
     send_allocate_snap_id();
@@ -225,7 +225,7 @@ Context *SnapshotCreateRequest<I>::send_create_object_map() {
   }
 
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
 
   image_ctx.object_map->snapshot_add(
     m_snap_id, create_context_callback<
@@ -239,10 +239,10 @@ template <typename I>
 Context *SnapshotCreateRequest<I>::handle_create_object_map(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
-    lderr(cct) << this << " " << __func__ << ": failed to snapshot object map: "
+    lderr(cct) << this << " " << __FFL__ << ": failed to snapshot object map: "
                << cpp_strerror(*result) << dendl;
 
     update_snap_context();
@@ -265,7 +265,7 @@ Context *SnapshotCreateRequest<I>::send_create_image_state() {
   }
 
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
 
   auto req = mirror::snapshot::SetImageStateRequest<I>::create(
       &image_ctx, m_snap_id, create_context_callback<
@@ -279,12 +279,12 @@ template <typename I>
 Context *SnapshotCreateRequest<I>::handle_create_image_state(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   update_snap_context();
   image_ctx.io_work_queue->unblock_writes();
   if (*result < 0) {
-    lderr(cct) << this << " " << __func__ << ": failed to snapshot object map: "
+    lderr(cct) << this << " " << __FFL__ << ": failed to snapshot object map: "
                << cpp_strerror(*result) << dendl;
     return this->create_context_finisher(*result);
   }
@@ -296,7 +296,7 @@ template <typename I>
 void SnapshotCreateRequest<I>::send_release_snap_id() {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
 
   ceph_assert(m_snap_id != CEPH_NOSNAP);
 
@@ -311,7 +311,7 @@ template <typename I>
 Context *SnapshotCreateRequest<I>::handle_release_snap_id(int *result) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   ceph_assert(m_ret_val < 0);
   *result = m_ret_val;
@@ -335,7 +335,7 @@ void SnapshotCreateRequest<I>::update_snap_context() {
   }
 
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
 
   // should have been canceled prior to releasing lock
   ceph_assert(image_ctx.exclusive_lock == nullptr ||

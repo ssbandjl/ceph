@@ -344,7 +344,7 @@ void RGWOp_MDLog_Notify::execute() {
   }
 
   char* buf = data.c_str();
-  ldout(s->cct, 20) << __func__ << "(): read data: " << buf << dendl;
+  ldout(s->cct, 20) << __FFL__ << "(): read data: " << buf << dendl;
 
   JSONParser p;
   r = p.parse(buf, data.length());
@@ -365,7 +365,7 @@ void RGWOp_MDLog_Notify::execute() {
 
   if (store->ctx()->_conf->subsys.should_gather<ceph_subsys_rgw, 20>()) {
     for (set<int>::iterator iter = updated_shards.begin(); iter != updated_shards.end(); ++iter) {
-      ldout(s->cct, 20) << __func__ << "(): updated shard=" << *iter << dendl;
+      ldout(s->cct, 20) << __FFL__ << "(): updated shard=" << *iter << dendl;
     }
   }
 
@@ -706,7 +706,7 @@ void RGWOp_DATALog_Notify::execute() {
   }
 
   char* buf = data.c_str();
-  ldout(s->cct, 20) << __func__ << "(): read data: " << buf << dendl;
+  ldout(s->cct, 20) << __FFL__ << "(): read data: " << buf << dendl;
 
   JSONParser p;
   r = p.parse(buf, data.length());
@@ -727,10 +727,10 @@ void RGWOp_DATALog_Notify::execute() {
 
   if (store->ctx()->_conf->subsys.should_gather<ceph_subsys_rgw, 20>()) {
     for (map<int, set<string> >::iterator iter = updated_shards.begin(); iter != updated_shards.end(); ++iter) {
-      ldout(s->cct, 20) << __func__ << "(): updated shard=" << iter->first << dendl;
+      ldout(s->cct, 20) << __FFL__ << "(): updated shard=" << iter->first << dendl;
       set<string>& keys = iter->second;
       for (set<string>::iterator kiter = keys.begin(); kiter != keys.end(); ++kiter) {
-      ldout(s->cct, 20) << __func__ << "(): modified key=" << *kiter << dendl;
+      ldout(s->cct, 20) << __FFL__ << "(): modified key=" << *kiter << dendl;
       }
     }
   }

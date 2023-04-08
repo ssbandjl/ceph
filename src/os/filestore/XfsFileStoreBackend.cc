@@ -120,13 +120,13 @@ int XfsFileStoreBackend::detect_features()
     //   http://oss.sgi.com/bugzilla/show_bug.cgi?id=874
     int ver = get_linux_version();
     if (ver == 0) {
-      dout(0) << __func__ << ": couldn't verify extsize not buggy, disabling extsize" << dendl;
+      dout(0) << __FFL__ << ": couldn't verify extsize not buggy, disabling extsize" << dendl;
       m_has_extsize = false;
     } else if (ver < KERNEL_VERSION(3, 5, 0)) {
-      dout(0) << __func__ << ": disabling extsize, your kernel < 3.5 and has buggy extsize ioctl" << dendl;
+      dout(0) << __FFL__ << ": disabling extsize, your kernel < 3.5 and has buggy extsize ioctl" << dendl;
       m_has_extsize = false;
     } else {
-      dout(0) << __func__ << ": extsize is supported and your kernel >= 3.5" << dendl;
+      dout(0) << __FFL__ << ": extsize is supported and your kernel >= 3.5" << dendl;
       m_has_extsize = true;
     }
   } else {

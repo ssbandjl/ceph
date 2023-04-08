@@ -6,7 +6,7 @@
 
 #define dout_subsys ceph_subsys_immutable_obj_cache
 #undef dout_prefix
-#define dout_prefix *_dout << "ceph::cache::Types: " << __func__ << ": "
+#define dout_prefix *_dout << "ceph::cache::Types: " << __FFL__ << ": "
 
 namespace ceph {
 namespace immutable_obj_cache {

@@ -42,13 +42,13 @@ void AsyncOperation::start_op(ImageCtx &image_ctx) {
   ceph_assert(m_image_ctx == NULL);
   m_image_ctx = &image_ctx;
 
-  ldout(m_image_ctx->cct, 20) << this << " " << __func__ << dendl;
+  ldout(m_image_ctx->cct, 20) << this << " " << __FFL__ << dendl;
   std::lock_guard l{m_image_ctx->async_ops_lock};
   m_image_ctx->async_ops.push_front(&m_xlist_item);
 }
 
 void AsyncOperation::finish_op() {
-  ldout(m_image_ctx->cct, 20) << this << " " << __func__ << dendl;
+  ldout(m_image_ctx->cct, 20) << this << " " << __FFL__ << dendl;
 
   {
     std::lock_guard l{m_image_ctx->async_ops_lock};

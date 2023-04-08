@@ -70,7 +70,7 @@ void SetSnapRequest<I>::send_init_exclusive_lock() {
   }
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << __func__ << dendl;
+  ldout(cct, 10) << __FFL__ << dendl;
 
   m_exclusive_lock = ExclusiveLock<I>::create(m_image_ctx);
 
@@ -85,7 +85,7 @@ void SetSnapRequest<I>::send_init_exclusive_lock() {
 template <typename I>
 Context *SetSnapRequest<I>::handle_init_exclusive_lock(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 10) << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to initialize exclusive lock: "
@@ -99,7 +99,7 @@ Context *SetSnapRequest<I>::handle_init_exclusive_lock(int *result) {
 template <typename I>
 void SetSnapRequest<I>::send_block_writes() {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << __func__ << dendl;
+  ldout(cct, 10) << __FFL__ << dendl;
 
   m_writes_blocked = true;
 
@@ -114,7 +114,7 @@ void SetSnapRequest<I>::send_block_writes() {
 template <typename I>
 Context *SetSnapRequest<I>::handle_block_writes(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 10) << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to block writes: " << cpp_strerror(*result)
@@ -151,7 +151,7 @@ Context *SetSnapRequest<I>::send_shut_down_exclusive_lock(int *result) {
   }
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << __func__ << dendl;
+  ldout(cct, 10) << __FFL__ << dendl;
 
   using klass = SetSnapRequest<I>;
   Context *ctx = create_context_callback<
@@ -163,7 +163,7 @@ Context *SetSnapRequest<I>::send_shut_down_exclusive_lock(int *result) {
 template <typename I>
 Context *SetSnapRequest<I>::handle_shut_down_exclusive_lock(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 10) << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to shut down exclusive lock: "
@@ -209,7 +209,7 @@ Context *SetSnapRequest<I>::send_refresh_parent(int *result) {
     }
   }
 
-  ldout(cct, 10) << __func__ << dendl;
+  ldout(cct, 10) << __FFL__ << dendl;
 
   using klass = SetSnapRequest<I>;
   Context *ctx = create_context_callback<
@@ -224,7 +224,7 @@ Context *SetSnapRequest<I>::send_refresh_parent(int *result) {
 template <typename I>
 Context *SetSnapRequest<I>::handle_refresh_parent(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 10) << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to refresh snapshot parent: " << cpp_strerror(*result)
@@ -261,7 +261,7 @@ Context *SetSnapRequest<I>::send_open_object_map(int *result) {
   }
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << __func__ << dendl;
+  ldout(cct, 10) << __FFL__ << dendl;
 
   using klass = SetSnapRequest<I>;
   Context *ctx = create_context_callback<
@@ -274,7 +274,7 @@ Context *SetSnapRequest<I>::send_open_object_map(int *result) {
 template <typename I>
 Context *SetSnapRequest<I>::handle_open_object_map(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 10) << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to open object map: " << cpp_strerror(*result)
@@ -300,7 +300,7 @@ Context *SetSnapRequest<I>::send_finalize_refresh_parent(int *result) {
   }
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   using klass = SetSnapRequest<I>;
   Context *ctx = create_context_callback<
@@ -312,7 +312,7 @@ Context *SetSnapRequest<I>::send_finalize_refresh_parent(int *result) {
 template <typename I>
 Context *SetSnapRequest<I>::handle_finalize_refresh_parent(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to close parent image: " << cpp_strerror(*result)
@@ -325,7 +325,7 @@ Context *SetSnapRequest<I>::handle_finalize_refresh_parent(int *result) {
 template <typename I>
 int SetSnapRequest<I>::apply() {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << __func__ << dendl;
+  ldout(cct, 10) << __FFL__ << dendl;
 
   std::scoped_lock locker{m_image_ctx.owner_lock, m_image_ctx.image_lock};
   if (m_snap_id != CEPH_NOSNAP) {

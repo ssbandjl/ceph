@@ -20,7 +20,7 @@ static sem_t *sem;
 
 static void watch_notify_test_cb(uint8_t opcode, uint64_t ver, void *arg)
 {
-  std::cout << __func__ << std::endl;
+  std::cout << __FFL__ << std::endl;
   sem_post(sem);
 }
 
@@ -51,7 +51,7 @@ void LibRadosWatchNotify::watch_notify2_test_cb(void *arg,
 				  void *data,
 				  size_t data_len)
 {
-  std::cout << __func__ << " from " << notifier_gid << " notify_id " << notify_id
+  std::cout << __FFL__ << " from " << notifier_gid << " notify_id " << notify_id
 	    << " cookie " << cookie << std::endl;
   ceph_assert(notifier_gid > 0);
   auto thiz = reinterpret_cast<LibRadosWatchNotify*>(arg);
@@ -69,7 +69,7 @@ void LibRadosWatchNotify::watch_notify2_test_errcb(void *arg,
                                                    uint64_t cookie,
                                                    int err)
 {
-  std::cout << __func__ << " cookie " << cookie << " err " << err << std::endl;
+  std::cout << __FFL__ << " cookie " << cookie << " err " << err << std::endl;
   ceph_assert(cookie > 1000);
   auto thiz = reinterpret_cast<LibRadosWatchNotify*>(arg);
   ceph_assert(thiz);

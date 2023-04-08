@@ -646,7 +646,7 @@ int RGWCoroutinesManager::run(list<RGWCoroutinesStack *>& stacks)
     op_not_blocked = false;
 
     if (stack->is_io_blocked()) {
-      ldout(cct, 20) << __func__ << ":" << " stack=" << (void *)stack << " is io blocked" << dendl;
+      ldout(cct, 20) << __FFL__ << ":" << " stack=" << (void *)stack << " is io blocked" << dendl;
       if (stack->is_interval_waiting()) {
         interval_wait_count++;
       }
@@ -655,10 +655,10 @@ int RGWCoroutinesManager::run(list<RGWCoroutinesStack *>& stacks)
       /* do nothing, we'll re-add the stack when the blocking stack is done,
        * or when we're awaken
        */
-      ldout(cct, 20) << __func__ << ":" << " stack=" << (void *)stack << " is_blocked_by_stack()=" << stack->is_blocked_by_stack()
+      ldout(cct, 20) << __FFL__ << ":" << " stack=" << (void *)stack << " is_blocked_by_stack()=" << stack->is_blocked_by_stack()
 	             << " is_sleeping=" << stack->is_sleeping() << " waiting_for_child()=" << stack->waiting_for_child() << dendl;
     } else if (stack->is_done()) {
-      ldout(cct, 20) << __func__ << ":" << " stack=" << (void *)stack << " is done" << dendl;
+      ldout(cct, 20) << __FFL__ << ":" << " stack=" << (void *)stack << " is done" << dendl;
       RGWCoroutinesStack *s;
       while (stack->unblock_stack(&s)) {
 	if (!s->is_blocked_by_stack() && !s->is_done()) {
@@ -717,7 +717,7 @@ next:
         ldout(cct, 5) << "completion_mgr.get_next() returned ret=" << ret << dendl;
       }
       if (going_down) {
-	ldout(cct, 5) << __func__ << "(): was stopped, exiting" << dendl;
+	ldout(cct, 5) << __FFL__ << "(): was stopped, exiting" << dendl;
 	ret = -ECANCELED;
         canceled = true;
         break;
@@ -741,7 +741,7 @@ next:
       ::encode_json("entry", *s, &formatter);
     }
     formatter.close_section();
-    lderr(cct) << __func__ << "(): ERROR: deadlock detected, dumping remaining coroutines:\n";
+    lderr(cct) << __FFL__ << "(): ERROR: deadlock detected, dumping remaining coroutines:\n";
     formatter.flush(*_dout);
     *_dout << dendl;
     ceph_assert(context_stacks.empty() || going_down); // assert on deadlock

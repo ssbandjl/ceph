@@ -121,7 +121,7 @@ Allocator *Allocator::create(CephContext* cct, string type,
       name);
   }
   if (alloc == nullptr) {
-    lderr(cct) << "Allocator::" << __func__ << " unknown alloc type "
+    lderr(cct) << "Allocator::" << __FFL__ << " unknown alloc type "
 	     << type << dendl;
   }
   return alloc;

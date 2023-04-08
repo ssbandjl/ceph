@@ -25,7 +25,7 @@
 #define dout_subsys ceph_subsys_rbd
 #undef dout_prefix
 #define dout_prefix *_dout << "librbd::io::CopyupRequest: " << this            \
-                           << " " << __func__ << ": "                          \
+                           << " " << __FFL__ << ": "                          \
                            << data_object_name(m_image_ctx, m_object_no) << " "
 
 namespace librbd {

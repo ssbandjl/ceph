@@ -83,7 +83,7 @@ int ObjectStore::probe_block_device_fsid(
   // reliably.
   r = BlueStore::get_block_device_fsid(cct, path, fsid);
   if (r == 0) {
-    lgeneric_dout(cct, 0) << __func__ << " " << path << " is bluestore, "
+    lgeneric_dout(cct, 0) << __FFL__ << " " << path << " is bluestore, "
 			  << *fsid << dendl;
     return r;
   }
@@ -93,7 +93,7 @@ int ObjectStore::probe_block_device_fsid(
   // okay, try FileStore (journal).
   r = FileStore::get_block_device_fsid(cct, path, fsid);
   if (r == 0) {
-    lgeneric_dout(cct, 0) << __func__ << " " << path << " is filestore, "
+    lgeneric_dout(cct, 0) << __FFL__ << " " << path << " is filestore, "
 			  << *fsid << dendl;
     return r;
   }

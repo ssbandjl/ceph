@@ -36,7 +36,7 @@ void StoreTestFixture::SetUp()
   int r = ::mkdir(data_dir.c_str(), 0777);
   if (r < 0) {
     r = -errno;
-    cerr << __func__ << ": unable to create " << data_dir << ": " << cpp_strerror(r) << std::endl;
+    cerr << __FFL__ << ": unable to create " << data_dir << ": " << cpp_strerror(r) << std::endl;
   }
   ASSERT_EQ(0, r);
 
@@ -45,7 +45,7 @@ void StoreTestFixture::SetUp()
                                   data_dir,
                                   string("store_test_temp_journal")));
   if (!store) {
-    cerr << __func__ << ": objectstore type " << type << " doesn't exist yet!" << std::endl;
+    cerr << __FFL__ << ": objectstore type " << type << " doesn't exist yet!" << std::endl;
   }
   ASSERT_TRUE(store);
 #if defined(WITH_BLUESTORE)

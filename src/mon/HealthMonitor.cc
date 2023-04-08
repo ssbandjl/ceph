@@ -44,18 +44,18 @@ HealthMonitor::HealthMonitor(Monitor *m, Paxos *p, const string& service_name)
 
 void HealthMonitor::init()
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
 }
 
 void HealthMonitor::create_initial()
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
 }
 
 void HealthMonitor::update_from_paxos(bool *need_bootstrap)
 {
   version = get_last_committed();
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   load_health();
 
   bufferlist qbl;
@@ -313,7 +313,7 @@ bool HealthMonitor::prepare_command(MonOpRequestRef op)
   }
 
 out:
-  dout(4) << __func__ << " done, r=" << r << dendl;
+  dout(4) << __FFL__ << " done, r=" << r << dendl;
   /* Compose response */
   string rs;
   getline(ss, rs);
@@ -343,7 +343,7 @@ void HealthMonitor::tick()
   if (!is_active()) {
     return;
   }
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   bool changed = false;
   if (check_member_health()) {
     changed = true;
@@ -399,7 +399,7 @@ bool HealthMonitor::check_mutes()
 	}
 	if (q->second.count < p->second.count) {
 	  // rachet down the mute
-	  dout(10) << __func__ << " mute " << p->first << " count "
+	  dout(10) << __FFL__ << " mute " << p->first << " count "
 		   << p->second.count << " -> " << q->second.count
 		   << dendl;
 	  p->second.count = q->second.count;
@@ -538,7 +538,7 @@ health_status_t HealthMonitor::get_health_status(
 
 bool HealthMonitor::check_member_health()
 {
-  dout(20) << __func__ << dendl;
+  dout(20) << __FFL__ << dendl;
   bool changed = false;
   const auto max = g_conf().get_val<uint64_t>("mon_health_max_detail");
 
@@ -553,7 +553,7 @@ bool HealthMonitor::check_member_health()
   stats.store_stats.bytes_log = extra["log"];
   stats.store_stats.bytes_misc = extra["misc"];
   stats.last_update = ceph_clock_now();
-  dout(10) << __func__ << " avail " << stats.fs_stats.avail_percent << "%"
+  dout(10) << __FFL__ << " avail " << stats.fs_stats.avail_percent << "%"
 	   << " total " << byte_u_t(stats.fs_stats.byte_total)
 	   << ", used " << byte_u_t(stats.fs_stats.byte_used)
 	   << ", avail " << byte_u_t(stats.fs_stats.byte_avail) << dendl;
@@ -673,7 +673,7 @@ bool HealthMonitor::check_member_health()
 
 bool HealthMonitor::check_leader_health()
 {
-  dout(20) << __func__ << dendl;
+  dout(20) << __FFL__ << dendl;
   bool changed = false;
 
   // prune quorum_health

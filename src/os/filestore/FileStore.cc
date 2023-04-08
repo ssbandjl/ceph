@@ -1212,7 +1212,7 @@ bool FileStore::is_rotational()
     delete backend;
     backend = nullptr;
   }
-  dout(10) << __func__ << " " << (int)rotational << dendl;
+  dout(10) << __FFL__ << " " << (int)rotational << dendl;
   return rotational;
 }
 
@@ -1236,7 +1236,7 @@ bool FileStore::is_journal_rotational()
     delete backend;
     backend = nullptr;
   }
-  dout(10) << __func__ << " " << (int)journal_rotational << dendl;
+  dout(10) << __FFL__ << " " << (int)journal_rotational << dendl;
   return journal_rotational;
 }
 
@@ -1271,7 +1271,7 @@ int FileStore::_detect_fs()
     if (int rc = BlkDev{fsid_fd}.wholedisk(dev_node, PATH_MAX); rc == 0) {
       vdo_fd = get_vdo_stats_handle(dev_node, &vdo_name);
       if (vdo_fd >= 0) {
-	dout(0) << __func__ << " VDO volume " << vdo_name << " for " << dev_node
+	dout(0) << __FFL__ << " VDO volume " << vdo_name << " for " << dev_node
 		<< dendl;
       }
     }
@@ -2520,7 +2520,7 @@ void FileStore::_set_global_replay_guard(const coll_t& cid,
   // and make sure our xattr is durable.
   r = ::fsync(fd);
   if (r < 0) {
-    derr << __func__ << " fsync failed: " << cpp_strerror(errno) << dendl;
+    derr << __FFL__ << " fsync failed: " << cpp_strerror(errno) << dendl;
     ceph_abort();
   }
 
@@ -2593,7 +2593,7 @@ void FileStore::_set_replay_guard(int fd,
   // first make sure the previous operation commits
   int r = ::fsync(fd);
   if (r < 0) {
-    derr << __func__ << " fsync failed: " << cpp_strerror(errno) << dendl;
+    derr << __FFL__ << " fsync failed: " << cpp_strerror(errno) << dendl;
     ceph_abort();
   }
 
@@ -2620,7 +2620,7 @@ void FileStore::_set_replay_guard(int fd,
   // and make sure our xattr is durable.
   r = ::fsync(fd);
   if (r < 0) {
-    derr << __func__ << " fsync failed: " << cpp_strerror(errno) << dendl;
+    derr << __FFL__ << " fsync failed: " << cpp_strerror(errno) << dendl;
     ceph_abort();
   }
 
@@ -2674,7 +2674,7 @@ void FileStore::_close_replay_guard(int fd, const SequencerPosition& spos,
   // and make sure our xattr is durable.
   r = ::fsync(fd);
   if (r < 0) {
-    derr << __func__ << " fsync failed: " << cpp_strerror(errno) << dendl;
+    derr << __FFL__ << " fsync failed: " << cpp_strerror(errno) << dendl;
     ceph_abort();
   }
 
@@ -3456,7 +3456,7 @@ int FileStore::read(
 	     cct->_conf->filestore_debug_random_read_err &&
 	     (rand() % (int)(cct->_conf->filestore_debug_random_read_err *
 			     100.0)) == 0) {
-    dout(0) << __func__ << ": inject random EIO" << dendl;
+    dout(0) << __FFL__ << ": inject random EIO" << dendl;
     return -EIO;
   } else {
     tracepoint(objectstore, read_exit, got);
@@ -4983,7 +4983,7 @@ int FileStore::list_collections(vector<coll_t>& ls, bool include_temp)
       char filename[PATH_MAX];
       if (int n = snprintf(filename, sizeof(filename), "%s/%s", fn, de->d_name);
 	  n >= static_cast<int>(sizeof(filename))) {
-	derr << __func__ << " path length overrun: " << n << dendl;
+	derr << __FFL__ << " path length overrun: " << n << dendl;
 	ceph_abort();
       }
 
@@ -6366,7 +6366,7 @@ void FSSuperblock::generate_test_instances(list<FSSuperblock*>& o)
 void FileStore::OpSequencer::_register_apply(Op *o)
 {
   if (o->registered_apply) {
-    dout(20) << __func__ << " " << o << " already registered" << dendl;
+    dout(20) << __FFL__ << " " << o << " already registered" << dendl;
     return;
   }
   o->registered_apply = true;
@@ -6374,7 +6374,7 @@ void FileStore::OpSequencer::_register_apply(Op *o)
     for (auto& i : t.get_object_index()) {
       uint32_t key = i.first.hobj.get_hash();
       applying.emplace(make_pair(key, &i.first));
-      dout(20) << __func__ << " " << o << " " << i.first << " ("
+      dout(20) << __FFL__ << " " << o << " " << i.first << " ("
 	       << &i.first << ")" << dendl;
     }
   }
@@ -6391,7 +6391,7 @@ void FileStore::OpSequencer::_unregister_apply(Op *o)
       while (p != applying.end() &&
 	     p->first == key) {
 	if (p->second == &i.first) {
-	  dout(20) << __func__ << " " << o << " " << i.first << " ("
+	  dout(20) << __FFL__ << " " << o << " " << i.first << " ("
 		   << &i.first << ")" << dendl;
 	  applying.erase(p);
 	  removed = true;
@@ -6415,7 +6415,7 @@ retry:
     while (p != applying.end() &&
 	   p->first == key) {
       if (*p->second == oid) {
-	dout(20) << __func__ << " " << oid << " waiting on " << p->second
+	dout(20) << __FFL__ << " " << oid << " waiting on " << p->second
 		 << dendl;
 	cond.wait(l);
 	goto retry;
@@ -6424,5 +6424,5 @@ retry:
     }
     break;
   }
-  dout(20) << __func__ << " " << oid << " done" << dendl;
+  dout(20) << __FFL__ << " " << oid << " done" << dendl;
 }

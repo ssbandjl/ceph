@@ -36,7 +36,7 @@ using ceph::bufferlist;
 
 #define dout_subsys ceph_subsys_mgrc
 #undef dout_prefix
-#define dout_prefix *_dout << "mgrc " << __func__ << " "
+#define dout_prefix *_dout << "mgrc " << __FFL__ << " "
 
 MgrClient::MgrClient(CephContext *cct_, Messenger *msgr_, MonMap *monmap_)
   : Dispatcher(cct_),
@@ -266,7 +266,7 @@ bool MgrClient::ms_handle_reset(Connection *con)
 {
   std::lock_guard l(lock);
   if (session && con == session->con) {
-    ldout(cct, 4) << __func__ << " con " << con << dendl;
+    ldout(cct, 4) << __FFL__ << " con " << con << dendl;
     reconnect();
     return true;
   }

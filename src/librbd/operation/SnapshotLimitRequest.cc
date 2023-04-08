@@ -29,7 +29,7 @@ template <typename I>
 bool SnapshotLimitRequest<I>::should_complete(int r) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << " r=" << r << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << " r=" << r << dendl;
 
   if (r < 0) {
     lderr(cct) << "encountered error: " << cpp_strerror(r) << dendl;
@@ -43,7 +43,7 @@ void SnapshotLimitRequest<I>::send_limit_snaps() {
   ceph_assert(ceph_mutex_is_locked(image_ctx.owner_lock));
 
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
 
   {
     std::shared_lock image_locker{image_ctx.image_lock};

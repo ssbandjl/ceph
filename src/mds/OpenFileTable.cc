@@ -167,19 +167,19 @@ void OpenFileTable::put_ref(CInode *in, frag_t fg)
 
 void OpenFileTable::add_inode(CInode *in)
 {
-  dout(10) << __func__ << " " << *in << dendl;
+  dout(10) << __FFL__ << " " << *in << dendl;
   get_ref(in);
 }
 
 void OpenFileTable::remove_inode(CInode *in)
 {
-  dout(10) << __func__ << " " << *in << dendl;
+  dout(10) << __FFL__ << " " << *in << dendl;
   put_ref(in);
 }
 
 void OpenFileTable::add_dirfrag(CDir *dir)
 {
-  dout(10) << __func__ << " " << *dir << dendl;
+  dout(10) << __FFL__ << " " << *dir << dendl;
   ceph_assert(!dir->state_test(CDir::STATE_TRACKEDBYOFT));
   dir->state_set(CDir::STATE_TRACKEDBYOFT);
   get_ref(dir->get_inode(), dir->get_frag());
@@ -187,7 +187,7 @@ void OpenFileTable::add_dirfrag(CDir *dir)
 
 void OpenFileTable::remove_dirfrag(CDir *dir)
 {
-  dout(10) << __func__ << " " << *dir << dendl;
+  dout(10) << __FFL__ << " " << *dir << dendl;
   ceph_assert(dir->state_test(CDir::STATE_TRACKEDBYOFT));
   dir->state_clear(CDir::STATE_TRACKEDBYOFT);
   put_ref(dir->get_inode(), dir->get_frag());
@@ -195,7 +195,7 @@ void OpenFileTable::remove_dirfrag(CDir *dir)
 
 void OpenFileTable::notify_link(CInode *in)
 {
-  dout(10) << __func__ << " " << *in << dendl;
+  dout(10) << __FFL__ << " " << *in << dendl;
   auto p = anchor_map.find(in->ino());
   ceph_assert(p != anchor_map.end());
   ceph_assert(p->second.nref > 0);
@@ -214,7 +214,7 @@ void OpenFileTable::notify_link(CInode *in)
 
 void OpenFileTable::notify_unlink(CInode *in)
 {
-  dout(10) << __func__ << " " << *in << dendl;
+  dout(10) << __FFL__ << " " << *in << dendl;
   auto p = anchor_map.find(in->ino());
   ceph_assert(p != anchor_map.end());
   ceph_assert(p->second.nref > 0);
@@ -268,7 +268,7 @@ public:
 
 void OpenFileTable::_commit_finish(int r, uint64_t log_seq, MDSContext *fin)
 {
-  dout(10) << __func__ << " log_seq " << log_seq << dendl;
+  dout(10) << __FFL__ << " log_seq " << log_seq << dendl;
   if (r < 0) {
     mds->handle_write_error(r);
     return;
@@ -307,7 +307,7 @@ public:
 void OpenFileTable::_journal_finish(int r, uint64_t log_seq, MDSContext *c,
 				    std::map<unsigned, std::vector<ObjectOperation> >& ops_map)
 {
-  dout(10) << __func__ << " log_seq " << log_seq << dendl;
+  dout(10) << __FFL__ << " log_seq " << log_seq << dendl;
   if (r < 0) {
     mds->handle_write_error(r);
     return;
@@ -333,7 +333,7 @@ void OpenFileTable::_journal_finish(int r, uint64_t log_seq, MDSContext *c,
 
 void OpenFileTable::commit(MDSContext *c, uint64_t log_seq, int op_prio)
 {
-  dout(10) << __func__ << " log_seq " << log_seq << dendl;
+  dout(10) << __FFL__ << " log_seq " << log_seq << dendl;
 
   ceph_assert(num_pending_commit == 0);
   num_pending_commit++;
@@ -713,10 +713,10 @@ public:
 void OpenFileTable::_recover_finish(int r)
 {
   if (r < 0) {
-    derr << __func__ << " got " << cpp_strerror(r) << dendl;
+    derr << __FFL__ << " got " << cpp_strerror(r) << dendl;
     _reset_states();
   } else {
-    dout(10) << __func__ << ": load complete" << dendl;
+    dout(10) << __FFL__ << ": load complete" << dendl;
   }
 
   journal_state = JOURNAL_NONE;
@@ -755,7 +755,7 @@ void OpenFileTable::_load_finish(int op_r, int header_r, int values_r,
   };
 
   if (op_r < 0) {
-    derr << __func__ << " got " << cpp_strerror(op_r) << dendl;
+    derr << __FFL__ << " got " << cpp_strerror(op_r) << dendl;
     err = op_r;
     goto out;
   }
@@ -830,7 +830,7 @@ void OpenFileTable::_load_finish(int op_r, int header_r, int values_r,
       decode_func(idx, ino, it.second);
     }
   } catch (buffer::error &e) {
-    derr << __func__ << ": corrupted header/values: " << e.what() << dendl;
+    derr << __FFL__ << ": corrupted header/values: " << e.what() << dendl;
     goto out;
   }
 
@@ -841,7 +841,7 @@ void OpenFileTable::_load_finish(int op_r, int header_r, int values_r,
       last_key = values.rbegin()->first;
     else
       idx++;
-    dout(10) << __func__ << ": continue to load from '" << last_key << "'" << dendl;
+    dout(10) << __FFL__ << ": continue to load from '" << last_key << "'" << dendl;
     object_t oid = get_object_name(idx);
     object_locator_t oloc(mds->mdsmap->get_metadata_pool());
     C_IO_OFT_Load *c = new C_IO_OFT_Load(this, idx, !more);
@@ -857,7 +857,7 @@ void OpenFileTable::_load_finish(int op_r, int header_r, int values_r,
 
   // replay journal
   if (loaded_journals.size() > 0) {
-    dout(10) << __func__ << ": recover journal" << dendl;
+    dout(10) << __FFL__ << ": recover journal" << dendl;
 
     C_GatherBuilder gather(g_ceph_context,
 			   new C_OnFinisher(new C_IO_OFT_Recover(this),
@@ -909,7 +909,7 @@ void OpenFileTable::_load_finish(int op_r, int header_r, int values_r,
 	    op.omap_rm_keys(to_remove);
 	}
       } catch (buffer::error &e) {
-	derr << __func__ << ": corrupted journal: " << e.what() << dendl;
+	derr << __FFL__ << ": corrupted journal: " << e.what() << dendl;
 	goto out;
       }
 
@@ -944,7 +944,7 @@ void OpenFileTable::_load_finish(int op_r, int header_r, int values_r,
 
   journal_state = JOURNAL_NONE;
   err = 0;
-  dout(10) << __func__ << ": load complete" << dendl;
+  dout(10) << __FFL__ << ": load complete" << dendl;
 out:
 
   if (err < 0)
@@ -957,7 +957,7 @@ out:
 
 void OpenFileTable::load(MDSContext *onload)
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   ceph_assert(!load_done);
   if (onload)
     waiting_for_load.push_back(onload);
@@ -1049,7 +1049,7 @@ void OpenFileTable::_open_ino_finish(inodeno_t ino, int r)
 
 void OpenFileTable::_prefetch_dirfrags()
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   ceph_assert(prefetch_state == DIRFRAGS);
 
   MDCache *mdcache = mds->mdcache;
@@ -1114,7 +1114,7 @@ void OpenFileTable::_prefetch_dirfrags()
 
 void OpenFileTable::_prefetch_inodes()
 {
-  dout(10) << __func__ << " state " << prefetch_state << dendl;
+  dout(10) << __FFL__ << " state " << prefetch_state << dendl;
   ceph_assert(!num_opening_inodes);
   num_opening_inodes = 1;
 
@@ -1177,7 +1177,7 @@ void OpenFileTable::_prefetch_inodes()
 
 bool OpenFileTable::prefetch_inodes()
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   ceph_assert(!prefetch_state);
   prefetch_state = DIR_INODES;
 

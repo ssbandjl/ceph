@@ -58,7 +58,7 @@ void handle_mon_signal(int signum)
 
 int obtain_monmap(MonitorDBStore &store, bufferlist &bl)
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   /*
    * the monmap may be in one of three places:
    *  'mon_sync:temp_newer_monmap' - stashed newer map for bootstrap
@@ -73,7 +73,7 @@ int obtain_monmap(MonitorDBStore &store, bufferlist &bl)
       int err = store.get("monmap", latest_ver, bl);
       ceph_assert(err == 0);
       ceph_assert(bl.length() > 0);
-      dout(10) << __func__ << " read last committed monmap ver "
+      dout(10) << __FFL__ << " read last committed monmap ver "
                << latest_ver << dendl;
 
       // see if there is stashed newer map (see bootstrap())
@@ -85,11 +85,11 @@ int obtain_monmap(MonitorDBStore &store, bufferlist &bl)
 	MonMap b;
 	b.decode(bl2);
 	if (b.get_epoch() > latest_ver) {
-	  dout(10) << __func__ << " using stashed monmap " << b.get_epoch()
+	  dout(10) << __FFL__ << " using stashed monmap " << b.get_epoch()
 		   << " instead" << dendl;
 	  bl.claim(bl2);
 	} else {
-	  dout(10) << __func__ << " ignoring stashed monmap " << b.get_epoch()
+	  dout(10) << __FFL__ << " ignoring stashed monmap " << b.get_epoch()
 		   << dendl;
 	}
       }
@@ -99,18 +99,18 @@ int obtain_monmap(MonitorDBStore &store, bufferlist &bl)
 
   if (store.exists("mon_sync", "in_sync")
       || store.exists("mon_sync", "force_sync")) {
-    dout(10) << __func__ << " detected aborted sync" << dendl;
+    dout(10) << __FFL__ << " detected aborted sync" << dendl;
     if (store.exists("mon_sync", "latest_monmap")) {
       int err = store.get("mon_sync", "latest_monmap", bl);
       ceph_assert(err == 0);
       ceph_assert(bl.length() > 0);
-      dout(10) << __func__ << " read backup monmap" << dendl;
+      dout(10) << __FFL__ << " read backup monmap" << dendl;
       return 0;
     }
   }
 
   if (store.exists("mon_sync", "temp_newer_monmap")) {
-    dout(10) << __func__ << " found temp_newer_monmap" << dendl;
+    dout(10) << __FFL__ << " found temp_newer_monmap" << dendl;
     int err = store.get("mon_sync", "temp_newer_monmap", bl);
     ceph_assert(err == 0);
     ceph_assert(bl.length() > 0);
@@ -118,14 +118,14 @@ int obtain_monmap(MonitorDBStore &store, bufferlist &bl)
   }
 
   if (store.exists("mkfs", "monmap")) {
-    dout(10) << __func__ << " found mkfs monmap" << dendl;
+    dout(10) << __FFL__ << " found mkfs monmap" << dendl;
     int err = store.get("mkfs", "monmap", bl);
     ceph_assert(err == 0);
     ceph_assert(bl.length() > 0);
     return 0;
   }
 
-  derr << __func__ << " unable to find a monmap" << dendl;
+  derr << __FFL__ << " unable to find a monmap" << dendl;
   return -ENOENT;
 }
 
@@ -707,7 +707,7 @@ int main(int argc, const char **argv)
       derr << "unable to obtain a monmap: " << cpp_strerror(err) << dendl;
     }
 
-    dout(10) << __func__ << " monmap:\n";
+    dout(10) << __FFL__ << " monmap:\n";
     JSONFormatter jf(true);
     jf.dump_object("monmap", monmap);
     jf.flush(*_dout);

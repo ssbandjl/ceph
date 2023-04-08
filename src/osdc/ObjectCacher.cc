@@ -1864,7 +1864,7 @@ void ObjectCacher::_maybe_wait_for_writeback(uint64_t len,
     if (blocked == 0) {
       trace->event("start wait for writeback");
     }
-    ldout(cct, 10) << __func__ << " waiting for dirty|tx "
+    ldout(cct, 10) << __FFL__ << " waiting for dirty|tx "
 		   << (get_stat_dirty() + get_stat_tx()) << " >= max "
 		   << max_dirty << " + dirty_waiting "
 		   << get_stat_dirty_waiting() << dendl;
@@ -1877,7 +1877,7 @@ void ObjectCacher::_maybe_wait_for_writeback(uint64_t len,
     stat_dirty_waiting -= len;
     --stat_nr_dirty_waiters;
     ++blocked;
-    ldout(cct, 10) << __func__ << " woke up" << dendl;
+    ldout(cct, 10) << __FFL__ << " woke up" << dendl;
   }
   if (blocked > 0) {
     trace->event("finish wait for writeback");
@@ -2559,14 +2559,14 @@ void ObjectCacher::_discard(ObjectSet *oset, const vector<ObjectExtent>& exls,
                             C_GatherBuilder* gather)
 {
   if (oset->objects.empty()) {
-    ldout(cct, 10) << __func__ << " on " << oset << " dne" << dendl;
+    ldout(cct, 10) << __FFL__ << " on " << oset << " dne" << dendl;
     return;
   }
 
-  ldout(cct, 10) << __func__ << " " << oset << dendl;
+  ldout(cct, 10) << __FFL__ << " " << oset << dendl;
 
   for (auto& ex : exls) {
-    ldout(cct, 10) << __func__ << " " << oset << " ex " << ex << dendl;
+    ldout(cct, 10) << __FFL__ << " " << oset << " ex " << ex << dendl;
     sobject_t soid(ex.oid, CEPH_NOSNAP);
     if (objects[oset->poolid].count(soid) == 0)
       continue;

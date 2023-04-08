@@ -41,7 +41,7 @@ Context *Request<I>::create_context_finisher(int r) {
 
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
   return util::create_context_callback<Request<I>, &Request<I>::finish>(this);
 }
 
@@ -49,7 +49,7 @@ template <typename I>
 void Request<I>::finish_and_destroy(int r) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << r << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << r << dendl;
 
   // automatically commit the event if required (delete after commit)
   if (m_appended_op_event && !m_committed_op_event &&
@@ -64,7 +64,7 @@ template <typename I>
 void Request<I>::finish(int r) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << r << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << r << dendl;
 
   ceph_assert(!m_appended_op_event || m_committed_op_event);
   AsyncRequest<I>::finish(r);
@@ -101,7 +101,7 @@ bool Request<I>::commit_op_event(int r) {
   if (image_ctx.journal != nullptr &&
       image_ctx.journal->is_journal_appending()) {
     CephContext *cct = image_ctx.cct;
-    ldout(cct, 10) << this << " " << __func__ << ": r=" << r << dendl;
+    ldout(cct, 10) << this << " " << __FFL__ << ": r=" << r << dendl;
 
     // ops will be canceled / completed before closing journal
     ceph_assert(image_ctx.journal->is_journal_ready());
@@ -116,7 +116,7 @@ template <typename I>
 void Request<I>::handle_commit_op_event(int r, int original_ret_val) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << r << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << r << dendl;
 
   if (r < 0) {
     lderr(cct) << "failed to commit op event to journal: " << cpp_strerror(r)
@@ -147,7 +147,7 @@ void Request<I>::append_op_event(Context *on_safe) {
   ceph_assert(ceph_mutex_is_locked(image_ctx.image_lock));
 
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   m_op_tid = image_ctx.journal->allocate_op_tid();
   image_ctx.journal->append_op_event(
@@ -159,7 +159,7 @@ template <typename I>
 void Request<I>::handle_op_event_safe(int r) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << r << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << r << dendl;
 
   if (r < 0) {
     lderr(cct) << "failed to commit op event to journal: " << cpp_strerror(r)

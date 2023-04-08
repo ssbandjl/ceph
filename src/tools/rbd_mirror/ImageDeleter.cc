@@ -135,7 +135,7 @@ ImageDeleter<I>::ImageDeleter(
 
 #undef dout_prefix
 #define dout_prefix *_dout << "rbd::mirror::ImageDeleter: " << " " \
-                           << __func__ << ": "
+                           << __FFL__ << ": "
 
 template <typename I>
 void ImageDeleter<I>::trash_move(librados::IoCtx& local_io_ctx,
@@ -152,7 +152,7 @@ void ImageDeleter<I>::trash_move(librados::IoCtx& local_io_ctx,
 
 #undef dout_prefix
 #define dout_prefix *_dout << "rbd::mirror::ImageDeleter: " << this << " " \
-                           << __func__ << ": "
+                           << __FFL__ << ": "
 
 template <typename I>
 void ImageDeleter<I>::init(Context* on_finish) {

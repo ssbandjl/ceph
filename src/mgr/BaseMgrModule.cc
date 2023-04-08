@@ -255,7 +255,7 @@ ceph_set_health_checks(BaseMgrModule *self, PyObject *args)
     return NULL;
   }
   if (!PyDict_Check(checks)) {
-    derr << __func__ << " arg not a dict" << dendl;
+    derr << __FFL__ << " arg not a dict" << dendl;
     Py_RETURN_NONE;
   }
   PyObject *checksls = PyDict_Items(checks);
@@ -265,12 +265,12 @@ ceph_set_health_checks(BaseMgrModule *self, PyObject *args)
     char *check_name = nullptr;
     PyObject *check_info = nullptr;
     if (!PyArg_ParseTuple(kv, "sO:pair", &check_name, &check_info)) {
-      derr << __func__ << " dict item " << i
+      derr << __FFL__ << " dict item " << i
 	   << " not a size 2 tuple" << dendl;
       continue;
     }
     if (!PyDict_Check(check_info)) {
-      derr << __func__ << " item " << i << " " << check_name
+      derr << __FFL__ << " item " << i << " " << check_name
 	   << " value not a dict" << dendl;
       continue;
     }
@@ -282,21 +282,21 @@ ceph_set_health_checks(BaseMgrModule *self, PyObject *args)
     for (int j = 0; j < PyList_Size(infols); ++j) {
       PyObject *pair = PyList_GET_ITEM(infols, j);
       if (!PyTuple_Check(pair)) {
-	derr << __func__ << " item " << i << " pair " << j
+	derr << __FFL__ << " item " << i << " pair " << j
 	     << " not a tuple" << dendl;
 	continue;
       }
       char *k = nullptr;
       PyObject *v = nullptr;
       if (!PyArg_ParseTuple(pair, "sO:pair", &k, &v)) {
-	derr << __func__ << " item " << i << " pair " << j
+	derr << __FFL__ << " item " << i << " pair " << j
 	     << " not a size 2 tuple" << dendl;
 	continue;
       }
       string ks(k);
       if (ks == "severity") {
 	if (!PyUnicode_Check(v)) {
-	  derr << __func__ << " check " << check_name
+	  derr << __FFL__ << " check " << check_name
 	       << " severity value not string" << dendl;
 	  continue;
 	}
@@ -307,7 +307,7 @@ ceph_set_health_checks(BaseMgrModule *self, PyObject *args)
 	}
       } else if (ks == "summary") {
 	if (!PyUnicode_Check(v)) {
-	  derr << __func__ << " check " << check_name
+	  derr << __FFL__ << " check " << check_name
 	       << " summary value not [unicode] string" << dendl;
 	  continue;
 	} else {
@@ -317,20 +317,20 @@ ceph_set_health_checks(BaseMgrModule *self, PyObject *args)
 	if (PyLong_Check(v)) {
 	  count = PyLong_AsLong(v);
 	} else {
-	  derr << __func__ << " check " << check_name
+	  derr << __FFL__ << " check " << check_name
 	       << " count value not int" << dendl;
 	  continue;
 	}
       } else if (ks == "detail") {
 	if (!PyList_Check(v)) {
-	  derr << __func__ << " check " << check_name
+	  derr << __FFL__ << " check " << check_name
 	       << " detail value not list" << dendl;
 	  continue;
 	}
 	for (int k = 0; k < PyList_Size(v); ++k) {
 	  PyObject *di = PyList_GET_ITEM(v, k);
 	  if (!PyUnicode_Check(di)) {
-	    derr << __func__ << " check " << check_name
+	    derr << __FFL__ << " check " << check_name
 		 << " detail item " << k << " not a [unicode] string" << dendl;
 	    continue;
 	  } else {
@@ -338,7 +338,7 @@ ceph_set_health_checks(BaseMgrModule *self, PyObject *args)
 	  }
 	}
       } else {
-	derr << __func__ << " check " << check_name
+	derr << __FFL__ << " check " << check_name
 	     << " unexpected key " << k << dendl;
       }
     }
@@ -804,7 +804,7 @@ ceph_add_osd_perf_query(BaseMgrModule *self, PyObject *args)
     return nullptr;
   }
   if (!PyDict_Check(py_query)) {
-    derr << __func__ << " arg not a dict" << dendl;
+    derr << __FFL__ << " arg not a dict" << dendl;
     Py_RETURN_NONE;
   }
 
@@ -828,18 +828,18 @@ ceph_add_osd_perf_query(BaseMgrModule *self, PyObject *args)
     char *query_param_name = nullptr;
     PyObject *query_param_val = nullptr;
     if (!PyArg_ParseTuple(kv, "sO:pair", &query_param_name, &query_param_val)) {
-      derr << __func__ << " dict item " << i << " not a size 2 tuple" << dendl;
+      derr << __FFL__ << " dict item " << i << " not a size 2 tuple" << dendl;
       Py_RETURN_NONE;
     }
     if (query_param_name == NAME_KEY_DESCRIPTOR) {
       if (!PyList_Check(query_param_val)) {
-        derr << __func__ << " " << query_param_name << " not a list" << dendl;
+        derr << __FFL__ << " " << query_param_name << " not a list" << dendl;
         Py_RETURN_NONE;
       }
       for (int j = 0; j < PyList_Size(query_param_val); j++) {
         PyObject *sub_key = PyList_GET_ITEM(query_param_val, j);
         if (!PyDict_Check(sub_key)) {
-          derr << __func__ << " query " << query_param_name << " item " << j
+          derr << __FFL__ << " query " << query_param_name << " item " << j
                << " not a dict" << dendl;
           Py_RETURN_NONE;
         }
@@ -848,34 +848,34 @@ ceph_add_osd_perf_query(BaseMgrModule *self, PyObject *args)
         for (int k = 0; k < PyList_Size(sub_key_params); ++k) {
           PyObject *pair = PyList_GET_ITEM(sub_key_params, k);
           if (!PyTuple_Check(pair)) {
-            derr << __func__ << " query " << query_param_name << " item " << j
+            derr << __FFL__ << " query " << query_param_name << " item " << j
                  << " pair " << k << " not a tuple" << dendl;
             Py_RETURN_NONE;
           }
           char *param_name = nullptr;
           PyObject *param_value = nullptr;
           if (!PyArg_ParseTuple(pair, "sO:pair", &param_name, &param_value)) {
-            derr << __func__ << " query " << query_param_name << " item " << j
+            derr << __FFL__ << " query " << query_param_name << " item " << j
                  << " pair " << k << " not a size 2 tuple" << dendl;
             Py_RETURN_NONE;
           }
           if (param_name == NAME_SUB_KEY_TYPE) {
             if (!PyUnicode_Check(param_value)) {
-              derr << __func__ << " query " << query_param_name << " item " << j
+              derr << __FFL__ << " query " << query_param_name << " item " << j
                    << " contains invalid param " << param_name << dendl;
               Py_RETURN_NONE;
             }
             auto type = PyUnicode_AsUTF8(param_value);
             auto it = sub_key_types.find(type);
             if (it == sub_key_types.end()) {
-              derr << __func__ << " query " << query_param_name << " item " << j
+              derr << __FFL__ << " query " << query_param_name << " item " << j
                    << " contains invalid type " << dendl;
               Py_RETURN_NONE;
             }
             d.type = it->second;
           } else if (param_name == NAME_SUB_KEY_REGEX) {
             if (!PyUnicode_Check(param_value)) {
-              derr << __func__ << " query " << query_param_name << " item " << j
+              derr << __FFL__ << " query " << query_param_name << " item " << j
                    << " contains invalid param " << param_name << dendl;
               Py_RETURN_NONE;
             }
@@ -883,25 +883,25 @@ ceph_add_osd_perf_query(BaseMgrModule *self, PyObject *args)
             try {
               d.regex = d.regex_str.c_str();
             } catch (const std::regex_error& e) {
-              derr << __func__ << " query " << query_param_name << " item " << j
+              derr << __FFL__ << " query " << query_param_name << " item " << j
                    << " contains invalid regex " << d.regex_str << dendl;
               Py_RETURN_NONE;
             }
             if (d.regex.mark_count() == 0) {
-              derr << __func__ << " query " << query_param_name << " item " << j
+              derr << __FFL__ << " query " << query_param_name << " item " << j
                    << " regex " << d.regex_str << ": no capturing groups"
                    << dendl;
               Py_RETURN_NONE;
             }
           } else {
-            derr << __func__ << " query " << query_param_name << " item " << j
+            derr << __FFL__ << " query " << query_param_name << " item " << j
                  << " contains invalid param " << param_name << dendl;
             Py_RETURN_NONE;
           }
         }
         if (d.type == static_cast<OSDPerfMetricSubKeyType>(-1) ||
             d.regex_str.empty()) {
-          derr << __func__ << " query " << query_param_name << " item " << i
+          derr << __FFL__ << " query " << query_param_name << " item " << i
                << " invalid" << dendl;
           Py_RETURN_NONE;
         }
@@ -909,20 +909,20 @@ ceph_add_osd_perf_query(BaseMgrModule *self, PyObject *args)
       }
     } else if (query_param_name == NAME_COUNTERS_DESCRIPTORS) {
       if (!PyList_Check(query_param_val)) {
-        derr << __func__ << " " << query_param_name << " not a list" << dendl;
+        derr << __FFL__ << " " << query_param_name << " not a list" << dendl;
         Py_RETURN_NONE;
       }
       for (int j = 0; j < PyList_Size(query_param_val); j++) {
         PyObject *py_type = PyList_GET_ITEM(query_param_val, j);
         if (!PyUnicode_Check(py_type)) {
-          derr << __func__ << " query " << query_param_name << " item " << j
+          derr << __FFL__ << " query " << query_param_name << " item " << j
                << " not a string" << dendl;
           Py_RETURN_NONE;
         }
         auto type = PyUnicode_AsUTF8(py_type);
         auto it = counter_types.find(type);
         if (it == counter_types.end()) {
-          derr << __func__ << " query " << query_param_name << " item " << type
+          derr << __FFL__ << " query " << query_param_name << " item " << type
                << " is not valid type" << dendl;
           Py_RETURN_NONE;
         }
@@ -930,7 +930,7 @@ ceph_add_osd_perf_query(BaseMgrModule *self, PyObject *args)
       }
     } else if (query_param_name == NAME_LIMIT) {
       if (!PyDict_Check(query_param_val)) {
-        derr << __func__ << " query " << query_param_name << " not a dict"
+        derr << __FFL__ << " query " << query_param_name << " not a dict"
              << dendl;
         Py_RETURN_NONE;
       }
@@ -944,54 +944,54 @@ ceph_add_osd_perf_query(BaseMgrModule *self, PyObject *args)
         PyObject *limit_param_val = nullptr;
         if (!PyArg_ParseTuple(kv, "sO:pair", &limit_param_name,
                               &limit_param_val)) {
-          derr << __func__ << " limit item " << j << " not a size 2 tuple"
+          derr << __FFL__ << " limit item " << j << " not a size 2 tuple"
                << dendl;
           Py_RETURN_NONE;
         }
 
         if (limit_param_name == NAME_LIMIT_ORDER_BY) {
           if (!PyUnicode_Check(limit_param_val)) {
-            derr << __func__ << " " << limit_param_name << " not a string"
+            derr << __FFL__ << " " << limit_param_name << " not a string"
                  << dendl;
             Py_RETURN_NONE;
           }
           auto order_by = PyUnicode_AsUTF8(limit_param_val);
           auto it = counter_types.find(order_by);
           if (it == counter_types.end()) {
-            derr << __func__ << " limit " << limit_param_name
+            derr << __FFL__ << " limit " << limit_param_name
                  << " not a valid counter type" << dendl;
             Py_RETURN_NONE;
           }
           limit->order_by = it->second;
         } else if (limit_param_name == NAME_LIMIT_MAX_COUNT) {
           if (!PyLong_Check(limit_param_val)) {
-            derr << __func__ << " " << limit_param_name << " not an int"
+            derr << __FFL__ << " " << limit_param_name << " not an int"
                  << dendl;
             Py_RETURN_NONE;
           }
           limit->max_count = PyLong_AsLong(limit_param_val);
         } else {
-          derr << __func__ << " unknown limit param: " << limit_param_name
+          derr << __FFL__ << " unknown limit param: " << limit_param_name
                << dendl;
           Py_RETURN_NONE;
         }
       }
     } else {
-      derr << __func__ << " unknown query param: " << query_param_name << dendl;
+      derr << __FFL__ << " unknown query param: " << query_param_name << dendl;
       Py_RETURN_NONE;
     }
   }
 
   if (query.key_descriptor.empty() ||
       query.performance_counter_descriptors.empty()) {
-    derr << __func__ << " invalid query" << dendl;
+    derr << __FFL__ << " invalid query" << dendl;
     Py_RETURN_NONE;
   }
 
   if (limit) {
     auto &ds = query.performance_counter_descriptors;
     if (std::find(ds.begin(), ds.end(), limit->order_by) == ds.end()) {
-      derr << __func__ << " limit order_by " << limit->order_by
+      derr << __FFL__ << " limit order_by " << limit->order_by
            << " not in performance_counter_descriptors" << dendl;
       Py_RETURN_NONE;
     }
@@ -1035,7 +1035,7 @@ ceph_is_authorized(BaseMgrModule *self, PyObject *args)
   }
 
   if (!PyDict_Check(args_dict)) {
-    derr << __func__ << " arg not a dict" << dendl;
+    derr << __FFL__ << " arg not a dict" << dendl;
     Py_RETURN_FALSE;
   }
 
@@ -1048,7 +1048,7 @@ ceph_is_authorized(BaseMgrModule *self, PyObject *args)
     char *arg_key = nullptr;
     char *arg_value = nullptr;
     if (!PyArg_ParseTuple(kv, "ss:pair", &arg_key, &arg_value)) {
-      derr << __func__ << " dict item " << i << " not a size 2 tuple" << dendl;
+      derr << __FFL__ << " dict item " << i << " not a size 2 tuple" << dendl;
       continue;
     }
 

@@ -43,7 +43,7 @@ int ClassHandler::open_class(const string& cname, ClassData **pcls)
 
 int ClassHandler::open_all_classes()
 {
-  ldout(cct, 10) << __func__ << dendl;
+  ldout(cct, 10) << __FFL__ << dendl;
   DIR *dir = ::opendir(cct->_conf->osd_class_dir.c_str());
   if (!dir)
     return -errno;
@@ -59,7 +59,7 @@ int ClassHandler::open_all_classes()
       char cname[PATH_MAX + 1];
       strncpy(cname, pde->d_name + sizeof(CLS_PREFIX) - 1, sizeof(cname) -1);
       cname[strlen(cname) - (sizeof(CLS_SUFFIX) - 1)] = '\0';
-      ldout(cct, 10) << __func__ << " found " << cname << dendl;
+      ldout(cct, 10) << __FFL__ << " found " << cname << dendl;
       ClassData *cls;
       // skip classes that aren't in 'osd class load list'
       r = open_class(cname, &cls);
@@ -146,7 +146,7 @@ int ClassHandler::_load_class(ClassData *cls)
       int r = ::stat(fname, &st);
       if (r < 0) {
         r = -errno;
-	ldout(cct, 0) << __func__ << " could not stat class " << fname
+	ldout(cct, 0) << __FFL__ << " could not stat class " << fname
 		      << ": " << cpp_strerror(r) << dendl;
       } else {
 	ldout(cct, 0) << "_load_class could not open class " << fname

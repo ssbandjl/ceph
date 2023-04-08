@@ -97,7 +97,7 @@ int RGWSI_SysObj_Cache::remove(RGWSysObjectCtxBase& obj_ctx,
   ObjectCacheInfo info;
   int r = distribute_cache(name, obj, info, REMOVE_OBJ, y);
   if (r < 0) {
-    ldout(cct, 0) << "ERROR: " << __func__ << "(): failed to distribute cache: r=" << r << dendl;
+    ldout(cct, 0) << "ERROR: " << __FFL__ << "(): failed to distribute cache: r=" << r << dendl;
   }
 
   return RGWSI_SysObj_Core::remove(obj_ctx, objv_tracker, obj, y);

@@ -1255,7 +1255,7 @@ namespace rgw {
 
   bool RGWFileHandle::reclaim(const cohort::lru::ObjectFactory* newobj_fac) {
     lsubdout(fs->get_context(), rgw, 17)
-      << __func__ << " " << *this
+      << __FFL__ << " " << *this
       << dendl;
     auto factory = dynamic_cast<const RGWFileHandle::Factory*>(newobj_fac);
     if (factory == nullptr) {
@@ -1315,7 +1315,7 @@ namespace rgw {
     rgw::sal::RGWRadosUser ruser(rgwlib.get_store(), *fs->get_user());
 
     lsubdout(cct, rgw, 10)
-      << __func__ << " readdir called on "
+      << __FFL__ << " readdir called on "
       << object_name()
       << dendl;
 
@@ -1589,7 +1589,7 @@ namespace rgw {
     rgw_obj obj{s->bucket, s->object};
 
     if (s->object.empty()) {
-      ldout(s->cct, 0) << __func__ << " called on empty object" << dendl;
+      ldout(s->cct, 0) << __FFL__ << " called on empty object" << dendl;
       goto done;
     }
 
@@ -2069,7 +2069,7 @@ int rgw_lookup(struct rgw_fs *rgw_fs,
     if (unlikely((strcmp(path, "..") == 0))) {
       rgw_fh = parent;
       lsubdout(fs->get_context(), rgw, 17)
-	<< __func__ << " BANG"<< *rgw_fh
+	<< __FFL__ << " BANG"<< *rgw_fh
 	<< dendl;
       fs->ref(rgw_fh);
     } else {
@@ -2143,7 +2143,7 @@ int rgw_fh_rele(struct rgw_fs *rgw_fs, struct rgw_file_handle *fh,
   RGWFileHandle* rgw_fh = get_rgwfh(fh);
 
   lsubdout(fs->get_context(), rgw, 17)
-    << __func__ << " " << *rgw_fh
+    << __FFL__ << " " << *rgw_fh
     << dendl;
 
   fs->unref(rgw_fh);

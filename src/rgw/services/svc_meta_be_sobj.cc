@@ -111,7 +111,7 @@ int RGWSI_MetaBackend_SObj::call(std::optional<RGWSI_MetaBackend_CtxParams> opt,
     RGWSI_MetaBackend_SObj::Context_SObj ctx(sysobj_svc, opt_sobj.sysobj_ctx);
     return f(&ctx);
   } catch (const std::bad_variant_access&) {
-    ldout(cct, 0) << "ERROR: possible bug: " << __FILE__ << ":" << __LINE__ << ":" << __func__ << "(): bad variant access" << dendl;
+    ldout(cct, 0) << "ERROR: possible bug: " << __FILE__ << ":" << __LINE__ << ":" << __FFL__ << "(): bad variant access" << dendl;
   }
 
   return -EINVAL;

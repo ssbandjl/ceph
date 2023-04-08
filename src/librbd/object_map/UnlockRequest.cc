@@ -32,7 +32,7 @@ template <typename I>
 void UnlockRequest<I>::send_unlock() {
   CephContext *cct = m_image_ctx.cct;
   std::string oid(ObjectMap<>::object_map_name(m_image_ctx.id, CEPH_NOSNAP));
-  ldout(cct, 10) << this << " " << __func__ << ": oid=" << oid << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": oid=" << oid << dendl;
 
   librados::ObjectWriteOperation op;
   rados::cls::lock::unlock(&op, RBD_LOCK_NAME, "");
@@ -48,7 +48,7 @@ void UnlockRequest<I>::send_unlock() {
 template <typename I>
 Context *UnlockRequest<I>::handle_unlock(int *ret_val) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *ret_val << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *ret_val << dendl;
 
   if (*ret_val < 0 && *ret_val != -ENOENT) {
     lderr(m_image_ctx.cct) << "failed to release object map lock: "

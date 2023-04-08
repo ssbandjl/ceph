@@ -564,7 +564,7 @@ string RGWMetadataHandler_GenericMetaBE::get_marker(void *handle)
   string marker;
   int r = op->list_get_marker(&marker);
   if (r < 0) {
-    ldout(cct, 0) << "ERROR: " << __func__ << "(): list_get_marker() returned: r=" << r << dendl;
+    ldout(cct, 0) << "ERROR: " << __FFL__ << "(): list_get_marker() returned: r=" << r << dendl;
     /* not much else to do */
   }
 

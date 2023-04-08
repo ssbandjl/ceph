@@ -47,7 +47,7 @@ void encode_and_write(
 
   written.insert(offset, bl.length(), bl);
 
-  ldpp_dout(dpp, 20) << __func__ << ": " << oid
+  ldpp_dout(dpp, 20) << __FFL__ << ": " << oid
 		     << " new_size "
 		     << offset + bl.length()
 		     << dendl;
@@ -402,12 +402,12 @@ void ECTransaction::generate_transactions(
 
       uint64_t new_size = orig_size;
       uint64_t append_after = new_size;
-      ldpp_dout(dpp, 20) << __func__ << ": new_size start " << new_size << dendl;
+      ldpp_dout(dpp, 20) << __FFL__ << ": new_size start " << new_size << dendl;
       if (op.truncate && op.truncate->first < new_size) {
 	ceph_assert(!op.is_fresh_object());
 	new_size = sinfo.logical_to_next_stripe_offset(
 	  op.truncate->first);
-	ldpp_dout(dpp, 20) << __func__ << ": new_size truncate down "
+	ldpp_dout(dpp, 20) << __FFL__ << ": new_size truncate down "
 			   << new_size << dendl;
 	if (new_size != op.truncate->first) { // 0 the unaligned part
 	  bufferlist bl;
@@ -433,10 +433,10 @@ void ECTransaction::generate_transactions(
 	    sinfo.logical_to_prev_stripe_offset(op.truncate->first));
 	  ceph_assert(rollback_extents.empty());
 
-	  ldpp_dout(dpp, 20) << __func__ << ": saving extent "
+	  ldpp_dout(dpp, 20) << __FFL__ << ": saving extent "
 			     << make_pair(restore_from, restore_len)
 			     << dendl;
-	  ldpp_dout(dpp, 20) << __func__ << ": truncating to "
+	  ldpp_dout(dpp, 20) << __FFL__ << ": truncating to "
 			     << new_size
 			     << dendl;
 	  rollback_extents.emplace_back(
@@ -455,7 +455,7 @@ void ECTransaction::generate_transactions(
 	    
 	  }
 	} else {
-	  ldpp_dout(dpp, 20) << __func__ << ": not saving extents, fresh object"
+	  ldpp_dout(dpp, 20) << __FFL__ << ": not saving extents, fresh object"
 			     << dendl;
 	}
 	for (auto &&st : *transactions) {
@@ -488,7 +488,7 @@ void ECTransaction::generate_transactions(
 	uint64_t off = extent.get_off();
 	uint64_t len = extent.get_len();
 	uint64_t end = off + len;
-	ldpp_dout(dpp, 20) << __func__ << ": adding buffer_update "
+	ldpp_dout(dpp, 20) << __FFL__ << ": adding buffer_update "
 			   << make_pair(off, len)
 			   << dendl;
 	ceph_assert(len > 0);
@@ -496,7 +496,7 @@ void ECTransaction::generate_transactions(
 	  ceph_assert(off > append_after);
 	  bl.prepend_zero(off - new_size);
 	  len += off - new_size;
-	  ldpp_dout(dpp, 20) << __func__ << ": prepending zeroes to align "
+	  ldpp_dout(dpp, 20) << __FFL__ << ": prepending zeroes to align "
 			     << off << "->" << new_size
 			     << dendl;
 	  off = new_size;
@@ -506,7 +506,7 @@ void ECTransaction::generate_transactions(
 	    end);
 	  uint64_t tail = aligned_end - end;
 	  bl.append_zero(tail);
-	  ldpp_dout(dpp, 20) << __func__ << ": appending zeroes to align end "
+	  ldpp_dout(dpp, 20) << __FFL__ << ": appending zeroes to align end "
 			     << end << "->" << end+tail
 			     << ", len: " << len << "->" << len+tail
 			     << dendl;
@@ -533,7 +533,7 @@ void ECTransaction::generate_transactions(
 	  zeroes,
 	  bl);
 	new_size = truncate_to;
-	ldpp_dout(dpp, 20) << __func__ << ": truncating out to "
+	ldpp_dout(dpp, 20) << __FFL__ << ": truncating out to "
 			   << truncate_to
 			   << dendl;
       }
@@ -543,7 +543,7 @@ void ECTransaction::generate_transactions(
 	want.insert(i);
       }
       auto to_overwrite = to_write.intersect(0, append_after);
-      ldpp_dout(dpp, 20) << __func__ << ": to_overwrite: "
+      ldpp_dout(dpp, 20) << __FFL__ << ": to_overwrite: "
 			 << to_overwrite
 			 << dendl;
       for (auto &&extent: to_overwrite) {
@@ -555,7 +555,7 @@ void ECTransaction::generate_transactions(
 	    extent.get_off());
 	  uint64_t restore_len = sinfo.aligned_logical_offset_to_chunk_offset(
 	    extent.get_len());
-	  ldpp_dout(dpp, 20) << __func__ << ": overwriting "
+	  ldpp_dout(dpp, 20) << __FFL__ << ": overwriting "
 			     << restore_from << "~" << restore_len
 			     << dendl;
 	  if (rollback_extents.empty()) {
@@ -594,13 +594,13 @@ void ECTransaction::generate_transactions(
       auto to_append = to_write.intersect(
 	append_after,
 	std::numeric_limits<uint64_t>::max() - append_after);
-      ldpp_dout(dpp, 20) << __func__ << ": to_append: "
+      ldpp_dout(dpp, 20) << __FFL__ << ": to_append: "
 			 << to_append
 			 << dendl;
       for (auto &&extent: to_append) {
 	ceph_assert(sinfo.logical_offset_is_stripe_aligned(extent.get_off()));
 	ceph_assert(sinfo.logical_offset_is_stripe_aligned(extent.get_len()));
-	ldpp_dout(dpp, 20) << __func__ << ": appending "
+	ldpp_dout(dpp, 20) << __FFL__ << ": appending "
 			   << extent.get_off() << "~" << extent.get_len()
 			   << dendl;
 	encode_and_write(
@@ -618,13 +618,13 @@ void ECTransaction::generate_transactions(
 	  dpp);
       }
 
-      ldpp_dout(dpp, 20) << __func__ << ": " << oid
+      ldpp_dout(dpp, 20) << __FFL__ << ": " << oid
 			 << " resetting hinfo to logical size "
 			 << new_size
 			 << dendl;
       if (!rollback_extents.empty() && entry) {
 	if (entry) {
-	  ldpp_dout(dpp, 20) << __func__ << ": " << oid
+	  ldpp_dout(dpp, 20) << __FFL__ << ": " << oid
 			     << " marking rollback extents "
 			     << rollback_extents
 			     << dendl;
@@ -638,7 +638,7 @@ void ECTransaction::generate_transactions(
       }
 
       if (entry && !to_append.empty()) {
-	ldpp_dout(dpp, 20) << __func__ << ": marking append "
+	ldpp_dout(dpp, 20) << __FFL__ << ": marking append "
 			   << append_after
 			   << dendl;
 	entry->mod_desc.append(append_after);

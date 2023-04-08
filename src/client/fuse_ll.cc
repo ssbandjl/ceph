@@ -143,7 +143,7 @@ static void get_fuse_groups(UserPerm& perms, fuse_req_t req)
     if (count > 0) {
       perms.init_gids(gids, count);
     } else if (count < 0) {
-      derr << __func__ << ": getgroups failed: " << cpp_strerror(-count)
+      derr << __FFL__ << ": getgroups failed: " << cpp_strerror(-count)
 	   << dendl;
     }
   }

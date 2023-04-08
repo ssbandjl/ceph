@@ -65,7 +65,7 @@ class EventDriverTest : public ::testing::TestWithParam<const char*> {
 
   EventDriverTest(): driver(0) {}
   void SetUp() override {
-    cerr << __func__ << " start set up " << GetParam() << std::endl;
+    cerr << __FFL__ << " start set up " << GetParam() << std::endl;
 #ifdef HAVE_EPOLL
     if (strcmp(GetParam(), "epoll"))
       driver = new EpollDriver(g_ceph_context);

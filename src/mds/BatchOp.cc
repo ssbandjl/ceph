@@ -20,7 +20,7 @@
 
 void BatchOp::forward(mds_rank_t target)
 {
-  dout(20) << __func__ << ": forwarding batch ops to " << target << ": ";
+  dout(20) << __FFL__ << ": forwarding batch ops to " << target << ": ";
   print(*_dout);
   *_dout << dendl;
   _forward(target);
@@ -28,7 +28,7 @@ void BatchOp::forward(mds_rank_t target)
 
 void BatchOp::respond(int r)
 {
-  dout(20) << __func__ << ": responding to batch ops with result=" << r << ": ";
+  dout(20) << __FFL__ << ": responding to batch ops with result=" << r << ": ";
   print(*_dout);
   *_dout << dendl;
   _respond(r);

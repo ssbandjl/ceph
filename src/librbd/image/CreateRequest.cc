@@ -108,7 +108,7 @@ int CreateRequest<I>::validate_order(CephContext *cct, uint8_t order) {
 
 #undef dout_prefix
 #define dout_prefix *_dout << "librbd::image::CreateRequest: " << this << " " \
-                           << __func__ << ": "
+                           << __FFL__ << ": "
 
 template<typename I>
 CreateRequest<I>::CreateRequest(const ConfigProxy& config, IoCtx &ioctx,

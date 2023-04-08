@@ -178,7 +178,7 @@ int tcpv4_connect(tcp<ipv4_traits>& tcpv4, const entity_addr_t &addr,
 template <typename InetTraits>
 void tcp<InetTraits>::respond_with_reset(tcp_hdr* rth, ipaddr local_ip, ipaddr foreign_ip)
 {
-  ldout(cct, 20) << __func__ << " tcp header rst=" << bool(rth->f_rst) << " fin=" << bool(rth->f_fin)
+  ldout(cct, 20) << __FFL__ << " tcp header rst=" << bool(rth->f_rst) << " fin=" << bool(rth->f_fin)
                  << " syn=" << bool(rth->f_syn) << dendl;
   if (rth->f_rst) {
     return;
@@ -252,7 +252,7 @@ void tcp<InetTraits>::tcb::input_handle_listen_state(tcp_hdr* th, Packet p)
 
   _rcv.urgent = _rcv.next;
 
-  ldout(_tcp.cct, 10) << __func__ << " listen: LISTEN -> SYN_RECEIVED" << dendl;
+  ldout(_tcp.cct, 10) << __FFL__ << " listen: LISTEN -> SYN_RECEIVED" << dendl;
   init_from_options(th, opt_start, opt_end);
   do_syn_received();
 }
@@ -267,7 +267,7 @@ void tcp<InetTraits>::tcb::input_handle_syn_sent_state(tcp_hdr* th, Packet p)
   tcp_sequence seg_seq = th->seq;
   auto seg_ack = th->ack;
 
-  ldout(_tcp.cct, 20) << __func__ << " tcp header seq " << seg_seq.raw << " ack " << seg_ack.raw
+  ldout(_tcp.cct, 20) << __FFL__ << " tcp header seq " << seg_seq.raw << " ack " << seg_ack.raw
                       << " fin=" << bool(th->f_fin) << " syn=" << bool(th->f_syn) << dendl;
 
   bool acceptable = false;
@@ -314,14 +314,14 @@ void tcp<InetTraits>::tcb::input_handle_syn_sent_state(tcp_hdr* th, Packet p)
       // If SND.UNA > ISS (our SYN has been ACKed), change the connection
       // state to ESTABLISHED, form an ACK segment
       // <SEQ=SND.NXT><ACK=RCV.NXT><CTL=ACK>
-      ldout(_tcp.cct, 20) << __func__ << " syn: SYN_SENT -> ESTABLISHED" << dendl;
+      ldout(_tcp.cct, 20) << __FFL__ << " syn: SYN_SENT -> ESTABLISHED" << dendl;
       init_from_options(th, opt_start, opt_end);
       do_established();
       output();
     } else {
       // Otherwise enter SYN_RECEIVED, form a SYN,ACK segment
       // <SEQ=ISS><ACK=RCV.NXT><CTL=SYN,ACK>
-      ldout(_tcp.cct, 20) << __func__ << " syn: SYN_SENT -> SYN_RECEIVED" << dendl;
+      ldout(_tcp.cct, 20) << __FFL__ << " syn: SYN_SENT -> SYN_RECEIVED" << dendl;
       do_syn_received();
     }
   }
@@ -340,7 +340,7 @@ void tcp<InetTraits>::tcb::input_handle_other_state(tcp_hdr* th, Packet p)
   tcp_sequence seg_seq = th->seq;
   auto seg_ack = th->ack;
   auto seg_len = p.len();
-  ldout(_tcp.cct, 20) << __func__ << " tcp header seq " << seg_seq.raw << " ack " << seg_ack.raw
+  ldout(_tcp.cct, 20) << __FFL__ << " tcp header seq " << seg_seq.raw << " ack " << seg_ack.raw
                       << " snd next " << _snd.next.raw << " unack " << _snd.unacknowledged.raw
                       << " rcv next " << _rcv.next.raw << " len " << seg_len
                       << " fin=" << bool(th->f_fin) << " syn=" << bool(th->f_syn) << dendl;
@@ -356,7 +356,7 @@ void tcp<InetTraits>::tcb::input_handle_other_state(tcp_hdr* th, Packet p)
   if (seg_seq < _rcv.next) {
     // ignore already acknowledged data
     auto dup = std::min(uint32_t(_rcv.next - seg_seq), seg_len);
-    ldout(_tcp.cct, 10) << __func__ << " dup segment len " << dup << dendl;
+    ldout(_tcp.cct, 10) << __FFL__ << " dup segment len " << dup << dendl;
     p.trim_front(dup);
     seg_len -= dup;
     seg_seq += dup;
@@ -364,7 +364,7 @@ void tcp<InetTraits>::tcb::input_handle_other_state(tcp_hdr* th, Packet p)
   // FIXME: We should trim data outside the right edge of the receive window as well
 
   if (seg_seq != _rcv.next) {
-    ldout(_tcp.cct, 10) << __func__ << " out of order, expect " << _rcv.next.raw
+    ldout(_tcp.cct, 10) << __FFL__ << " out of order, expect " << _rcv.next.raw
                         << " actual " << seg_seq.raw
                         << " out of order size " << _rcv.out_of_order.map.size()
                         << dendl;
@@ -435,12 +435,12 @@ void tcp<InetTraits>::tcb::input_handle_other_state(tcp_hdr* th, Packet p)
       // If SND.UNA =< SEG.ACK =< SND.NXT then enter ESTABLISHED state
       // and continue processing.
       if (_snd.unacknowledged <= seg_ack && seg_ack <= _snd.next) {
-        ldout(_tcp.cct, 20) << __func__ << " SYN_RECEIVED -> ESTABLISHED" << dendl;
+        ldout(_tcp.cct, 20) << __FFL__ << " SYN_RECEIVED -> ESTABLISHED" << dendl;
         do_established();
         if (_tcp.push_listen_queue(_local_port, this)) {
-          ldout(_tcp.cct, 20) << __func__ << " successfully accepting socket" << dendl;
+          ldout(_tcp.cct, 20) << __FFL__ << " successfully accepting socket" << dendl;
         } else {
-          ldout(_tcp.cct, 5) << __func__ << " not exist listener or full queue, reset" << dendl;
+          ldout(_tcp.cct, 5) << __FFL__ << " not exist listener or full queue, reset" << dendl;
           return respond_with_reset(th);
         }
       } else {
@@ -449,7 +449,7 @@ void tcp<InetTraits>::tcb::input_handle_other_state(tcp_hdr* th, Packet p)
       }
     }
     auto update_window = [this, th, seg_seq, seg_ack] {
-      ldout(_tcp.cct, 20) << __func__ << " window update seg_seq=" << seg_seq
+      ldout(_tcp.cct, 20) << __FFL__ << " window update seg_seq=" << seg_seq
                           << " seg_ack=" << seg_ack << " old window=" << th->window
                           << " new window=" << int(_snd.window_scale) << dendl;
       _snd.window = th->window << _snd.window_scale;
@@ -494,14 +494,14 @@ void tcp<InetTraits>::tcb::input_handle_other_state(tcp_hdr* th, Packet p)
           // We are in fast retransmit / fast recovery phase
           uint32_t smss = _snd.mss;
           if (seg_ack > _snd.recover) {
-            ldout(_tcp.cct, 20) << __func__ << " ack: full_ack" << dendl;
+            ldout(_tcp.cct, 20) << __FFL__ << " ack: full_ack" << dendl;
             // Set cwnd to min (ssthresh, max(FlightSize, SMSS) + SMSS)
             _snd.cwnd = std::min(_snd.ssthresh, std::max(flight_size(), smss) + smss);
             // Exit the fast recovery procedure
             exit_fast_recovery();
             set_retransmit_timer();
           } else {
-            ldout(_tcp.cct, 20) << __func__ << " ack: partial_ack" << dendl;
+            ldout(_tcp.cct, 20) << __FFL__ << " ack: partial_ack" << dendl;
             // Retransmit the first unacknowledged segment
             fast_retransmit();
             // Deflate the congestion window by the amount of new data
@@ -582,7 +582,7 @@ void tcp<InetTraits>::tcb::input_handle_other_state(tcp_hdr* th, Packet p)
       // our FIN is now acknowledged then enter FIN-WAIT-2 and continue
       // processing in that state.
       if (seg_ack == _snd.next + 1) {
-        ldout(_tcp.cct, 20) << __func__ << " ack: FIN_WAIT_1 -> FIN_WAIT_2" << dendl;
+        ldout(_tcp.cct, 20) << __FFL__ << " ack: FIN_WAIT_1 -> FIN_WAIT_2" << dendl;
         _state = FIN_WAIT_2;
         do_local_fin_acked();
       }
@@ -597,7 +597,7 @@ void tcp<InetTraits>::tcb::input_handle_other_state(tcp_hdr* th, Packet p)
     // CLOSING STATE
     if (in_state(CLOSING)) {
       if (seg_ack == _snd.next + 1) {
-        ldout(_tcp.cct, 20) << __func__ << " ack: CLOSING -> TIME_WAIT" << dendl;
+        ldout(_tcp.cct, 20) << __FFL__ << " ack: CLOSING -> TIME_WAIT" << dendl;
         do_local_fin_acked();
         return do_time_wait();
       } else {
@@ -607,7 +607,7 @@ void tcp<InetTraits>::tcb::input_handle_other_state(tcp_hdr* th, Packet p)
     // LAST_ACK STATE
     if (in_state(LAST_ACK)) {
       if (seg_ack == _snd.next + 1) {
-        ldout(_tcp.cct, 20) << __func__ << " ack: LAST_ACK -> CLOSED" << dendl;
+        ldout(_tcp.cct, 20) << __FFL__ << " ack: LAST_ACK -> CLOSED" << dendl;
         do_local_fin_acked();
         return do_closed();
       }
@@ -649,7 +649,7 @@ void tcp<InetTraits>::tcb::input_handle_other_state(tcp_hdr* th, Packet p)
       } else {
         do_output = should_send_ack(seg_len);
       }
-      ldout(_tcp.cct, 20) << __func__ << " merged=" << merged << " do_output=" << do_output << dendl;
+      ldout(_tcp.cct, 20) << __FFL__ << " merged=" << merged << " do_output=" << do_output << dendl;
     }
   } else if (in_state(CLOSE_WAIT | CLOSING | LAST_ACK | TIME_WAIT)) {
     // This should not occur, since a FIN has been received from the
@@ -678,7 +678,7 @@ void tcp<InetTraits>::tcb::input_handle_other_state(tcp_hdr* th, Packet p)
       _errno = 0;
 
       if (in_state(SYN_RECEIVED | ESTABLISHED)) {
-        ldout(_tcp.cct, 20) << __func__ << " fin: SYN_RECEIVED or ESTABLISHED -> CLOSE_WAIT" << dendl;
+        ldout(_tcp.cct, 20) << __FFL__ << " fin: SYN_RECEIVED or ESTABLISHED -> CLOSE_WAIT" << dendl;
         _state = CLOSE_WAIT;
         // EOF
       }
@@ -688,11 +688,11 @@ void tcp<InetTraits>::tcb::input_handle_other_state(tcp_hdr* th, Packet p)
         // timers; otherwise enter the CLOSING state.
         // Note: If our FIN has been ACKed, we should be in FIN_WAIT_2
         // not FIN_WAIT_1 if we reach here.
-        ldout(_tcp.cct, 20) << __func__ << " fin: FIN_WAIT_1 -> CLOSING" << dendl;
+        ldout(_tcp.cct, 20) << __FFL__ << " fin: FIN_WAIT_1 -> CLOSING" << dendl;
         _state = CLOSING;
       }
       if (in_state(FIN_WAIT_2)) {
-        ldout(_tcp.cct, 20) << __func__ << " fin: FIN_WAIT_2 -> TIME_WAIT" << dendl;
+        ldout(_tcp.cct, 20) << __FFL__ << " fin: FIN_WAIT_2 -> TIME_WAIT" << dendl;
         return do_time_wait();
       }
     }
@@ -707,7 +707,7 @@ void tcp<InetTraits>::tcb::input_handle_other_state(tcp_hdr* th, Packet p)
 template <typename InetTraits>
 void tcp<InetTraits>::tcb::connect()
 {
-  ldout(_tcp.cct, 20) << __func__ << dendl;
+  ldout(_tcp.cct, 20) << __FFL__ << dendl;
   // An initial send sequence number (ISS) is selected.  A SYN segment of the
   // form <SEQ=ISS><CTL=SYN> is sent.  Set SND.UNA to ISS, SND.NXT to ISS+1,
   // enter SYN-SENT state, and return.
@@ -734,12 +734,12 @@ void tcp<InetTraits>::tcb::close_final_cleanup()
 
   _snd.closed = true;
   signal_data_received();
-  ldout(_tcp.cct, 20) << __func__ << " unsent_len=" << _snd.unsent_len << dendl;
+  ldout(_tcp.cct, 20) << __FFL__ << " unsent_len=" << _snd.unsent_len << dendl;
   if (in_state(CLOSE_WAIT)) {
-    ldout(_tcp.cct, 20) << __func__ << " CLOSE_WAIT -> LAST_ACK" << dendl;
+    ldout(_tcp.cct, 20) << __FFL__ << " CLOSE_WAIT -> LAST_ACK" << dendl;
     _state = LAST_ACK;
   } else if (in_state(ESTABLISHED)) {
-    ldout(_tcp.cct, 20) << __func__ << " ESTABLISHED -> FIN_WAIT_1" << dendl;
+    ldout(_tcp.cct, 20) << __FFL__ << " ESTABLISHED -> FIN_WAIT_1" << dendl;
     _state = FIN_WAIT_1;
   }
   // Send <FIN> to remote
@@ -767,7 +767,7 @@ void tcp<InetTraits>::tcb::retransmit()
       output_update_rto();
     } else {
       _errno = -ECONNABORTED;
-      ldout(_tcp.cct, 5) << __func__ << " syn retransmit exceed max "
+      ldout(_tcp.cct, 5) << __FFL__ << " syn retransmit exceed max "
                          << _max_nr_retransmit << dendl;
       _errno = -ETIMEDOUT;
       cleanup();
@@ -780,7 +780,7 @@ void tcp<InetTraits>::tcb::retransmit()
     if (_snd.fin_retransmit++ < _max_nr_retransmit) {
       output_update_rto();
     } else {
-      ldout(_tcp.cct, 5) << __func__ << " fin retransmit exceed max "
+      ldout(_tcp.cct, 5) << __FFL__ << " fin retransmit exceed max "
                          << _max_nr_retransmit << dendl;
       _errno = -ETIMEDOUT;
       cleanup();
@@ -809,13 +809,13 @@ void tcp<InetTraits>::tcb::retransmit()
   // End fast recovery
   exit_fast_recovery();
 
-  ldout(_tcp.cct, 20) << __func__ << " unack data size " << _snd.data.size()
+  ldout(_tcp.cct, 20) << __FFL__ << " unack data size " << _snd.data.size()
                       << " nr=" << unacked_seg.nr_transmits << dendl;
   if (unacked_seg.nr_transmits < _max_nr_retransmit) {
     unacked_seg.nr_transmits++;
   } else {
     // Delete connection when max num of retransmission is reached
-    ldout(_tcp.cct, 5) << __func__ << " seg retransmit exceed max "
+    ldout(_tcp.cct, 5) << __FFL__ << " seg retransmit exceed max "
                        << _max_nr_retransmit << dendl;
     _errno = -ETIMEDOUT;
     cleanup();
@@ -828,7 +828,7 @@ void tcp<InetTraits>::tcb::retransmit()
 
 template <typename InetTraits>
 void tcp<InetTraits>::tcb::persist() {
-  ldout(_tcp.cct, 20) << __func__ << " persist timer fired" << dendl;
+  ldout(_tcp.cct, 20) << __FFL__ << " persist timer fired" << dendl;
   // Send 1 byte packet to probe peer's window size
   _snd.window_probe = true;
   output_one();

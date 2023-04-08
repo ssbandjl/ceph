@@ -10,7 +10,7 @@
 #define dout_context g_ceph_context
 #define dout_subsys ceph_subsys_mgr
 #undef dout_prefix
-#define dout_prefix *_dout << "mgr.metric_collector " << __func__ << ": "
+#define dout_prefix *_dout << "mgr.metric_collector " << __FFL__ << ": "
 
 template <typename Query, typename Limit, typename Key, typename Report>
 MetricCollector<Query, Limit, Key, Report>::MetricCollector(MetricListener &listener)

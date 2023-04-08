@@ -70,7 +70,7 @@ template <typename I>
 bool RenameRequest<I>::should_complete(int r) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << ": state=" << m_state << ", "
+  ldout(cct, 5) << this << " " << __FFL__ << ": state=" << m_state << ", "
                 << "r=" << r << dendl;
   r = filter_return_code(r);
   if (r < 0) {
@@ -152,7 +152,7 @@ template <typename I>
 void RenameRequest<I>::send_read_directory() {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
   m_state = STATE_READ_DIRECTORY;
 
   librados::ObjectReadOperation op;
@@ -169,7 +169,7 @@ template <typename I>
 void RenameRequest<I>::send_read_source_header() {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
   m_state = STATE_READ_SOURCE_HEADER;
 
   librados::ObjectReadOperation op;
@@ -188,7 +188,7 @@ template <typename I>
 void RenameRequest<I>::send_write_destination_header() {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
   m_state = STATE_WRITE_DEST_HEADER;
 
   librados::ObjectWriteOperation op;
@@ -205,7 +205,7 @@ template <typename I>
 void RenameRequest<I>::send_update_directory() {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
   m_state = STATE_UPDATE_DIRECTORY;
 
   librados::ObjectWriteOperation op;
@@ -233,7 +233,7 @@ template <typename I>
 void RenameRequest<I>::send_remove_source_header() {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  ldout(cct, 5) << this << " " << __func__ << dendl;
+  ldout(cct, 5) << this << " " << __FFL__ << dendl;
   m_state = STATE_REMOVE_SOURCE_HEADER;
 
   librados::ObjectWriteOperation op;

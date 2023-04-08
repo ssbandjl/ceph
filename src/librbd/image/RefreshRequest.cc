@@ -76,7 +76,7 @@ void RefreshRequest<I>::send_get_migration_header() {
   }
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   librados::ObjectReadOperation op;
   cls_client::migration_get_start(&op);
@@ -93,13 +93,13 @@ void RefreshRequest<I>::send_get_migration_header() {
 template <typename I>
 Context *RefreshRequest<I>::handle_get_migration_header(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result == 0) {
     auto it = m_out_bl.cbegin();
     *result = cls_client::migration_get_finish(&it, &m_migration_spec);
   } else if (*result == -ENOENT) {
-    ldout(cct, 5) << this << " " << __func__ << ": no migration header found"
+    ldout(cct, 5) << this << " " << __FFL__ << ": no migration header found"
                   << ", retrying" << dendl;
     send();
     return nullptr;
@@ -118,15 +118,15 @@ Context *RefreshRequest<I>::handle_get_migration_header(int *result) {
       *result = -EROFS;
       return m_on_finish;
     }
-    ldout(cct, 1) << this << " " << __func__ << ": migrating to: "
+    ldout(cct, 1) << this << " " << __FFL__ << ": migrating to: "
                   << m_migration_spec << dendl;
     break;
   case cls::rbd::MIGRATION_HEADER_TYPE_DST:
-    ldout(cct, 1) << this << " " << __func__ << ": migrating from: "
+    ldout(cct, 1) << this << " " << __FFL__ << ": migrating from: "
                   << m_migration_spec << dendl;
     switch (m_migration_spec.state) {
     case cls::rbd::MIGRATION_STATE_PREPARING:
-      ldout(cct, 5) << this << " " << __func__ << ": current migration state: "
+      ldout(cct, 5) << this << " " << __FFL__ << ": current migration state: "
                     << m_migration_spec.state << ", retrying" << dendl;
       send();
       return nullptr;
@@ -136,21 +136,21 @@ Context *RefreshRequest<I>::handle_get_migration_header(int *result) {
       break;
     case cls::rbd::MIGRATION_STATE_ABORTING:
       if (!m_read_only) {
-        lderr(cct) << this << " " << __func__ << ": migration is being aborted"
+        lderr(cct) << this << " " << __FFL__ << ": migration is being aborted"
                    << dendl;
         *result = -EROFS;
         return m_on_finish;
       }
       break;
     default:
-      lderr(cct) << this << " " << __func__ << ": migration is in an "
+      lderr(cct) << this << " " << __FFL__ << ": migration is in an "
                  << "unexpected state" << dendl;
       *result = -EINVAL;
       return m_on_finish;
     }
     break;
   default:
-    ldout(cct, 1) << this << " " << __func__ << ": migration type "
+    ldout(cct, 1) << this << " " << __FFL__ << ": migration type "
                   << m_migration_spec.header_type << dendl;
     *result = -EBADMSG;
     return m_on_finish;
@@ -167,7 +167,7 @@ Context *RefreshRequest<I>::handle_get_migration_header(int *result) {
 template <typename I>
 void RefreshRequest<I>::send_v1_read_header() {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   librados::ObjectReadOperation op;
   op.read(0, 0, nullptr, nullptr);
@@ -185,7 +185,7 @@ void RefreshRequest<I>::send_v1_read_header() {
 template <typename I>
 Context *RefreshRequest<I>::handle_v1_read_header(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": " << "r=" << *result << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": " << "r=" << *result << dendl;
 
   rbd_obj_header_ondisk v1_header;
   bool migrating = false;
@@ -199,7 +199,7 @@ Context *RefreshRequest<I>::handle_v1_read_header(int *result) {
                     sizeof(RBD_HEADER_TEXT)) != 0) {
     if (memcmp(RBD_MIGRATE_HEADER_TEXT, m_out_bl.c_str(),
                sizeof(RBD_MIGRATE_HEADER_TEXT)) == 0) {
-      ldout(cct, 1) << this << " " << __func__ << ": migration v1 header detected"
+      ldout(cct, 1) << this << " " << __FFL__ << ": migration v1 header detected"
                     << dendl;
       migrating = true;
     } else {
@@ -230,7 +230,7 @@ Context *RefreshRequest<I>::handle_v1_read_header(int *result) {
 template <typename I>
 void RefreshRequest<I>::send_v1_get_snapshots() {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   librados::ObjectReadOperation op;
   cls_client::old_snapshot_list_start(&op);
@@ -248,7 +248,7 @@ void RefreshRequest<I>::send_v1_get_snapshots() {
 template <typename I>
 Context *RefreshRequest<I>::handle_v1_get_snapshots(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": " << "r=" << *result << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": " << "r=" << *result << dendl;
 
   std::vector<std::string> snap_names;
   std::vector<uint64_t> snap_sizes;
@@ -284,7 +284,7 @@ Context *RefreshRequest<I>::handle_v1_get_snapshots(int *result) {
 template <typename I>
 void RefreshRequest<I>::send_v1_get_locks() {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   librados::ObjectReadOperation op;
   rados::cls::lock::get_lock_info_start(&op, RBD_LOCK_NAME);
@@ -302,7 +302,7 @@ void RefreshRequest<I>::send_v1_get_locks() {
 template <typename I>
 Context *RefreshRequest<I>::handle_v1_get_locks(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": "
+  ldout(cct, 10) << this << " " << __FFL__ << ": "
                  << "r=" << *result << dendl;
 
   if (*result == 0) {
@@ -327,7 +327,7 @@ Context *RefreshRequest<I>::handle_v1_get_locks(int *result) {
 template <typename I>
 void RefreshRequest<I>::send_v1_apply() {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   // ensure we are not in a rados callback when applying updates
   using klass = RefreshRequest<I>;
@@ -339,7 +339,7 @@ void RefreshRequest<I>::send_v1_apply() {
 template <typename I>
 Context *RefreshRequest<I>::handle_v1_apply(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   apply();
   return send_flush_aio();
@@ -348,7 +348,7 @@ Context *RefreshRequest<I>::handle_v1_apply(int *result) {
 template <typename I>
 void RefreshRequest<I>::send_v2_get_mutable_metadata() {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   uint64_t snap_id;
   {
@@ -382,7 +382,7 @@ void RefreshRequest<I>::send_v2_get_mutable_metadata() {
 template <typename I>
 Context *RefreshRequest<I>::handle_v2_get_mutable_metadata(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": "
+  ldout(cct, 10) << this << " " << __FFL__ << ": "
                  << "r=" << *result << dendl;
 
   auto it = m_out_bl.cbegin();
@@ -461,7 +461,7 @@ template <typename I>
 void RefreshRequest<I>::send_v2_get_parent() {
   // NOTE: remove support when Mimic is EOLed
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": legacy=" << m_legacy_parent
+  ldout(cct, 10) << this << " " << __FFL__ << ": legacy=" << m_legacy_parent
                  << dendl;
 
   librados::ObjectReadOperation op;
@@ -484,7 +484,7 @@ template <typename I>
 Context *RefreshRequest<I>::handle_v2_get_parent(int *result) {
   // NOTE: remove support when Mimic is EOLed
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   auto it = m_out_bl.cbegin();
   if (!m_legacy_parent) {
@@ -531,7 +531,7 @@ Context *RefreshRequest<I>::handle_v2_get_parent(int *result) {
 template <typename I>
 void RefreshRequest<I>::send_v2_get_metadata() {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   auto ctx = create_context_callback<
     RefreshRequest<I>, &RefreshRequest<I>::handle_v2_get_metadata>(this);
@@ -545,7 +545,7 @@ void RefreshRequest<I>::send_v2_get_metadata() {
 template <typename I>
 Context *RefreshRequest<I>::handle_v2_get_metadata(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to retrieve metadata: " << cpp_strerror(*result)
@@ -560,7 +560,7 @@ Context *RefreshRequest<I>::handle_v2_get_metadata(int *result) {
 template <typename I>
 void RefreshRequest<I>::send_v2_get_pool_metadata() {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   auto ctx = create_context_callback<
     RefreshRequest<I>, &RefreshRequest<I>::handle_v2_get_pool_metadata>(this);
@@ -573,7 +573,7 @@ void RefreshRequest<I>::send_v2_get_pool_metadata() {
 template <typename I>
 Context *RefreshRequest<I>::handle_v2_get_pool_metadata(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to retrieve pool metadata: " << cpp_strerror(*result)
@@ -596,7 +596,7 @@ void RefreshRequest<I>::send_v2_get_op_features() {
   }
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   librados::ObjectReadOperation op;
   cls_client::op_features_get_start(&op);
@@ -613,7 +613,7 @@ void RefreshRequest<I>::send_v2_get_op_features() {
 template <typename I>
 Context *RefreshRequest<I>::handle_v2_get_op_features(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": "
+  ldout(cct, 10) << this << " " << __FFL__ << ": "
                  << "r=" << *result << dendl;
 
   // -EOPNOTSUPP handler not required since feature bit implies OSD
@@ -634,7 +634,7 @@ Context *RefreshRequest<I>::handle_v2_get_op_features(int *result) {
 template <typename I>
 void RefreshRequest<I>::send_v2_get_group() {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   librados::ObjectReadOperation op;
   cls_client::image_group_get_start(&op);
@@ -652,7 +652,7 @@ void RefreshRequest<I>::send_v2_get_group() {
 template <typename I>
 Context *RefreshRequest<I>::handle_v2_get_group(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": "
+  ldout(cct, 10) << this << " " << __FFL__ << ": "
                  << "r=" << *result << dendl;
 
   if (*result == 0) {
@@ -682,7 +682,7 @@ void RefreshRequest<I>::send_v2_get_snapshots() {
   }
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   librados::ObjectReadOperation op;
   for (auto snap_id : m_snapc.snaps) {
@@ -720,7 +720,7 @@ void RefreshRequest<I>::send_v2_get_snapshots() {
 template <typename I>
 Context *RefreshRequest<I>::handle_v2_get_snapshots(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": " << "r=" << *result << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": " << "r=" << *result << dendl;
 
   auto it = m_out_bl.cbegin();
   for (size_t i = 0; i < m_snapc.snaps.size(); ++i) {
@@ -820,7 +820,7 @@ void RefreshRequest<I>::send_v2_refresh_parent() {
         RefreshParentRequest<I>::is_refresh_required(m_image_ctx, parent_md,
                                                      migration_info))) {
       CephContext *cct = m_image_ctx.cct;
-      ldout(cct, 10) << this << " " << __func__ << dendl;
+      ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
       using klass = RefreshRequest<I>;
       Context *ctx = create_context_callback<
@@ -840,7 +840,7 @@ void RefreshRequest<I>::send_v2_refresh_parent() {
 template <typename I>
 Context *RefreshRequest<I>::handle_v2_refresh_parent(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to refresh parent image: " << cpp_strerror(*result)
@@ -865,7 +865,7 @@ void RefreshRequest<I>::send_v2_init_exclusive_lock() {
 
   // implies exclusive lock dynamically enabled or image open in-progress
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   // TODO need safe shut down
   m_exclusive_lock = m_image_ctx.create_exclusive_lock();
@@ -881,7 +881,7 @@ void RefreshRequest<I>::send_v2_init_exclusive_lock() {
 template <typename I>
 Context *RefreshRequest<I>::handle_v2_init_exclusive_lock(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to initialize exclusive lock: "
@@ -928,7 +928,7 @@ void RefreshRequest<I>::send_v2_open_journal() {
   // implies journal dynamically enabled since ExclusiveLock will init
   // the journal upon acquiring the lock
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   using klass = RefreshRequest<I>;
   Context *ctx = create_context_callback<
@@ -942,7 +942,7 @@ void RefreshRequest<I>::send_v2_open_journal() {
 template <typename I>
 Context *RefreshRequest<I>::handle_v2_open_journal(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to initialize journal: " << cpp_strerror(*result)
@@ -970,7 +970,7 @@ void RefreshRequest<I>::send_v2_block_writes() {
   }
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   // we need to block writes temporarily to avoid in-flight journal
   // writes
@@ -985,7 +985,7 @@ void RefreshRequest<I>::send_v2_block_writes() {
 template <typename I>
 Context *RefreshRequest<I>::handle_v2_block_writes(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to block writes: " << cpp_strerror(*result)
@@ -1012,7 +1012,7 @@ void RefreshRequest<I>::send_v2_open_object_map() {
   // since SetSnapRequest loads the object map for a snapshot and
   // ExclusiveLock loads the object map for HEAD
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   if (m_image_ctx.snap_name.empty()) {
     m_object_map = m_image_ctx.create_object_map(CEPH_NOSNAP);
@@ -1042,7 +1042,7 @@ void RefreshRequest<I>::send_v2_open_object_map() {
 template <typename I>
 Context *RefreshRequest<I>::handle_v2_open_object_map(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to open object map: " << cpp_strerror(*result)
@@ -1062,7 +1062,7 @@ Context *RefreshRequest<I>::handle_v2_open_object_map(int *result) {
 template <typename I>
 void RefreshRequest<I>::send_v2_apply() {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   // ensure we are not in a rados callback when applying updates
   using klass = RefreshRequest<I>;
@@ -1074,7 +1074,7 @@ void RefreshRequest<I>::send_v2_apply() {
 template <typename I>
 Context *RefreshRequest<I>::handle_v2_apply(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   apply();
 
@@ -1088,7 +1088,7 @@ Context *RefreshRequest<I>::send_v2_finalize_refresh_parent() {
   }
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   using klass = RefreshRequest<I>;
   Context *ctx = create_context_callback<
@@ -1100,7 +1100,7 @@ Context *RefreshRequest<I>::send_v2_finalize_refresh_parent() {
 template <typename I>
 Context *RefreshRequest<I>::handle_v2_finalize_refresh_parent(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   ceph_assert(m_refresh_parent != nullptr);
   delete m_refresh_parent;
@@ -1116,7 +1116,7 @@ Context *RefreshRequest<I>::send_v2_shut_down_exclusive_lock() {
   }
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   // exclusive lock feature was dynamically disabled. in-flight IO will be
   // flushed and in-flight requests will be canceled before releasing lock
@@ -1130,7 +1130,7 @@ Context *RefreshRequest<I>::send_v2_shut_down_exclusive_lock() {
 template <typename I>
 Context *RefreshRequest<I>::handle_v2_shut_down_exclusive_lock(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to shut down exclusive lock: "
@@ -1157,7 +1157,7 @@ Context *RefreshRequest<I>::send_v2_close_journal() {
   }
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   // journal feature was dynamically disabled
   using klass = RefreshRequest<I>;
@@ -1170,7 +1170,7 @@ Context *RefreshRequest<I>::send_v2_close_journal() {
 template <typename I>
 Context *RefreshRequest<I>::handle_v2_close_journal(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     save_result(result);
@@ -1196,7 +1196,7 @@ Context *RefreshRequest<I>::send_v2_close_object_map() {
   }
 
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
   // object map was dynamically disabled
   using klass = RefreshRequest<I>;
@@ -1209,7 +1209,7 @@ Context *RefreshRequest<I>::send_v2_close_object_map() {
 template <typename I>
 Context *RefreshRequest<I>::handle_v2_close_object_map(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to close object map: " << cpp_strerror(*result)
@@ -1233,7 +1233,7 @@ Context *RefreshRequest<I>::send_flush_aio() {
 
   if (m_flush_aio) {
     CephContext *cct = m_image_ctx.cct;
-    ldout(cct, 10) << this << " " << __func__ << dendl;
+    ldout(cct, 10) << this << " " << __FFL__ << dendl;
 
     std::shared_lock owner_locker{m_image_ctx.owner_lock};
     auto ctx = create_context_callback<
@@ -1259,7 +1259,7 @@ Context *RefreshRequest<I>::send_flush_aio() {
 template <typename I>
 Context *RefreshRequest<I>::handle_flush_aio(int *result) {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 10) << this << " " << __func__ << ": r=" << *result << dendl;
+  ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *result << dendl;
 
   if (*result < 0) {
     lderr(cct) << "failed to flush pending AIO: " << cpp_strerror(*result)
@@ -1275,7 +1275,7 @@ Context *RefreshRequest<I>::handle_error(int *result) {
     *result = m_error_result;
 
     CephContext *cct = m_image_ctx.cct;
-    ldout(cct, 10) << this << " " << __func__ << ": r=" << *result << dendl;
+    ldout(cct, 10) << this << " " << __FFL__ << ": r=" << *result << dendl;
   }
   return m_on_finish;
 }
@@ -1283,7 +1283,7 @@ Context *RefreshRequest<I>::handle_error(int *result) {
 template <typename I>
 void RefreshRequest<I>::apply() {
   CephContext *cct = m_image_ctx.cct;
-  ldout(cct, 20) << this << " " << __func__ << dendl;
+  ldout(cct, 20) << this << " " << __FFL__ << dendl;
 
   std::scoped_lock locker{m_image_ctx.owner_lock, m_image_ctx.image_lock};
 
@@ -1475,7 +1475,7 @@ int RefreshRequest<I>::get_migration_info(ParentImageInfo *parent_md,
     if (m_migration_spec.header_type != cls::rbd::MIGRATION_HEADER_TYPE_SRC &&
         m_migration_spec.pool_id != -1 &&
         m_migration_spec.state != cls::rbd::MIGRATION_STATE_EXECUTED) {
-      lderr(cct) << this << " " << __func__ << ": invalid migration spec"
+      lderr(cct) << this << " " << __FFL__ << ": invalid migration spec"
                  << dendl;
       return -EINVAL;
     }

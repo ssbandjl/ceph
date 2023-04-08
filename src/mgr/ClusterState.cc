@@ -22,7 +22,7 @@
 #define dout_context g_ceph_context
 #define dout_subsys ceph_subsys_mgr
 #undef dout_prefix
-#define dout_prefix *_dout << "mgr " << __func__ << " "
+#define dout_prefix *_dout << "mgr " << __FFL__ << " "
 
 ClusterState::ClusterState(
   MonClient *monc_,
@@ -289,7 +289,7 @@ bool ClusterState::asok_command(
 	  continue;
 	auto stale_time = g_ceph_context->_conf.get_val<int64_t>("osd_mon_heartbeat_stat_stale");
 	if (now.sec() - j.second.last_update > stale_time) {
-	  dout(20) << __func__ << " time out heartbeat for osd " << i.first
+	  dout(20) << __FFL__ << " time out heartbeat for osd " << i.first
 	           << " last_update " << j.second.last_update << dendl;
 	   continue;
 	}

@@ -48,7 +48,7 @@ public:
 
   void handle_notify(uint64_t notify_id, uint64_t cookie, uint64_t notifier_gid,
 		     bufferlist& bl) override {
-    std::cout << __func__ << " cookie " << cookie << " notify_id " << notify_id
+    std::cout << __FFL__ << " cookie " << cookie << " notify_id " << notify_id
 	      << " notifier_gid " << notifier_gid << std::endl;
     notify->notify_bl = bl;
     notify->notify_cookies.insert(cookie);
@@ -60,7 +60,7 @@ public:
   }
 
   void handle_error(uint64_t cookie, int err) override {
-    std::cout << __func__ << " cookie " << cookie
+    std::cout << __FFL__ << " cookie " << cookie
 	      << " err " << err << std::endl;
     ceph_assert(cookie > 1000);
     notify->notify_err = err;
@@ -75,7 +75,7 @@ class WatchNotifyTestCtx : public WatchCtx
 public:
   void notify(uint8_t opcode, uint64_t ver, bufferlist& bl) override
   {
-    std::cout << __func__ << std::endl;
+    std::cout << __FFL__ << std::endl;
     sem_post(sem);
   }
 };

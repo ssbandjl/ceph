@@ -47,12 +47,12 @@ void IOContext::aio_wait()
   std::unique_lock l(lock);
   // see _aio_thread for waker logic
   while (num_running.load() > 0) {
-    dout(10) << __func__ << " " << this
+    dout(10) << __FFL__ << " " << this
 	     << " waiting for " << num_running.load() << " aios to complete"
 	     << dendl;
     cond.wait(l);
   }
-  dout(20) << __func__ << " " << this << " done" << dendl;
+  dout(20) << __FFL__ << " " << this << " done" << dendl;
 }
 
 uint64_t IOContext::get_num_ios() const
@@ -111,7 +111,7 @@ BlockDevice *BlockDevice::create(CephContext* cct, const string& path,
   }
 #endif
 
-  dout(1) << __func__ << " path " << path << " type " << type << dendl;
+  dout(1) << __FFL__ << " path " << path << " type " << type << dendl;
 
 #if defined(HAVE_BLUESTORE_PMEM)
   if (type == "pmem") {
@@ -131,7 +131,7 @@ BlockDevice *BlockDevice::create(CephContext* cct, const string& path,
 #endif
 #endif
 
-  derr << __func__ << " unknown backend " << type << dendl;
+  derr << __FFL__ << " unknown backend " << type << dendl;
   ceph_abort();
   return NULL;
 }
@@ -149,7 +149,7 @@ void BlockDevice::reap_ioc()
   if (ioc_reap_count.load()) {
     std::lock_guard l(ioc_reap_lock);
     for (auto p : ioc_reap_queue) {
-      dout(20) << __func__ << " reap ioc " << p << dendl;
+      dout(20) << __FFL__ << " reap ioc " << p << dendl;
       delete p;
     }
     ioc_reap_queue.clear();

@@ -165,7 +165,7 @@ struct TestMigration : public TestFixture {
 
   void migration_prepare(librados::IoCtx& dst_io_ctx,
                          const std::string &dst_name, int r = 0) {
-    std::cout << __func__ << std::endl;
+    std::cout << __FFL__ << std::endl;
 
     close_image(m_ictx);
     m_ictx = nullptr;
@@ -183,7 +183,7 @@ struct TestMigration : public TestFixture {
 
   void migration_execute(librados::IoCtx& io_ctx, const std::string &name,
                          int r = 0) {
-    std::cout << __func__ << std::endl;
+    std::cout << __FFL__ << std::endl;
 
     librbd::NoOpProgressContext no_op;
     EXPECT_EQ(r, librbd::api::Migration<>::execute(io_ctx, name, no_op));
@@ -191,7 +191,7 @@ struct TestMigration : public TestFixture {
 
   void migration_abort(librados::IoCtx& io_ctx, const std::string &name,
                        int r = 0) {
-    std::cout << __func__ << std::endl;
+    std::cout << __FFL__ << std::endl;
 
     std::string dst_name = m_ictx->name;
     close_image(m_ictx);
@@ -210,7 +210,7 @@ struct TestMigration : public TestFixture {
   }
 
   void migration_commit(librados::IoCtx& io_ctx, const std::string &name) {
-    std::cout << __func__ << std::endl;
+    std::cout << __FFL__ << std::endl;
 
     librbd::NoOpProgressContext no_op;
     EXPECT_EQ(0, librbd::api::Migration<>::commit(io_ctx, name, no_op));

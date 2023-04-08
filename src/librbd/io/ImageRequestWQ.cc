@@ -20,7 +20,7 @@
 #define dout_subsys ceph_subsys_rbd
 #undef dout_prefix
 #define dout_prefix *_dout << "librbd::io::ImageRequestWQ: " << this \
-                           << " " << __func__ << ": "
+                           << " " << __FFL__ << ": "
 
 namespace librbd {
 
@@ -717,7 +717,7 @@ void ImageRequestWQ<I>::shut_down(Context *on_shutdown) {
     m_shutdown = true;
 
     CephContext *cct = m_image_ctx.cct;
-    ldout(cct, 5) << __func__ << ": in_flight=" << m_in_flight_ios.load()
+    ldout(cct, 5) << __FFL__ << ": in_flight=" << m_in_flight_ios.load()
                   << dendl;
     if (m_in_flight_ios > 0) {
       m_on_shutdown = on_shutdown;

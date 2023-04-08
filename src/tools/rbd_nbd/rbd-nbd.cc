@@ -243,12 +243,12 @@ private:
     IOContext *ctx = reinterpret_cast<IOContext *>(arg);
     int ret = aio_completion->get_return_value();
 
-    dout(20) << __func__ << ": " << *ctx << dendl;
+    dout(20) << __FFL__ << ": " << *ctx << dendl;
 
     if (ret == -EINVAL) {
       // if shrinking an image, a pagecache writeback might reference
       // extents outside of the range of the new image extents
-      dout(0) << __func__ << ": masking IO out-of-bounds error" << dendl;
+      dout(0) << __FFL__ << ": masking IO out-of-bounds error" << dendl;
       ctx->data.clear();
       ret = 0;
     }
@@ -259,7 +259,7 @@ private:
                 ret < static_cast<int>(ctx->request.len)) {
       int pad_byte_count = static_cast<int> (ctx->request.len) - ret;
       ctx->data.append_zero(pad_byte_count);
-      dout(20) << __func__ << ": " << *ctx << ": Pad byte count: "
+      dout(20) << __FFL__ << ": " << *ctx << ": Pad byte count: "
                << pad_byte_count << dendl;
       ctx->reply.error = htonl(0);
     } else {
@@ -276,7 +276,7 @@ private:
       std::unique_ptr<IOContext> ctx(new IOContext());
       ctx->server = this;
 
-      dout(20) << __func__ << ": waiting for nbd request" << dendl;
+      dout(20) << __FFL__ << ": waiting for nbd request" << dendl;
 
       int r = safe_read_exact(fd, &ctx->request, sizeof(struct nbd_request));
       if (r < 0) {
@@ -342,7 +342,7 @@ private:
           goto signal;
       }
     }
-    dout(20) << __func__ << ": terminated" << dendl;
+    dout(20) << __FFL__ << ": terminated" << dendl;
 
 signal:
     std::lock_guard l{disconnect_lock};
@@ -352,14 +352,14 @@ signal:
   void writer_entry()
   {
     while (!terminated) {
-      dout(20) << __func__ << ": waiting for io request" << dendl;
+      dout(20) << __FFL__ << ": waiting for io request" << dendl;
       std::unique_ptr<IOContext> ctx(wait_io_finish());
       if (!ctx) {
-	dout(20) << __func__ << ": no io requests, terminating" << dendl;
+	dout(20) << __FFL__ << ": no io requests, terminating" << dendl;
         return;
       }
 
-      dout(20) << __func__ << ": got: " << *ctx << dendl;
+      dout(20) << __FFL__ << ": got: " << *ctx << dendl;
 
       int r = safe_write(fd, &ctx->reply, sizeof(struct nbd_reply));
       if (r < 0) {
@@ -377,7 +377,7 @@ signal:
       }
       dout(20) << *ctx << ": finish" << dendl;
     }
-    dout(20) << __func__ << ": terminated" << dendl;
+    dout(20) << __FFL__ << ": terminated" << dendl;
   }
 
   class ThreadHelper : public Thread
@@ -406,7 +406,7 @@ public:
   void start()
   {
     if (!started) {
-      dout(10) << __func__ << ": starting" << dendl;
+      dout(10) << __FFL__ << ": starting" << dendl;
 
       started = true;
 
@@ -427,7 +427,7 @@ public:
   ~NBDServer()
   {
     if (started) {
-      dout(10) << __func__ << ": terminating" << dendl;
+      dout(10) << __FFL__ << ": terminating" << dendl;
 
       shutdown();
 
@@ -1055,11 +1055,11 @@ static void handle_signal(int signum)
   derr << "*** Got signal " << sig_str(signum) << " ***" << dendl;
 
   if (nbd < 0 || nbd_index < 0) {
-    dout(20) << __func__ << ": " << "disconnect not needed." << dendl;
+    dout(20) << __FFL__ << ": " << "disconnect not needed." << dendl;
     return;
   }
 
-  dout(20) << __func__ << ": " << "sending NBD_DISCONNECT" << dendl;
+  dout(20) << __FFL__ << ": " << "sending NBD_DISCONNECT" << dendl;
   ret = netlink_disconnect(nbd_index);
   if (ret == 1)
     ret = ioctl(nbd, NBD_DISCONNECT);
@@ -1067,7 +1067,7 @@ static void handle_signal(int signum)
   if (ret != 0) {
     derr << "rbd-nbd: disconnect failed. Error: " << ret << dendl;
   } else {
-    dout(20) << __func__ << ": " << "disconnected" << dendl;
+    dout(20) << __FFL__ << ": " << "disconnected" << dendl;
   }
 }
 

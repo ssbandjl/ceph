@@ -22,7 +22,7 @@
 #undef dout_prefix
 #define dout_prefix *_dout << "rbd::mirror::image_replayer::journal::" \
                            << "CreateLocalImageRequest: " << this << " " \
-                           << __func__ << ": "
+                           << __FFL__ << ": "
 
 namespace rbd {
 namespace mirror {

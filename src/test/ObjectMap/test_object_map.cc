@@ -608,7 +608,7 @@ public:
     bool err = false;
     for (auto &&i: omap[obj]) {
       if (!in_db.count(i.first)) {
-	out << __func__ << ": obj " << obj << " missing key "
+	out << __FFL__ << ": obj " << obj << " missing key "
 	    << i.first << std::endl;
 	err = true;
       } else {
@@ -616,7 +616,7 @@ public:
       }
     }
     if (!in_db.empty()) {
-      out << __func__ << ": obj " << obj << " found extra keys "
+      out << __FFL__ << ": obj " << obj << " found extra keys "
 	  << in_db << std::endl;
       err = true;
     }

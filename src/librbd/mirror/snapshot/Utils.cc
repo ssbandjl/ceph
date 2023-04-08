@@ -11,7 +11,7 @@
 
 #undef dout_prefix
 #define dout_prefix *_dout << "librbd::mirror::snapshot::util: " \
-                           << " " << __func__ << ": "
+                           << " " << __FFL__ << ": "
 
 namespace librbd {
 namespace mirror {

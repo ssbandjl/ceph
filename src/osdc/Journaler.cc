@@ -1251,7 +1251,7 @@ bool Journaler::try_read_entry(bufferlist& bl)
       ceph_assert(start_ptr == read_pos);
     }
   } catch (const buffer::error &e) {
-    lderr(cct) << __func__ << ": decode error from journal_stream" << dendl;
+    lderr(cct) << __FFL__ << ": decode error from journal_stream" << dendl;
     error = -EINVAL;
     return false;
   }
@@ -1265,7 +1265,7 @@ bool Journaler::try_read_entry(bufferlist& bl)
     // We were readable, we might not be any more
     readable = _is_readable();
   } catch (const buffer::error &e) {
-    lderr(cct) << __func__ << ": decode error from _is_readable" << dendl;
+    lderr(cct) << __FFL__ << ": decode error from _is_readable" << dendl;
     error = -EINVAL;
     return false;
   }
@@ -1406,7 +1406,7 @@ void Journaler::handle_write_error(int r)
     /* We don't call error handler more than once, subsequent errors
      * are dropped -- this is okay as long as the error handler does
      * something dramatic like respawn */
-    lderr(cct) << __func__ << ": multiple write errors, handler already called"
+    lderr(cct) << __FFL__ << ": multiple write errors, handler already called"
 	       << dendl;
   } else {
     ceph_abort_msg("unhandled write error");
@@ -1581,7 +1581,7 @@ void Journaler::shutdown()
 {
   lock_guard l(lock);
 
-  ldout(cct, 1) << __func__ << dendl;
+  ldout(cct, 1) << __FFL__ << dendl;
 
   state = STATE_STOPPING;
   readable = false;

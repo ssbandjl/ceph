@@ -285,7 +285,7 @@ int RGWBucketGetSyncPolicyHandlerCR::Request::_send_request()
                                                         &result->policy_handler,
                                                         null_yield);
   if (r < 0) {
-    lderr(cct) << "ERROR: " << __func__ << "(): get_sync_policy_handler() returned " << r << dendl;
+    lderr(cct) << "ERROR: " << __FFL__ << "(): get_sync_policy_handler() returned " << r << dendl;
     return  r;
   }
 

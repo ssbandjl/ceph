@@ -69,7 +69,7 @@ int BitmapFreelistManager::create(uint64_t new_size, uint64_t granularity,
 
   blocks = size_2_block_count(size);
   if (blocks * bytes_per_block > size) {
-    dout(10) << __func__ << " rounding blocks up from 0x" << std::hex << size
+    dout(10) << __FFL__ << " rounding blocks up from 0x" << std::hex << size
 	     << " to 0x" << (blocks * bytes_per_block)
 	     << " (0x" << blocks << " blocks)" << std::dec << dendl;
     // set past-eof blocks as allocated
@@ -114,7 +114,7 @@ int BitmapFreelistManager::_expand(uint64_t old_size, KeyValueDB* db)
 
   auto blocks0 = size_2_block_count(old_size);
   if (blocks0 * bytes_per_block > old_size) {
-    dout(10) << __func__ << " rounding1 blocks up from 0x" << std::hex
+    dout(10) << __FFL__ << " rounding1 blocks up from 0x" << std::hex
              << old_size << " to 0x" << (blocks0 * bytes_per_block)
 	     << " (0x" << blocks0 << " blocks)" << std::dec << dendl;
     // reset past-eof blocks to unallocated
@@ -125,7 +125,7 @@ int BitmapFreelistManager::_expand(uint64_t old_size, KeyValueDB* db)
   blocks = size_2_block_count(size);
 
   if (blocks * bytes_per_block > size) {
-    dout(10) << __func__ << " rounding2 blocks up from 0x" << std::hex
+    dout(10) << __FFL__ << " rounding2 blocks up from 0x" << std::hex
              << size << " to 0x" << (blocks * bytes_per_block)
 	     << " (0x" << blocks << " blocks)" << std::dec << dendl;
     // set past-eof blocks as allocated
@@ -159,7 +159,7 @@ int BitmapFreelistManager::read_size_meta_from_db(KeyValueDB* kvdb,
   bufferlist v;
   int r = kvdb->get(meta_prefix, "size", &v);
   if (r < 0) {
-    derr << __func__ << " missing size meta in DB" << dendl;
+    derr << __FFL__ << " missing size meta in DB" << dendl;
     return ENOENT;
   } else {
     auto p = v.cbegin();
@@ -181,28 +181,28 @@ void BitmapFreelistManager::_load_from_db(KeyValueDB* kvdb)
       bufferlist bl = it->value();
       auto p = bl.cbegin();
       decode(bytes_per_block, p);
-      dout(10) << __func__ << " bytes_per_block 0x" << std::hex
+      dout(10) << __FFL__ << " bytes_per_block 0x" << std::hex
         << bytes_per_block << std::dec << dendl;
     } else if (k == "blocks") {
       bufferlist bl = it->value();
       auto p = bl.cbegin();
       decode(blocks, p);
-      dout(10) << __func__ << " blocks 0x" << std::hex << blocks << std::dec
+      dout(10) << __FFL__ << " blocks 0x" << std::hex << blocks << std::dec
         << dendl;
     } else if (k == "size") {
       bufferlist bl = it->value();
       auto p = bl.cbegin();
       decode(size, p);
-      dout(10) << __func__ << " size 0x" << std::hex << size << std::dec
+      dout(10) << __FFL__ << " size 0x" << std::hex << size << std::dec
         << dendl;
     } else if (k == "blocks_per_key") {
       bufferlist bl = it->value();
       auto p = bl.cbegin();
       decode(blocks_per_key, p);
-      dout(10) << __func__ << " blocks_per_key 0x" << std::hex << blocks_per_key
+      dout(10) << __FFL__ << " blocks_per_key 0x" << std::hex << blocks_per_key
         << std::dec << dendl;
     } else {
-      derr << __func__ << " unrecognized meta " << k << dendl;
+      derr << __FFL__ << " unrecognized meta " << k << dendl;
     }
     it->next();
   }
@@ -213,15 +213,15 @@ int BitmapFreelistManager::init(const bluestore_bdev_label_t& label,
   KeyValueDB *kvdb,
   bool db_in_read_only)
 {
-  dout(1) << __func__ << dendl;
+  dout(1) << __FFL__ << dendl;
   int r = _init_from_label(label);
   if (r != 0) {
-    dout(1) << __func__ << " fall back to legacy meta repo" << dendl;
+    dout(1) << __FFL__ << " fall back to legacy meta repo" << dendl;
     _load_from_db(kvdb);
   }
   _sync(kvdb, db_in_read_only);
 
-  dout(10) << __func__ << std::hex
+  dout(10) << __FFL__ << std::hex
 	   << " size 0x" << size
 	   << " bytes_per_block 0x" << bytes_per_block
 	   << " blocks 0x" << blocks
@@ -233,7 +233,7 @@ int BitmapFreelistManager::init(const bluestore_bdev_label_t& label,
 
 int BitmapFreelistManager::_init_from_label(const bluestore_bdev_label_t& label)
 {
-  dout(1) << __func__ << dendl;
+  dout(1) << __FFL__ << dendl;
 
   int r = ENOENT;
   string err;
@@ -243,14 +243,14 @@ int BitmapFreelistManager::_init_from_label(const bluestore_bdev_label_t& label)
   if (it != end) {
     size = strict_iecstrtoll(it->second.c_str(), &err);
     if (!err.empty()) {
-      derr << __func__ << " Failed to parse - "
+      derr << __FFL__ << " Failed to parse - "
         << it->first << ":" << it->second
         << ", error: " << err << dendl;
       return r;
     }
   } else {
     // this is expected for legacy deployed OSDs
-    dout(0) << __func__ << " bfm_size not found in bdev meta" << dendl;
+    dout(0) << __FFL__ << " bfm_size not found in bdev meta" << dendl;
     return r;
   }
 
@@ -258,13 +258,13 @@ int BitmapFreelistManager::_init_from_label(const bluestore_bdev_label_t& label)
   if (it != end) {
     blocks = strict_iecstrtoll(it->second.c_str(), &err);
     if (!err.empty()) {
-      derr << __func__ << " Failed to parse - "
+      derr << __FFL__ << " Failed to parse - "
         << it->first << ":" << it->second
         << ", error: " << err << dendl;
       return r;
     }
   } else {
-    derr << __func__ << " bfm_blocks not found in bdev meta" << dendl;
+    derr << __FFL__ << " bfm_blocks not found in bdev meta" << dendl;
     return r;
   }
 
@@ -272,26 +272,26 @@ int BitmapFreelistManager::_init_from_label(const bluestore_bdev_label_t& label)
   if (it != end) {
     bytes_per_block = strict_iecstrtoll(it->second.c_str(), &err);
     if (!err.empty()) {
-      derr << __func__ << " Failed to parse - "
+      derr << __FFL__ << " Failed to parse - "
         << it->first << ":" << it->second
         << ", error: " << err << dendl;
       return r;
     }
   } else {
-    derr << __func__ << " bfm_bytes_per_block not found in bdev meta" << dendl;
+    derr << __FFL__ << " bfm_bytes_per_block not found in bdev meta" << dendl;
     return r;
   }
   it = label.meta.find("bfm_blocks_per_key");
   if (it != end) {
     blocks_per_key = strict_iecstrtoll(it->second.c_str(), &err);
     if (!err.empty()) {
-      derr << __func__ << " Failed to parse - "
+      derr << __FFL__ << " Failed to parse - "
         << it->first << ":" << it->second
         << ", error: " << err << dendl;
       return r;
     }
   } else {
-    derr << __func__ << " bfm_blocks_per_key not found in bdev meta" << dendl;
+    derr << __FFL__ << " bfm_blocks_per_key not found in bdev meta" << dendl;
     return r;
   }
   r = 0;
@@ -309,7 +309,7 @@ void BitmapFreelistManager::_init_misc()
 
   bytes_per_key = bytes_per_block * blocks_per_key;
   key_mask = ~(bytes_per_key - 1);
-  dout(10) << __func__ << std::hex << " bytes_per_key 0x" << bytes_per_key
+  dout(10) << __FFL__ << std::hex << " bytes_per_key 0x" << bytes_per_key
 	   << ", key_mask 0x" << key_mask << std::dec
 	   << dendl;
 }
@@ -321,12 +321,12 @@ void BitmapFreelistManager::sync(KeyValueDB* kvdb)
 
 void BitmapFreelistManager::_sync(KeyValueDB* kvdb, bool read_only)
 {
-  dout(10) << __func__ << " checks if size sync is needed" << dendl;
+  dout(10) << __FFL__ << " checks if size sync is needed" << dendl;
   uint64_t size_db = 0;
   int r = read_size_meta_from_db(kvdb, &size_db);
   ceph_assert(r >= 0);
   if (!read_only && size_db < size) {
-    dout(1) << __func__ << " committing new size 0x" << std::hex << size
+    dout(1) << __FFL__ << " committing new size 0x" << std::hex << size
       << std::dec << dendl;
     r = _expand(size_db, kvdb);
     ceph_assert(r == 0);
@@ -334,14 +334,14 @@ void BitmapFreelistManager::_sync(KeyValueDB* kvdb, bool read_only)
     // this might hapen when OSD passed the following sequence:
     // upgrade -> downgrade -> expand -> upgrade
     // One needs to run expand once again to syncup
-    dout(1) << __func__ << " fall back to legacy meta repo" << dendl;
+    dout(1) << __FFL__ << " fall back to legacy meta repo" << dendl;
     _load_from_db(kvdb);
   }
 }
 
 void BitmapFreelistManager::shutdown()
 {
-  dout(1) << __func__ << dendl;
+  dout(1) << __FFL__ << dendl;
 }
 
 void BitmapFreelistManager::enumerate_reset()
@@ -391,7 +391,7 @@ bool BitmapFreelistManager::enumerate_next(KeyValueDB *kvdb, uint64_t *offset, u
 
   // initial base case is a bit awkward
   if (enumerate_offset == 0 && enumerate_bl_pos == 0) {
-    dout(10) << __func__ << " start" << dendl;
+    dout(10) << __FFL__ << " start" << dendl;
     enumerate_p = kvdb->get_iterator(bitmap_prefix);
     enumerate_p->lower_bound(string());
     // we assert that the first block is always allocated; it's true,
@@ -406,7 +406,7 @@ bool BitmapFreelistManager::enumerate_next(KeyValueDB *kvdb, uint64_t *offset, u
   }
 
   if (enumerate_offset >= size) {
-    dout(10) << __func__ << " end" << dendl;
+    dout(10) << __FFL__ << " end" << dendl;
     return false;
   }
 
@@ -415,7 +415,7 @@ bool BitmapFreelistManager::enumerate_next(KeyValueDB *kvdb, uint64_t *offset, u
     enumerate_bl_pos = get_next_clear_bit(enumerate_bl, enumerate_bl_pos);
     if (enumerate_bl_pos >= 0) {
       *offset = _get_offset(enumerate_offset, enumerate_bl_pos);
-      dout(30) << __func__ << " found clear bit, key 0x" << std::hex
+      dout(30) << __FFL__ << " found clear bit, key 0x" << std::hex
 	       << enumerate_offset << " bit 0x" << enumerate_bl_pos
 	       << " offset 0x" << *offset
 	       << std::dec << dendl;
@@ -452,13 +452,13 @@ bool BitmapFreelistManager::enumerate_next(KeyValueDB *kvdb, uint64_t *offset, u
       enumerate_bl_pos = get_next_set_bit(enumerate_bl, enumerate_bl_pos);
       if (enumerate_bl_pos >= 0) {
 	end = _get_offset(enumerate_offset, enumerate_bl_pos);
-	dout(30) << __func__ << " found set bit, key 0x" << std::hex
+	dout(30) << __FFL__ << " found set bit, key 0x" << std::hex
 		 << enumerate_offset << " bit 0x" << enumerate_bl_pos
 		 << " offset 0x" << end << std::dec
 		 << dendl;
 	end = std::min(get_alloc_units() * bytes_per_block, end);
 	*length = end - *offset;
-        dout(10) << __func__ << std::hex << " 0x" << *offset << "~" << *length
+        dout(10) << __FFL__ << std::hex << " 0x" << *offset << "~" << *length
 		 << std::dec << dendl;
 	return true;
       }
@@ -480,14 +480,14 @@ bool BitmapFreelistManager::enumerate_next(KeyValueDB *kvdb, uint64_t *offset, u
   if (enumerate_offset < size) {
     end = get_alloc_units() * bytes_per_block;
     *length = end - *offset;
-    dout(10) << __func__ << std::hex << " 0x" << *offset << "~" << *length
+    dout(10) << __FFL__ << std::hex << " 0x" << *offset << "~" << *length
 	     << std::dec << dendl;
     enumerate_offset = size;
     enumerate_bl_pos = blocks_per_key;
     return true;
   }
 
-  dout(10) << __func__ << " end" << dendl;
+  dout(10) << __FFL__ << " end" << dendl;
   return false;
 }
 
@@ -496,7 +496,7 @@ void BitmapFreelistManager::dump(KeyValueDB *kvdb)
   enumerate_reset();
   uint64_t offset, length;
   while (enumerate_next(kvdb, &offset, &length)) {
-    dout(20) << __func__ << " 0x" << std::hex << offset << "~" << length
+    dout(20) << __FFL__ << " 0x" << std::hex << offset << "~" << length
 	     << std::dec << dendl;
   }
 }
@@ -520,7 +520,7 @@ void BitmapFreelistManager::_verify_range(KeyValueDB *kvdb,
       for (unsigned i = s; i <= e; ++i) {
 	int has = !!(p[i >> 3] & (1ull << (i & 7)));
 	if (has != val) {
-	  derr << __func__ << " key 0x" << std::hex << first_key << " bit 0x"
+	  derr << __FFL__ << " key 0x" << std::hex << first_key << " bit 0x"
 	       << i << " has 0x" << has << " expected 0x" << val
 	       << std::dec << dendl;
 	  ++errors;
@@ -528,7 +528,7 @@ void BitmapFreelistManager::_verify_range(KeyValueDB *kvdb,
       }
     } else {
       if (val) {
-	derr << __func__ << " key 0x" << std::hex << first_key
+	derr << __FFL__ << " key 0x" << std::hex << first_key
 	     << " not present, expected 0x" << val << std::dec << dendl;
 	++errors;
       }
@@ -547,7 +547,7 @@ void BitmapFreelistManager::_verify_range(KeyValueDB *kvdb,
 	for (unsigned i = s; i < e; ++i) {
 	  int has = !!(p[i >> 3] & (1ull << (i & 7)));
 	  if (has != val) {
-	    derr << __func__ << " key 0x" << std::hex << first_key << " bit 0x"
+	    derr << __FFL__ << " key 0x" << std::hex << first_key << " bit 0x"
 		 << i << " has 0x" << has << " expected 0x" << val << std::dec
 		 << dendl;
 	    ++errors;
@@ -555,7 +555,7 @@ void BitmapFreelistManager::_verify_range(KeyValueDB *kvdb,
 	}
       } else {
 	if (val) {
-	  derr << __func__ << " key 0x" << std::hex << first_key
+	  derr << __FFL__ << " key 0x" << std::hex << first_key
 	       << " not present, expected 0x" << val << std::dec << dendl;
 	  ++errors;
 	}
@@ -574,7 +574,7 @@ void BitmapFreelistManager::_verify_range(KeyValueDB *kvdb,
 	  for (unsigned i = 0; i < blocks_per_key; ++i) {
 	    int has = !!(p[i >> 3] & (1ull << (i & 7)));
 	    if (has != val) {
-	      derr << __func__ << " key 0x" << std::hex << first_key << " bit 0x"
+	      derr << __FFL__ << " key 0x" << std::hex << first_key << " bit 0x"
 		   << i << " has 0x" << has << " expected 0x" << val
 		   << std::dec << dendl;
 	      ++errors;
@@ -582,7 +582,7 @@ void BitmapFreelistManager::_verify_range(KeyValueDB *kvdb,
 	  }
 	} else {
 	  if (val) {
-	    derr << __func__ << " key 0x" << std::hex << first_key
+	    derr << __FFL__ << " key 0x" << std::hex << first_key
 		 << " not present, expected 0x" << val << std::dec << dendl;
 	    ++errors;
 	  }
@@ -602,7 +602,7 @@ void BitmapFreelistManager::_verify_range(KeyValueDB *kvdb,
 	for (unsigned i = 0; i < e; ++i) {
 	  int has = !!(p[i >> 3] & (1ull << (i & 7)));
 	  if (has != val) {
-	    derr << __func__ << " key 0x" << std::hex << first_key << " bit 0x"
+	    derr << __FFL__ << " key 0x" << std::hex << first_key << " bit 0x"
 		 << i << " has 0x" << has << " expected 0x" << val << std::dec
 		 << dendl;
 	    ++errors;
@@ -610,7 +610,7 @@ void BitmapFreelistManager::_verify_range(KeyValueDB *kvdb,
 	}
       } else {
 	if (val) {
-	  derr << __func__ << " key 0x" << std::hex << first_key
+	  derr << __FFL__ << " key 0x" << std::hex << first_key
 	       << " not present, expected 0x" << val << std::dec << dendl;
 	  ++errors;
 	}
@@ -618,7 +618,7 @@ void BitmapFreelistManager::_verify_range(KeyValueDB *kvdb,
     }
   }
   if (errors) {
-    derr << __func__ << " saw " << errors << " errors" << dendl;
+    derr << __FFL__ << " saw " << errors << " errors" << dendl;
     ceph_abort_msg("bitmap freelist errors");
   }
 }
@@ -627,7 +627,7 @@ void BitmapFreelistManager::allocate(
   uint64_t offset, uint64_t length,
   KeyValueDB::Transaction txn)
 {
-  dout(10) << __func__ << " 0x" << std::hex << offset << "~" << length
+  dout(10) << __FFL__ << " 0x" << std::hex << offset << "~" << length
 	   << std::dec << dendl;
   _xor(offset, length, txn);
 }
@@ -636,7 +636,7 @@ void BitmapFreelistManager::release(
   uint64_t offset, uint64_t length,
   KeyValueDB::Transaction txn)
 {
-  dout(10) << __func__ << " 0x" << std::hex << offset << "~" << length
+  dout(10) << __FFL__ << " 0x" << std::hex << offset << "~" << length
 	   << std::dec << dendl;
   _xor(offset, length, txn);
 }
@@ -651,7 +651,7 @@ void BitmapFreelistManager::_xor(
 
   uint64_t first_key = offset & key_mask;
   uint64_t last_key = (offset + length - 1) & key_mask;
-  dout(20) << __func__ << " first_key 0x" << std::hex << first_key
+  dout(20) << __FFL__ << " first_key 0x" << std::hex << first_key
 	   << " last_key 0x" << last_key << std::dec << dendl;
 
   if (first_key == last_key) {
@@ -666,7 +666,7 @@ void BitmapFreelistManager::_xor(
     make_offset_key(first_key, &k);
     bufferlist bl;
     bl.append(p);
-    dout(30) << __func__ << " 0x" << std::hex << first_key << std::dec << ": ";
+    dout(30) << __FFL__ << " 0x" << std::hex << first_key << std::dec << ": ";
     bl.hexdump(*_dout, false);
     *_dout << dendl;
     txn->merge(bitmap_prefix, k, bl);
@@ -684,7 +684,7 @@ void BitmapFreelistManager::_xor(
       make_offset_key(first_key, &k);
       bufferlist bl;
       bl.append(p);
-      dout(30) << __func__ << " 0x" << std::hex << first_key << std::dec << ": ";
+      dout(30) << __FFL__ << " 0x" << std::hex << first_key << std::dec << ": ";
       bl.hexdump(*_dout, false);
       *_dout << dendl;
       txn->merge(bitmap_prefix, k, bl);
@@ -694,7 +694,7 @@ void BitmapFreelistManager::_xor(
     while (first_key < last_key) {
       string k;
       make_offset_key(first_key, &k);
-      dout(30) << __func__ << " 0x" << std::hex << first_key << std::dec
+      dout(30) << __FFL__ << " 0x" << std::hex << first_key << std::dec
       	 << ": ";
       all_set_bl.hexdump(*_dout, false);
       *_dout << dendl;
@@ -713,7 +713,7 @@ void BitmapFreelistManager::_xor(
       make_offset_key(first_key, &k);
       bufferlist bl;
       bl.append(p);
-      dout(30) << __func__ << " 0x" << std::hex << first_key << std::dec << ": ";
+      dout(30) << __FFL__ << " 0x" << std::hex << first_key << std::dec << ": ";
       bl.hexdump(*_dout, false);
       *_dout << dendl;
       txn->merge(bitmap_prefix, k, bl);

@@ -32,7 +32,7 @@ MgrStatMonitor::~MgrStatMonitor() = default;
 
 void MgrStatMonitor::create_initial()
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   version = 0;
   service_map.epoch = 1;
   service_map.modified = ceph_clock_now();
@@ -56,7 +56,7 @@ void MgrStatMonitor::update_from_paxos(bool *need_bootstrap)
       if (!p.end()) {
 	decode(progress_events, p);
       }
-      dout(10) << __func__ << " v" << version
+      dout(10) << __FFL__ << " v" << version
 	       << " service_map e" << service_map.epoch
 	       << " " << progress_events.size() << " progress events"
 	       << dendl;
@@ -72,7 +72,7 @@ void MgrStatMonitor::update_from_paxos(bool *need_bootstrap)
 
 void MgrStatMonitor::update_logger()
 {
-  dout(20) << __func__ << dendl;
+  dout(20) << __FFL__ << dendl;
 
   mon->cluster_logger->set(l_cluster_osd_bytes, digest.osd_sum.statfs.total);
   mon->cluster_logger->set(l_cluster_osd_bytes_used,
@@ -207,7 +207,7 @@ bool MgrStatMonitor::prepare_report(MonOpRequestRef op)
     pending_service_map_bl.swap(m->service_map_bl);
   }
   pending_progress_events.swap(m->progress_events);
-  dout(10) << __func__ << " " << pending_digest << ", "
+  dout(10) << __FFL__ << " " << pending_digest << ", "
 	   << pending_health_checks.checks.size() << " health checks, "
 	   << progress_events.size() << " progress events" << dendl;
   dout(20) << "pending_digest:\n";
@@ -249,7 +249,7 @@ bool MgrStatMonitor::preprocess_getpoolstats(MonOpRequestRef op)
     return true;
   }
   if (m->fsid != mon->monmap->fsid) {
-    dout(0) << __func__ << " on fsid "
+    dout(0) << __FFL__ << " on fsid "
 	    << m->fsid << " != " << mon->monmap->fsid << dendl;
     return true;
   }
@@ -283,7 +283,7 @@ bool MgrStatMonitor::preprocess_statfs(MonOpRequestRef op)
     return true;
   }
   if (statfs->fsid != mon->monmap->fsid) {
-    dout(0) << __func__ << " on fsid " << statfs->fsid
+    dout(0) << __FFL__ << " on fsid " << statfs->fsid
             << " != " << mon->monmap->fsid << dendl;
     return true;
   }
@@ -291,10 +291,10 @@ bool MgrStatMonitor::preprocess_statfs(MonOpRequestRef op)
   if (pool && !mon->osdmon()->osdmap.have_pg_pool(*pool)) {
     // There's no error field for MStatfsReply so just ignore the request.
     // This is known to happen when a client is still accessing a removed fs.
-    dout(1) << __func__ << " on removed pool " << *pool << dendl;
+    dout(1) << __FFL__ << " on removed pool " << *pool << dendl;
     return true;
   }
-  dout(10) << __func__ << " " << *statfs
+  dout(10) << __FFL__ << " " << *statfs
            << " from " << statfs->get_orig_source() << dendl;
   epoch_t ver = get_last_committed();
   auto reply = new MStatfsReply(statfs->fsid, statfs->get_tid(), ver);
@@ -323,7 +323,7 @@ void MgrStatMonitor::check_sub(Subscription *sub)
 
 void MgrStatMonitor::check_subs()
 {
-  dout(10) << __func__ << dendl;
+  dout(10) << __FFL__ << dendl;
   if (!service_map.epoch) {
     return;
   }

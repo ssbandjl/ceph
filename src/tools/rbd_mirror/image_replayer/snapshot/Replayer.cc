@@ -37,7 +37,7 @@
 #define dout_subsys ceph_subsys_rbd_mirror
 #undef dout_prefix
 #define dout_prefix *_dout << "rbd::mirror::image_replayer::snapshot::" \
-                           << "Replayer: " << this << " " << __func__ << ": "
+                           << "Replayer: " << this << " " << __FFL__ << ": "
 
 extern PerfCounters *g_snapshot_perf_counters;
 

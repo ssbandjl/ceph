@@ -73,7 +73,7 @@ template <typename I>
 bool InvalidateRequest<I>::should_complete(int r) {
   I &image_ctx = this->m_image_ctx;
   CephContext *cct = image_ctx.cct;
-  lderr(cct) << this << " " << __func__ << ": r=" << r << dendl;
+  lderr(cct) << this << " " << __FFL__ << ": r=" << r << dendl;
   return true;
 }
 

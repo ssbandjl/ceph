@@ -725,7 +725,7 @@ public:
 
   void ImageCtx::apply_metadata(const std::map<std::string, bufferlist> &meta,
                                 bool thread_safe) {
-    ldout(cct, 20) << __func__ << dendl;
+    ldout(cct, 20) << __FFL__ << dendl;
 
     std::unique_lock image_locker(image_lock);
 
@@ -743,7 +743,7 @@ public:
       if (!boost::starts_with(key, "rbd_")) {
         // ignore non-RBD configuration keys
         // TODO use option schema to determine applicable subsystem
-        ldout(cct, 0) << __func__ << ": ignoring config " << key << dendl;
+        ldout(cct, 0) << __FFL__ << ": ignoring config " << key << dendl;
         continue;
       }
 
@@ -751,10 +751,10 @@ public:
         std::string val(meta_pair.second.c_str(), meta_pair.second.length());
         int r = config.set_val(key, val);
         if (r >= 0) {
-          ldout(cct, 20) << __func__ << ": " << key << "=" << val << dendl;
+          ldout(cct, 20) << __FFL__ << ": " << key << "=" << val << dendl;
           config_overrides.insert(key);
         } else {
-          lderr(cct) << __func__ << ": failed to set config " << key << " "
+          lderr(cct) << __FFL__ << ": failed to set config " << key << " "
                      << "with value " << val << ": " << cpp_strerror(r)
                      << dendl;
         }
