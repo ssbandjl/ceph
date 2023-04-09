@@ -222,3 +222,185 @@ for host in $hosts;do
 done
 
 set_nonce: 设置随机值
+
+
+Infiniband::Infiniband
+verify_prereq
+
+先设置环境变量, 后 ibv_fork_init() https://github.com/ssbandjl/ceph/commit/b2d3f5e0970a4afbb82676af9e5b9a12f62a7747
+ibv_fork_init will check environment variable RDMAV_HUGEPAGES_SAFE to decide whether huge page is usable in system
+
+src/test/msgr/perf_msgr_server.cc
+server, 服务端, 建连接
+MessengerServer
+Messenger *Messenger::create type=async+rdma, lname=server -> Messenger *Messenger::create
+  new AsyncMessenger -> AsyncMessenger::AsyncMessenger
+    dispatch_queue
+      DispatchQueue(CephContext *cct, Messenger *msgr, string &name) 本地快速分发, 节流阀
+    lookup_or_create_singleton_object<StackSingleton>
+    single->ready(transport_type)
+       NetworkStack::create(cct, type) -> std::make_shared<RDMAStack>(c, t)
+        RDMAStack::RDMAStack
+          NetworkStack(cct, t) 构造, 线程池默认3个线程,
+            create_worker(cct, type, worker_id) -> NetworkStack::create_worker -> new RDMAWorker(c, worker_id) -> RDMAWorker::RDMAWorker
+              Worker(CephContext *c, unsigned worker_id) Stack是一个网络IO框架，封装了所有必要的基础网络接口，然后它管理线程工作。posix、dpdk甚至RDMA等不同的网络后端都需要继承Stack类来实现必要的接口。 所以这会让其他人轻松网络后端集成到 ceph 中。 否则，每个后端都需要实现整个 Messenger 逻辑，如重新连接、策略处理、会话维持...
+            w->center.init -> EventCenter::init
+              driver = new EpollDriver(cct)
+              driver->init(this, nevent) -> int EpollDriver::init
+                events = (struct epoll_event*)calloc
+                epfd = epoll_create(1024)
+                fcntl(epfd, F_SETFD, FD_CLOEXEC)
+              file_events.resize(nevent) 5000
+              pipe_cloexec(fds, 0) -> pipe2(pipefd, O_CLOEXEC | flags) 创建管道,均为非阻塞
+              notify_receive_fd = fds[0] 接收端,读端
+              notify_send_fd = fds[1] 发送端,写端
+            workers.push_back(w)
+          Infiniband::Infiniband
+            device_name(cct->_conf->ms_async_rdma_device_name) 从配置中获取rdma设备名 TODO
+            port_num( cct->_conf->ms_async_rdma_port_num) 默认为1 端口也从配置文件中获取
+            verify_prereq -> void Infiniband::verify_prereq
+              RDMAV_HUGEPAGES_SAFE 设置安全大页
+              ibv_fork_init
+              getrlimit(RLIMIT_MEMLOCK, &limit) 获取资源限制的配置
+          get_num_worker 3
+          for
+            w->set_dispatcher(rdma_dispatcher)
+            w->set_ib(ib)
+    stack->start()
+      std::function<void ()> thread = add_thread(i) 暂不执行
+        w->center.set_owner()
+          notify_handler = new C_handle_notify(this, cct)
+          create_file_event(notify_receive_fd, EVENT_READABLE, notify_handler) 将之前管道的读端设置epoll监听
+            driver->add_event(fd, event->mask, mask)
+              epoll_ctl(epfd, op, fd, &ee)
+            event->read_cb = ctxt 设置读事件回调
+        w->initialize()
+        w->init_done()
+          init_cond.notify_all() 通知等待的线程,完成初始化
+        while (!w->done)
+          w->center.process_events 循环处理事件 -> int EventCenter::process_events
+            driver->event_wait(fired_events, &tv) -> int EpollDriver::event_wait
+              epoll_wait 写端写入c触发执行此处
+              fired_events[event_id].fd = e->data.fd
+            event = _get_file_event(fired_events[event_id].fd)
+            cb = event->read_cb 可读回调
+            cb->do_request(fired_events[event_id].fd) 处理事件
+              r = read(fd_or_id, c, sizeof(c)) 读管道对端发来的字符,如:c
+            cur_process.swap(external_events)
+      spawn_worker(i, std::move(thread)) 启动新线程,返回join控制器
+      workers[i]->wait_for_init() 等所有工人完成初始化
+    local_connection = ceph::make_ref<AsyncConnection> -> AsyncConnection::AsyncConnection
+      ms_connection_ready_timeout 建连超时时间
+      ms_connection_idle_timeout 不活跃的时间, 如果两端连接空闲超过15分钟(没有活动的读写),则销毁连接
+      read_handler = new C_handle_read(this) -> conn->process()
+        void AsyncConnection::process()
+      write_handler = new C_handle_write(this) -> conn->handle_write()
+        void AsyncConnection::handle_write
+      write_callback_handler = new C_handle_write_callback(this) -> AsyncConnection::handle_write_callback -> AsyncConnection::write 写的时候传递callback
+      wakeup_handler = new C_time_wakeup(this) -> void AsyncConnection::wakeup_from -> void AsyncConnection::process()
+      tick_handler = new C_tick_wakeup(this)-> void AsyncConnection::tick 计时器()
+        protocol->fault() 处理错误
+    init_local_connection
+      void ms_deliver_handle_fast_connect
+    reap_handler = new C_handle_reap(this)
+      void AsyncMessenger::reap_dead 收割死连接
+    processors.push_back(new Processor(this, stack->get_worker(i), cct))
+      Processor::Processor
+        listen_handler(new C_processor_accept(this))
+          void Processor::accept() 等待事件触发
+msgr->set_default_policy
+dummy_auth.auth_registry.refresh_config()
+msgr->set_auth_server(&dummy_auth) 初始化函数,在绑定前调用
+server.start()
+  msgr->bind(addr)
+    AsyncMessenger::bind
+      bindv -> int r = p->bind
+      int Processor::bind
+        listen_sockets.resize
+        conf->ms_bind_retry_count 3次重试
+        worker->center.submit_to lambda []()->void 匿名函数
+          c->in_thread()
+            pthread_equal(pthread_self(), owner) 本线程
+          C_submit_event<func> event(std::move(f), false) f=listen
+            void do_request -> f() -> listen -> worker->listen(listen_addr, k, opts, &listen_sockets[k]) -> int RDMAWorker::listen 由事件触发执行
+              ib->init() -> void Infiniband::init
+                new DeviceList(cct)
+                  ibv_get_device_list 4网口
+                  if (cct->_conf->ms_async_rdma_cm)
+                  new Device(cct, device_list[i]) -> Device::Device
+                    ibv_open_device
+                    ibv_get_device_name
+                    ibv_query_device 参考设备属性: device_attr
+                get_device 根据配置的设备名在设备列表中查询
+                binding_port -> void Device::binding_port
+                  
+                new ProtectionDomain(cct, device)
+              dispatcher->polling_start()
+              new RDMAServerSocketImpl(cct, ib, dispatcher, this, sa, addr_slot)
+              int r = p->listen(sa, opt)
+              *sock = ServerSocket(std::unique_ptr<ServerSocketImpl>(p))
+            cond.notify_all() -> 通知等待的线程
+          dispatch_event_external -> void EventCenter::dispatch_event_external
+            external_events.push_back(e)
+            wakeup()
+              write(notify_send_fd, &buf, sizeof(buf)) buf=c -> notify_receive_fd, 唤醒 epoll_wait
+          event.wait()
+          
+    
+
+
+
+超时处理: 
+new C_handle_reap(this)
+  local_worker->create_time_event( ReapDeadConnectionMaxPeriod...
+    reap_dead
+
+
+设备属性: device_attr
+(gdb) p device_attr
+$17 = {
+  fw_ver = "16.33.1048", '\000' <repeats 53 times>, 
+  node_guid = 8550064101420093112, 
+  sys_image_guid = 8550064101420093112, 
+  max_mr_size = 18446744073709551615, 
+  page_size_cap = 18446744073709547520, 
+  vendor_id = 713, 
+  vendor_part_id = 4119, 
+  hw_ver = 0, 
+  max_qp = 131072, 
+  max_qp_wr = 32768, 
+---Type <return> to continue, or q <return> to quit---
+  device_cap_flags = 3983678518, 
+  max_sge = 30, 
+  max_sge_rd = 30, 
+  max_cq = 16777216, 
+  max_cqe = 4194303, 
+  max_mr = 16777216, 
+  max_pd = 8388608, 
+  max_qp_rd_atom = 16, 
+  max_ee_rd_atom = 0, 
+  max_res_rd_atom = 2097152, 
+  max_qp_init_rd_atom = 16, 
+---Type <return> to continue, or q <return> to quit---
+  max_ee_init_rd_atom = 0, 
+  atomic_cap = IBV_ATOMIC_HCA, 
+  max_ee = 0, 
+  max_rdd = 0, 
+  max_mw = 16777216, 
+  max_raw_ipv6_qp = 0, 
+  max_raw_ethy_qp = 0, 
+  max_mcast_grp = 2097152, 
+  max_mcast_qp_attach = 240, 
+  max_total_mcast_qp_attach = 503316480, 
+  max_ah = 2147483647, 
+---Type <return> to continue, or q <return> to quit---
+  max_fmr = 0, 
+  max_map_per_fmr = 0, 
+  max_srq = 8388608, 
+  max_srq_wr = 32767, 
+  max_srq_sge = 31, 
+  max_pkeys = 128, 
+  local_ca_ack_delay = 16 '\020', 
+  phys_port_cnt = 1 '\001'
+}
+

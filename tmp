@@ -1,0 +1,8 @@
+local_delivery_thread: 本地快速分发
+dispatch_throttler 分发器节流阀: 节流阻止我们建立大量等待调度的积压
+
+Stack是一个网络IO框架，封装了所有必要的基础网络接口，然后它管理线程工作。posix、dpdk甚至RDMA等不同的网络后端都需要继承Stack类来实现必要的接口。 所以这会让其他人轻松网络后端集成到 ceph 中。 否则，每个后端都需要实现整个 Messenger 逻辑，如重新连接、策略处理、会话维持...
+
+分配大页面
+1. 使用 HUGE_PAGE_SIZE_2MB 用于 2MB 页面对齐。
+2. 使用 ALIGN_TO_PAGE_2MB 将请求大小对齐为 2MB
