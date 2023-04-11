@@ -85,6 +85,7 @@ pthread_create(&thread_id, thread_attr, _entry_func, (void*)this)
 设置日志文件: set_log_file
 打开日志文件: m_fd = ::open(m_log_file.c_str(), O_CREAT|O_WRONLY|O_APPEND|O_CLOEXEC, 0644)
 打印日志: cerr << __func__ << " " << __FL__ << " server accept client connect" << std::endl;
+打印日志代码示例: ldout(cct, 10) << __FFL__ << " client connect -> server" << dendl;
 
 默认配置: Option("ms_type"
 默认开启RDMA: .set_default("async+rdma")
@@ -144,6 +145,9 @@ cm建连: if (cct->_conf->ms_async_rdma_cm), https://github.com/ssbandjl/ceph/co
 
 cm讨论: https://lists.ceph.io/hyperkitty/list/dev@ceph.io/thread/YUX4DTCFXKLOBCQNSNBEBZGOBBQSYIS4/
 您是说 1) 首先创建 RDMA 内存区域 (MR) 2) 在中使用 MR bufferlist 3）将bufferlist作为工作请求发布到RDMA发送队列中直接发送 不使用 tx_copy_chunk？
+
+讨论3个rdma问题: https://lists.ceph.io/hyperkitty/list/dev@ceph.io/message/EHRT7TOSUP7PBJXQOBMQVUBA7JUQZNGF/
+
 https://github.com/ceph/ceph/pull/28344/files
 使用ceph块设备, rgw, fs: https://www.cnblogs.com/cyh00001/p/16759266.html
 https://lists.ceph.io/hyperkitty/search?mlist=dev%40ceph.io&q=rdma
@@ -168,7 +172,7 @@ iwarp或ib(默认)
 连接后: worker->center.create_file_event(tcp_fd, EVENT_READABLE | EVENT_WRITABLE , established_handler)
 发送cm元数据: int Infiniband::QueuePair::send_cm_meta
 
-h3c tag: Aug 29, 2017, v12.2.0 https://github.com/ceph/ceph/commit/32ce2a3ae5239ee33d6150705cdb24d43bab910c
+h3c tag: 2017/8/27, Aug 29, 2017, v12.2.0 https://github.com/ceph/ceph/commit/32ce2a3ae5239ee33d6150705cdb24d43bab910c
 社区:
 commit b661348f156f148d764b998b65b90451f096cb27 (tag: v12.1.2)
 Author: Jenkins <jenkins@ceph.com>
@@ -181,8 +185,6 @@ rsync -urpv root@ubuntu22:/root/project/stor/ceph/xb/docker/ceph/build/bin/ceph_
 rsync -urpv root@ubuntu22:/root/project/stor/ceph/xb/docker/ceph/build/bin/ceph_perf_msgr_client .
 rsync -urpv root@ubuntu22:/root/project/stor/ceph/xb/docker/ceph/build/lib/libceph-common.so.2 .
 
-客户端建连接
-conn->connect
 
 编译ceph_msgr_perf工具:
 cmake -DWITH_TESTS=1 ../CMakeList.txt
@@ -227,8 +229,12 @@ set_nonce: 设置随机值
 Infiniband::Infiniband
 verify_prereq
 
-先设置环境变量, 后 ibv_fork_init() https://github.com/ssbandjl/ceph/commit/b2d3f5e0970a4afbb82676af9e5b9a12f62a7747
+先设置环境变量, 后 ibv_fork_init() https://github.com/ceph/ceph/commit/b2d3f5e0970a4afbb82676af9e5b9a12f62a7747
 ibv_fork_init will check environment variable RDMAV_HUGEPAGES_SAFE to decide whether huge page is usable in system
+新版本增加判断:
+if (ibv_is_fork_initialized() == IBV_FORK_UNNEEDED) {
+  lderr(cct) << __FFL__ << " no need ibv_fork_init" << dendl;
+}
 
 src/test/msgr/perf_msgr_server.cc
 server, 服务端, 建连接
@@ -376,8 +382,16 @@ server.start()
             wakeup()
               write(notify_send_fd, &buf, sizeof(buf)) buf=c -> notify_receive_fd, 唤醒 epoll_wait
           event.wait()
-          
+  msgr->add_dispatcher_head(&dispatcher)
+    ready()
+      p->start() -> void Processor::start()
+        worker->center.create_file_event listen_handler -> pro->accept() -> void Processor::accept()
+  msgr->start()
+  msgr->wait()    
     
+
+客户端建连接
+perf_msgr_client.cc -> main
 
 
 
@@ -434,4 +448,33 @@ $17 = {
   local_ca_ack_delay = 16 '\020', 
   phys_port_cnt = 1 '\001'
 }
+
+
+qp析构(销毁qp): schedule_qp_destroy
+msg/async/rdma：使用特殊的Beacon 检测SQ WRs drained 将QueuePair 切换到error 状态，然后post Beacon WR 发送队列。 所有未完成的 WQE 将被刷新到 CQ。 在 CQ 中，在销毁 QueuePair 之前，检查完成队列元素以检测 SQ WRs 是否已被耗尽。 如果不使用/不支持 SRQ，我们不会将另一个 Beacon WR 发布到 RQ，原因是只有在从 CQ 轮询了所有刷新的 WR 后，才能销毁 QueuePair。请参阅以下规范的第 474 页：InfiniBandTM 架构规范第 1 卷，版本 1.3 规范链接：https://cw.infinibandta.org/document/dl/7859
+
+安装rdma依赖, libibverbs, 
+yum install -y libibverbs-devel librdmacm-devel
+centos8: 
+rpm -qa|grep libibverbs
+libibverbs-35.0-1.el8.x86_64
+编译rdma-core: https://runsisi.com/2021/03/07/rdma-core/
+
+版本差异: https://github.com/ceph/ceph/compare/v12.2.0...v15.2.17
+
+TODO:
+1. 3.0增加 
+modify_qp_to_error
+modify_qp_to_rts
+modify_qp_to_rtr
+内存池: msg/async/rdma: improves RX buffer management: https://github.com/ssbandjl/ceph/commit/720d044db13886ac9926d689e970381cdf78f8eb
+共享接收队列 srq: https://github.com/ssbandjl/ceph/commit/282499b77f85fed50ce00c5414af12335371a4b3
+修复错误事件中心被 rdma 构造连接传输 ib sync msg C_handle_connection_established: https://github.com/ssbandjl/ceph/commit/8b2a95011ca34ba3880440339693170a174034ab
+schedule_qp_destroy: https://github.com/ssbandjl/ceph/commit/e907e18154421885f1b02518496694b0987ab9f9
+buffer_prefetch 预读: https://github.com/ssbandjl/ceph/commit/2754d60f6615024c76f09d22d2480a9b69369a12
+msg/async/rdma: deal with all RDMA device async event 补全事件处理: https://github.com/ssbandjl/ceph/commit/1c76c1320721cc555a376d7b8660c19538d3f1b4
+1.列出RDMA设备的所有异步事件
+2.输出致命错误事件以检查RDMA设备状态
+加锁获取qp: https://github.com/ssbandjl/ceph/commit/cc08b02046ce1243926c2d716281566bd0a70402
+加速 tx handle 以前 Dispatcher 线程将轮询 rx 和 tx 事件，然后调度, 这些事件传递给 RDMAWorker 和 RDMAConnectedSocketImpl: https://github.com/ssbandjl/ceph/commit/bc580b0a6100637ecbfeeecefc84e2b81ff25c34
 
