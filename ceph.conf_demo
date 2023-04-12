@@ -1,0 +1,30 @@
+[global]
+       cluster = ceph
+       fsid = 24280750-d4f7-4d4f-89e4-f95b8fab87ff
+       auth_cluster_required = cephx
+       auth_service_required = cephx
+       auth_client_required = cephx
+
+       osd pool default size = 2
+       osd pool default min size = 2
+       osd pool default pg num = 64
+       osd pool default pgp num = 128
+
+       osd pool default crush rule = 0
+       osd crush chooseleaf type = 1
+
+       mon_allow_pool_delete=true
+       osd_pool_default_pg_autoscale_mode=on
+
+       ms_type = async+rdma
+       ;----changcheng: change device to your dev name----------
+       ms_async_rdma_device_name = irdma1
+       ;----changcheng: ignore below parameters with Mellanox NIC--------
+       ;ms_async_rdma_support_srq = false
+
+       mon_initial_members = server0
+       mon_host = 172.16.1.4
+
+   [mon.rdmarhel0]
+       host = server0
+       mon addr = 172.16.1.4

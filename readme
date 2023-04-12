@@ -313,7 +313,11 @@ Messenger *Messenger::create type=async+rdma, lname=server -> Messenger *Messeng
     processors.push_back(new Processor(this, stack->get_worker(i), cct))
       Processor::Processor
         listen_handler(new C_processor_accept(this))
-          void Processor::accept() 等待事件触发
+          void Processor::accept() 等待事件触发(客户端执行connect后触发)
+            listen_sockets -> while (true)
+              msgr->get_stack()->get_worker()
+              listen_socket.accept(&cli_socket, opts, &addr, w)
+              msgr->add_accept
 msgr->set_default_policy
 dummy_auth.auth_registry.refresh_config()
 msgr->set_auth_server(&dummy_auth) 初始化函数,在绑定前调用
@@ -386,14 +390,86 @@ server.start()
     ready()
       p->start() -> void Processor::start()
         worker->center.create_file_event listen_handler -> pro->accept() -> void Processor::accept()
-  msgr->start()
-  msgr->wait()    
+  msgr->start() -> int AsyncMessenger::start()
+  msgr->wait() -> void AsyncMessenger::wait()  
     
 
 客户端建连接
 perf_msgr_client.cc -> main
+  MessengerClient client(public_msgr_type, args[0], think_time)
+  client.ready
+    Messenger *msgr = Messenger::create
+    msgr->set_default_policy -> Policy(bool l, bool s ...
+    msgr->start() -> int AsyncMessenger::start()
+      if (!did_bind) 客户端不需要bind
+      set_myaddrs(newaddrs) -> void Messenger::set_endpoint_addr
+      _init_local_connection() -> void _init_local_connection()
+        ms_deliver_handle_fast_connect(local_connection.get()) -> void ms_deliver_handle_fast_connect将新连接通知每个快速调度程序。 每当启动或重新连接新连接时调用此函数 fast_dispatchers为空?
+    ConnectionRef conn = msgr->connect_to_osd(addrs) 连接到OSD -> ConnectionRef connect_to_osd -> ConnectionRef AsyncMessenger::connect_to
+      AsyncConnectionRef conn = _lookup_conn(av) 先在连接池查找连接
+      conn = create_connect(av, type, false) 没找到,新建连接 -> AsyncConnectionRef AsyncMessenger::create_connect
+        Worker *w = stack->get_worker()
+        auto conn = ceph::make_ref<AsyncConnection> -> AsyncConnection::AsyncConnection 构造连接
+          recv_buf = new char[2*recv_max_prefetch] 使用缓冲区读取来避免小的读取开销
+          new ProtocolV2(this) ceph v2协议, 在v1基础上支持地址向量, 在横幅(banner)交换之后，对等体交换他们的地址向量address vectors
+        conn->connect(addrs, type, target) -> void AsyncConnection::connect -> _connect -> void AsyncConnection::_connect()
+          state = STATE_CONNECTING 初始状态机
+          protocol->connect() -> void ProtocolV2::connect() -> state = START_CONNECT
+          center->dispatch_event_external(read_handler) -> 触发状态机推进 -> process
+        conns[addrs] = conn 保存连接 -> ceph::unordered_map<entity_addrvec_t, AsyncConnectionRef> conns 无序map
+    ClientThread *t = new ClientThread(msgr, c, conn, msg_len, ops, think_time_us) -> ClientThread(Messenger *m 新建客户端线程
+      data.append(ptr) 将打他填充全0
+    msgrs.push_back(msgr)
+    clients.push_back(t)
+  Cycles::init() -> void Cycles::init() 校准时钟频率
+  uint64_t start = Cycles::rdtsc()
+  client.start() -> void start() -> clients[i]->create("client") -> void Thread::create
+    pthread_create(&thread_id, thread_attr, _entry_func, (void*)this) -> void *Thread::_entry_func
+    void *entry() override 重写entry
+      hobject_t hobj(oid, oloc.key -> struct object_t
+        void build_hash_cache() crc32c
+      MOSDOp *m = new MOSDOp -> MOSDOp(int inc, long tid, 
+      bufferlist msg_data(data)
+      m->write(0, msg_len, msg_data) -> void write
+        add_simple_op(CEPH_OSD_OP_WRITE, off, len) -> ops.push_back(osd_op)
+        data.claim(bl)
+          clear()
+          claim_append(bl)
+      conn->send_message(m) -> void ProtocolV2::send_message(Message *m) ssize_t RDMAConnectedSocketImpl::send
+        out_queue[m->get_priority()].emplace_back
+        connection->center->dispatch_event_external(connection->write_handler) -> void AsyncConnection::handle_write
+          const auto out_entry = _get_next_outgoing()
+          write_message(out_entry.m, more)
+            connection->_try_send(more) -> cs.send(outgoing_bl, more) -> ssize_t RDMAConnectedSocketImpl::send
+              ssize_t r = submit(more) ssize_t -> RDMAConnectedSocketImpl::submit
+                auto it = std::cbegin(pending_bl.buffers())
+                size_t copied = tx_copy_chunk(tx_buffers, wait_copy_len, copy_start, it);
+                post_work_request(tx_buffers)
+                  ibv_post_send
+      msgr->shutdown()
+  stop = Cycles::rdtsc()
+...
+NetworkStack::add_thread
+  w->center.process_events -> C_handle_read -> conn->process() -> void AsyncConnection::process()
+    worker->connect(target_addr, opts, &cs) -> int RDMAWorker::connect
+      ib->init()
+      dispatcher->polling_start()
+      new RDMAConnectedSocketImpl -> RDMAConnectedSocketImpl::RDMAConnectedSocketImpl
+        read_handler(new C_handle_connection_read(this))
+        established_handler(new C_handle_connection_established(this))
+      p->try_connect(addr, opts) -> int RDMAConnectedSocketImpl::try_connect
+        tcp_fd = net.nonblock_connect(peer_addr, opts.connect_bind_addr) -> generic_connect -> int NetHandler::generic_connect
+          create_socket
+          ::connect(s, addr.get_sockaddr(), addr.get_sockaddr_len()) syscall 客户端连接服务端(socket) -> 服务端触发事件(C_processor_accept) -> void Processor::accept()
+          worker->center.create_file_event(tcp_fd, EVENT_READABLE | EVENT_WRITABLE , established_handler) -> established_handler -> int RDMAConnectedSocketImpl::handle_connection_established
 
-
+      *socket = ConnectedSocket(std::move(csi))
+    center->create_file_event(cs.fd(), EVENT_READABLE, read_handler) -> state = STATE_CONNECTING_RE -> void AsyncConnection::process() (回到process)
+    ...
+    case STATE_CONNECTING_RE
+      cs.is_connected()
+      center->create_file_event EVENT_WRITABLE read_handler -> process
+      logger->tinc -> void PerfCounters::tinc 性能统计(时延统计)
 
 超时处理: 
 new C_handle_reap(this)
@@ -477,4 +553,21 @@ msg/async/rdma: deal with all RDMA device async event 补全事件处理: https:
 2.输出致命错误事件以检查RDMA设备状态
 加锁获取qp: https://github.com/ssbandjl/ceph/commit/cc08b02046ce1243926c2d716281566bd0a70402
 加速 tx handle 以前 Dispatcher 线程将轮询 rx 和 tx 事件，然后调度, 这些事件传递给 RDMAWorker 和 RDMAConnectedSocketImpl: https://github.com/ssbandjl/ceph/commit/bc580b0a6100637ecbfeeecefc84e2b81ff25c34
+
+补充rdma主要改动: 
+https://ceph.io/en/news/blog/2019/v14-2-0-nautilus-released/
+https://ceph.io/en/news/blog/2020/v15-2-0-octopus-released/
+配置gid: https://github.com/ceph/ceph/pull/31517/files
+修复内存泄漏: rdma_free_devices https://github.com/ceph/ceph/pull/27574/files
+代码优化: 将连接管理数据（LID、GID、QPN、PSN）从 RDMAConnectedSocketImpl 移动到 QueuePair。 目标是 1) 简化 switch QueuePair 状态 2) 简化管理连接管理数据将 QP 切换到 Error 状态以将未完成的 WR 刷新到 CQ 并使用 Beacon WR 检测 SQD 使没有SRQ的RNIC在msg/async/rdma中工作 根据2&3中的变化细化handle_rx/tx_event&handle_async_event 根据其父类简化 RDMAIWARPConnectedSocketImpl, https://github.com/ceph/ceph/pull/29947
+
+v16.2.0 Pacific released 太平洋
+centos8: https://ceph.io/en/news/blog/2021/v16-2-0-pacific-released/
+
+AMQP（Advanced Message Queuing Protocol，高级消息队列协议）是一个进程间传递异步消息的网络协议
+
+
+
+client 写流程:
+conn->send_message(*p)
 

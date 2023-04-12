@@ -35,3 +35,8 @@ $22 = {
 ---Type <return> to continue, or q <return> to quit---
   port_cap_flags2 = 0
 }
+
+获取当前时间: static time_point now()
+
+增加引用计数:  w->get_perf_counter()->inc(l_msgr_active_connections)
+
