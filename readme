@@ -87,6 +87,13 @@ pthread_create(&thread_id, thread_attr, _entry_func, (void*)this)
 打印日志: cerr << __func__ << " " << __FL__ << " server accept client connect" << std::endl;
 打印日志代码示例: ldout(cct, 10) << __FFL__ << " client connect -> server" << dendl;
 
+日志配置:
+debug {subsystem} = {log-level}/{memory-level}
+#for example
+debug mds log = 1/20
+
+
+
 默认配置: Option("ms_type"
 默认开启RDMA: .set_default("async+rdma")
 配置文件: https://docs.ceph.com/en/latest/rados/configuration/ceph-conf/
@@ -156,7 +163,9 @@ https://lists.ceph.io/hyperkitty/list/dev@ceph.io/message/EHRT7TOSUP7PBJXQOBMQVU
 配置文件: ms_async_rdma_device_name = mlx5_0
 查询gid; ibv_query_gid(ctxt, port_num, gid_idx, &gid)
 roce: https://docs.nvidia.com/networking/pages/viewpage.action?pageId=12013422
+
 支持共享接收队列: https://github.com/ssbandjl/ceph/commit/9fc9f08371d36d0cc38cbe8cbb235fa07ae0a6c0
+
 为 beacon(灯塔) 保留额外的一个 WR，以指示所有 WCE 已被消耗
 内存管理: memory_manager = new MemoryManager(cct, device, pd);
 提升接收缓存区(内存管理)性能: https://github.com/ssbandjl/ceph/commit/720d044db13886ac9926d689e970381cdf78f8eb
@@ -570,4 +579,35 @@ AMQP（Advanced Message Queuing Protocol，高级消息队列协议）是一个�
 
 client 写流程:
 conn->send_message(*p)
+
+
+减少状态机:
+ private:
+  enum {
+    STATE_NONE,
+    STATE_CONNECTING,
+    STATE_CONNECTING_RE,
+    STATE_ACCEPTING,
+    STATE_CONNECTION_ESTABLISHED,
+    STATE_CLOSED
+  };
+
+bench-write
+gdb --args rbd bench-write .d2.rbd/500G3 --io-size 4M --io-pattern rand --io-threads 1 --io-total 100M
+/home/xb/project/stor/ceph/xb/docker/ceph/src/tools/rbd/rbd.cc main
+  do_bench -> start_io aio_write2 ictx->io_work_queue->aio_write 
+
+客户端写, osd写, 参考
+https://my.oschina.net/u/2460844/blog/534390
+src/osdc/Objecter.cc
+void Objecter::_op_submit
+  check_for_latest_map = _calc_target(&op->target, nullptr)
+  _get_session(op->target.osd, &s, sul) -> int Objecter::_get_session
+    osd_sessions.find(osd)
+    OSDSession *s = new OSDSession(cct, osd) 没找到, 准备新建
+    s->con = messenger->connect_to_osd(osdmap->get_addrs(osd))
+    logger->set(l_osdc_osd_sessions, osd_sessions.size()) 统计会话数量
+  _session_op_assign(s, op)
+  _send_op(op) -> void Objecter::_send_op(Op *op) -> op->session->con->send_message(m)
+
 

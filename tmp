@@ -40,3 +40,43 @@ $22 = {
 
 增加引用计数:  w->get_perf_counter()->inc(l_msgr_active_connections)
 
+
+Ceph Manager 守护进程 (ceph-mgr) 与监控守护进程一起运行，为外部监控和管理系统提供额外的监控和接口。
+monitor daemons
+
+性能统计:
+https://docs.ceph.com/en/latest/dev/perf_counters/
+说明: https://www.modb.pro/db/135643
+用户和开发人员还可以在本地访问性能计数器数据，以检查集群的整体健康状况、识别工作负载模式、按守护程序类型监控集群性能，以及解决延迟、节流、内存管理等问题（参见访问）
+性能计数器数据通过管理套接字访问:
+ceph daemon osd.0 perf schema
+ceph daemon osd.0 perf dump
+ceph daemon {daemon id} counter dump
+ceph daemon {daemon id} counter schema
+ceph daemon {daemon id} perf dump
+ceph daemon DAEMON_NAME perf schema
+ceph daemon DAEMON_NAME perf dump
+ceph daemon mon.`hostname -s` perf schema
+ceph daemon perf dump objecter
+
+查看连接数: 
+ceph daemon osd.0 perf dump objecter|grep session
+
+https://www.cnblogs.com/yanling-coder/p/12620005.html
+查看配置:
+ceph daemon osd.0 config show
+
+设置:
+# 使用 daemon 进行设置的方式就是一个个的去设置，这样可以比较好的反馈，此方法是需要在设置的角色所在的主机上进行设置。
+命令格式：
+ceph daemon {daemon-type}.{id} config set {name}={value}
+命令举例：
+ceph daemon mon.ceph-monitor-1 config set mon_allow_pool_delete false
+
+
+内部节流机制会报告有关其节流方式的统计信息:
+throttle-msgr_dispatch_throttler-hbserver
+throttle-msgr_dispatch_throttler-client
+throttle-filestore_bytes
+
+

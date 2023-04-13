@@ -1047,6 +1047,7 @@ Infiniband::Infiniband(CephContext *cct)
   ldout(cct, 20) << __FFL__ << " constructing Infiniband..." << dendl;
 }
 
+/* 初始化IB */
 void Infiniband::init()
 {
   std::lock_guard l{lock};
@@ -1066,12 +1067,15 @@ void Infiniband::init()
 
   support_srq = cct->_conf->ms_async_rdma_support_srq;
   if (support_srq) {
+    /* 共享接收队列SRQ, 接收队列长度设置为, RDMA设备属性上的, 最大共享接收队列工作请求数 */
     ceph_assert(device->device_attr.max_srq);
     rx_queue_len = device->device_attr.max_srq_wr;
   }
   else
+    /* 普通接收队列RQ, 使用设备上的最大队列对工作请求数作为接收队列长度 */
     rx_queue_len = device->device_attr.max_qp_wr;
   if (rx_queue_len > cct->_conf->ms_async_rdma_receive_queue_len) {
+    /* 接收队列长度不能超过配置文件中的长度 */
     rx_queue_len = cct->_conf->ms_async_rdma_receive_queue_len;
     ldout(cct, 1) << __FFL__ << " assigning: " << rx_queue_len << " receive buffers" << dendl;
   } else {
@@ -1079,6 +1083,7 @@ void Infiniband::init()
   }
 
   // check for the misconfiguration
+  /* 接收缓冲区的数量可以比接收队列长度大很多, 所以反过来, 接收队列长度只能比接收缓存区小(很多) */
   if (cct->_conf->ms_async_rdma_receive_buffers > 0 &&
       rx_queue_len > (unsigned)cct->_conf->ms_async_rdma_receive_buffers) {
     lderr(cct) << __FFL__ << " rdma_receive_queue_len (" <<
@@ -1102,7 +1107,7 @@ void Infiniband::init()
     ceph_abort();
   }
 
-  ldout(cct, 1) << __FFL__ << " device allow " << device->device_attr.max_cqe
+  ldout(cct, 1) << __FFL__ << " device(nic_name) " << device->get_name() << " allow " << device->device_attr.max_cqe
                 << " completion entries" << dendl;
 
   memory_manager = new MemoryManager(cct, device, pd);
