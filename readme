@@ -98,42 +98,10 @@ debug mds log = 1/20
 默认开启RDMA: .set_default("async+rdma")
 配置文件: https://docs.ceph.com/en/latest/rados/configuration/ceph-conf/
 
-服务端, rdma堆栈:
-#0  NetworkStack::create (c=0x555555641870, t="rdma") at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/async/Stack.cc:67
-#1  0x00007fffeda53354 in StackSingleton::ready (this=0x5555556c6020, type="rdma") at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/async/AsyncMessenger.cc:257
-#2  0x00007fffeda4922a in AsyncMessenger::AsyncMessenger (this=0x5555556c3ef0, cct=0x555555641870, name=..., type="async+rdma", mname="server", _nonce=0)
-    at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/async/AsyncMessenger.cc:294
-#3  0x00007fffeda2ef0d in Messenger::create (cct=0x555555641870, type="async+rdma", name=..., lname="", nonce=0, cflags=0)
-    at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/Messenger.cc:46
-#4  0x00005555555a48ce in MessengerServer::MessengerServer (this=0x7fffffffdb50, t="async+rdma", addr="175.16.53.61:10001", threads=1, delay=0)
-    at /home/xb/project/stor/ceph/xb/docker/ceph/src/test/msgr/perf_msgr_server.cc:119
-#5  0x000055555559e8ce in main (argc=4, argv=0x7fffffffdfa8) at /home/xb/project/stor/ceph/xb/docker/ceph/src/test/msgr/perf_msgr_server.cc:173
-
-客户端流程:
-#0  AsyncMessenger::connect_to (this=0x5555556d87b0, type=4, addrs=..., anon=false, not_local_dest=false)
-    at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/async/AsyncMessenger.cc:719
-#1  0x00005555555abf60 in Messenger::connect_to_osd (this=0x5555556d87b0, dest=..., anon=false, not_local_dest=false)
-    at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/Messenger.h:548
-#2  0x00005555555b08d5 in MessengerClient::ready (this=0x7fffffffdc80, c=1, jobs=1, ops=1, msg_len=4096)
-    at /home/xb/project/stor/ceph/xb/docker/ceph/src/test/msgr/perf_msgr_client.cc:144
-#3  0x00005555555a7c43 in main (argc=7, argv=0x7fffffffdf48) at /home/xb/project/stor/ceph/xb/docker/ceph/src/test/msgr/perf_msgr_client.cc:212
-
 
 返回自动变量auto:  const auto& _lookup_conn
 要求(断言)已上锁: ceph_assert(ceph_mutex_is_locked(lock))
 
-客户端, 建连接:
-(gdb) bt
-#0  AsyncConnection::connect (this=0x555555768760, addrs=..., type=4, target=...) at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/async/AsyncConnection.cc:478
-#1  0x00007fffeda4ca38 in AsyncMessenger::create_connect (this=0x5555556d87b0, addrs=..., type=4, anon=false)
-    at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/async/AsyncMessenger.cc:612
-#2  0x00007fffeda4da7d in AsyncMessenger::connect_to (this=0x5555556d87b0, type=4, addrs=..., anon=false, not_local_dest=false)
-    at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/async/AsyncMessenger.cc:723
-#3  0x00005555555abf60 in Messenger::connect_to_osd (this=0x5555556d87b0, dest=..., anon=false, not_local_dest=false)
-    at /home/xb/project/stor/ceph/xb/docker/ceph/src/msg/Messenger.h:548
-#4  0x00005555555b08d5 in MessengerClient::ready (this=0x7fffffffdc80, c=1, jobs=1, ops=1, msg_len=4096)
-    at /home/xb/project/stor/ceph/xb/docker/ceph/src/test/msgr/perf_msgr_client.cc:144
-#5  0x00005555555a7c43 in main (argc=7, argv=0x7fffffffdf48) at /home/xb/project/stor/ceph/xb/docker/ceph/src/test/msgr/perf_msgr_client.cc:212
 
 rdma ib初始化: ib->init() -> void Infiniband::init()
 gdb 打印ib设备: (gdb) p **((ibv_device **) 0x7fffd4000c30)
@@ -381,6 +349,17 @@ server.start()
                   cq->init() -> int Infiniband::CompletionChannel::init
                     ibv_create_comp_channel 创建完成通道 -> NetHandler(cct).set_nonblock(channel->fd) 设置非阻塞
                 t = std::thread(&RDMADispatcher::polling, this) 启动polling线程 rdma-polling -> void RDMADispatcher::polling
+                  tx_cq->poll_cq(MAX_COMPLETIONS, wc)
+                  handle_tx_event -> tx_chunks.push_back(chunk) -> post_tx_buffer
+                    tx -> void RDMAWorker::handle_pending_message()
+                  handle_rx_event -> void RDMADispatcher::handle_rx_event
+                    conn->post_chunks_to_rq(1) 向接收队列补一个内存块(WR) -> int Infiniband::post_chunks_to_rq
+                      ibv_post_srq_recv | ibv_post_recv
+                    polled[conn].push_back(*response)
+                    qp->remove_rq_wr(chunk)
+                    chunk->clear_qp()
+                    pass_wc -> void RDMAConnectedSocketImpl::pass_wc(std::vector<ibv_wc> &&v) ->  notify() -> void RDMAConnectedSocketImpl::notify
+                      eventfd_write(notify_fd, event_val) -> eventfd_read(notify_fd, &event_val) <- ssize_t RDMAConnectedSocketImpl::read <- process
               new RDMAServerSocketImpl(cct, ib, dispatcher, this, sa, addr_slot)
               int r = p->listen(sa, opt) -> int RDMAServerSocketImpl::listen
                 server_setup_socket = net.create_socket(sa.get_family(), true) -> socket_cloexec
@@ -454,7 +433,7 @@ perf_msgr_client.cc -> main
                 auto it = std::cbegin(pending_bl.buffers())
                 size_t copied = tx_copy_chunk(tx_buffers, wait_copy_len, copy_start, it);
                 post_work_request(tx_buffers)
-                  ibv_post_send
+                  ibv_post_send -> ibv_poll_cq 触发发端/收端 -> int Infiniband::CompletionQueue::poll_cq <- void RDMADispatcher::polling()
       msgr->shutdown()
   stop = Cycles::rdtsc()
 ...
@@ -479,7 +458,23 @@ NetworkStack::add_thread
       cs.is_connected()
       center->create_file_event EVENT_WRITABLE read_handler -> process
       logger->tinc -> void PerfCounters::tinc 性能统计(时延统计)
-
+    ...
+    protocol->read_event() -> START_ACCEPT -> run_continuation(CONTINUATION(start_server_banner_exchange))
+      CONTINUATION_RUN(continuation)
+      CtPtr ProtocolV2::read -> ssize_t AsyncConnection::read -> read_until
+        read_bulk ->  nread = cs.read(buf, len) -> ssize_t RDMAConnectedSocketImpl::read -> eventfd_read(notify_fd, &event_val)
+          read = read_buffers(buf,len) -> ssize_t RDMAConnectedSocketImpl::read_buffers
+            buffer_prefetch() 预读 -> void RDMAConnectedSocketImpl::buffer_prefetch
+              ibv_wc* response = &cqe[i]
+              chunk->prepare_read(response->byte_len)
+              buffers.push_back(chunk)
+            tmp = (*pchunk)->read(buf + read_size, len - read_size) -> uint32_t Infiniband::MemoryManager::Chunk::read
+              memcpy(buf, buffer + offset, read_len);
+            (*pchunk)->reset_read_chunk() 将偏移和边界都置0
+            dispatcher->post_chunk_to_pool(*pchunk) -> void RDMADispatcher::post_chunk_to_pool
+              ib->post_chunk_to_pool(chunk)
+            update_post_backlog -> void RDMAConnectedSocketImpl::update_post_backlog
+            
 超时处理: 
 new C_handle_reap(this)
   local_worker->create_time_event( ReapDeadConnectionMaxPeriod...
@@ -608,6 +603,15 @@ void Objecter::_op_submit
     s->con = messenger->connect_to_osd(osdmap->get_addrs(osd))
     logger->set(l_osdc_osd_sessions, osd_sessions.size()) 统计会话数量
   _session_op_assign(s, op)
-  _send_op(op) -> void Objecter::_send_op(Op *op) -> op->session->con->send_message(m)
+  _send_op(op) -> void Objecter::_send_op(Op *op) -> op->session -> con->send_message(m)
 
+
+osd落盘, 主副本和从副本同步: https://my.oschina.net/u/2460844/blog/534390
+osd读数据
+seastar::future<> ProtocolV2::read_message
+...
+bool OSD::ms_dispatch
+void OSD::_dispatch
+void OSD::dispatch_op -> void OSD::handle_pg_create
+  osdmap->get_primary_shard(on, &pgid)
 
