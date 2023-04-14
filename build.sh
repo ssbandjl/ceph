@@ -9,6 +9,7 @@ print "start build"
 
 cd build
 make -j16
+# make install
 
 end_time=`date +%s`
 time_cost=$((end_time-start_time))

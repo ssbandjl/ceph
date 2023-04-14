@@ -615,3 +615,79 @@ void OSD::_dispatch
 void OSD::dispatch_op -> void OSD::handle_pg_create
   osdmap->get_primary_shard(on, &pgid)
 
+crimson是crimson-osd的代号，也就是下一代ceph-osd。 它通过利用 DPDK 和 SPDK 等最先进的技术，以快速网络设备、快速存储设备为目标，以获得更好的性能。 并且它将通过 BlueStore 保留对 HDD 和低端 SSD 的支持。 Crimson 将尝试向后兼容经典 OSD
+
+crc问题:
+handle_read_frame_dispatch
+handle_message
+Message *decode_message
+  bad crc in front
+filter: *.cc, *.h, src/msg, *.sh, *.rst
+
+生成uudid: uuidgen
+NetworkStack::add_thread(unsigned int)::{lambda()#1}::operator()() const ()
+  EventCenter::process_events(int)
+    AsyncConnection::process
+      decode_message(CephContext*, int, ceph_msg_header&, ceph_msg_footer&, ceph::buffer::list&, ceph::buffer::list&, ceph::buffer::list&, Connection*)
+        bad crc in front
+
+测试:
+ceph_test_msgr src/test/test_msgr.cc main
+
+
+前端:
+发现目标
+iscsiadm --mode discovery --op update --type sendtargets --portal targetIP
+iscsiadm -m discovery -t sendtargets -p 175.19.53.72
+
+创建需要的设备:
+iscsiadm --mode node -l all
+
+查看所有活动的会话
+iscsiadm --mode session
+
+目标:
+查看模块(rbd,bs_rbd.so的动态链接库):
+tgtadm --lld iscsi --mode system --op show|grep rbd
+
+创建镜像:
+rbd create iscsi-image --size 4096
+查镜像:
+rbd ls -p p0 -l --format json --pretty-format
+
+创建tgt:
+tgtadm --lld iscsi --mode target --op new --tid 1 --targetname iqn.2013-15.com.example:cephtgt.target0
+查看:
+tgtadm --lld iscsi --op show --mode target
+tgtadm --lld iscsi --op show --mode target --tid 512
+
+创建lun:
+tgtadm --lld iscsi --mode logicalunit --op new --tid 1 --lun 1 --backing-store iscsi-image --bstype rbd
+tgtadm --lld iscsi --op bind --mode target --tid 1 -I ALL
+
+查看rbd块设备
+rbd ls {poolname}
+
+查池:
+rados lspools
+ceph osd lspools
+ceph osd pool ls
+ceph osd pool ls detail
+ceph osd dump|grep pool
+rados df
+ceph osd pool get {pool-name} {key}
+ceph df
+
+
+创池:
+ceph osd pool create wgsrbd 64 64
+
+存储池启用rbd:
+ceph osd pool application enable wgsrbd rbd
+
+初始化rbd:
+rbd pool init -p wgsrbd
+下一步就可创建镜像
+
+客户端映射镜像:
+rbd -p wgsrbd map wgs-img1
