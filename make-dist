@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+set -x 
+
 SCRIPTNAME="$(basename "${0}")"
 BASEDIR="$(readlink -f "$(dirname "${0}")")"
 
@@ -159,12 +161,12 @@ download_boost $boost_version 59c9b274bc451cf91a9ba1dd2c7fdcaf5d60b1b3aa83f2c9fa
                https://downloads.sourceforge.net/project/boost/boost/$boost_version \
                https://download.ceph.com/qa
 
-build_dashboard_frontend
+# build_dashboard_frontend
 generate_rook_ceph_client
 tar --concatenate -f $outfile.all.tar $outfile.version.tar
 tar --concatenate -f $outfile.all.tar $outfile.boost.tar
 tar --concatenate -f $outfile.all.tar $outfile.tar
-tar --concatenate -f $outfile.all.tar dashboard_frontend.tar
+# tar --concatenate -f $outfile.all.tar dashboard_frontend.tar
 tar --concatenate -f $outfile.all.tar rook_ceph_client.tar
 mv $outfile.all.tar $outfile.tar
 rm $outfile
