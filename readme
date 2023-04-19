@@ -724,6 +724,7 @@ daos参考:
 默认目录: /root/rpmbuild
 修改目录: –buildroot xxx
 或 Specify the topdir parameter in the rpmrc file or rpmmacros file
+<<<<<<< HEAD
 rpmbuild --root /home/rpmbuild -ta driver.tar.gz
 
 create a file called .rpmmacros in your %HOME% dir, add the following to the file "%_topdir x:/rpmbuild" (w/o the quotes)
