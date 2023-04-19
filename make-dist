@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+set -x 
+
 SCRIPTNAME="$(basename "${0}")"
 BASEDIR="$(readlink -f "$(dirname "${0}")")"
 
@@ -153,25 +155,25 @@ ln -s . $outfile
 tar cvf $outfile.version.tar $outfile/src/.git_version $outfile/ceph.spec $outfile/alpine/APKBUILD
 # NOTE: If you change this version number make sure the package is available
 # at the three URLs referenced below (may involve uploading to download.ceph.com)
-boost_version=1.72.0
-download_boost $boost_version 59c9b274bc451cf91a9ba1dd2c7fdcaf5d60b1b3aa83f2c9fa143417cc660722 \
-               https://boostorg.jfrog.io/artifactory/main/release/$boost_version/source \
-               https://downloads.sourceforge.net/project/boost/boost/$boost_version \
-               https://download.ceph.com/qa
+# boost_version=1.72.0
+# download_boost $boost_version 59c9b274bc451cf91a9ba1dd2c7fdcaf5d60b1b3aa83f2c9fa143417cc660722 \
+#                https://boostorg.jfrog.io/artifactory/main/release/$boost_version/source \
+#                https://downloads.sourceforge.net/project/boost/boost/$boost_version \
+#                https://download.ceph.com/qa
 
-build_dashboard_frontend
+# build_dashboard_frontend
 generate_rook_ceph_client
 tar --concatenate -f $outfile.all.tar $outfile.version.tar
-tar --concatenate -f $outfile.all.tar $outfile.boost.tar
+#tar --concatenate -f $outfile.all.tar $outfile.boost.tar
 tar --concatenate -f $outfile.all.tar $outfile.tar
-tar --concatenate -f $outfile.all.tar dashboard_frontend.tar
+# tar --concatenate -f $outfile.all.tar dashboard_frontend.tar
 tar --concatenate -f $outfile.all.tar rook_ceph_client.tar
 mv $outfile.all.tar $outfile.tar
 rm $outfile
 rm -f $outfile.version.tar
 rm -f $outfile.boost.tar
 
-echo "compressing..."
+echo -e "compressing..., cmd:bzip2 -9 $outfile.tar"
 bzip2 -9 $outfile.tar
 
 echo "done."

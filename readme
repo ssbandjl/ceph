@@ -17,6 +17,8 @@ perf_msgr_client.cc -> main
 编译rdma:
 ./do_cmake.sh -DCMAKE_INSTALL_PREFIX=/usr -DWITH_RDMA=ON
 
+just build client:
+make client > log 2>&1 &
 
 qa:
 启动虚拟集群: https://docs.ceph.com/en/quincy/dev/dev_cluster_deployement/
@@ -92,7 +94,8 @@ debug {subsystem} = {log-level}/{memory-level}
 #for example
 debug mds log = 1/20
 
-
+打印每行日志:
+void Log::_flush
 
 默认配置: Option("ms_type"
 默认开启RDMA: .set_default("async+rdma")
@@ -691,3 +694,68 @@ rbd pool init -p wgsrbd
 
 客户端映射镜像:
 rbd -p wgsrbd map wgs-img1
+
+编译rpm包:
+安装工具: yum install rpm-build rpmdevtools -y
+make-dist, 该脚本主要用于生成ceph.spec和ceph-*.tar.bz2文件以供后面打rpm包使用。我们主要改变了rpm_version,rpm_release ，是否下载boost库等
+bash make-srpm.sh build
+bash make-srpm.sh clean
+
+tar --strip-components=1 -C ~/rpmbuild/SPECS/ --no-anchored -xvjf ~/rpmbuild/SOURCES/ceph-10.2.11.tar.bz2 "ceph.spec"
+生成目录:
+rpmdev-setuptree
+ls -alh /root/rpmbuild
+tree rpmbuild/SRPMS/
+rpmbuild -ba ~/rpmbuild/SPECS/ceph.spec
+tree  rpmbuild/RPMS/
+%debug_package
+%prep
+
+daos参考:
+%if (0%{?suse_version} > 0)
+%global __debug_package 1
+%global _debuginfo_subpackages 0
+%debug_package
+%endif
+
+%prep
+%autosetup
+
+默认目录: /root/rpmbuild
+修改目录: –buildroot xxx
+或 Specify the topdir parameter in the rpmrc file or rpmmacros file
+rpmbuild --root /home/rpmbuild -ta driver.tar.gz
+
+create a file called .rpmmacros in your %HOME% dir, add the following to the file "%_topdir x:/rpmbuild" (w/o the quotes)
+.rpmmacros
+%packager YourName
+%_topdir /home/build/rpmbuild 
+%_tmppath /home/build/rpmbuild/tmp
+
+单元测试:
+ctest -V -R client
+
+rpm:
+https://download.ceph.com/rpm-15.2.17/el7/x86_64/
+https://mirrors.cloud.tencent.com/ceph/rpm-15.2.17/el7/SRPMS/ceph-15.2.17-0.el7.src.rpm
+
+编译:
+参考命令
+安装gcc
+git clone [https://github.com/gcc-mirror/gcc.git](https://github.com/gcc-mirror/gcc.git)
+mkdir build ; cd build
+../configure --prefix=/usr --disable-multilib 
+yum install -y gmp-devel libmpc-devel mpfr-devel flex
+make -j16 > log 2>&1 && make install >log 2>&1 &
+
+编译前检查:
+make check
+
+安装依赖包:
+yum -y install python36-Cython
+
+编译, 统计cpu性能
+./do-cmake.sh -DCMAKE_CXX_FLAGS="-fno-omit-frame-pointer -O2 -g"
+cd build
+cmake --build .
+
