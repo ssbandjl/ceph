@@ -538,6 +538,11 @@ msg/async/rdma：使用特殊的Beacon 检测SQ WRs drained 将QueuePair 切换�
 
 安装rdma依赖, libibverbs, 
 yum install -y libibverbs-devel librdmacm-devel
+
+yum update
+yum install epel-release
+yum install boost boost-thread boost-devel
+
 centos8: 
 rpm -qa|grep libibverbs
 libibverbs-35.0-1.el8.x86_64
@@ -599,7 +604,8 @@ gdb --args rbd bench-write .d2.rbd/500G3 --io-size 4M --io-pattern rand --io-thr
 https://my.oschina.net/u/2460844/blog/534390
 src/osdc/Objecter.cc
 void Objecter::_op_submit
-  check_for_latest_map = _calc_target(&op->target, nullptr)
+  check_for_latest_map = _calc_target(&op->target, nullptr) -> int Objecter::_calc_target
+
   _get_session(op->target.osd, &s, sul) -> int Objecter::_get_session
     osd_sessions.find(osd)
     OSDSession *s = new OSDSession(cct, osd) 没找到, 准备新建
@@ -760,3 +766,10 @@ yum -y install python36-Cython
 cd build
 cmake --build .
 
+rbd接口使用:
+examples/librbd/hello_world.cc
+
+
+
+h3c:
+Processor::accept
