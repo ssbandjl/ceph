@@ -849,7 +849,7 @@ std::vector<Option> get_global_options() {
     .add_see_also("keyfile"),
 
     Option("heartbeat_interval", Option::TYPE_INT, Option::LEVEL_ADVANCED)
-    .set_default(5)
+    .set_default(5000)
     .set_flag(Option::FLAG_STARTUP)
     .set_description("Frequency of internal heartbeat checks (seconds)"),
 
@@ -1057,7 +1057,7 @@ std::vector<Option> get_global_options() {
 
 
     Option("ms_connection_ready_timeout", Option::TYPE_UINT, Option::LEVEL_ADVANCED)
-    .set_default(10)
+    .set_default(100000)
     .set_description("Time before we declare a not yet ready connection as dead (seconds)"),
 
     Option("ms_connection_idle_timeout", Option::TYPE_UINT, Option::LEVEL_ADVANCED)
@@ -3069,12 +3069,12 @@ std::vector<Option> get_global_options() {
     .set_description(""),
 
     Option("osd_heartbeat_interval", Option::TYPE_INT, Option::LEVEL_DEV)
-    .set_default(6)
-    .set_min_max(1, 60)
+    .set_default(600)
+    .set_min_max(1, 6000)
     .set_description("Interval (in seconds) between peer pings"),
 
     Option("osd_heartbeat_grace", Option::TYPE_INT, Option::LEVEL_ADVANCED)
-    .set_default(20)
+    .set_default(2000)
     .set_description(""),
 
     Option("osd_heartbeat_stale", Option::TYPE_INT, Option::LEVEL_ADVANCED)

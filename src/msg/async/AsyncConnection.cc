@@ -126,6 +126,7 @@ AsyncConnection::AsyncConnection(CephContext *cct, AsyncMessenger *m, DispatchQu
     msgr2(m2), state_offset(0),
     worker(w), center(&w->center),read_buffer(nullptr)
 {
+  // std::cout << __FFL__ << " constructing AsyncConnection..." << std::endl;
 #ifdef UNIT_TESTS_BUILT
   this->interceptor = m->interceptor;
 #endif

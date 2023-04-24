@@ -2333,7 +2333,7 @@ INSTANTIATE_TEST_SUITE_P(
   Messenger,
   MessengerTest,
   ::testing::Values(
-    "async+posix"
+    "async+rdma"
   )
 );
 

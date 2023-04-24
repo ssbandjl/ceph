@@ -686,7 +686,7 @@ void RDMAWorker::initialize()
 int RDMAWorker::listen(entity_addr_t &sa, unsigned addr_slot,
 		       const SocketOptions &opt,ServerSocket *sock)
 {
-  cerr << "server ib init " << __FFL__ << std::endl;
+  ldout(cct, 10) << __FFL__ << " server ib init and ready polling_start" << dendl;
   ib->init();
   dispatcher->polling_start();
 
@@ -708,7 +708,7 @@ int RDMAWorker::listen(entity_addr_t &sa, unsigned addr_slot,
 
 int RDMAWorker::connect(const entity_addr_t &addr, const SocketOptions &opts, ConnectedSocket *socket)
 {
-  cerr << __FFL__ << " client ib init" << std::endl;
+  ldout(cct, 10) << __FFL__ << "client ib init" << dendl;
   ib->init();
   dispatcher->polling_start();
 
@@ -718,7 +718,7 @@ int RDMAWorker::connect(const entity_addr_t &addr, const SocketOptions &opts, Co
   } else {
     p = new RDMAConnectedSocketImpl(cct, ib, dispatcher, this);
   }
-  cerr << __FFL__ << " client connect -> server" << std::endl;
+  ldout(cct, 10) << __FFL__ << " client connect -> server" << dendl;
   int r = p->try_connect(addr, opts);
 
   if (r < 0) {
@@ -779,9 +779,9 @@ RDMAStack::RDMAStack(CephContext *cct, const string &t)
   : NetworkStack(cct, t), ib(make_shared<Infiniband>(cct)),
     rdma_dispatcher(make_shared<RDMADispatcher>(cct, ib))
 {
-  ldout(cct, 20) << __FFL__ << " constructing RDMAStack..." << dendl;
 
   unsigned num = get_num_worker();
+  ldout(cct, 20) << __FFL__ << " constructing RDMAStack... worker_num " << num << dendl;
   for (unsigned i = 0; i < num; ++i) {
     RDMAWorker* w = dynamic_cast<RDMAWorker*>(get_worker(i));
     w->set_dispatcher(rdma_dispatcher);

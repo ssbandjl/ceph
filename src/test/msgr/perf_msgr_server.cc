@@ -144,7 +144,7 @@ void usage(const string &name) {
 
 int main(int argc, char **argv)
 {
-  cerr << __FFL__ << " " << __FL__ << " start" << std::endl;
+  cerr << __FFL__ << std::endl;
   vector<const char*> args;
   argv_to_vec(argc, (const char **)argv, args);
 

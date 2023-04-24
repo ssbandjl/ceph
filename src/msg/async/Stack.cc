@@ -43,11 +43,11 @@ std::function<void ()> NetworkStack::add_thread(unsigned worker_id)
       ceph_pthread_setname(pthread_self(), tp_name);
       const unsigned EventMaxWaitUs = 30000000;
       w->center.set_owner();
-      ldout(cct, 10) << __FFL__ << " starting" << dendl;
+      ldout(cct, 10) << __FFL__ << " starting " << tp_name << dendl;
       w->initialize();
       w->init_done();
       while (!w->done) {
-        ldout(cct, 30) << __FFL__ << " calling event process" << dendl;
+        ldout(cct, 30) << __FFL__ << " calling event process worker:" << tp_name << dendl;
 
         ceph::timespan dur;
         int r = w->center.process_events(EventMaxWaitUs, &dur);

@@ -82,29 +82,29 @@ int Processor::bind(const entity_addrvec_t &bind_addrs,
 
     for (int i = 0; i < conf->ms_bind_retry_count; i++) {
       if (i > 0) {
-	lderr(msgr->cct) << __FFL__ << " was unable to bind. Trying again in "
-			 << conf->ms_bind_retry_delay << " seconds " << dendl;
-	sleep(conf->ms_bind_retry_delay);
+	      lderr(msgr->cct) << __FFL__ << " was unable to bind. Trying again in " 
+          << conf->ms_bind_retry_delay << " seconds " << dendl;
+	      sleep(conf->ms_bind_retry_delay);
       }
 
       if (listen_addr.get_port()) {
-	worker->center.submit_to(
-	  worker->center.get_id(),
-	  [this, k, &listen_addr, &opts, &r]() {
-	    r = worker->listen(listen_addr, k, opts, &listen_sockets[k]);
-	  }, false);
-	if (r < 0) {
-	  lderr(msgr->cct) << __FFL__ << " unable to bind to " << listen_addr
-			   << ": " << cpp_strerror(r) << dendl;
-	  continue;
-	}
+	      worker->center.submit_to(
+          worker->center.get_id(),
+          [this, k, &listen_addr, &opts, &r]() {
+	          r = worker->listen(listen_addr, k, opts, &listen_sockets[k]);
+          }, 
+          false);
+        if (r < 0) {
+          lderr(msgr->cct) << __FFL__ << " unable to bind to " << listen_addr << ": " << cpp_strerror(r) << dendl;
+          continue;
+	      }
       } else {
-	// try a range of ports
-	for (int port = msgr->cct->_conf->ms_bind_port_min;
+      // try a range of ports
+      for (int port = msgr->cct->_conf->ms_bind_port_min;
 	     port <= msgr->cct->_conf->ms_bind_port_max;
 	     port++) {
-	  if (avoid_ports.count(port))
-	    continue;
+        if (avoid_ports.count(port))
+          continue;
 
 	  listen_addr.set_port(port);
 	  worker->center.submit_to(
@@ -719,11 +719,11 @@ ConnectionRef AsyncMessenger::connect_to(int type,
 
   AsyncConnectionRef conn = _lookup_conn(av);
   if (conn) {
-    ldout(cct, 10) << __FFL__ << " " << av << " existing " << conn << dendl;
+    ldout(cct, 10) << __FFL__ << " " << av << " conn existing " << conn << dendl;
   } else {
     // 
     conn = create_connect(av, type, false);
-    ldout(cct, 10) << __FFL__ << " " << av << " new " << conn << dendl;
+    ldout(cct, 10) << __FFL__ << " create_connect " << av << " new conn " << conn << dendl;
   }
 
   return conn;
