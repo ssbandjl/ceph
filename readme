@@ -105,8 +105,11 @@ void Log::_flush
 返回自动变量auto:  const auto& _lookup_conn
 要求(断言)已上锁: ceph_assert(ceph_mutex_is_locked(lock))
 
+int RDMAWorker::listen -> rdma ib初始化: ib->init() -> void Infiniband::init()
 
-rdma ib初始化: ib->init() -> void Infiniband::init()
+int RDMAWorker::connect -> ib->init() -> void Infiniband::init()
+  
+
 gdb 打印ib设备: (gdb) p **((ibv_device **) 0x7fffd4000c30)
 cm建连: if (cct->_conf->ms_async_rdma_cm), https://github.com/ssbandjl/ceph/commit/2d4890580f3acdd6387bcdde15f78eba35237589
 
