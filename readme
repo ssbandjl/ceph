@@ -733,7 +733,6 @@ daos参考:
 默认目录: /root/rpmbuild
 修改目录: –buildroot xxx
 或 Specify the topdir parameter in the rpmrc file or rpmmacros file
-<<<<<<< HEAD
 rpmbuild --root /home/rpmbuild -ta driver.tar.gz
 
 create a file called .rpmmacros in your %HOME% dir, add the following to the file "%_topdir x:/rpmbuild" (w/o the quotes)
@@ -804,3 +803,17 @@ $SUDO $yumdnf install -y $yumdnf-utils
 yum install lttng-ust-devel
 yum install epel-release
 rm -rf build;clear;./do_cmake.sh
+分析代码技术错误,  analyze Teuthology failures
+src/script/ceph-debug-docker.sh v15.2.17
+
+虚拟集群:
+cd build
+OSD=3 MON=3 MGR=3 ../src/vstart.sh -n -x
+# check that it's there
+bin/ceph health
+
+rm -rf build;clear;./do_cmake.sh && cd build && make -j64
+rpm -ivh python3-devel-3.6.8-18.el7.x86_64.rpm
+ceph.spec prometheus
+ceph.spec.in
+yum-builddep -y --setopt=*.skip_if_unavailable=true /tmp/install-deps.3292027/ceph.spec 2>&1 | tee /tmp/install-deps.3292027/yum-builddep.out

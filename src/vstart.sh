@@ -970,18 +970,18 @@ EOF
             fi
         fi
 
-        while ! ceph_adm -h | grep -c -q ^restful ; do
-            debug echo 'waiting for mgr restful module to start'
-            sleep 1
-        done
-        if ceph_adm restful create-self-signed-cert; then
-            SF=`mktemp`
-            ceph_adm restful create-key admin -o $SF
-            RESTFUL_SECRET=`cat $SF`
-            rm $SF
-        else
-            debug echo MGR Restful is not working, perhaps the package is not installed?
-        fi
+        # while ! ceph_adm -h | grep -c -q ^restful ; do
+        #     debug echo 'waiting for mgr restful module to start'
+        #     sleep 1
+        # done
+        # if ceph_adm restful create-self-signed-cert; then
+        #     SF=`mktemp`
+        #     ceph_adm restful create-key admin -o $SF
+        #     RESTFUL_SECRET=`cat $SF`
+        #     rm $SF
+        # else
+        #     debug echo MGR Restful is not working, perhaps the package is not installed?
+        # fi
     fi
 
     if [ "$cephadm" -eq 1 ]; then
