@@ -776,3 +776,31 @@ examples/librbd/hello_world.cc
 
 h3c:
 Processor::accept
+
+
+技术检查:
+src/script/ceph-debug-docker.sh v15.2.17
+
+cmake .. \
+-DPYTHON_INCLUDE_DIR=$(python3 -c "import sysconfig; print(sysconfig.get_path('include'))")  \
+-DPYTHON_LIBRARY=$(python3 -c "import sysconfig; print(sysconfig.get_config_var('LIBDIR'))")
+
+message("python3头文件目录：" ${Python3_INCLUDE_DIRS})
+message("python3的版本信息：" ${Python3_VERSION})
+message("python3的库文件信息：" ${Python3_LIBRARIES})
+
+file(
+  DOWNLOAD
+  "${url}" "/home/xb/project/stor/ceph/xb/docker/ceph/build/boost/src/boost_1_72_0.tar.bz2"
+
+../src/vstart.sh -d -n -l -e -o "osd_tracing = true"
+
+
+Timed out waiting for lttng-sessiond (in lttng_ust_init() at lttng-ust-comm.c:1444)
+
+deps install
+$SUDO $yumdnf install -y $yumdnf-utils
+
+yum install lttng-ust-devel
+yum install epel-release
+rm -rf build;clear;./do_cmake.sh

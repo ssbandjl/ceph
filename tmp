@@ -80,3 +80,4 @@ throttle-msgr_dispatch_throttler-client
 throttle-filestore_bytes
 
 
+class ObjectExtent
