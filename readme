@@ -817,3 +817,54 @@ rpm -ivh python3-devel-3.6.8-18.el7.x86_64.rpm
 ceph.spec prometheus
 ceph.spec.in
 yum-builddep -y --setopt=*.skip_if_unavailable=true /tmp/install-deps.3292027/ceph.spec 2>&1 | tee /tmp/install-deps.3292027/yum-builddep.out
+
+
+bufferlist, 参考: https://blog.csdn.net/bandaoyu/article/details/113250328, 
+buffer:raw_malloc
+class buffer::raw_malloc : public buffer::raw
+
+src/include/buffer_fwd.h, class ptr
+class CEPH_BUFFER_API ptr
+  raw *_raw;
+  unsigned _off, _len;
+  ...
+
+unsigned buffer::ptr::append(const char *p, unsigned l)
+
+bufferlist是buffer::list的别名, bufferlist将数据以不连续链表的方式存储, _buffers是一个ptr的链表，_len是整个_buffers中所有的ptr的数据的总长度，_memcopy_count用于统计memcopy的字节数，append_buffer是用于优化append操作的缓冲区，可以看出bufferlist将数据以不连续链表的方式存储
+
+
+class CEPH_BUFFER_API iterator_impl
+这个递进关系比较明显，从宏观的bufferlist，递进到内部的某个bufferptr，再递进到bufferptr内部raw数据区的某个偏移位置。 此外还包含了当前位置在整个bufferlist的偏移量off
+理解了上述的内容，bufferlist剩余的上千行代码，基本也就变成了流水账了，不难理解了，在此就不再赘述了
+
+下面对bufferlist中我遇到的一些函数进行分析，其他函数遇到再说。
+
+clear()
+清空bufferlist中的内容
+
+push_front(raw* / ptr &)
+push_back(raw* / ptr &)
+在_buffers的前面或后面增加新的ptr
+
+rebuild()
+rebuild(ptr &nb)
+将bufferlist中buffers链表中所有的ptr中的数据存到一个ptr中，并将_buffers原有数据clear，然后将新的单个ptr push到_buffers中。
+带参数时使用参数传入的ptr作为目标ptr，不带参数时自己创建一个ptr。
+
+claim(list &bl, unsigned int flags = CLAIM_DEFAULT);
+将bl的数据拿过来，替换原有的数据。调用后bl数据被清空。
+
+claim_append(list &bl, unsigned int flags = CLAIM_DEFAULT);
+claim_prepend(list &bl, unsigned int flags = CLAIM_DEFAULT);
+将bl的数据拿过来，splice到_buffers的尾部/头部。
+
+append(...)
+将数据追加到_buffers尾部，已有ptr空间不够时，会自动分配新的ptr。
+
+splice(unsigned off, unsigned len, list *claim_by = 0)
+将_buffers中总偏移off处长度为len的数据，move到claim_by对应的bufferlist的尾部。注意是move不是copy。
+
+write(int off, int len, std::ostream &out)
+将_buffers中总偏移量off处长度为len的数据，写入到ostream。注意是copy，不是move
+
