@@ -1,3 +1,4 @@
+rm -rf build
 ./do_cmake.sh
 
 function print(){
