@@ -446,7 +446,7 @@ perf_msgr_client.cc -> main
            ops.push_back(osd_op)
         data.claim(bl)
           clear()
-          claim_append(bl) -> void buffer::list::claim_append
+          claim_append(bl) -> void buffer::list::claim_append 要求追加, 免拷贝?
             _buffers.splice_back(bl._buffers) 拼接回来
             bl._buffers.clear_and_dispose()
         header.data_off = off
@@ -458,10 +458,27 @@ perf_msgr_client.cc -> main
           write_message(out_entry.m, more)
             ssize_t total_send_size = connection->outgoing_bl.length() 4406=310+4096
             connection->_try_send(more) -> cs.send(outgoing_bl, more) -> ssize_t RDMAConnectedSocketImpl::send
-              size_t bytes = bl.length() 26B
+              size_t bytes = bl.length() 4406B
+              pending_bl.claim_append(bl) 换变量, bl留着干啥? 回收?
               ssize_t r = submit(more) ssize_t -> RDMAConnectedSocketImpl::submit
-                auto it = std::cbegin(pending_bl.buffers())
+                pending_bl.length() 4406
+                auto it = std::cbegin(pending_bl.buffers()) cbegin()和cend()是C++11新增的，它们返回一个const的迭代器，不能用于修改元素, 常量迭代器
+                while (it != pending_bl.buffers().end()) 循环
+                if (ib->is_tx_buffer(it->raw_c_str())) 不进该分支
+                msg/async/rdma：使用 shared_ptr 管理 Infiniband obj
+                1.不要使用裸指针来管理Infiniband obj
+                2.直接访问Infiniband obj而不是从RDMA堆栈。 这可以避免在 RDMAWorker 和 RDMADispatcher 中缓存 RDMAStack obj
+                wait_copy_len += it->length() = 32
+                tx_buffers.push_back(ib->get_tx_chunk_by_buffer(it->raw_c_str()))
                 size_t copied = tx_copy_chunk(tx_buffers, wait_copy_len, copy_start, it);
+                total_copied += tx_copy_chunk(tx_buffers, wait_copy_len, copy_start, it) -> size_t RDMAConnectedSocketImpl::tx_copy_chunk
+                  int RDMAWorker::get_reged_mem -> 获取已注册的内存 int Infiniband::get_tx_buffers -> get_send_buffers -> Infiniband::MemoryManager::Cluster::get_buffers
+                    size_t got = ib->get_memory_manager()->get_tx_buffer_size() * r  131072>4406 获取到的内存满足需求的大小
+                  Chunk *current_chunk = tx_buffers[chunk_idx]
+                  size_t real_len = current_chunk->write((char*)addr + slice_write_len, start->length() - slice_write_len) -> uint32_t Infiniband::MemoryManager::Chunk::write
+                    memcpy(buffer + offset, buf, write_len) 拷贝内存(循环拷贝)
+                  write_len 4406
+                pending_bl.clear() 拷贝完释放pb
                 post_work_request(tx_buffers)
                   while (current_buffer != tx_buffers.end())
                   ibv_post_send -> ibv_poll_cq 触发发端/收端 -> int Infiniband::CompletionQueue::poll_cq <- void RDMADispatcher::polling()
