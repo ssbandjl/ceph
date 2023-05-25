@@ -388,7 +388,7 @@ server.start()
   msgr->wait() -> void AsyncMessenger::wait()  
     
 
-客户端建连接, src/test/msgr/perf_msgr_client.cc
+客户端建连接, src/test/msgr/perf_msgr_client.cc, gdb --args ceph_perf_msgr_client 175.16.53.62:10001 10 1 1 0 4096
 perf_msgr_client.cc -> main
   MessengerClient client(public_msgr_type, args[0], think_time)
   client.ready
@@ -416,7 +416,9 @@ perf_msgr_client.cc -> main
       bufferptr ptr(msg_len) 申请数据指针 -> buffer::ptr::ptr(unsigned l) : _off(0), _len(l)
          _raw = buffer::create(l).release() -> ceph::unique_leakable_ptr<buffer::raw> buffer::create, 通过返回其值并用空指针替换它来释放其存储指针的所有权。此调用不会破坏托管对象，但 unique_ptr 对象从删除对象的责任中解脱出来。 某些其他实体必须负责在某个时刻删除该对象。要强制销毁指向的对象，请使用成员函数 reset 或对其执行赋值操作
           buffer::create_aligned(len, sizeof(size_t)) -> ceph::unique_leakable_ptr<buffer::raw> buffer::create_aligned
-            create_aligned_in_mempool -> ceph::unique_leakable_ptr<buffer::raw> buffer::create_aligned_in_mempool
+            create_aligned_in_mempool -> mempool::mempool_buffer_anon 宏: f(buffer_anon) -> ceph::unique_leakable_ptr<buffer::raw> buffer::create_aligned_in_mempool, 1M: create_aligned_in_mempool (len=1048576, align=8, mempool=18)
+              len >= CEPH_PAGE_SIZE * 2 如果待分配内存长度大于2倍CEPH_PAGE_SIZE(系统页:sysconf(_SC_PAGESIZE))=8K, 则用原生posix对齐分配 -> ceph::unique_leakable_ptr<buffer::raw>(new raw_posix_aligned(len, align)) ->  raw_posix_aligned(unsigned l, unsigned _align) : raw(l)
+                r = ::posix_memalign((void**)(void*)&data, align, len);
               return raw_combined::create(len, align, mempool) -> src/common/buffer.cc -> static ceph::unique_leakable_ptr<buffer::raw> -> create(unsigned len,
                 align = std::max<unsigned>(align, sizeof(void *)) = 8
                 size_t rawlen = round_up_to(sizeof(buffer::raw_combined) 96
@@ -458,12 +460,12 @@ perf_msgr_client.cc -> main
           write_message(out_entry.m, more)
             ssize_t total_send_size = connection->outgoing_bl.length() 4406=310+4096
             connection->_try_send(more) -> cs.send(outgoing_bl, more) -> ssize_t RDMAConnectedSocketImpl::send
-              size_t bytes = bl.length() 4406B
+              size_t bytes = bl.length() 4KB:4406B=4096+310/1MB:1048886=1048576+310
               pending_bl.claim_append(bl) 换变量, bl留着干啥? 回收?
               ssize_t r = submit(more) ssize_t -> RDMAConnectedSocketImpl::submit
                 pending_bl.length() 4406
                 auto it = std::cbegin(pending_bl.buffers()) cbegin()和cend()是C++11新增的，它们返回一个const的迭代器，不能用于修改元素, 常量迭代器
-                while (it != pending_bl.buffers().end()) 循环
+                while (it != pending_bl.buffers().end()) 循环, 切片, 分段
                 if (ib->is_tx_buffer(it->raw_c_str())) 不进该分支
                 msg/async/rdma：使用 shared_ptr 管理 Infiniband obj
                 1.不要使用裸指针来管理Infiniband obj
@@ -473,13 +475,15 @@ perf_msgr_client.cc -> main
                 size_t copied = tx_copy_chunk(tx_buffers, wait_copy_len, copy_start, it);
                 total_copied += tx_copy_chunk(tx_buffers, wait_copy_len, copy_start, it) -> size_t RDMAConnectedSocketImpl::tx_copy_chunk
                   int RDMAWorker::get_reged_mem -> 获取已注册的内存 int Infiniband::get_tx_buffers -> get_send_buffers -> Infiniband::MemoryManager::Cluster::get_buffers
-                    size_t got = ib->get_memory_manager()->get_tx_buffer_size() * r  131072>4406 获取到的内存满足需求的大小
-                  Chunk *current_chunk = tx_buffers[chunk_idx]
+                    size_t got = ib->get_memory_manager()->get_tx_buffer_size() * r  131072>4406 获取到的内存满足需求的大小, 1MB, 131072*9=1179648
+                  auto chunk_idx = tx_buffers.size() 9个chunk
+                  Chunk *current_chunk = tx_buffers[chunk_idx] 
                   size_t real_len = current_chunk->write((char*)addr + slice_write_len, start->length() - slice_write_len) -> uint32_t Infiniband::MemoryManager::Chunk::write
                     memcpy(buffer + offset, buf, write_len) 拷贝内存(循环拷贝)
                   write_len 4406
                 pending_bl.clear() 拷贝完释放pb
                 post_work_request(tx_buffers)
+                  tx_buffers.size() = 1
                   while (current_buffer != tx_buffers.end())
                   ibv_post_send -> ibv_poll_cq 触发发端/收端 -> int Infiniband::CompletionQueue::poll_cq <- void RDMADispatcher::polling()
       msgr->shutdown()
@@ -895,3 +899,72 @@ int main () {
 }
 
 ptr* _carriage(运输): rack bufferptr 我们可以修改（特别是 ::append() 到）。 并非所有 bptrs 缓冲区列表都具有此特性——如果有人 ::push_back(const ptr&)，他希望它不会改变
+
+1MB, WR:
+502       if (ibv_post_send(qp->get_qp(), iswr, &bad_tx_work_request)) {
+(gdb) p iswr
+$59 = {{
+    wr_id = 93825015914456, 
+    next = 0x0, 
+    sg_list = 0x7fffe4af2be0, 
+    num_sge = 1, 
+    opcode = IBV_WR_SEND, 
+    send_flags = 2, 
+    {
+      imm_data = 0, 
+      invalidate_rkey = 0
+    }, 
+    wr = {
+      rdma = {
+        remote_addr = 0, 
+        rkey = 0
+      }, 
+      atomic = {
+        remote_addr = 0, 
+        compare_add = 0, 
+        swap = 0, 
+        rkey = 0
+      }, 
+      ud = {
+        ah = 0x0, 
+        remote_qpn = 0, 
+        remote_qkey = 0
+      }
+    }, 
+    qp_type = {
+      xrc = {
+        remote_srqn = 0
+      }
+    }, 
+    {
+      bind_mw = {
+        mw = 0x0, 
+        rkey = 0, 
+        bind_info = {
+          mr = 0x0, 
+          addr = 0, 
+          length = 0, 
+          mw_access_flags = 0
+        }
+      }, 
+      tso = {
+        hdr = 0x0, 
+        hdr_sz = 0, 
+        mss = 0
+      }
+    }
+  }}
+(gdb) 
+
+(gdb) p iswr[0].sg_list
+$79 = (ibv_sge *) 0x7fffe4af2be0
+(gdb) p * (ibv_sge *) 0x7fffe4af2be0
+$80 = {
+  addr = 93825150820352, 
+  length = 26, 
+  lkey = 33802381
+}
+(gdb) 
+
+
+
