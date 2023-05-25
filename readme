@@ -414,7 +414,7 @@ perf_msgr_client.cc -> main
     ClientThread *t = new ClientThread(msgr, c, conn, msg_len, ops, think_time_us) -> ClientThread(Messenger *m 新建客户端线程, 构造数据
       m->add_dispatcher_head(&dispatcher)
       bufferptr ptr(msg_len) 申请数据指针 -> buffer::ptr::ptr(unsigned l) : _off(0), _len(l)
-         _raw = buffer::create(l).release() -> ceph::unique_leakable_ptr<buffer::raw> buffer::create
+         _raw = buffer::create(l).release() -> ceph::unique_leakable_ptr<buffer::raw> buffer::create, 通过返回其值并用空指针替换它来释放其存储指针的所有权。此调用不会破坏托管对象，但 unique_ptr 对象从删除对象的责任中解脱出来。 某些其他实体必须负责在某个时刻删除该对象。要强制销毁指向的对象，请使用成员函数 reset 或对其执行赋值操作
           buffer::create_aligned(len, sizeof(size_t)) -> ceph::unique_leakable_ptr<buffer::raw> buffer::create_aligned
             create_aligned_in_mempool -> ceph::unique_leakable_ptr<buffer::raw> buffer::create_aligned_in_mempool
               return raw_combined::create(len, align, mempool) -> src/common/buffer.cc -> static ceph::unique_leakable_ptr<buffer::raw> -> create(unsigned len,
@@ -425,7 +425,9 @@ perf_msgr_client.cc -> main
                 new (ptr + datalen) raw_combined(ptr, len, align, mempool))
          _raw->nref.store(1, std::memory_order_release)
       memset(ptr.c_str(), 0, msg_len) 置0
-      data.append(ptr) 将data填充全0
+      data.append(ptr) 将data填充全0 -> void buffer::list::append -> void push_back(const ptr& bp)
+        _buffers.push_back(*ptr_node::create(bp).release())
+        _len += bp.length()
     msgrs.push_back(msgr)
     clients.push_back(t)
   Cycles::init() -> void Cycles::init() 校准时钟频率
@@ -437,16 +439,24 @@ perf_msgr_client.cc -> main
         void build_hash_cache() crc32c
       MOSDOp *m = new MOSDOp -> MOSDOp(int inc, long tid, 
       bufferlist msg_data(data) 拷贝构造函数?, 拷贝数据
-      m->write(0, msg_len, msg_data) -> void write 通过消息msg写数据到对端
+      m->write(0, msg_len, msg_data) -> void write 通过消息msg写数据到对端, offset=0, len=4096, buffer_list=bl(msg_data)
         add_simple_op(CEPH_OSD_OP_WRITE, off, len) -> ops.push_back(osd_op)
+           osd_op.op.extent.offset = off
+           osd_op.op.extent.length = len
+           ops.push_back(osd_op)
         data.claim(bl)
           clear()
-          claim_append(bl)
+          claim_append(bl) -> void buffer::list::claim_append
+            _buffers.splice_back(bl._buffers) 拼接回来
+            bl._buffers.clear_and_dispose()
+        header.data_off = off
       conn->send_message(m) -> void ProtocolV2::send_message(Message *m) ssize_t RDMAConnectedSocketImpl::send
         out_queue[m->get_priority()].emplace_back
         connection->center->dispatch_event_external(connection->write_handler) -> void AsyncConnection::handle_write
           const auto out_entry = _get_next_outgoing()
+          more = !out_queue.empty() 如果发送队列不为空,则more为true,表示还有更多的待发送的数据
           write_message(out_entry.m, more)
+            ssize_t total_send_size = connection->outgoing_bl.length() 4406=310+4096
             connection->_try_send(more) -> cs.send(outgoing_bl, more) -> ssize_t RDMAConnectedSocketImpl::send
               size_t bytes = bl.length() 26B
               ssize_t r = submit(more) ssize_t -> RDMAConnectedSocketImpl::submit
@@ -845,3 +855,26 @@ yum install -y lttng-tools lttng-ust
 qa:
 1. 识别大IO, 大块IO(4K, 512K, 1M...)在哪里进行切分? 就在那里做RDMA单边逻辑
 2. 
+
+release cpp demo, release.cc, release.cpp
+// unique_ptr::release example
+#include <iostream>
+#include <memory>
+
+int main () {
+  std::unique_ptr<int> auto_pointer (new int);
+  int * manual_pointer;
+
+  *auto_pointer=10;
+
+  manual_pointer = auto_pointer.release();
+  // (auto_pointer is now empty)
+
+  std::cout << "manual_pointer points to " << *manual_pointer << '\n';
+
+  delete manual_pointer;
+
+  return 0;
+}
+
+ptr* _carriage(运输): rack bufferptr 我们可以修改（特别是 ::append() 到）。 并非所有 bptrs 缓冲区列表都具有此特性——如果有人 ::push_back(const ptr&)，他希望它不会改变
