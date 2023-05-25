@@ -462,7 +462,7 @@ ssize_t RDMAConnectedSocketImpl::submit(bool more)
 
 int RDMAConnectedSocketImpl::post_work_request(std::vector<Chunk*> &tx_buffers)
 {
-  ldout(cct, 20) << __FFL__ << " QP: " << local_qpn << " " << tx_buffers[0] << dendl;
+  ldout(cct, 20) << " QP: " << local_qpn << " " << tx_buffers[0] << " tx_buffers_size:" << tx_buffers.size() << __FFL__ << dendl;
   vector<Chunk*>::iterator current_buffer = tx_buffers.begin();
   ibv_sge isge[tx_buffers.size()];
   uint32_t current_sge = 0;
@@ -479,7 +479,7 @@ int RDMAConnectedSocketImpl::post_work_request(std::vector<Chunk*> &tx_buffers)
     isge[current_sge].addr = reinterpret_cast<uint64_t>((*current_buffer)->buffer);
     isge[current_sge].length = (*current_buffer)->get_offset();
     isge[current_sge].lkey = (*current_buffer)->mr->lkey;
-    ldout(cct, 25) << __FFL__ << " sending buffer: " << *current_buffer << " length: " << isge[current_sge].length  << dendl;
+    ldout(cct, 25) << " sending buffer: " << *current_buffer << " length: " << isge[current_sge].length  << __FFL__ << dendl;
 
     iswr[current_swr].wr_id = reinterpret_cast<uint64_t>(*current_buffer);
     iswr[current_swr].next = NULL;

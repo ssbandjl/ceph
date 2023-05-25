@@ -388,7 +388,7 @@ server.start()
   msgr->wait() -> void AsyncMessenger::wait()  
     
 
-客户端建连接
+客户端建连接, src/test/msgr/perf_msgr_client.cc
 perf_msgr_client.cc -> main
   MessengerClient client(public_msgr_type, args[0], think_time)
   client.ready
@@ -411,8 +411,21 @@ perf_msgr_client.cc -> main
           protocol->connect() -> void ProtocolV2::connect() -> state = START_CONNECT
           center->dispatch_event_external(read_handler) -> 触发状态机推进 -> process
         conns[addrs] = conn 保存连接 -> ceph::unordered_map<entity_addrvec_t, AsyncConnectionRef> conns 无序map
-    ClientThread *t = new ClientThread(msgr, c, conn, msg_len, ops, think_time_us) -> ClientThread(Messenger *m 新建客户端线程
-      data.append(ptr) 将打他填充全0
+    ClientThread *t = new ClientThread(msgr, c, conn, msg_len, ops, think_time_us) -> ClientThread(Messenger *m 新建客户端线程, 构造数据
+      m->add_dispatcher_head(&dispatcher)
+      bufferptr ptr(msg_len) 申请数据指针 -> buffer::ptr::ptr(unsigned l) : _off(0), _len(l)
+         _raw = buffer::create(l).release() -> ceph::unique_leakable_ptr<buffer::raw> buffer::create
+          buffer::create_aligned(len, sizeof(size_t)) -> ceph::unique_leakable_ptr<buffer::raw> buffer::create_aligned
+            create_aligned_in_mempool -> ceph::unique_leakable_ptr<buffer::raw> buffer::create_aligned_in_mempool
+              return raw_combined::create(len, align, mempool) -> src/common/buffer.cc -> static ceph::unique_leakable_ptr<buffer::raw> -> create(unsigned len,
+                align = std::max<unsigned>(align, sizeof(void *)) = 8
+                size_t rawlen = round_up_to(sizeof(buffer::raw_combined) 96
+                size_t datalen = round_up_to(len, alignof(buffer::raw_combined)) 4096
+                int r = ::posix_memalign((void**)(void*)&ptr, align, rawlen + datalen); 96+4096
+                new (ptr + datalen) raw_combined(ptr, len, align, mempool))
+         _raw->nref.store(1, std::memory_order_release)
+      memset(ptr.c_str(), 0, msg_len) 置0
+      data.append(ptr) 将data填充全0
     msgrs.push_back(msgr)
     clients.push_back(t)
   Cycles::init() -> void Cycles::init() 校准时钟频率
@@ -423,8 +436,8 @@ perf_msgr_client.cc -> main
       hobject_t hobj(oid, oloc.key -> struct object_t
         void build_hash_cache() crc32c
       MOSDOp *m = new MOSDOp -> MOSDOp(int inc, long tid, 
-      bufferlist msg_data(data)
-      m->write(0, msg_len, msg_data) -> void write
+      bufferlist msg_data(data) 拷贝构造函数?, 拷贝数据
+      m->write(0, msg_len, msg_data) -> void write 通过消息msg写数据到对端
         add_simple_op(CEPH_OSD_OP_WRITE, off, len) -> ops.push_back(osd_op)
         data.claim(bl)
           clear()
@@ -435,10 +448,12 @@ perf_msgr_client.cc -> main
           const auto out_entry = _get_next_outgoing()
           write_message(out_entry.m, more)
             connection->_try_send(more) -> cs.send(outgoing_bl, more) -> ssize_t RDMAConnectedSocketImpl::send
+              size_t bytes = bl.length() 26B
               ssize_t r = submit(more) ssize_t -> RDMAConnectedSocketImpl::submit
                 auto it = std::cbegin(pending_bl.buffers())
                 size_t copied = tx_copy_chunk(tx_buffers, wait_copy_len, copy_start, it);
                 post_work_request(tx_buffers)
+                  while (current_buffer != tx_buffers.end())
                   ibv_post_send -> ibv_poll_cq 触发发端/收端 -> int Infiniband::CompletionQueue::poll_cq <- void RDMADispatcher::polling()
       msgr->shutdown()
   stop = Cycles::rdtsc()
@@ -819,52 +834,14 @@ ceph.spec.in
 yum-builddep -y --setopt=*.skip_if_unavailable=true /tmp/install-deps.3292027/ceph.spec 2>&1 | tee /tmp/install-deps.3292027/yum-builddep.out
 
 
-bufferlist, 参考: https://blog.csdn.net/bandaoyu/article/details/113250328, 
-buffer:raw_malloc
-class buffer::raw_malloc : public buffer::raw
 
-src/include/buffer_fwd.h, class ptr
-class CEPH_BUFFER_API ptr
-  raw *_raw;
-  unsigned _off, _len;
-  ...
-
-unsigned buffer::ptr::append(const char *p, unsigned l)
-
-bufferlist是buffer::list的别名, bufferlist将数据以不连续链表的方式存储, _buffers是一个ptr的链表，_len是整个_buffers中所有的ptr的数据的总长度，_memcopy_count用于统计memcopy的字节数，append_buffer是用于优化append操作的缓冲区，可以看出bufferlist将数据以不连续链表的方式存储
+echo "182.200.53.62 c62" >> /etc/hosts
 
 
-class CEPH_BUFFER_API iterator_impl
-这个递进关系比较明显，从宏观的bufferlist，递进到内部的某个bufferptr，再递进到bufferptr内部raw数据区的某个偏移位置。 此外还包含了当前位置在整个bufferlist的偏移量off
-理解了上述的内容，bufferlist剩余的上千行代码，基本也就变成了流水账了，不难理解了，在此就不再赘述了
+lttng:
+yum install -y epel-release
+yum install -y lttng-tools lttng-ust
 
-下面对bufferlist中我遇到的一些函数进行分析，其他函数遇到再说。
-
-clear()
-清空bufferlist中的内容
-
-push_front(raw* / ptr &)
-push_back(raw* / ptr &)
-在_buffers的前面或后面增加新的ptr
-
-rebuild()
-rebuild(ptr &nb)
-将bufferlist中buffers链表中所有的ptr中的数据存到一个ptr中，并将_buffers原有数据clear，然后将新的单个ptr push到_buffers中。
-带参数时使用参数传入的ptr作为目标ptr，不带参数时自己创建一个ptr。
-
-claim(list &bl, unsigned int flags = CLAIM_DEFAULT);
-将bl的数据拿过来，替换原有的数据。调用后bl数据被清空。
-
-claim_append(list &bl, unsigned int flags = CLAIM_DEFAULT);
-claim_prepend(list &bl, unsigned int flags = CLAIM_DEFAULT);
-将bl的数据拿过来，splice到_buffers的尾部/头部。
-
-append(...)
-将数据追加到_buffers尾部，已有ptr空间不够时，会自动分配新的ptr。
-
-splice(unsigned off, unsigned len, list *claim_by = 0)
-将_buffers中总偏移off处长度为len的数据，move到claim_by对应的bufferlist的尾部。注意是move不是copy。
-
-write(int off, int len, std::ostream &out)
-将_buffers中总偏移量off处长度为len的数据，写入到ostream。注意是copy，不是move
-
+qa:
+1. 识别大IO, 大块IO(4K, 512K, 1M...)在哪里进行切分? 就在那里做RDMA单边逻辑
+2. 
