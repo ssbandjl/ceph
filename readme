@@ -22,3 +22,8 @@ qa:
 
 
 
+ceph支持daos后端(rgw, s3), src/rgw/rgw_sal_daos.cc, https://github.com/ceph/ceph/pull/47709/files
+
+
+
+
