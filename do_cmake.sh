@@ -60,11 +60,14 @@ if type cmake3 > /dev/null 2>&1 ; then
 else
     CMAKE=cmake
 fi
-ARGS+=" -DWITH_LTTNG=ON"
 # ARGS+=" -DPYTHON_INCLUDE_DIR=/usr/include/python3.6m"
 # ARGS+=" -DPYTHON_LIBRARY=/usr/lib64"
-${CMAKE} $ARGS "$@" $CEPH_GIT_DIR || exit 1
+ARGS+=" -DWITH_EVENTTRACE=OFF"
+# ARGS+=" -DWITH_OSD_INSTRUMENT_FUNCTIONS=ON"
+ARGS+=" -DWITH_LTTNG=OFF"
+ARGS+=" -DWITH_BLKIN=OFF"
 echo -e "cmake_cmd:${CMAKE} $ARGS $@ $CEPH_GIT_DIR"
+${CMAKE} $ARGS "$@" $CEPH_GIT_DIR || exit 1
 set +x
 
 # minimal config to find plugins

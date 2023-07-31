@@ -13,6 +13,7 @@
 #include "global/global_context.h"
 
 #include "Message.h"
+// #include "Messenger.h"
 
 #include "messages/MPGStats.h"
 
@@ -964,7 +965,7 @@ void Message::decode_trace(bufferlist::const_iterator &p, bool create)
   blkin_trace_info info = {};
   decode(info, p);
 
-#ifdef WITH_BLKIN
+#ifdef WITH_BLKIN_OFF
   if (!connection)
     return;
 
