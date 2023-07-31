@@ -868,3 +868,8 @@ splice(unsigned off, unsigned len, list *claim_by = 0)
 write(int off, int len, std::ostream &out)
 将_buffers中总偏移量off处长度为len的数据，写入到ostream。注意是copy，不是move
 
+
+
+qingyun, brpc,  ucx, libfabric(cart), ceph_rdma, 
+
+

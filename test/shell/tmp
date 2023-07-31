@@ -1,0 +1,2 @@
+sed -i "s|debug_ms = 30|debug_ms = 5|g" /etc/ceph/ceph.conf
+grep debug_ms /etc/ceph/ceph.conf
