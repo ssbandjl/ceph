@@ -973,3 +973,23 @@ $80 = {
 qingyun, brpc,  ucx, libfabric(cart), ceph_rdma, 
 
 
+
+
+rbd_write -> 
+参考堆栈:
+#0  Objecter::_op_submit (this=this@entry=0x9505c0, op=op@entry=0x997310, sul=..., ptid=ptid@entry=0x9971c0) at /block/gouxu/ceph-L/src/osdc/Objecter.cc:6185
+#1  0x00007ffff74a5ed6 in Objecter::_op_submit_with_budget (this=this@entry=0x9505c0, op=op@entry=0x997310, sul=..., ptid=ptid@entry=0x9971c0, ctx_budget=ctx_budget@entry=0x0) at /block/gouxu/ceph-L/src/osdc/Objecter.cc:5878
+#2  0x00007ffff74a6c19 in Objecter::op_submit (this=0x9505c0, op=0x997310, ptid=0x9971c0, ctx_budget=0x0) at /block/gouxu/ceph-L/src/osdc/Objecter.cc:5797
+#3  0x00007ffff742c229 in librados::IoCtxImpl::aio_operate_read (this=0x98e440, oid=..., o=0x996de0, c=0x9970e0, flags=flags@entry=0, pbl=pbl@entry=0x984708, trace_info=trace_info@entry=0x0, vae_sparse_flag=vae_sparse_flag@entry=false)
+    at /block/gouxu/ceph-L/src/librados/IoCtxImpl.cc:993
+#4  0x00007ffff73ec78f in librados::IoCtx::aio_operate (this=0x994ed8, oid=..., c=c@entry=0x997290, o=o@entry=0x7fffffffd830, pbl=pbl@entry=0x984708) at /block/gouxu/ceph-L/src/librados/librados.cc:1611
+#5  0x00007ffff79212ae in librbd::image::OpenRequest<librbd::ImageCtx>::send_v2_detect_header (this=this@entry=0x9846f0) at /block/gouxu/ceph-L/src/librbd/image/OpenRequest.cc:98
+#6  0x00007ffff7921465 in librbd::image::OpenRequest<librbd::ImageCtx>::send (this=this@entry=0x9846f0) at /block/gouxu/ceph-L/src/librbd/image/OpenRequest.cc:44
+#7  0x00007ffff787c20f in librbd::ImageState<librbd::ImageCtx>::send_open_unlock (this=0x984100) at /block/gouxu/ceph-L/src/librbd/ImageState.cc:626
+#8  0x00007ffff788232f in librbd::ImageState<librbd::ImageCtx>::open (this=this@entry=0x984100, skip_open_parent=skip_open_parent@entry=false, on_finish=on_finish@entry=0x7fffffffdc80, 
+    enSpliAgentInit=enSpliAgentInit@entry=librbd::EN_SPLIT_FLAG_TRUE) at /block/gouxu/ceph-L/src/librbd/ImageState.cc:284
+#9  0x00007ffff78826a4 in librbd::ImageState<librbd::ImageCtx>::open (this=0x984100, skip_open_parent=skip_open_parent@entry=false, enSpliAgentInit=enSpliAgentInit@entry=librbd::EN_SPLIT_FLAG_TRUE)
+    at /block/gouxu/ceph-L/src/librbd/ImageState.cc:252
+#10 0x00007ffff78608d3 in rbd_open (p=<optimized out>, name=<optimized out>, image=0x7fffffffdf20, snap_name=<optimized out>) at /block/gouxu/ceph-L/src/librbd/librbd.cc:4604
+#11 0x0000000000400cc7 in main (argc=1, argv=0x7fffffffe098) at rbd_write.c:120
+
