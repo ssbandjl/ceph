@@ -7,13 +7,12 @@
 
 int main (int argc, const char* argv[])
 {
-
         /* Declare the cluster handle and required arguments. */
         rados_t cluster;
         char cluster_name[] = "ceph";
         // char cluster_name[] = "neo-neo";
         char user_name[] = "client.admin";
-        uint64_t flags;
+        uint64_t flags = 0;
 
         /* Initialize the cluster handle with the "ceph" cluster name and the "client.admin" user */
         int err;
@@ -62,7 +61,7 @@ int main (int argc, const char* argv[])
 
         rados_ioctx_t io;
         //char *poolname = "data";
-        char *poolname = "p0";
+        char *poolname = ".disk_pool1.rbd";
 
         err = rados_ioctx_create(cluster, poolname, &io);
         if (err < 0) {

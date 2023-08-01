@@ -27,11 +27,11 @@
      uint64_t flags = 0;
      int i=0;
     
-    printf("main rdb write start pid %d\n", getpid());
+     printf("main rdb write start pid %d\n", getpid());
      rados_ioctx_t io; 
-    //  char *poolname = "p0"; rados lspools
-    //  char *poolname = ".d.rbd";
-     char *poolname = ".d0.rbd";
+     //  char *poolname = "p0"; rados lspools
+     //  char *poolname = ".d.rbd";
+     char *poolname = ".disk_pool1.rbd";
  
      //Initialize the cluster handle with the "ceph" cluster name 
      //and the "client.admin" user name
@@ -83,7 +83,7 @@
          printf("\nCreated I/O context. \n");
      }
  
-     const char* name = "500G";
+     const char* name = "image_100g";
     //  const char* name_01 = "img2";
     //  const char* name_02 = "rbd_test_02.img";
     //  uint64_t size = 1073741824;

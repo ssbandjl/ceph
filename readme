@@ -708,8 +708,10 @@ iscsiadm --mode session
 查看模块(rbd,bs_rbd.so的动态链接库):
 tgtadm --lld iscsi --mode system --op show|grep rbd
 
-创建镜像:
-rbd create iscsi-image --size 4096
+创建镜像: rbd create --size {megabytes} {pool-name}/{image-name}
+rbd create iscsi-image --size 4096 #4096M=4G
+rbd create .disk_pool1.rbd/image_100g --size 102400 && rbd ls -p .disk_pool1.rbd  #查池: rados lspools
+
 查镜像:
 rbd ls -p p0 -l --format json --pretty-format
 
@@ -993,3 +995,299 @@ rbd_write ->
 #10 0x00007ffff78608d3 in rbd_open (p=<optimized out>, name=<optimized out>, image=0x7fffffffdf20, snap_name=<optimized out>) at /block/gouxu/ceph-L/src/librbd/librbd.cc:4604
 #11 0x0000000000400cc7 in main (argc=1, argv=0x7fffffffe098) at rbd_write.c:120
 
+
+
+
+---------------------------------------- DL ----------------------------------------
+Ceph数据存储2-rbd client 端的数据请求处理 转载
+Darren_Wen2020-05-15 18:14:10博主文章分类：ceph研发
+文章标签rbd clientIO流程数据请求文章分类软件研发阅读数1507
+本节讲述数据写操作的生命开始，介绍写操作的流程处理。代码参考0.94.x版本；
+首先看一下我们用python调用librbd 写rbd设备的测试代码：
+#!/usr/bin/env python
+import sys,rados,rbd
+
+def connectceph():
+      cluster = rados.Rados(conffile = '/root/xuyanjiangtest/ceph-0.94.3/src/ceph.conf')
+      cluster.connect()
+      ioctx = cluster.open_ioctx('mypool')
+      rbd_inst = rbd.RBD()
+      size = 4*1024**3 #4 GiB
+      rbd_inst.create(ioctx,'myimage',size)
+      image = rbd.Image(ioctx,'myimage')
+      data = 'foo'* 200
+      image.write(data,0)
+      image.close()
+      ioctx.close()
+      cluster.shutdown()
+ 
+if __name__ == "__main__":
+        connectceph()
+
+一、写操作数据request的孕育过程
+在write request 请求开始之前，它需要准备点旅行的用品，往返的机票等。下面先看看前期准备了什么。
+首先cluster = rados.Rados(conffile = ‘XXXX/ceph.conf’)，用当前的这个ceph的配置文件去创建一个rados，这里主要是解析ceph.conf中写明的参数。然后将这些参数的值保存在rados中。
+cluster.connect() ，这里将会创建一个radosclient的结构，这里会把这个结构主要包含了几个功能模块：消息管理模块Messager，数据处理模块Objector，finisher线程模块。这些模块具体的工作后面讲述。
+ioctx = cluster.open_ioctx(‘mypool’)，为一个名字叫做mypool的存储池创建一个ioctx ，ioctx中会指明radosclient与Objector模块，同时也会记录mypool的信息，包括pool的参数等。
+rbd_inst.create(ioctx,‘myimage’,size) ，创建一个名字为myimage的rbd设备，之后就是将数据写入这个设备。
+image = rbd.Image(ioctx,‘myimage’)，创建image结构，这里该结构将myimage与ioctx 联系起来，后面可以通过image结构直接找到ioctx。这里会将ioctx复制两份，分为为data_ioctx和md_ctx。见明知意，一个用来处理rbd的存储数据，一个用来处理rbd的管理数据。
+通过上面的操作就会形成这样的结构(如下图)
+Ceph数据存储2-rbd client 端的数据请求处理_IO流程
+图1-1 request孕育阶段
+过程描述，首先根据配置文件创建一个rados，接下来为这个rados创建一个radosclient，radosclient包含了3个主要模块(finisher,Messager，Objector)。再根据pool创建对应的ioctx，ioctx中能够找到radosclient。再对生成对应rbd的结构image，这个image中复制了两个ioctx，分别成为了md_ioctx与data_ioctx。这时完全可以根据image入口去查找到前期准备的其他数据结构。接下来的数据操作完全从image开始，也是rbd的具体实例。
+二、request的出生和成长。
+image.write(data,0)，通过image开始了一个写请求的生命的开始。这里指明了request的两个基本要素 buffer=data 和 offset=0。由这里开始进入了ceph的世界，也是c++的世界。
+由image.write(data,0) 转化为librbd.cc 文件中的 Image::write 函数，来看看这个函数的主要实现
+ssize_t Image::write(uint64_t ofs, size_t len, bufferlist& bl)
+  {  
+      //…………………
+   ImageCtx *ictx = (ImageCtx *)ctx;
+    int r = librbd::write(ictx, ofs, len, bl.c_str(), 0); -> int r = ictx->io_work_queue->write(ofs, len, bufferlist{bl}, 0)
+    return r;     
+  }
+
+该函数中直接进行分发给了 librbd::write 的函数了。跟随下来看看 librbd::write 中的实现。该函数的具体实现在internal.cc文件中。
+ssize_t write(ImageCtx *ictx, uint64_t off, size_t len, const char *buf, int op_flags)
+ {
+      ……………
+    Context *ctx = new C_SafeCond(&mylock, &cond, &done, &ret);   //---a
+    AioCompletion *c = aio_create_completion_internal(ctx, rbd_ctx_cb);//---b
+   r = aio_write(ictx, off, mylen, buf, c, op_flags);  //---c
+     ……………     
+    while (!done)
+           cond.Wait(mylock);  // ---d
+      ……………
+}
+
+—a.这句要为这个操作申请一个回调操作，所谓的回调就是一些收尾的工作，信号唤醒处理。
+—b。这句是要申请一个io完成时 要进行的操作，当io完成时，会调用rbd_ctx_cb函数，该函数会继续调用ctx->complete（）。
+—c.该函数aio_write会继续处理这个请求。
+—d.当c句将这个io下发到osd的时候，osd还没请求处理完成，则等待在d上，直到底层处理完请求，回调b申请的 AioCompletion, 继续调用a中的ctx->complete（），唤醒这里的等待信号，然后程序继续向下执行。
+3.再来看看aio_write 拿到了 请求的offset和buffer会做点什么呢？
+int aio_write(ImageCtx *ictx, uint64_t off, size_t len, const char *buf,
+           AioCompletion *c, int op_flags)
+  {
+      ………
+      //将请求按着object进行拆分
+      vector<ObjectExtent> extents;
+     if (len > 0) 
+      {
+         Striper::file_to_extents(ictx->cct, ictx->format_string,
+                        &ictx->layout, off, clip_len, 0, extents);   //---a
+      } 
+      //处理每一个object上的请求数据
+      for (vector<ObjectExtent>::iterator p = extents.begin(); p != extents.end(); ++p) 
+      {
+               ……..
+           C_AioWrite *req_comp = new C_AioWrite(cct, c); //---b
+           ……..
+           AioWrite *req = new AioWrite(ictx, p->oid.name, p->objectno, p- >offset,bl,….., req_comp);     //---c
+           r = req->send();    //---d
+           …….
+      }
+      ……
+}
+
+根据请求的大小需要将这个请求按着object进行划分，由函数file_to_extents进行处理，处理完成后按着object进行保存在extents中。file_to_extents()存在很多同名函数注意区分。这些函数的主要内容做了一件事儿，那就对原始请求的拆分。
+一个rbd设备是有很多的object组成，也就是将rbd设备进行切块，每一个块叫做object，每个object的大小默认为4M，也可以自己指定。file_to_extents函数将这个大的请求分别映射到object上去，拆成了很多小的请求如下图。最后映射的结果保存在ObjectExtent中。
+Ceph数据存储2-rbd client 端的数据请求处理_rbd client_02
+原本的offset是指在rbd内的偏移量(写入rbd的位置)，经过file_to_extents后，转化成了一个或者多个object的内部的偏移量offset0。这样转化后处理一批这个object内的请求。
+4.再回到 aio_write函数中，需要将拆分后的每一个object请求进行处理。
+—b.为写请求申请一个回调处理函数。
+—c.根据object内部的请求，创建一个叫做AioWrite的结构。
+—d.将这个AioWrite的req进行下发send().
+5.这里AioWrite 是继承自 AbstractWrite ，AbstractWrite 继承自AioRequest类，在AbstractWrite 类中定义了send的方法，看下send的具体内容.
+int AbstractWrite::send() 
+ {  ………………
+    if (send_pre())           //---a
+      ……………
+}
+#进入send_pre()函数中
+bool AbstractWrite::send_pre()
+｛
+      m_state = LIBRBD_AIO_WRITE_PRE;   // ----a
+      FunctionContext *ctx =    //----b
+           new FunctionContext( boost::bind(&AioRequest::complete, this, _1));
+      m_ictx->object_map.aio_update（ctx）; //-----c
+｝
+
+—a.修改m_state 状态为LIBRBD_AIO_WRITE_PRE。
+—b.申请一个回调函数，实际调用AioRequest::complete()
+—c.开始下发object_map.aio_update的请求，这是一个状态更新的函数，不是很重要的环节，这里不再多说，当更新的请求完成时会自动回调到b申请的回调函数。
+6.进入到AioRequest::complete() 函数中。
+void AioRequest::complete(int r)
+ {
+    if (should_complete(r))   //---a
+        …….
+}
+
+—a.should_complete函数是一个纯虚函数，需要在继承类AbstractWrite中实现，来7. 看看AbstractWrite:: should_complete()
+bool AbstractWrite::should_complete(int r)
+{
+    switch (m_state) 
+  {
+          case LIBRBD_AIO_WRITE_PRE:  //----a
+      {
+                     send_write(); //----b
+
+----a.在send_pre中已经设置m_state的状态为LIBRBD_AIO_WRITE_PRE，所以会走这个分支。
+----b. send_write()函数中，会继续进行处理，
+7.1.下面来看这个send_write函数
+void AbstractWrite::send_write()
+｛
+      m_state = LIBRBD_AIO_WRITE_FLAT;   //----a
+      add_write_ops(&m_write);    // ----b
+      int r = m_ictx->data_ctx.aio_operate(m_oid, rados_completion, &m_write);
+｝
+
+—a.重新设置m_state的状态为 LIBRBD_AIO_WRITE_FLAT。
+—b.填充m_write，将请求转化为m_write。
+—c.下发m_write ，使用data_ctx.aio_operate 函数处理。继续调用io_ctx_impl->aio_operate()函数，继续调用objecter->mutate().
+//librados.cc
+librados::IoCtx::aio_operate(const std::string& oid, AioCompletion *c,
+				 librados::ObjectWriteOperation *o,
+				 snap_t snap_seq, std::vector<snap_t>& snaps)
+{
+  return io_ctx_impl->aio_operate(obj, (::ObjectOperation*)o->impl, c->pc,
+				  snapc, 0);
+}
+//IoCtxImpl.cc
+librados::IoCtxImpl::aio_operate(......)
+{
+c->tid = objecter->mutate(oid, oloc, *o, snap_context, ut, flags, onack, oncommit,
+		            &c->objver);
+}
+
+8.objecter->mutate()
+ceph_tid_t mutate(……..) 
+  {
+    Op *o = prepare_mutate_op(oid, oloc, op, snapc, mtime, flags, onack, oncommit, objver);   //----d
+    return op_submit(o);
+  }
+
+—d.将请求转化为Op请求，继续使用op_submit下发这个请求。在op_submit中继续调用_op_submit_with_budget处理请求。继续调用_op_submit处理。
+8.1 _op_submit 的处理过程。这里值得细看
+ceph_tid_t Objecter::_op_submit(Op *op, RWLock::Context& lc)
+｛
+    check_for_latest_map = _calc_target(&op->target, &op->last_force_resend)； //---a
+    int r = _get_session(op->target.osd, &s, lc);  //---b
+    _session_op_assign(s, op); //----c
+    _send_op(op, m); //----d
+｝
+
+----a. _calc_target，通过计算当前object的保存的osd，然后将主osd保存在target中，rbd写数据都是先发送到主osd，主osd再将数据发送到其他的副本osd上。这里对于怎么来选取osd集合与主osd的关系就不再多说，在《ceph的数据存储之路(3)》中已经讲述这个过程的原理了，代码部分不难理解。
+----b. _get_session，该函数是用来与主osd建立通信的，建立通信后，可以通过该通道发送给主osd。再来看看这个函数是怎么处理的
+9._get_session
+int Objecter::_get_session(int osd, OSDSession **session, RWLock::Context& lc)
+{
+    map<int,OSDSession*>::iterator p = osd_sessions.find(osd);   //----a
+    OSDSession *s = new OSDSession(cct, osd); //----b
+    osd_sessions[osd] = s;//--c
+    s->con = messenger->get_connection(osdmap->get_inst(osd));//-d
+    ………
+｝
+
+----a.首先在osd_sessions中查找是否已经存在一个连接可以直接使用，第一次通信是没有的。
+----b.重新申请一个OSDSession，并且使用osd等信息进行初始化。
+—c. 将新申请的OSDSession添加到osd_sessions中保存，以备下次使用。
+----d.调用messager的get_connection方法。在该方法中继续想办法与目标osd建立连接。
+10.messager 是由子类simpleMessager实现的，下面来看下SimpleMessager中get_connection的实现方法
+ConnectionRef SimpleMessenger::get_connection(const entity_inst_t& dest)
+{
+    Pipe *pipe = _lookup_pipe(dest.addr);     //-----a
+    if (pipe) 
+    {
+        ……
+    } 
+    else 
+    {
+      pipe = connect_rank(dest.addr, dest.name.type(), NULL, NULL); //----b
+    }
+｝
+
+—a.首先要查找这个pipe，第一次通信，自然这个pipe是不存在的。
+----b. connect_rank 会根据这个目标osd的addr进行创建。看下connect_rank做了什么。
+11.SimpleMessenger::connect_rank
+Pipe *SimpleMessenger::connect_rank(const entity_addr_t& addr,  int type, PipeConnection *con,    Message *first)
+｛
+      Pipe *pipe = new Pipe(this, Pipe::STATE_CONNECTING, static_cast<PipeConnection*>(con));      //----a
+      pipe->set_peer_type(type); //----b
+      pipe->set_peer_addr(addr); //----c
+      pipe->policy = get_policy(type); //----d
+      pipe->start_writer();  //----e
+      return pipe; //----f
+｝
+
+----a.首先需要创建这个pipe，并且pipe同pipecon进行关联。
+----b,----c,-----d。都是进行一些参数的设置。
+----e.开始启动pipe的写线程，这里pipe的写线程的处理函数pipe->writer(),该函数中会尝试连接osd。并且建立socket连接通道。
+目前的资源统计一下，写请求可以根据目标主osd，去查找或者建立一个OSDSession，这个OSDSession中会有一个管理数据通道的Pipe结构，然后这个结构中存在一个发送消息的处理线程writer，这个线程会保持与目标osd的socket通信。
+12.建立并且获取到了这些资源，这时再回到_op_submit 函数中
+ceph_tid_t Objecter::_op_submit(Op *op, RWLock::Context& lc)
+｛
+    check_for_latest_map = _calc_target(&op->target, &op->last_force_resend)； //---a
+    int r = _get_session(op->target.osd, &s, lc);  //---b
+    _session_op_assign(s, op); //----c
+    MOSDOp *m = _prepare_osd_op(op); //-----d
+    _send_op(op, m); //----e
+｝
+
+—c，将当前的op请求与这个session进行绑定，在后面发送请求的时候能知道使用哪一个session进行发送。
+–d，将op转化为MOSDop，后面会以MOSDOp为对象进行处理的。
+—e，_send_op 会根据之前建立的通信通道，将这个MOSDOp发送出去。_send_op 中调用op->session->con->send_message(m)，这个方法会调用SimpleMessager-> send_message(m), 再调用_send_message(),再调用submit_message().在submit_message会找到之前的pipe，然后调用pipe->send方法，最后通过pipe->writer的线程发送到目标osd。
+自此，客户就等待osd处理完成返回结果了。
+总结客户端的所有流程和数据结构，下面来看下客户端的所有结构图。
+Ceph数据存储2-rbd client 端的数据请求处理_数据请求_03
+通过这个全部的结构图来总结客户端的处理过程。
+1.看左上角的rados结构，首先创建io环境，创建rados信息，将配置文件中的数据结构化到rados中。
+2.根据rados创建一个radosclient的客户端结构，该结构包括了三个重要的模块，finiser 回调处理线程、Messager消息处理结构、Objector数据处理结构。最后的数据都是要封装成消息 通过Messager发送给目标的osd。
+3.根据pool的信息与radosclient进行创建一个ioctx，这里面包好了pool相关的信息，然后获得这些信息后在数据处理时会用到。
+4.紧接着会复制这个ioctx到imagectx中，变成data_ioctx与md_ioctx数据处理通道，最后将imagectx封装到image结构当中。之后所有的写操作都会通过这个image进行。顺着image的结构可以找到前面创建并且可以使用的数据结构。
+5.通过最右上角的image进行读写操作，当读写操作的对象为image时，这个image会开始处理请求，然后这个请求经过处理拆分成object对象的请求。拆分后会交给objector进行处理查找目标osd，当然这里使用的就是crush算法，找到目标osd的集合与主osd。
+6.将请求op封装成MOSDOp消息，然后交给SimpleMessager处理，SimpleMessager会尝试在已有的osd_session中查找，如果没有找到对应的session，则会重新创建一个OSDSession，并且为这个OSDSession创建一个数据通道pipe，把数据通道保存在SimpleMessager中，可以下次使用。
+7.pipe 会与目标osd建立Socket通信通道，pipe会有专门的写线程writer来负责socket通信。在线程writer中会先连接目标ip，建立通信。消息从SimpleMessager收到后会保存到pipe的outq队列中，writer线程另外的一个用途就是监视这个outq队列，当队列中存在消息等待发送时，会就将消息写入socket，发送给目标OSD。
+8.等待OSD将数据消息处理完成之后，就是进行回调，反馈执行结果，然后一步步的将结果告知调用者。
+上面是就rbd client处理写请求的过程，那么下面会在分析一个OSD是如何接到请求，并且怎么来处理这个请求的。请期待下一节。
+转载： https://my.oschina.net/u/2460844/blog/532755
+
+
+---------------------------------------- DL ----------------------------------------
+
+
+
+rbd_write.c:145 -> main -> rbd_write
+  librbd::ImageCtx *ictx = (librbd::ImageCtx *)image
+  bl.push_back(create_write_raw(ictx, buf, len, nullptr))
+  ictx->io_work_queue->write(ofs, len, std::move(bl), 0)
+
+
+
+
+
+sphinx-build
+yum install python-sphinx
+
+
+/opt/h3c/lib/librbd.so.1 -> librbd.so.1.12.0
+[root@node1 ceph]# ls -alh /opt/h3c/lib/librados.so*
+lrwxrwxrwx 1 root root   13 Jul 21 16:23 /opt/h3c/lib/librados.so -> librados.so.2
+lrwxrwxrwx 1 root root   17 Jul 21 16:23 /opt/h3c/lib/librados.so.2 -> librados.so.2.0.0
+-rwxr-xr-x 1 root root 2.4M Jul 21 16:23 /opt/h3c/lib/librados.so.2.0.0
+
+[root@node1 ceph]# ls -alh /opt/h3c/lib/librbd*
+lrwxrwxrwx 1 root root   11 Jul 21 16:23 /opt/h3c/lib/librbd.so -> librbd.so.1
+lrwxrwxrwx 1 root root   16 Jul 21 16:23 /opt/h3c/lib/librbd.so.1 -> librbd.so.1.12.0
+-rwxr-xr-x 1 root root 4.3M Jul 21 16:23 /opt/h3c/lib/librbd.so.1.12.0
+lrwxrwxrwx 1 root root   14 Jul 21 16:23 /opt/h3c/lib/librbd_tp.so -> librbd_tp.so.1
+lrwxrwxrwx 1 root root   18 Jul 21 16:23 /opt/h3c/lib/librbd_tp.so.1 -> librbd_tp.so.1.0.0
+-rwxr-xr-x 1 root root 468K Jul 21 16:23 /opt/h3c/lib/librbd_tp.so.1.0.0
+
+
+
+
+rados_write.c:83 -> main -> rados_write -> extern "C" int _rados_write
+  ctx->write(oid, bl, len, off) -> int librados::IoCtxImpl::write
+    prepare_assert_ops(&op)
+    op.write(off, mybl)
+
+rbd_write.c:145 -> rbd_write

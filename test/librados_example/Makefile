@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-g -Wl,-rpath=/opt/h3c/lib -lrados -L/opt/h3c/lib/
+CFLAGS=-Og -g3 -Wl,-rpath=/opt/h3c/lib -lrados -L/opt/h3c/lib/
 
 all:rados_write
 rados_write:rados_write.c
