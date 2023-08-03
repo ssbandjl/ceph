@@ -438,7 +438,7 @@ find_package(Python3 ${WITH_PYTHON3} ${find_python3_exact} REQUIRED
   COMPONENTS Interpreter Development)
 unset(find_python3_exact)
 
-option(WITH_MGR "ceph-mgr is enabled" OFF)
+option(WITH_MGR "ceph-mgr is enabled" ON)
 if(WITH_MGR)
   set(MGR_PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
   set(MGR_PYTHON_LIBRARIES ${Python3_LIBRARIES})
@@ -499,7 +499,7 @@ option(DEBUG_GATHER "C_Gather debugging is enabled" ON)
 option(ENABLE_COVERAGE "Coverage is enabled" OFF)
 option(PG_DEBUG_REFS "PG Ref debugging is enabled" OFF)
 
-option(WITH_TESTS "enable the build of ceph-test package scripts/binaries" ON)
+option(WITH_TESTS "enable the build of ceph-test package scripts/binaries" OFF)
 set(UNIT_TESTS_BUILT ${WITH_TESTS})
 set(CEPH_TEST_TIMEOUT 3600 CACHE STRING 
   "Maximum time before a CTest gets killed" )

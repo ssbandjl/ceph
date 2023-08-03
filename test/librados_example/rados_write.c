@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-//#include <rados/librados.h>
-#include </opt/h3c/include/rados/librados.h>
+#include <rados/librados.h>
+// #include </opt/h3c/include/rados/librados.h>
 
 int main (int argc, const char* argv[])
 {
@@ -28,7 +28,8 @@ int main (int argc, const char* argv[])
 
         /* Read a Ceph configuration file to configure the cluster handle. */
         //err = rados_conf_read_file(cluster, "/etc/ceph/ceph.conf");
-        err = rados_conf_read_file(cluster, "/etc/ceph/ceph.conf");
+        // err = rados_conf_read_file(cluster, "/etc/ceph/ceph.conf");
+        err = rados_conf_read_file(cluster, "/home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf");
         if (err < 0) {
                 fprintf(stderr, "%s: cannot read config file: %s\n", argv[0], strerror(-err));
                 exit(EXIT_FAILURE);
@@ -61,7 +62,8 @@ int main (int argc, const char* argv[])
 
         rados_ioctx_t io;
         //char *poolname = "data";
-        char *poolname = ".disk_pool1.rbd";
+        // char *poolname = ".disk_pool1.rbd";
+        char *poolname = "p1";
 
         err = rados_ioctx_create(cluster, poolname, &io);
         if (err < 0) {

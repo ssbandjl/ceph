@@ -69,7 +69,9 @@ ON/OFF
 address sanitizer
 
 docker run -it -d --privileged --cap-add=ALL --name centos7  -p 22223:22 -p 6666:6666 -v /home/xb/project/stor/ceph/xb/docker/ceph:/home/xb/project/stor/ceph/xb/docker/ceph ceph_centos7:v15.2.17
-docker exec -u root -it centos7 bash -c 'cd /home/xb/project/stor/ceph/xb/docker/ceph;exec "${SHELL:-sh}"'
+docker exec -u root -it ceph bash -c 'cd /home/xb/project/stor/ceph/xb/docker/ceph;exec "${SHELL:-sh}"'
+
+docker run -it -d --privileged --cap-add=ALL --name ceph  -p 22223:22 -p 6666:6666 -v /home/xb/project/ceph/xb/ceph:/home/xb/project/stor/ceph/xb/docker/ceph ceph_centos7:v15.2.17
 
 gdb:
 cd /home/xb/project/stor/ceph/xb/docker/ceph/build/bin
@@ -739,8 +741,31 @@ ceph osd pool get {pool-name} {key}
 ceph df
 
 
-创池:
-ceph osd pool create wgsrbd 64 64
+创池, 创建池, io, pool: https://docs.ceph.com/en/reef/rados/operations/pools/
+ceph osd pool create {pool-name} [{pg-num} [{pgp-num}]] [replicated] [crush-rule-name] [expected-num-objects]
+ceph osd pool create {pool-name} [{pg-num} [{pgp-num}]] erasure [erasure-code-profile] [crush-rule-name] [expected_num_objects] [--autoscale-mode=<on,off,warn>]
+
+ceph osd pool create p1 3 && ceph osd lspools && rados bench -p p1 5 write
+ceph osd pool stats p1
+
+
+rbd块设备: https://docs.ceph.com/en/quincy/rbd/rados-rbd-cmds/
+该rbd命令使您能够创建、列出、内省和删除块设备映像。您还可以使用它来克隆镜像、创建快照、将镜像回滚到快照、查看快照等。有关使用该命令的详细信息，rbd请参阅RBD – 管理 RADOS 块设备 (RBD) 镜像: https://docs.ceph.com/en/quincy/man/8/rbd/
+rbd 是一个用于操作 rados 块设备 (RBD) 映像的实用程序，由 Linux rbd 驱动程序和 QEMU/KVM 的 rbd 存储驱动程序使用。 RBD image是简单的块设备，在对象上进行条带化并存储在 RADOS 对象存储中。 image条带对象的大小必须是 2 的幂
+
+创建卷/image
+rbd create --size 1024 p1/image1 && rbd ls p1 && rbd info p1/image1
+
+
+下发io:
+rados bench -p .disk_pool1.rbd 5 write
+
+rados put test-object-1 ../src/vstart.sh --pool=test-blkin
+rados -p test-blkin ls
+ceph osd map test-blkin test-object-1
+rados get test-object-1 ./vstart-copy.sh --pool=test-blkin
+md5sum vstart*
+rados rm test-object-1 --pool=test-blkin
 
 存储池启用rbd:
 ceph osd pool application enable wgsrbd rbd
@@ -855,8 +880,7 @@ rm -rf build;clear;./do_cmake.sh
 src/script/ceph-debug-docker.sh v15.2.17
 
 虚拟集群:
-cd build
-OSD=3 MON=3 MGR=3 ../src/vstart.sh -n -x
+cd build && OSD=3 MON=3 MGR=3 ../src/vstart.sh -n -x
 # check that it's there
 bin/ceph health
 
@@ -1284,10 +1308,597 @@ lrwxrwxrwx 1 root root   18 Jul 21 16:23 /opt/h3c/lib/librbd_tp.so.1 -> librbd_t
 
 
 
-
+iopath
 rados_write.c:83 -> main -> rados_write -> extern "C" int _rados_write
-  ctx->write(oid, bl, len, off) -> int librados::IoCtxImpl::write
+  rados_create2 -> extern "C" int _rados_create2
+    CephInitParameters iparams(CEPH_ENTITY_TYPE_CLIENT) -> CephInitParameters::CephInitParameters -> name.set(module_type, "admin")
+    rados_create_cct
+    new librados::RadosClient
+  rados_conf_read_file
+  rados_connect -> extern "C" int _rados_connect(rados_t cluster)
+    client->connect() -> int librados::RadosClient::connect()
+      Messenger::create_client_messenger(cct, "radosclient")
+      objecter = new (std::nothrow) Objecter(cct, messenger, &monclient, &finisher)
+      objecter->set_balanced_budget()
+      objecter->init()
+      ...
+  rados_ioctx_create -> extern "C" int _rados_ioctx_create
+    create_ioctx -> int librados::RadosClient::create_ioctx(
+      lookup_pool
+      new librados::IoCtxImpl
+  ctx->write(oid, bl, len, off) -> extern "C" int _rados_write -> ctx->write(oid, bl, len, off) -> int librados::IoCtxImpl::write
     prepare_assert_ops(&op)
-    op.write(off, mybl)
+    mybl.substr_of(bl, 0, len) -> 获取子字符串, 截取子串
+    op.write(off, mybl) -> void write(uint64_t off, ceph::buffer::list& bl) -> write(off, bl, 0, 0)
+      OSDOp& o = *ops.rbegin() -> 反向迭代
+      add_data(CEPH_OSD_OP_WRITE, off, bl.length(), bl)
+    return operate(oid, &op, NULL) -> int librados::IoCtxImpl::operate
+      Context *oncommit = new C_SafeCond(mylock, cond, &done, &r)
+      objecter->prepare_mutate_op -> Op *prepare_mutate_op
+      objecter->op_submit(objecter_op) -> void Objecter::op_submit -> _op_submit_with_budget(op, rl, ptid, ctx_budget) -> void Objecter::_op_submit_with_budget
+        int op_budget = _take_op_budget(op, sul) -> 流控 -> _op_submit(op, sul, ptid) -> void Objecter::_op_submit
+          _calc_target -> target
+          (gdb) p op->target
+$9 = {
+  flags = 32, 
+  epoch = 0, 
+  base_oid = {
+    name = "neo-obj"
+  }, 
+  base_oloc = {
+    pool = 1, 
+    key = "", 
+    nspace = "", 
+    hash = -1
+  }, 
+  target_oid = {
+    name = ""
+  }, 
+  target_oloc = {
+    pool = -1, 
+    key = "", 
+    nspace = "", 
+    hash = -1
+  }, 
+  precalc_pgid = false, 
+  pool_ever_existed = false, 
+  base_pgid = {
+    m_pool = 0, 
+    m_seed = 0, 
+    static calc_name_buf_size = 36 '$'
+  }, 
+  pgid = {
+    m_pool = 0, 
+    m_seed = 0, 
+    static calc_name_buf_size = 36 '$'
+  }, 
+  actual_pgid = {
+    pgid = {
+      m_pool = 0, 
+      m_seed = 0, 
+      static calc_name_buf_size = 36 '$'
+    }, 
+    shard = {
+      id = -1 '\377', 
+      static NO_SHARD = {
+        id = -1 '\377', 
+        static NO_SHARD = <same as static member of an already seen type>
+      }
+    }, 
+    static calc_name_buf_size = 40 '('
+  }, 
+  pg_num = 0, 
+  pg_num_mask = 0, 
+  pg_num_pending = 0, 
+  up = std::vector of length 0, capacity 0, 
+  acting = std::vector of length 0, capacity 0, 
+  up_primary = -1, 
+  acting_primary = -1, 
+  size = -1, 
+  min_size = -1, 
+  sort_bitwise = false, 
+  recovery_deletes = false, 
+  used_replica = false, 
+  paused = false, 
+  osd = -1, 
+  last_force_resend = 0
+}
+...
+  get_epoch
+  get_pg_pool
+  if ((t->flags & CEPH_OSD_FLAG_IGNORE_OVERLAY) == 0) -> osdc/Objecter：在每次 _calc_target 调用时重新计算 target_*，任何时候我们被要求计算目标时，我们都应该应用池分层参数。 之前仅在未计算目标时才这样做的逻辑没有多大意义，并且破坏了我们为获取目标池的正确 pg_num 所需的 *pi 更新。 对于采用原始 pg 的旧集群来说，这并不重要，但对于 luminous 及其他集群，我们需要精确的 spg_t，这需要正确的 pg_num
+  pi = osdmap->get_pg_pool(t->target_oloc.pool)
+  int ret = osdmap->object_locator_to_pg(t->target_oid, t->target_oloc
+  ceph_stable_mod
+  lookup_pg_mapping
+  osdmap->pg_to_up_acting_osds
+  update_pg_mapping(actual_pgid, std::move(pg_mapping))
+_get_session(op->target.osd, &s, sul)
+
+
+
+
+        
+
+
 
 rbd_write.c:145 -> rbd_write
+...
+get_handler_way
+start_in_flight_io
+create_write_request
+...
+
+
+
+
+v12
+https://github.com/ssbandjl/ceph_v12
+
+v12.2.14, 73, 
+
+sudo vi /etc/sysctl.conf
+net.ipv6.conf.all.disable_ipv6 = 1 
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+sudo sysctl -p
+
+-i https://pypi.tuna.tsinghua.edu.cn/simple
+
+set(VERSION 12.2.14)
+更新yun源
+wget https://copr.fedorainfracloud.org/coprs/jsynacek/systemd-backports-for-centos-7/repo/epel-7/jsynacek-systemd-backports-for-centos-7-epel-7.repo -O /etc/yum.repos.d/jsynacek-systemd-centos-7.repo
+yum update systemd -y
+
+
+
+https://boostorg.jfrog.io/artifactory/main/release/1.66.0/source/boost_1_66_0.tar.bz2
+
+cp cache/boost_1_66_0.tar.bz2 /home/xb/project/stor/ceph/ceph/build/boost/src/boost_1_66_0.tar.bz2
+
+
+WITH_TESTS
+CMakeLists.txt
+src/test/CMakeLists.txt
+
++ echo 'dashboard urls: http://182.200.53.73:41984/'
+dashboard urls: http://182.200.53.73:41984/
++ echo '  restful urls: https://182.200.53.73:42984'
+  restful urls: https://182.200.53.73:42984
++ echo '  w/ user/pass: admin / 978c009a-1726-45ef-aeac-5be2da32ae56'
+  w/ user/pass: admin / 978c009a-1726-45ef-aeac-5be2da32ae56
+
+
+echo -e "$CEPH_BUILD_ROOT vstart.sh:${LINENO}"
+
+src/ceph_mgr.cc
+
+export PATH=/home/xb/project/stor/ceph/ceph/build/bin:$PATH
+export PATH=/home/xb/project/stor/ceph/xb/docker/ceph/build/bin:$PATH
+运行 rados lspools | grep rgw
+ceph osd pool application enable $POOL rgw
+
+lttng-sessiond --daemoniz
+lttng-sessiond -d --no-kernel
+../src/vstart.sh -d -n -l -e -o "osd_tracing = true"
+../src/vstart.sh -d -n -o "osd_tracing = true"
+lttng list --userspace
+rados bench -p ec 5 write
+
+ps aux|grep lttng|grep -v grep|awk '{print$2}'|xargs kill -9
+
+
+[global]
+        osd_tracing = true
+        bluestore_tracing = true
+        event_tracing = true
+        osd_function_tracing = true
+        osd_objectstore_tracing = true
+        rbd_tracing = true
+        rados_tracing = true
+        rgw_op_tracing = true
+        rgw_rados_tracing = true
+
+
+OSD=3 MON=3 RGW=1 ../src/vstart.sh -n -o "rbd_blkin_trace_all=true" \
+  -o "osd_tracing = true" \
+  -o "bluestore_tracing = true" \
+  -o "event_tracing = true" \
+  -o "osd_function_tracing = true" \
+  -o "osd_objectstore_tracing = true" \
+  -o "rbd_tracing = true" \
+  -o "rgw_op_tracing = true" \
+  -o "rgw_rados_tracing = true" --mgr_num 0
+
+../stop.sh;OSD=3 MON=3 RGW=1 ../src/vstart.sh -n -X -o "rbd_blkin_trace_all=true" \
+  -o "osd_tracing = true" \
+  -o "bluestore_tracing = true" \
+  -o "event_tracing = true" \
+  -o "osd_function_tracing = false" \
+  -o "osd_objectstore_tracing = true" \
+  -o "rbd_tracing = true" \
+  -o "rgw_op_tracing = true" \
+  -o "rgw_rados_tracing = true"
+
+clear;./stop.sh;../src/vstart.sh -X -n -o "rbd_blkin_trace_all=true"   -o "osd_tracing = true"   -o "bluestore_tracing = true"   -o "event_tracing = true"   -o "osd_function_tracing = true"   -o "osd_objectstore_tracing = true"   -o "rbd_tracing = true"   -o "rgw_op_tracing = true"   -o "rgw_rados_tracing = true" --mgr_num 0
+
+ps aux|grep ceph|awk '{print$2}'|xargs -x kill
+ps aux|grep ceph|awk '{print$2}'|xargs -x -I '{}' kill -9 {}
+ps aux|grep ceph|awk '{print$2}'|while read pid;do echo $pid;kill -9 $pid;done;ps aux|grep ceph
+systemctl stop dse@n73 ceph-mon@n73 ceph-mgr@n73
+
+dashboard urls: http://182.200.53.73:41920/
+  restful urls: https://182.200.53.73:42920
+  w/ user/pass: admin / 
+
+
+export PYTHONPATH=./pybind:/home/xb/project/stor/ceph/ceph/src/pybind:/home/xb/project/stor/ceph/ceph/build/lib/cython_modules/lib.2
+export LD_LIBRARY_PATH=/home/xb/project/stor/ceph/ceph/build/lib
+
+export PYTHONPATH=/usr/local/lib64/python3.6/site-packages/babeltrace:$PYTHONPATH
+
+sudo vim /etc/ld.so.conf.d/sb.conf
+  $ sudo ldconfig 
+  $ cat /etc/ld.so.conf.d/sb.conf 
+  /usr/local/lib
+
+ceph config-key list
+ceph mgr module ls
+ceph mgr module disable dashboard
+ceph auth list
+ceph mgr module disable restful
+
+ps aux |grep lttng-sessiond
+
+
+PID: 1190156 - Name: /home/xb/project/stor/ceph/ceph/build/bin/ceph-osd
+      ust_baddr_statedump:soinfo (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      pg:queue_op (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_post (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_unknown (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_copy_from (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_copy_get (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_copy_get_classic (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_omaprmkeys (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_omapclear (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_omapsetheader (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_omapsetvals (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_omap_cmp (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_omapgetvalsbykeys (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_omapgetheader (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_omapgetvals (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_omapgetkeys (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_tmap2omap (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_tmapup (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_tmapput (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_tmapget (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_startsync (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_append (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_rmxattr (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_setxattr (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_cache_unpin (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_cache_pin (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_watch (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_clonerange (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_delete (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_truncate (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_create (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_zero (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_rollback (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_writesame (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_writefull (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_write (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_setallochint (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_notify_ack (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_notify (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_assert_src_version (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_list_snaps (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_list_watchers (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_assert_ver (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_cmpxattr (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_getxattrs (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_getxattr (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_cache_evict (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_cache_flush (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_try_flush (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_undirty (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_isdirty (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_stat (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_call (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_sparse_read (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_mapext (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_checksum (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_read (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre_extent_cmp (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:do_osd_op_pre (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:opwq_process_finish (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:opwq_process_start (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:ms_fast_dispatch (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:prepare_tx_exit (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      osd:prepare_tx_enter (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      oprequest:mark_flag_point (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      oprequest:set_rmw_flags (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint)
+      zipkin:timestamp (loglevel: TRACE_WARNING (4)) (type: tracepoint)
+      zipkin:keyval_integer (loglevel: TRACE_WARNING (4)) (type: tracepoint)
+      zipkin:keyval_string (loglevel: TRACE_WARNING (4)) (type: tracepoint)
+
+
+../src/vstart.sh -help
+
+src/tools/ceph_conf.cc
+
+
+restart
+./stop.sh;clear;sh -x ../src/vstart.sh -d -n -o "osd_tracing = true"
+
+replace in dir
+<< dendl;
+<< __FFL__ << dendl;
+
+std::string build_time = "2023/04/27 10:10:10";
+priv_ss << "set uid:gid to " << uid << ":" << gid << " (" << uid_string << ":" << gid_string << ")" << "build_time:" << build_time;
+
+tee .gitignore <<EOF
+install-deps-python2.7_tmp
+install-deps-python3_tmp
+install-deps-python3_tmp_bak
+<<EOF
+
+
+2023-05-07 10:22:38.372811 7fffeb0d5700  1 mgr init Loading python module 'balancer'init PyModuleRegistry.cc:165
+2023-05-07 10:22:38.534696 7fffeb0d5700  1 mgr init Loading python module 'dashboard'init PyModuleRegistry.cc:165
+LTTng-UST: Error (-17) while registering tracepoint probe. Duplicate registration of tracepoint probes having the same name is not allowed.
+
+Program received signal SIGABRT, Aborted.
+[Switching to Thread 0x7fffeb0d5700 (LWP 2814992)]
+0x00007ffff491a387 in raise () from /lib64/libc.so.6
+Missing separate debuginfos, use: debuginfo-install glibc-2.17-326.el7_9.x86_64 gperftools-libs-2.6.1-1.el7.x86_64 keyutils-libs-1.5.8-3.el7.x86_64 krb5-libs-1.15.1-55.el7_9.x86_64 libblkid-2.29-2.el7.centos.x86_64 libcom_err-1.42.9-19.el7.x86_64 libgcc-4.8.5-44.el7.x86_64 libibverbs-52mlnx1-1.53100.x86_64 libnl3-3.2.28-4.el7.x86_64 libselinux-2.5-15.el7.x86_64 libstdc++-4.8.5-44.el7.x86_64 libuuid-2.29-2.el7.centos.x86_64 lttng-ust-2.4.1-4.el7.x86_64 nspr-4.34.0-3.1.el7_9.x86_64 nss-3.79.0-5.el7_9.x86_64 nss-softokn-3.79.0-4.el7_9.x86_64 nss-softokn-freebl-3.79.0-4.el7_9.x86_64 nss-util-3.79.0-1.el7_9.x86_64 openssl-libs-1.0.2k-26.el7_9.x86_64 pcre-8.32-17.el7.x86_64 python-libs-2.7.5-92.el7_9.x86_64 python-markupsafe-0.11-10.el7.x86_64 sqlite-3.35.1-hl1.el7.x86_64 userspace-rcu-0.7.16-1.el7.x86_64 zlib-1.2.7-21.el7_9.x86_64
+(gdb) bt
+#0  0x00007ffff491a387 in raise () from /lib64/libc.so.6
+#1  0x00007ffff491ba78 in abort () from /lib64/libc.so.6
+#2  0x00007fffd236ff6b in __lttng_events_init__zipkin () at /usr/include/lttng/ust-tracepoint-event.h:782
+#3  0x00007ffff7dea9c3 in _dl_init_internal () from /lib64/ld-linux-x86-64.so.2
+#4  0x00007ffff7def59e in dl_open_worker () from /lib64/ld-linux-x86-64.so.2
+#5  0x00007ffff7dea7d4 in _dl_catch_error () from /lib64/ld-linux-x86-64.so.2
+#6  0x00007ffff7deeb8b in _dl_open () from /lib64/ld-linux-x86-64.so.2
+#7  0x00007ffff75c5fab in dlopen_doit () from /lib64/libdl.so.2
+#8  0x00007ffff7dea7d4 in _dl_catch_error () from /lib64/ld-linux-x86-64.so.2
+#9  0x00007ffff75c65ad in _dlerror_run () from /lib64/libdl.so.2
+#10 0x00007ffff75c6041 in dlopen@@GLIBC_2.2.5 () from /lib64/libdl.so.2
+#11 0x00007ffff7b20a4f in _PyImport_GetDynLoadFunc () from /lib64/libpython2.7.so.1.0
+#12 0x00007ffff7b0934e in _PyImport_LoadDynamicModule () from /lib64/libpython2.7.so.1.0
+#13 0x00007ffff7b07451 in import_submodule () from /lib64/libpython2.7.so.1.0
+#14 0x00007ffff7b07736 in load_next () from /lib64/libpython2.7.so.1.0
+#15 0x00007ffff7b0807e in PyImport_ImportModuleLevel () from /lib64/libpython2.7.so.1.0
+#16 0x00007ffff7aeb32f in builtin___import__ () from /lib64/libpython2.7.so.1.0
+#17 0x00007ffff7a5b073 in PyObject_Call () from /lib64/libpython2.7.so.1.0
+#18 0x00007ffff7aecf07 in PyEval_CallObjectWithKeywords () from /lib64/libpython2.7.so.1.0
+#19 0x00007ffff7af1bc5 in PyEval_EvalFrameEx () from /lib64/libpython2.7.so.1.0
+#20 0x00007ffff7af664d in PyEval_EvalCodeEx () from /lib64/libpython2.7.so.1.0
+#21 0x00007ffff7af6752 in PyEval_EvalCode () from /lib64/libpython2.7.so.1.0
+#22 0x00007ffff7b0653c in PyImport_ExecCodeModuleEx () from /lib64/libpython2.7.so.1.0
+#23 0x00007ffff7b067b8 in load_source_module () from /lib64/libpython2.7.so.1.0
+#24 0x00007ffff7b07451 in import_submodule () from /lib64/libpython2.7.so.1.0
+#25 0x00007ffff7b0769d in load_next () from /lib64/libpython2.7.so.1.0
+#26 0x00007ffff7b0807e in PyImport_ImportModuleLevel () from /lib64/libpython2.7.so.1.0
+#27 0x00007ffff7aeb32f in builtin___import__ () from /lib64/libpython2.7.so.1.0
+#28 0x00007ffff7a5b073 in PyObject_Call () from /lib64/libpython2.7.so.1.0
+#29 0x00007ffff7aecf07 in PyEval_CallObjectWithKeywords () from /lib64/libpython2.7.so.1.0
+#30 0x00007ffff7af1bc5 in PyEval_EvalFrameEx () from /lib64/libpython2.7.so.1.0
+#31 0x00007ffff7af664d in PyEval_EvalCodeEx () from /lib64/libpython2.7.so.1.0
+#32 0x00007ffff7af6752 in PyEval_EvalCode () from /lib64/libpython2.7.so.1.0
+#33 0x00007ffff7b0653c in PyImport_ExecCodeModuleEx () from /lib64/libpython2.7.so.1.0
+#34 0x00007ffff7b067b8 in load_source_module () from /lib64/libpython2.7.so.1.0
+#35 0x00007ffff7b07c4a in load_package () from /lib64/libpython2.7.so.1.0
+#36 0x00007ffff7b07451 in import_submodule () from /lib64/libpython2.7.so.1.0
+#37 0x00007ffff7b0769d in load_next () from /lib64/libpython2.7.so.1.0
+#38 0x00007ffff7b0807e in PyImport_ImportModuleLevel () from /lib64/libpython2.7.so.1.0
+#39 0x00007ffff7aeb32f in builtin___import__ () from /lib64/libpython2.7.so.1.0
+#40 0x00007ffff7a5b073 in PyObject_Call () from /lib64/libpython2.7.so.1.0
+#41 0x00007ffff7a5b155 in call_function_tail () from /lib64/libpython2.7.so.1.0
+#42 0x00007ffff7a5b23e in PyObject_CallFunction () from /lib64/libpython2.7.so.1.0
+#43 0x00007ffff7b08b22 in PyImport_Import () from /lib64/libpython2.7.so.1.0
+#44 0x000055555584472d in PyModule::load (this=this@entry=0x55555ee079b0, pMainThreadState=<optimized out>) at /home/xb/project/stor/ceph/ceph/src/mgr/PyModuleRegistry.cc:261
+#45 0x00005555558459d9 in PyModuleRegistry::init (this=this@entry=0x7fffffffe118, map=...) at /home/xb/project/stor/ceph/ceph/src/mgr/PyModuleRegistry.cc:167
+#46 0x00005555558598ec in MgrStandby::handle_mgr_map (this=this@entry=0x7fffffffc320, mmap=mmap@entry=0x55555ebb5200) at /home/xb/project/stor/ceph/ceph/src/mgr/MgrStandby.cc:316
+#47 0x000055555585aca0 in MgrStandby::ms_dispatch (this=0x7fffffffc320, m=0x55555ebb5200) at /home/xb/project/stor/ceph/ceph/src/mgr/MgrStandby.cc:376
+#48 0x0000555555c7e982 in ms_deliver_dispatch (m=0x55555ebb5200, this=0x55555eb6d500) at /home/xb/project/stor/ceph/ceph/src/msg/Messenger.h:668
+#49 DispatchQueue::entry (this=0x55555eb6d678) at /home/xb/project/stor/ceph/ceph/src/msg/DispatchQueue.cc:197
+#50 0x0000555555a4736d in DispatchQueue::DispatchThread::entry (this=<optimized out>) at /home/xb/project/stor/ceph/ceph/src/msg/DispatchQueue.h:101
+#51 0x00007ffff590eea5 in start_thread () from /lib64/libpthread.so.0
+#52 0x00007ffff49e2b0d in clone () from /lib64/libc.so.6
+(gdb) info locals
+No symbol table info
+
+gdb --args /home/xb/project/stor/ceph/ceph/build/bin/ceph-mgr -i x -c /home/xb/project/stor/ceph/ceph/build/ceph.conf -d
+mgr_module_path
+
+void MgrStandby::send_beacon() 发送信号
+_list_modules
+path, /home/xb/project/stor/ceph/ceph/src/pybind/mgr, 
+mgr initial modules = restful status dashboard balancer
+
+trace, 
+FUNCTRACE(), src/msg/async/AsyncMessenger.cc -> #define FUNCTRACE() EventTrace _t1
+event, https://github.com/ssbandjl/ceph_v12/commit/b3b20449dabbdfae6fb035d3e7efca52c21e9869
+
+Tracing your own user application, https://lttng.org/docs/v2.5/#doc-viewing-and-analyzing-your-traces
+跟踪就像在源代码的特定位置调用 printf()，尽管 LTTng 比 printf() 更快更灵活。 在 LTTng 领域，tracepoint() 类似于 printf()。
+但是，与 printf() 不同的是，tracepoint() 不使用格式字符串来了解其参数的类型：所有跟踪点的格式必须在使用它们之前定义。 所以在编写我们的 Hello world 程序之前，我们需要定义跟踪点的格式。 这是通过编写一个模板文件来完成的，该文件的名称通常以 .tp 扩展名（用于跟踪点）结尾，lttng-gen-tp 工具（与 LTTng-UST 一起提供）将使用它来生成目标文件（以及 .c 文件）和要包含在我们的应用程序源代码中的标头
+通过在您自己的应用程序中包含 hello-tp.h，您可以通过在调用 tracepoint() 时正确引用它来使用上面定义的跟踪点
+tracepoint(hello_world, my_first_tracepoint, 23, "hi there!")
+第一个：提供商名称（始终）
+第二：跟踪点名称（始终）
+第三个：my_integer_arg（第一个用户定义的参数）
+第 4 个：my_string_arg（第二个用户定义的参数）
+请注意，提供者和跟踪点名称不是字符串； 它们实际上是由 hello-tp.h 中的宏创建的变量的一部分。
+
+color, "\033[32m`date +'%Y/%m/%d %H:%M:%S'` xxx \033[0m"
+
+
+---------------------------------------- DL ----------------------------------------
+在以上背景下，ceph 官方开发了 ceph-mgr，主要目标实现 ceph 集群的管理，为外界提供统一的入口。要深入了解 ceph-mgr，就得了解 ceph-mgr 是如何跑起来的。
+
+由 官方文档 可知，ceph-mgr 是通过可执行文件 ceph-mgr 跑起来的，在源码src/CMakeLists.txt 搜索 ceph-mgr 可以搜到 add_executable(ceph-mgr ${mgr_srcs}...，从中可以看出 ceph-mgr 主要由 src/mgr 里的文件编译出来（猜也猜的出来），main 函数在 src/ceph_mgr.cc。以上就是相关文件，有需要深入的人可以去读，这里介绍整理之后的 ceph-mgr 工作原理。
+
+ceph-mgr 工作的模式是事件驱动型的，意思就是等待事件，事件来了则处理事件返回结果，又继续等待。其主要运行的线程包括：
+
+messenger 线程。这是事件驱动主线程，监听某一端口，由外界给输入事件，messenger 收到事件后分派给各个处理者。通过向 monitor 订阅某一个 topic 的消息，例如 mgrmap, osdmap，monitor 会在这些数据发生变化时把事件通知到 messenger 监听的端口。事件处理器包括：
+MgrStandby。Mgr 通过 standby 实现高可用，每一个运行的 ceph-mgr 都包含一个 MgrStandby，MgrStandby 并没有运行的线程，它存在于 messenger 收到消息时的回调，以及通过定时器线程运行的定时任务，并且管理着其他实体。其处理的唯一消息是 mgrmap，就是当主挂掉时要顶上来，当自己不是主时要退回去。什么时候切主由 monitor 管理，所以 MgrStandby 里切主逻辑比较简单，有一个 Mgr 实例，当收到 mgrmap 时生成该实例，存到 MgrStandby 属性里，就完了。因为在收到消息时，MgrStandby 如果看到有 Mgr 实例，就会把消息发到它那处理，在定时函数里，也会调用 mgr 的定时函数，这样，实际上，MgrStandby 就担起了主的任务。
+Mgr。如上段所述，Mgr 依附于 MgrStandby 存在，也没有单独线程。它通过处理 mon_map，fs_map，osd_map等事件，在内存中维护了集群成员信息，它管理 ceph-mgr 插件，为插件提供了所有数据的来源，也在特定事件发生时通知给 ceph-mgr 的插件，例如插件的 notify 函数，就是被 Mgr 回调的。
+DaemonServer。独立线程，和主 messenger 监听同一端口(待确认)。是 cluster 指标数据的主要维护者，并且负载执行对集群的操作，例如吩咐 OSD 进行 pg scrub等。
+plugin 线程。plugin 是 Python 写的，每个 plugin 都跑在单独线程里，线程调用的函数是 python 类的 serve。plugin 可以在 serve 里跑个 http server 来提供对外服务，ceph-mgr 为 plugin 提供了 get，get_server 等函数，这些函数返回关于集群的指标等数据。例如 prometheus 插件，就把 ceph 内部指标通过 http 协议以 prometheus 格式暴露出来，使得监控 ceph 集群变得较为简单。ceph 是 c++ 写的，ceph 会调用 python plugin 定义的方法（例如 serve），python plugin 可以调用 c++ 定义的函数（例如 get)，python/c++ 的互调是 python 提供的机制，其基本原理是：
+c++ 调 python。python 的实体在 c++ 里类型都是 PyObject，模块，函数、类、数据都是。cpython 提供了 PyImport_Import 用于通过名字得到 m模块对象对应的 PyObject，类可以通过 PyObject_GetAttrString 取模块的属性得到，以此类推，cpython 还提供了由 c 类型的值生成对应 python 类型的值的PyObject 的方法，例如 PyObject* PyString_FromString(char *)。有函数对象，有参数对象，就可以通过 PyObject * PyObject_CallObject() 调用函数，将得到的 PyObject* 再转回 c++ 类型就 OK 了。
+python 调用 c++。在 c++ 里定义 PyObject* ceph_state_get(PyObject *self, PyObject *args)，在函数里里面通过 PyArg_ParseTuple(args, "ss:ceph_state_get", &handle, &what) 把参数解析为 c++ 类型，就实现了一个 Python 函数。通过 PyMethodDef CephStateMethods[] = get 把 Python 函数加入到一个注册表里。通过 Py_InitModule("ceph_state", CephStateMethods)，将注册表里的函数定义为 ceph_state 模块的属性，并把该模块注入到 python sys.path 里，python 就可以通过 ceph_state.ceph_state_get 调用该函数了
+
+
+虚拟集群默认参数:
+[ -z "$CEPH_NUM_MON" ] && CEPH_NUM_MON=3
+[ -z "$CEPH_NUM_OSD" ] && CEPH_NUM_OSD=3
+[ -z "$CEPH_NUM_MDS" ] && CEPH_NUM_MDS=3
+[ -z "$CEPH_NUM_MGR" ] && CEPH_NUM_MGR=1
+[ -z "$CEPH_NUM_FS"  ] && CEPH_NUM_FS=1
+[ -z "$CEPH_MAX_MDS" ] && CEPH_MAX_MDS=1
+[ -z "$CEPH_NUM_RGW" ] && CEPH_NUM_RGW=0
+[ -z "$GANESHA_DAEMON_NUM" ] && GANESHA_DAEMON_NUM=0
+
+[ -z "$CEPH_DIR" ] && CEPH_DIR="$PWD"
+[ -z "$CEPH_DEV_DIR" ] && CEPH_DEV_DIR="$CEPH_DIR/dev"
+[ -z "$CEPH_OUT_DIR" ] && CEPH_OUT_DIR="$CEPH_DIR/out"
+[ -z "$CEPH_RGW_PORT" ] && CEPH_RGW_PORT=8000
+[ -z "$CEPH_CONF_PATH" ] && CEPH_CONF_PATH=$CEPH_DIR
+
+
+
+常用命令:
+ceph mon dump
+ceph osd dump
+ceph pg dump
+ceph osd crush dump
+map
+上面说过，monitor组件负责监视整个集群的运行状况，如各节点之间的状态、集群配置信息，这些信息由维护集群成员的守护程序来提供，如何存放这些信息呢，答案就是map，ceph monitor map 主要包括如下这几个
+Monitor map：包括有关monitor 节点端到端的信息，其中包括 Ceph 集群ID，监控主机名和IP以及端口。并且存储当前版本信息以及最新更改信息，通过 “ ceph mon dump ” 查看 monitor map
+OSD map：包括一些常用的信息，如集群ID、创建OSD map的 版本信息和最后修改信息，以及pool相关信息，主要包括pool 名字、pool的ID、类型，副本数目以及PGP等，还包括数量、状态、权重、最新的清洁间隔和OSD主机信息。通过命令 “ceph osd dump” 查看
+PG map：包括当前PG版本、时间戳、最新的OSD Map的版本信息、空间使用比例，以及接近占满比例信息，同事，也包括每个PG ID、对象数目、状态、OSD 的状态以及深度清理的详细信息。通过命令 “ceph pg dump” 可以查看相关状态
+CRUSH map： CRUSH map 包括集群存储设备信息，故障域层次结构和存储数据时定义失败域规则信息。通过 命令 “ceph osd crush dump 查看
+MDS map：MDS Map 包括存储当前 MDS map 的版本信息、创建当前的Map的信息、修改时间、数据和元数据POOL ID、集群MDS数目和MDS状态，可通过"ceph mds dump"查看
+副本
+副本是ceph存放数据的份数，可以理解为对一个文件备份的份数，ceph默认的副本数是3，即一个主（primary ），一个次（secondary），一个次次（tertiary）,只有primary osd的副本才解释客户端请求，它将数据写入其他osd
+如下,可以看到这个叫做testpool的pool中有一个叫做object1的object，他的map信息获取后可以看到
+这个对象在osd1上面是主，在osd0和osd2上是次和次次，也就是说在副本数为3的情况下，每个osd存储一个副本
+[root@ceph-1 ~]# ceph osd map testpool object1
+
+
+Ceph RBD 的实现原理与常规操作: https://www.cnblogs.com/jmilkfan-fanguiju/p/11825071.html
+rbd showmapped
+
+
+性能测试:
+rados bench -p <pool_name> <seconds> <write|seq|rand>
+
+写入和查看临时数据
+rados bench -p p1 10 write --no-cleanup && rados ls -p p1
+
+测试顺序读性能
+rados bench -p p1 10 seq
+
+随机读:  rados bench -p p1 10 rand
+
+fio 参考配置,  yum install -y fio "*librbd*", 
+cat write.fio
+[global]
+description="write test with block size of 4M"
+direct=1
+ioengine=rbd
+clustername=ceph
+clientname=admin
+pool=rbd_pool
+rbdname=volume01
+iodepth=32
+runtime=300
+rw=randrw
+numjobs=1
+bs=8k
+
+[logging]
+write_iops_log=write_iops_log
+write_bw_log=write_bw_log
+write_lat_log=write_lat_log
+
+
+gdb --args rados bench -p p1 10 write --no-cleanup
+src/tools/rados/rados.cc -> main
+argv_to_vec
+ceph_argparse_need_usage
+global_init CEPH_ENTITY_TYPE_CLIENT CODE_ENVIRONMENT_UTILITY -> global_init (defaults=0x0, args=std::vector of length 6, capacity 6 = {...}, module_type=8, code_env=CODE_ENVIRONMENT_UTILITY, flags=0, data_dir_option=0x0, run_pre_init=true)  _. global_init.cc:169
+  global_pre_init
+common_init_finish -> common_init.cc:87
+rados_tool_common
+  ret = rados.init_with_context(g_ceph_context) -> open rados
+  rados.connect()
+  rados.ioctx_create
+
+
+
+
+rm -f rados_write && gcc rados_write.c  -lrados -lrados  -g3 -Og -Wall  -Wl,-rpath=/home/xb/project/stor/ceph/xb/docker/ceph/build/lib -lrados -L/home/xb/project/stor/ceph/xb/docker/ceph/build/lib/ -o rados_write && ./rados_write --debug_objecter=30 --debug_ms=30
+
+
+
+写参考: https://ibz.bz/2017/01/12/8ab0314b456d4b1fa6e063dace9c9d8a.html
+设置image id
+ioctx->exec(oid, "rbd", "set_id", in, out)
+       >io_ctx_impl->exec(obj, cls, method, inbl, outbl)
+           >(::ObjectOperation)rd.call(cls, method, inbl) //将该操作封装成OSDOp，放入ObjectOperation对象的vector集合中
+               >add_call(CEPH_OSD_OP_CALL, cname, method, indata, NULL, NULL, NULL)
+           >operate_read(oid, &rd, &outbl) //发起读请求
+               >Objecter::Op *objecter_op = objecter->prepare_read_op(oid, oloc,*o, snap_seq, pbl, flags,onack, &ver) //创建Op的实例 数据结构变成Op
+               >objecter->op_submit(objecter_op) //提交到objecter层 操作对象为Objecter::Op
+                   >_op_submit_with_budget(op, lc, ctx_budget)
+                       >int op_budget = _take_op_budget(op) //减去该Op的预算for throttle;
+                           >int op_budget = calc_op_budget(op) //预算值是该Op的字节大小
+                           > _throttle_op(op, op_budget) //这里是Objecter的Throttle层，如果keep_balanced_budget=true，能实现对速度的限制（op_throttle_bytes&op_throttle_ops）
+                       >_op_submit(op, lc)
+                           >_calc_target(&op->target, &op->last_force_resend) //计算该op的操作对象（用到CRUSH算法）
+                           >_get_session(op->target.osd, &s, lc) //为该Op构建与osd对应的OSDSession
+                           >_send_op_account(op) //登记该次op操作
+                           > m = _prepare_osd_op(op) //使用Op中的信息，初始化MOSDOp的实例
+                           >_session_op_assign(s, op) //将Op与OSDSession相关联。
+                           > _send_op(op, m)
+                               >op->session->con->send_message(m) //进入Massenger层，操作对象MOSDOp
+                                   >static_cast<SimpleMessenger*>(msgr)->send_message(m, this) //使用使用massenger层的SimpleMessenger的实例发生消息
+                                       >_send_message(m, con)
+                                           >submit_message(m, static_cast<PipeConnection*>(con),con->get_peer_addr(), con->get_peer_type(), false) //提交信息
+                                               >static_cast<PipeConnection*>(con)->try_get_pipe(&pipe) //获取该PipConnection对应的Pipe的实例
+                                                   >pipe->_send(m) //通过Pipe发送消息，即：把消息放入到Pipe::out_q队列中，并通知Pipe中的写线程来做实际的发生操作。
+                                                       >out_q[m->get_priority()].push_back(m);
+                                                   >dispatch_queue.local_delivery(m, m->get_priority()) //如果发送端与接收端是同一个，则直接将消息投递到DispathcQueue::local_messages中
+
+
+m_ictx->data_ctx.aio_operate(m_oid, rados_completion, &m_write,m_snap_seq, m_snaps)
+   >io_ctx_impl->aio_operate(obj, (::ObjectOperation*)o->impl, c->pc,snapc, 0)
+       >objecter->mutate(oid, oloc, *o, snap_context, ut, flags, onack, oncommit,&c->objver) //进入Objecter层
+           >prepare_mutate_op(oid, oloc, op, snapc, mtime, flags, onack, oncommit, objver) //封装成Op
+           >objecter->op_submit(objecter_op) //提交到objecter层 操作对象为Objecter::Op
+               >_op_submit_with_budget(op, lc, ctx_budget)
+                   >int op_budget = _take_op_budget(op) //减去该Op的预算for throttle;
+                       >int op_budget = calc_op_budget(op) //预算值是该Op的字节大小
+                       > _throttle_op(op, op_budget) //这里是Objecter的Throttle层，如果keep_balanced_budget=true，能实现对速度的限制（op_throttle_bytes&op_throttle_ops）
+                   >_op_submit(op, lc)
+                       >_calc_target(&op->target, &op->last_force_resend) //计算该op的操作对象（用到CRUSH算法）
+                       >_get_session(op->target.osd, &s, lc) //为该Op构建与osd对应的OSDSession
+                       >_send_op_account(op) //登记该次op操作
+                       > m = _prepare_osd_op(op) //使用Op中的信息，初始化MOSDOp的实例
+                       >_session_op_assign(s, op) //将Op与OSDSession相关联。
+                       > _send_op(op, m)
+                           >op->session->con->send_message(m) //进入Massenger层，操作对象MOSDOp
+                               >static_cast<SimpleMessenger*>(msgr)->send_message(m, this) //使用使用massenger层的SimpleMessenger的实例发生消息
+                                   >_send_message(m, con)
+                                       >submit_message(m, static_cast<PipeConnection*>(con),con->get_peer_addr(), con->get_peer_type(), false) //提交信息
+                                           >static_cast<PipeConnection*>(con)->try_get_pipe(&pipe) //获取该PipConnection对应的Pipe的实例
+                                               >pipe->_send(m) //通过Pipe发送消息，即：把消息放入到Pipe::out_q队列中，并通知Pipe中的写线程来做实际的发生操作。
+                                                   >out_q[m->get_priority()].push_back(m);
+                                               >dispatch_queue.local_delivery(m, m->get_priority()) //如果发送端与接收端是同一个，则直接将消息投递到DispathcQueue::local_messages中
+
+
+                                      

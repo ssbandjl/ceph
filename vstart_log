@@ -1,0 +1,219 @@
+[root@0b62edfe88f5 build]# FS=0 OSD=3 MON=3 MGR=3 ../src/vstart.sh --debug --new
+ceph-mgr dashboard not built - disabling.
+** going verbose **
+rm -f core* 
+hostname 0b62edfe88f5
+ip 172.17.0.2
+port 40922
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-authtool --create-keyring --gen-key --name=mon. /home/xb/project/stor/ceph/xb/docker/ceph/build/keyring --cap mon 'allow *' 
+creating /home/xb/project/stor/ceph/xb/docker/ceph/build/keyring
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-authtool --gen-key --name=client.admin --cap mon 'allow *' --cap osd 'allow *' --cap mds 'allow *' --cap mgr 'allow *' /home/xb/project/stor/ceph/xb/docker/ceph/build/keyring 
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/monmaptool --create --clobber --addv a [v2:172.17.0.2:40922,v1:172.17.0.2:40923] --addv b [v2:172.17.0.2:40924,v1:172.17.0.2:40925] --addv c [v2:172.17.0.2:40926,v1:172.17.0.2:40927] --print /tmp/ceph_monmap.71439 
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/monmaptool: monmap file /tmp/ceph_monmap.71439
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/monmaptool: generated fsid 9c2d130a-fa53-4bdd-925e-f6ab1be4a7fd
+epoch 0
+fsid 9c2d130a-fa53-4bdd-925e-f6ab1be4a7fd
+last_changed 2023-08-02T06:43:02.871929+0000
+created 2023-08-02T06:43:02.871929+0000
+min_mon_release 0 (unknown)
+0: [v2:172.17.0.2:40922/0,v1:172.17.0.2:40923/0] mon.a
+1: [v2:172.17.0.2:40924/0,v1:172.17.0.2:40925/0] mon.b
+2: [v2:172.17.0.2:40926/0,v1:172.17.0.2:40927/0] mon.c
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/monmaptool: writing epoch 0 to /tmp/ceph_monmap.71439 (3 monitors)
+rm -rf -- /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mon.a 
+mkdir -p /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mon.a 
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mon --mkfs -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf -i a --monmap=/tmp/ceph_monmap.71439 --keyring=/home/xb/project/stor/ceph/xb/docker/ceph/build/keyring 
+rm -rf -- /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mon.b 
+mkdir -p /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mon.b 
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mon --mkfs -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf -i b --monmap=/tmp/ceph_monmap.71439 --keyring=/home/xb/project/stor/ceph/xb/docker/ceph/build/keyring 
+rm -rf -- /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mon.c 
+mkdir -p /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mon.c 
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mon --mkfs -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf -i c --monmap=/tmp/ceph_monmap.71439 --keyring=/home/xb/project/stor/ceph/xb/docker/ceph/build/keyring 
+rm -- /tmp/ceph_monmap.71439 
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mon -i a -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf 
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mon -i b -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf 
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mon -i c -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf 
+Populating config ...
+
+[mgr]
+        mgr/telemetry/enable = false
+        mgr/telemetry/nag = false
+Setting debug configs ...
+creating /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mgr.x/keyring
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf -k /home/xb/project/stor/ceph/xb/docker/ceph/build/keyring -i /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mgr.x/keyring auth add mgr.x mon 'allow profile mgr' mds 'allow *' osd 'allow *' 
+added key for mgr.x
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf -k /home/xb/project/stor/ceph/xb/docker/ceph/build/keyring config set mgr mgr/prometheus/x/server_port 9283 --force 
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf -k /home/xb/project/stor/ceph/xb/docker/ceph/build/keyring config set mgr mgr/restful/x/server_port 42922 --force 
+Starting mgr.x
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mgr -i x -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf 
+creating /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mgr.y/keyring
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf -k /home/xb/project/stor/ceph/xb/docker/ceph/build/keyring -i /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mgr.y/keyring auth add mgr.y mon 'allow profile mgr' mds 'allow *' osd 'allow *' 
+added key for mgr.y
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf -k /home/xb/project/stor/ceph/xb/docker/ceph/build/keyring config set mgr mgr/prometheus/y/server_port 10283 --force 
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf -k /home/xb/project/stor/ceph/xb/docker/ceph/build/keyring config set mgr mgr/restful/y/server_port 44922 --force 
+Starting mgr.y
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mgr -i y -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf 
+creating /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mgr.z/keyring
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf -k /home/xb/project/stor/ceph/xb/docker/ceph/build/keyring -i /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mgr.z/keyring auth add mgr.z mon 'allow profile mgr' mds 'allow *' osd 'allow *' 
+added key for mgr.z
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf -k /home/xb/project/stor/ceph/xb/docker/ceph/build/keyring config set mgr mgr/prometheus/z/server_port 11283 --force 
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf -k /home/xb/project/stor/ceph/xb/docker/ceph/build/keyring config set mgr mgr/restful/z/server_port 46922 --force 
+Starting mgr.z
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mgr -i z -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf 
+add osd0 d26db526-ec32-4d68-93cc-e48f4f9fd9d5
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf -k /home/xb/project/stor/ceph/xb/docker/ceph/build/keyring osd new d26db526-ec32-4d68-93cc-e48f4f9fd9d5 -i /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd0/new.json 
+0
+2023-08-02T06:43:10.399+0000 7f5be3bddb40 -1 bluestore(/home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd0/block) _read_bdev_label BlueStore.cc:5129 failed to open /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd0/block: (2) No such file or directory
+2023-08-02T06:43:10.399+0000 7f5be3bddb40 -1 bluestore(/home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd0/block) _read_bdev_label BlueStore.cc:5129 failed to open /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd0/block: (2) No such file or directory
+2023-08-02T06:43:10.399+0000 7f5be3bddb40 -1 bluestore(/home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd0/block) _read_bdev_label BlueStore.cc:5129 failed to open /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd0/block: (2) No such file or directory
+2023-08-02T06:43:10.400+0000 7f5be3bddb40 -1 bluestore(/home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd0) _read_fsid BlueStore.cc:5539 unparsable uuid 
+2023-08-02T06:43:10.440+0000 7f5be3bddb40 -1 freelist read_size_meta_from_db BitmapFreelistManager.cc:162 missing size meta in DB
+start osd.0
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-osd -i 0 -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf 
+add osd1 12d5daa2-1c94-4236-bbc6-82895887352c
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf -k /home/xb/project/stor/ceph/xb/docker/ceph/build/keyring osd new 12d5daa2-1c94-4236-bbc6-82895887352c -i /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd1/new.json 
+1
+2023-08-02T06:43:19.962+0000 7f7b8ef98b40 -1 bluestore(/home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd1/block) _read_bdev_label BlueStore.cc:5129 failed to open /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd1/block: (2) No such file or directory
+2023-08-02T06:43:19.962+0000 7f7b8ef98b40 -1 bluestore(/home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd1/block) _read_bdev_label BlueStore.cc:5129 failed to open /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd1/block: (2) No such file or directory
+2023-08-02T06:43:19.962+0000 7f7b8ef98b40 -1 bluestore(/home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd1/block) _read_bdev_label BlueStore.cc:5129 failed to open /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd1/block: (2) No such file or directory
+2023-08-02T06:43:19.963+0000 7f7b8ef98b40 -1 bluestore(/home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd1) _read_fsid BlueStore.cc:5539 unparsable uuid 
+2023-08-02T06:43:19.993+0000 7f7b8ef98b40 -1 freelist read_size_meta_from_db BitmapFreelistManager.cc:162 missing size meta in DB
+2023-08-02T06:43:20.529+0000 7efcb9704b40 -1 Falling back to public interface
+2023-08-02T06:43:24.786+0000 7efcb9704b40 -1 osd.0 0 log_to_monitors {default=true}
+start osd.1
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-osd -i 1 -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf 
+add osd2 8634552c-6f6c-4853-894a-416d69da5dac
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf -k /home/xb/project/stor/ceph/xb/docker/ceph/build/keyring osd new 8634552c-6f6c-4853-894a-416d69da5dac -i /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd2/new.json 
+2
+2023-08-02T06:43:29.590+0000 7ffadf416b40 -1 bluestore(/home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd2/block) _read_bdev_label BlueStore.cc:5129 failed to open /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd2/block: (2) No such file or directory
+2023-08-02T06:43:29.590+0000 7ffadf416b40 -1 bluestore(/home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd2/block) _read_bdev_label BlueStore.cc:5129 failed to open /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd2/block: (2) No such file or directory
+2023-08-02T06:43:29.590+0000 7ffadf416b40 -1 bluestore(/home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd2/block) _read_bdev_label BlueStore.cc:5129 failed to open /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd2/block: (2) No such file or directory
+2023-08-02T06:43:29.591+0000 7ffadf416b40 -1 bluestore(/home/xb/project/stor/ceph/xb/docker/ceph/build/dev/osd2) _read_fsid BlueStore.cc:5539 unparsable uuid 
+2023-08-02T06:43:29.627+0000 7ffadf416b40 -1 freelist read_size_meta_from_db BitmapFreelistManager.cc:162 missing size meta in DB
+2023-08-02T06:43:30.090+0000 7f4e61580b40 -1 Falling back to public interface
+2023-08-02T06:43:34.343+0000 7f4e61580b40 -1 osd.1 0 log_to_monitors {default=true}
+start osd.2
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-osd -i 2 -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf 
+2023-08-02T06:43:39.718+0000 7f25af981b40 -1 Falling back to public interface
+2023-08-02T06:43:44.215+0000 7f25af981b40 -1 osd.2 0 log_to_monitors {default=true}
+OSDs started
+mkdir -p /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mds.a 
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-authtool --create-keyring --gen-key --name=mds.a /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mds.a/keyring 
+creating /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mds.a/keyring
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf -k /home/xb/project/stor/ceph/xb/docker/ceph/build/keyring -i /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mds.a/keyring auth add mds.a mon 'allow profile mds' osd 'allow rw tag cephfs *=*' mds allow mgr 'allow profile mds' 
+added key for mds.a
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mds -i a -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf 
+starting mds.a at 
+mkdir -p /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mds.b 
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-authtool --create-keyring --gen-key --name=mds.b /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mds.b/keyring 
+creating /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mds.b/keyring
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf -k /home/xb/project/stor/ceph/xb/docker/ceph/build/keyring -i /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mds.b/keyring auth add mds.b mon 'allow profile mds' osd 'allow rw tag cephfs *=*' mds allow mgr 'allow profile mds' 
+added key for mds.b
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mds -i b -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf 
+starting mds.b at 
+mkdir -p /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mds.c 
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-authtool --create-keyring --gen-key --name=mds.c /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mds.c/keyring 
+creating /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mds.c/keyring
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf -k /home/xb/project/stor/ceph/xb/docker/ceph/build/keyring -i /home/xb/project/stor/ceph/xb/docker/ceph/build/dev/mds.c/keyring auth add mds.c mon 'allow profile mds' osd 'allow rw tag cephfs *=*' mds allow mgr 'allow profile mds' 
+added key for mds.c
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mds -i c -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf 
+starting mds.c at 
+/home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf -k /home/xb/project/stor/ceph/xb/docker/ceph/build/keyring fs authorize * client.fs / rwp 
+vstart cluster complete. Use stop.sh to stop. See out/* (e.g. 'tail -f out/????') for debug output.
+
+restful urls: https://172.17.0.2:42922, https://172.17.0.2:44922, https://172.17.0.2:46922
+  w/ user/pass: admin / 
+
+
+export PYTHONPATH=/home/xb/project/stor/ceph/xb/docker/ceph/src/pybind:/home/xb/project/stor/ceph/xb/docker/ceph/build/lib/cython_modules/lib.3:/home/xb/project/stor/ceph/xb/docker/ceph/src/python-common:$PYTHONPATH
+export LD_LIBRARY_PATH=/home/xb/project/stor/ceph/xb/docker/ceph/build/lib:$LD_LIBRARY_PATH
+alias cephfs-shell=/home/xb/project/stor/ceph/xb/docker/ceph/src/tools/cephfs/cephfs-shell
+CEPH_DEV=1
+[root@0b62edfe88f5 build]# FS=0 OSD=3 MON=3 MGR=3 ../src/vstart.sh --debug --new^C
+[root@0b62edfe88f5 build]# export PYTHONPATH=/home/xb/project/stor/ceph/xb/docker/ceph/src/pybind:/home/xb/project/stor/ceph/xb/docker/ceph/build/lib/cython_modules/lib.3:/home/xb/project/stor/ceph/xb/docker/ceph/src/python-common:$PYTHONPATH
+[root@0b62edfe88f5 build]# export LD_LIBRARY_PATH=/home/xb/project/stor/ceph/xb/docker/ceph/build/lib:$LD_LIBRARY_PATH
+[root@0b62edfe88f5 build]# alias cephfs-shell=/home/xb/project/stor/ceph/xb/docker/ceph/src/tools/cephfs/cephfs-shell
+[root@0b62edfe88f5 build]# CEPH_DEV=1
+[root@0b62edfe88f5 build]# ceph -s
+2023-08-02T06:45:39.531+0000 7fe2dc333700 -1 WARNING: all dangerous and experimental features are enabled.
+2023-08-02T06:45:39.548+0000 7fe2dc333700 -1 WARNING: all dangerous and experimental features are enabled.
+  cluster:
+    id:     33f64e90-9011-41e4-addc-918f51442ac1
+    health: HEALTH_WARN
+            12 mgr modules have failed dependencies
+ 
+  services:
+    mon: 3 daemons, quorum a,b,c (age 2m)
+    mgr: x(active, since 2m), standbys: y, z
+    mds:  3 up:standby
+    osd: 3 osds: 3 up (since 113s), 3 in (since 113s)
+ 
+  data:
+    pools:   0 pools, 0 pgs
+    objects: 0 objects, 0 B
+    usage:   6.0 GiB used, 297 GiB / 303 GiB avail
+    pgs:     
+ 
+[root@0b62edfe88f5 build]# lsblk
+lsblk: dm-1: failed to get device path
+lsblk: dm-2: failed to get device path
+lsblk: dm-0: failed to get device path
+lsblk: dm-1: failed to get device path
+lsblk: dm-2: failed to get device path
+lsblk: dm-0: failed to get device path
+NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+nvme0n1     259:0    0 931.5G  0 disk 
+├─nvme0n1p5 259:14   0   100M  0 part 
+├─nvme0n1p3 259:12   0   100M  0 part 
+├─nvme0n1p1 259:10   0   100M  0 part 
+├─nvme0n1p6 259:15   0    64G  0 part 
+├─nvme0n1p4 259:13   0    64G  0 part 
+└─nvme0n1p2 259:11   0   803G  0 part 
+nvme3n1     259:3    0 931.5G  0 disk 
+nvme2n1     259:2    0 931.5G  0 disk 
+nvme1n1     259:1    0 931.5G  0 disk 
+├─nvme1n1p4 259:19   0    64G  0 part 
+├─nvme1n1p2 259:17   0   803G  0 part 
+├─nvme1n1p5 259:20   0   100M  0 part 
+├─nvme1n1p3 259:18   0   100M  0 part 
+├─nvme1n1p1 259:16   0   100M  0 part 
+└─nvme1n1p6 259:21   0    64G  0 part 
+sda           8:0    0 447.1G  0 disk 
+├─sda2        8:2    0     1G  0 part 
+├─sda3        8:3    0   446G  0 part 
+└─sda1        8:1        200M  0 part 
+[root@0b62edfe88f5 build]# ps aux|grep osd
+root       64773  0.5  0.0 5401228 99548 ?       Ssl  06:24   0:06 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-osd -i 0 -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       65111  0.5  0.0 5401224 99076 ?       Ssl  06:24   0:06 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-osd -i 1 -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       65441  0.5  0.0 5401112 99436 ?       Ssl  06:24   0:06 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-osd -i 2 -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       69682  0.8  0.0 5466428 106416 ?      Ssl  06:28   0:09 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-osd -i 0 -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       70020  0.8  0.0 5466784 106504 ?      Ssl  06:28   0:09 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-osd -i 1 -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       70351  0.8  0.0 5466432 106780 ?      Ssl  06:28   0:09 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-osd -i 2 -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       72323  2.2  0.0 5466520 105212 ?      Ssl  06:43   0:03 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-osd -i 0 -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       72661  2.3  0.0 5466768 105348 ?      Ssl  06:43   0:03 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-osd -i 1 -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       72991  2.4  0.0 5466756 105824 ?      Ssl  06:43   0:03 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-osd -i 2 -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       73366  0.0  0.0  10716  2204 pts/1    S+   06:46   0:00 grep --color=auto osd
+[root@0b62edfe88f5 build]# ps aux|grep moni
+root       73368  0.0  0.0  10712  2244 pts/1    S+   06:46   0:00 grep --color=auto moni
+[root@0b62edfe88f5 build]# ps aux|grep mon
+root       64057  2.9  0.0 2144072 94096 ?       Ssl  06:23   0:39 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mon -i a -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       64100  2.0  0.0 2144036 98120 ?       Ssl  06:23   0:27 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mon -i b -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       64143  1.8  0.0 2144076 97980 ?       Ssl  06:23   0:25 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mon -i c -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       68937  3.2  0.0 2144040 105444 ?      Ssl  06:27   0:35 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mon -i a -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       71578  4.2  0.0 2078544 85020 ?       Ssl  06:43   0:07 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mon -i a -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       71621  2.8  0.0 2078504 85944 ?       Ssl  06:43   0:05 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mon -i b -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       71664  2.5  0.0 2078508 85432 ?       Ssl  06:43   0:04 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mon -i c -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       73370  0.0  0.0  10716  2188 pts/1    S+   06:46   0:00 grep --color=auto mon
+[root@0b62edfe88f5 build]# ps aux|grep mgr
+root       64311  0.6  0.1 2011024 153812 ?      Ssl  06:23   0:08 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mgr -i x -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       64434  0.3  0.1 1642248 141940 ?      Ssl  06:24   0:04 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mgr -i y -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       64552  0.3  0.1 1642248 141008 ?      Ssl  06:24   0:04 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mgr -i z -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       69220  0.8  0.1 2010908 157092 ?      Ssl  06:27   0:09 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mgr -i x -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       69343  0.4  0.1 1642244 147876 ?      Ssl  06:27   0:04 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mgr -i y -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       69461  0.4  0.1 1642252 148316 ?      Ssl  06:27   0:04 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mgr -i z -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       71861  1.5  0.1 2010944 150632 ?      Ssl  06:43   0:02 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mgr -i x -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       71984  0.9  0.1 1642284 138852 ?      Ssl  06:43   0:01 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mgr -i y -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       72102  0.9  0.1 1642276 138272 ?      Ssl  06:43   0:01 /home/xb/project/stor/ceph/xb/docker/ceph/build/bin/ceph-mgr -i z -c /home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf
+root       73372  0.0  0.0  10716  2152 pts/1    S+   06:46   0:00 grep --color=auto mgr
+[root@0b62edfe88f5 build]# ceph monitor map
+

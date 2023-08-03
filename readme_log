@@ -1,0 +1,100 @@
+(gdb) p pi
+
+$12 = (const pg_pool_t *) 0x7fffc4008068
+(gdb) p * (const pg_pool_t *) 0x7fffc4008068
+$13 = {
+  static APPLICATION_NAME_CEPHFS = 0x7fffef0a9707 "cephfs", 
+  static APPLICATION_NAME_RBD = 0x7fffef0a7d8c "rbd", 
+  static APPLICATION_NAME_RGW = 0x7fffef0a7e55 "rgw", 
+  create_time = {
+    tv = {
+      tv_sec = 1690959523, 
+      tv_nsec = 859751995
+    }
+  }, 
+  flags = 8193, 
+  type = 1 '\001', 
+  size = 3 '\003', 
+  min_size = 1 '\001', 
+  crush_rule = 0 '\000', 
+  object_hash = 2 '\002', 
+  pg_autoscale_mode = pg_pool_t::ON, 
+  pg_num = 3, 
+  pgp_num = 3, 
+  pg_num_pending = 3, 
+  pg_num_target = 3, 
+  pgp_num_target = 3, 
+  properties = std::map with 0 elements, 
+  erasure_code_profile = "", 
+  last_change = 21, 
+  last_force_op_resend = 0, 
+  last_force_op_resend_prenautilus = 0, 
+  last_force_op_resend_preluminous = 0, 
+  last_pg_merge_meta = {
+    source_pgid = {
+      m_pool = 0, 
+      m_seed = 0, 
+      static calc_name_buf_size = 36 '$'
+    }, 
+    ready_epoch = 0, 
+    last_epoch_started = 0, 
+    last_epoch_clean = 0, 
+    source_version = {
+      version = 0, 
+      epoch = 0, 
+      __pad = 0
+    }, 
+    target_version = {
+      version = 0, 
+      epoch = 0, 
+      __pad = 0
+    }
+  }, 
+  snap_seq = {
+    val = 3
+  }, 
+  snap_epoch = 21, 
+  auid = 0, 
+  quota_max_bytes = 0, 
+  quota_max_objects = 0, 
+  snaps = std::map with 0 elements, 
+  removed_snaps = {
+    _size = 0, 
+    m = std::map with 0 elements
+  }, 
+  pg_num_mask = 3, 
+  pgp_num_mask = 3, 
+  tiers = std::set with 0 elements, 
+  tier_of = -1, 
+  read_tier = -1, 
+  write_tier = -1, 
+  cache_mode = pg_pool_t::CACHEMODE_NONE, 
+  target_max_bytes = 0, 
+  target_max_objects = 0, 
+  cache_target_dirty_ratio_micro = 400000, 
+  cache_target_dirty_high_ratio_micro = 600000, 
+  cache_target_full_ratio_micro = 800000, 
+  cache_min_flush_age = 0, 
+  cache_min_evict_age = 0, 
+  hit_set_params = {
+    _vptr.Params = 0x7fffef569a98 <vtable for HitSet::Params+16>, 
+    impl = {
+      px = 0x0
+    }
+  }, 
+  hit_set_period = 0, 
+  hit_set_count = 0, 
+  use_gmt_hitset = true, 
+  min_read_recency_for_promote = 0, 
+  min_write_recency_for_promote = 0, 
+  hit_set_grade_decay_rate = 0, 
+  hit_set_search_last_n = 0, 
+  stripe_width = 0, 
+  expected_num_objects = 0, 
+  fast_read = false, 
+  opts = {
+    opts = std::map with 0 elements
+  }, 
+  application_metadata = std::map with 0 elements, 
+  grade_table = std::vector of length 0, capacity 0
+}
