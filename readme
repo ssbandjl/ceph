@@ -1308,7 +1308,7 @@ lrwxrwxrwx 1 root root   18 Jul 21 16:23 /opt/h3c/lib/librbd_tp.so.1 -> librbd_t
 
 
 
-iopath
+iopath, ./gdb_rados_write.sh
 rados_write.c:83 -> main -> rados_write -> extern "C" int _rados_write
   rados_create2 -> extern "C" int _rados_create2
     CephInitParameters iparams(CEPH_ENTITY_TYPE_CLIENT) -> CephInitParameters::CephInitParameters -> name.set(module_type, "admin")
@@ -1902,3 +1902,11 @@ m_ictx->data_ctx.aio_operate(m_oid, rados_completion, &m_write,m_snap_seq, m_sna
 
 
                                       
+
+
+编译, do_cmake.sh
+
+cmake -DCMAKE_C_FLAGS="-O0 -g3 -gdwarf-4" -DCMAKE_CXX_FLAGS="-O0 -g3 -gdwarf-4" -DBOOST_J=$(nproc) $ARGS "$@" ..    
+cmake -DWITH_EVENTTRACE=OFF -DWITH_LTTNG=OFF -DWITH_BLKIN=OFF '-DCMAKE_C_FLAGS=-O0 -g3 -gdwarf-4' '-DCMAKE_CXX_FLAGS=-O0 -g3 -gdwarf-4' ..
+
+

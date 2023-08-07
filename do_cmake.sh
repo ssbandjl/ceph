@@ -66,8 +66,9 @@ ARGS+=" -DWITH_EVENTTRACE=OFF"
 # ARGS+=" -DWITH_OSD_INSTRUMENT_FUNCTIONS=ON"
 ARGS+=" -DWITH_LTTNG=OFF"
 ARGS+=" -DWITH_BLKIN=OFF"
-echo -e "cmake_cmd:${CMAKE} $ARGS $@ $CEPH_GIT_DIR"
-${CMAKE} $ARGS "$@" $CEPH_GIT_DIR || exit 1
+# echo -e "cmake_cmd:${CMAKE} $ARGS $@ $CEPH_GIT_DIR"
+# cmake -DWITH_EVENTTRACE=OFF -DWITH_LTTNG=OFF -DWITH_BLKIN=OFF '-DCMAKE_C_FLAGS=-O0 -g3 -gdwarf-4' '-DCMAKE_CXX_FLAGS=-O0 -g3 -gdwarf-4' ..
+${CMAKE} $ARGS  -DCMAKE_C_FLAGS="-O0 -g3 -gdwarf-4" -DCMAKE_CXX_FLAGS="-O0 -g3 -gdwarf-4" "$@" $CEPH_GIT_DIR || exit 1
 set +x
 
 # minimal config to find plugins

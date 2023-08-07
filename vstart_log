@@ -129,7 +129,9 @@ export PYTHONPATH=/home/xb/project/stor/ceph/xb/docker/ceph/src/pybind:/home/xb/
 export LD_LIBRARY_PATH=/home/xb/project/stor/ceph/xb/docker/ceph/build/lib:$LD_LIBRARY_PATH
 alias cephfs-shell=/home/xb/project/stor/ceph/xb/docker/ceph/src/tools/cephfs/cephfs-shell
 CEPH_DEV=1
-[root@0b62edfe88f5 build]# FS=0 OSD=3 MON=3 MGR=3 ../src/vstart.sh --debug --new^C
+
+
+
 [root@0b62edfe88f5 build]# export PYTHONPATH=/home/xb/project/stor/ceph/xb/docker/ceph/src/pybind:/home/xb/project/stor/ceph/xb/docker/ceph/build/lib/cython_modules/lib.3:/home/xb/project/stor/ceph/xb/docker/ceph/src/python-common:$PYTHONPATH
 [root@0b62edfe88f5 build]# export LD_LIBRARY_PATH=/home/xb/project/stor/ceph/xb/docker/ceph/build/lib:$LD_LIBRARY_PATH
 [root@0b62edfe88f5 build]# alias cephfs-shell=/home/xb/project/stor/ceph/xb/docker/ceph/src/tools/cephfs/cephfs-shell

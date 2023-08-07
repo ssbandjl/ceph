@@ -84,3 +84,5 @@ GTAGS
 *.out
 build_bak/
 build_*
+
+test/librados_example/rados_write
