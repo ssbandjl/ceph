@@ -29,7 +29,7 @@ int main (int argc, const char* argv[])
         /* Read a Ceph configuration file to configure the cluster handle. */
         //err = rados_conf_read_file(cluster, "/etc/ceph/ceph.conf");
         // err = rados_conf_read_file(cluster, "/etc/ceph/ceph.conf");
-        err = rados_conf_read_file(cluster, "/home/xb/project/stor/ceph/xb/docker/ceph/build/ceph.conf");
+        err = rados_conf_read_file(cluster, "/home/xb/project/ceph/xb/ceph/build/ceph.conf");
         if (err < 0) {
                 fprintf(stderr, "%s: cannot read config file: %s\n", argv[0], strerror(-err));
                 exit(EXIT_FAILURE);
@@ -63,7 +63,7 @@ int main (int argc, const char* argv[])
         rados_ioctx_t io;
         //char *poolname = "data";
         // char *poolname = ".disk_pool1.rbd";
-        char *poolname = "p1";
+        char *poolname = "p1"; // ceph osd pool create p1 3 && ceph osd lspools && rados bench -p p1 5 write
 
         err = rados_ioctx_create(cluster, poolname, &io);
         if (err < 0) {
