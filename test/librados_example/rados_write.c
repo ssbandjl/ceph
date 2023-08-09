@@ -48,6 +48,7 @@ int main (int argc, const char* argv[])
 
         /* Connect to the cluster */
         err = rados_connect(cluster);
+        sleep(5);
         if (err < 0) {
                 fprintf(stderr, "%s: cannot connect to cluster: %s\n", argv[0], strerror(-err));
                 exit(EXIT_FAILURE);

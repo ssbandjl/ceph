@@ -1,6 +1,10 @@
 https://github.com/ssbandjl/ceph/tree/v15.2.17
 https://github.com/ssbandjl/ceph/tree/main
 
+
+ceph客户端源码分析(librados,crush,objecter): https://blog.csdn.net/csnd_pan/category_7315843.html
+
+
 build:
 close mrg,dashboard in build/CMakeCache.txt
 
@@ -71,11 +75,17 @@ address sanitizer
 docker run -it -d --privileged --cap-add=ALL --name centos7  -p 22223:22 -p 6666:6666 -v /home/xb/project/stor/ceph/xb/docker/ceph:/home/xb/project/stor/ceph/xb/docker/ceph ceph_centos7:v15.2.17
 docker exec -u root -it ceph bash -c 'cd /home/xb/project/stor/ceph/xb/docker/ceph;exec "${SHELL:-sh}"'
 
+s131:
 docker run -it -d --privileged --cap-add=ALL --name ceph_v15  -p 22223:22 -p 6666:6666  -p 42922:42922 -p 44922:44922 -p 46922:46922 -v /home/xb/project/ceph/xb/ceph:/home/xb/project/ceph/xb/ceph ceph_centos7:v15.2.17
 docker exec -u root -it ceph_v15 bash -c 'cd /home/xb/project/ceph/xb/ceph;exec "${SHELL:-sh}"'
 pip3 install prettytable
 yum install -y gdb
 
+env:
+export PYTHONPATH=/home/xb/project/ceph/xb/ceph/src/pybind:/home/xb/project/ceph/xb/ceph/build/lib/cython_modules/lib.3:/home/xb/project/ceph/xb/ceph/src/python-common:$PYTHONPATH
+export LD_LIBRARY_PATH=/home/xb/project/ceph/xb/ceph/build/lib:$LD_LIBRARY_PATH
+alias cephfs-shell=/home/xb/project/ceph/xb/ceph/src/tools/cephfs/cephfs-shell
+CEPH_DEV=1
 
 
 gdb:
@@ -750,7 +760,7 @@ ceph df
 ceph osd pool create {pool-name} [{pg-num} [{pgp-num}]] [replicated] [crush-rule-name] [expected-num-objects]
 ceph osd pool create {pool-name} [{pg-num} [{pgp-num}]] erasure [erasure-code-profile] [crush-rule-name] [expected_num_objects] [--autoscale-mode=<on,off,warn>]
 
-ceph osd pool create p1 3 && ceph osd lspools && rados bench -p p1 5 write
+cd build; ceph osd pool create p1 3 && ceph osd lspools && rados bench -p p1 5 write
 ceph osd pool stats p1
 
 
@@ -1314,30 +1324,101 @@ lrwxrwxrwx 1 root root   18 Jul 21 16:23 /opt/h3c/lib/librbd_tp.so.1 -> librbd_t
 
 参考文档, 深入理解ceph crush(3)—Object至PG映射源码分析: https://www.dovefi.com/post/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3crush3object%E8%87%B3pg%E6%98%A0%E5%B0%84%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/
 iopath, cd /home/xb/project/stor/ceph/xb/docker/ceph/test/librados_example; ./gdb_rados_write.sh
-rados_write.c:83 -> main -> rados_write -> extern "C" int _rados_write
+rados_write.c:83 -> main
   rados_create2 -> extern "C" int _rados_create2
     CephInitParameters iparams(CEPH_ENTITY_TYPE_CLIENT) -> CephInitParameters::CephInitParameters -> name.set(module_type, "admin")
-    rados_create_cct
-    new librados::RadosClient
-  rados_conf_read_file
+    rados_create_cct -> static CephContext *rados_create_cct
+      common_preinit -> CephContext *common_preinit -> 注意：如果您正在编写 Ceph 守护进程，请忽略此函数并调用 global_init 来代替。 它会为您调用 common_preinit。 common_preinit 创建 CephContext。 该函数为您提供 CephContext 后，您需要设置 Ceph 配置，该配置位于 CephContext 内，名为 md_config_t。 初始设置不是很有用，因为它们没有反映用户的要求。 这通常是通过以下方式完成的：cct->_conf.parse_env(); cct->_conf.apply_changes(); 您的库还可能提供读取配置文件的函数
+        new CephContext -> class CephContext
+          _perf_counters_collection = new PerfCountersCollection(this)
+          _admin_socket = new AdminSocket(this)
+          _admin_hook = new CephContextHook(this)
+          _admin_socket->register_command("assert", _admin_hook, "")
+          ...
+      parse_env
+      apply_changes -> void apply_changes(std::ostream* oss)
+        _gather_changes
+          map_observer_changes
+        call_observers
+          obs->handle_conf_change
+          call_gate_leave
+    new librados::RadosClient -> librados::RadosClient::RadosClient
+      add_observer -> void add_observer(md_config_obs_t* obs)
+        obs_mgr.add_observer(obs) -> 我们可以将实现放在 .cc 文件中，并且仅显式实例化所使用的模板专业化，但这迫使我们在编译时涉及未使用的标头和库。 例如，为了实例化，要实例化seastar的ObserverMgr，我们需要包含seastar标头以获取必要的类型，但这将迫使我们将非seastar二进制文件链接到seastar库。 因此，为了避免以增加编译时间为代价引入未使用的依赖项，我们将实现放在头文件中
+          observers.emplace
+        obs_call_gate.emplace -> 安置
+  rados_conf_read_file -> extern "C" int _rados_conf_read_file
+    conf.parse_config_files
+    parse_env
+    apply_changes
+    complain_about_parse_error
+  rados_conf_parse_argv -> extern "C" int _rados_conf_parse_argv
+    conf.apply_changes
   rados_connect -> extern "C" int _rados_connect(rados_t cluster)
     client->connect() -> int librados::RadosClient::connect()
-      MonClient mc_bootstrap(cct)
+      cct->_log->start()
+        create("log") -> void Thread::create
+      MonClient mc_bootstrap(cct) -> MonClient::MonClient
       MonClient::get_monmap_and_config
+        init_crypto ... -> static void init() 
         build_initial_monmap
-        messenger = Messenger::create_client_messenger
-        messenger->start()
-        ...
+          int MonMap::build_initial
+            init_with_ips
+            calc_legacy_ranks -> mon/MonMap：将排名顺序与entity_addr_t分开 我们当前根据mon地址的排序顺序定义mon排名顺序。 更改它，以便将排名顺序显式编码在 MonMap 的排名字段中。 如果我们加载旧版 MonMap，请计算旧版排序。 如果 monmap 尚不需要 nautilus 功能，请强制使用旧排序。 一旦所有 mons >= nautilus，我们就可以重新排序排名。 请注意，守护进程和客户端 (MonClients) 可能会看到不同的排名顺序。 那应该没问题
+        messenger = Messenger::create_client_messenger -> 创建客户端消息msg对象,启动3个work线程
+        add_dispatcher_head -> 启动2线程
+        messenger->start() -> int AsyncMessenger::start()
+        make_scope_guard
+        init() -> int MonClient::init()
+          refresh_config
+          new RotatingKeyRing
+          set_auth_client
+          add_dispatcher_head
+          timer.init()
+            thread = new SafeTimerThread(this)
+            thread->create("safe_timer") -> void SafeTimer::timer_thread() -> ceph中的SafeTimer类详解: https://blog.csdn.net/turou3442/article/details/96441221, https://blog.csdn.net/tiantao2012/article/details/78426276?ydreferer=aHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS8%3D, 由于是thread的子类，从entry的实现就知道这个thread的回调函数是timer_thread, void *entry() override
+          finisher.start() -> finisher_thread_entry -> ceph中的finisher类, https://blog.csdn.net/tiantao2012/article/details/79419556?ydreferer=aHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS8%3D, 要结束操作的类会把自己添加到finisher类的queue中，然后finisher类分别调用要结束操作类的complete函数
+          schedule_tick() -> void MonClient::schedule_tick() -> void MonClient::tick()
+            timer.add_event_after(hunt_interval, do_tick)
       Messenger::create_client_messenger(cct, "radosclient")
-      objecter = new (std::nothrow) Objecter(cct, messenger, &monclient, &finisher)
+      objecter = new (std::nothrow) Objecter(cct, messenger, &monclient, &finisher) -> Objecter::Objecter
+        ...
+        homeless_session(new OSDSession(cct, -1))
+        ...
       objecter->set_balanced_budget()
-      objecter->init() -> ... -> create_rados_client
-
-      ...
+      objecter->init() -> void Objecter::init() -> ... -> create_rados_client
+        PerfCountersBuilder pcb(cct, "objecter", l_osdc_first, l_osdc_last) -> 性能统计
+        RequestStateHook
+        AdminSocket* admin_socket = cct->get_admin_socket()
+        admin_socket->register_command("objecter_requests"
+        update_crush_location
+        add_observer
+          obs_mgr.add_observer(obs)
+            get_tracked_conf_keys -> crush_location -> crush算法(crush_map): https://docs.ceph.com/en/mimic/rados/operations/crush-map/
+        initialized = true
+      messenger->add_dispatcher_head(&mgrclient)
+      messenger->add_dispatcher_tail(objecter)
+      messenger->start()
+      monclient.set_want_keys
+      monclient.init
+      monclient.sub_want("mgrmap", 0, 0) -> 订阅mgrmap更新的信息, mgr订阅模式: https://blog.csdn.net/tiantao2012/article/details/80109739 -> == "xxx" -> switch (m->get_type()) -> bool Objecter::ms_dispatch(Message *m) -> case MSG_MGR_MAP -> handle_mgr_map
+      monclient.renew_subs()
+      mgrclient.init()
+      objecter->set_client_incarnation -> 客户端化身
+      objecter->start()  -> void Objecter::start
+        start_tick -> _send_linger_ping -> 心跳
+        Objecter::tick()
+          osd_sessions.begin
+          timer.reschedule_me
+      timer.init()
+      finisher.start()
+      instance_id = monclient.get_global_id()
   rados_ioctx_create -> extern "C" int _rados_ioctx_create
     create_ioctx -> int librados::RadosClient::create_ioctx(
-      lookup_pool
-      new librados::IoCtxImpl
+      lookup_pool -> int64_t librados::RadosClient::lookup_pool -> lookup_pg_pool_name
+        wait_for_osdmap
+          with_osdmap
+      new librados::IoCtxImpl -> librados::IoCtxImpl::IoCtxImpl
   rados_write -> ctx->write(oid, bl, len, off) -> extern "C" int _rados_write -> ctx->write(oid, bl, len, off) -> int librados::IoCtxImpl::write
     prepare_assert_ops(&op)
     mybl.substr_of(bl, 0, len) -> 获取子字符串, 截取子串
@@ -1982,3 +2063,171 @@ op_shardedwq 工作队列,内部包含多个队列, osd_op_tp 线程池
 waiting_for_map
 
 execute_ctx
+
+
+admin socket asok: find / -name "*.asok"
+注册命令: register_command
+std::string AdminSocket::bind_and_listen
+
+
+
+
+set print pretty on
+set history save on
+
+kill gdb: 
+kill -9 `ps aux|grep gdb|grep -v grep|awk '{print$2}'`
+
+
+void PrimaryLogPG::do_command
+int CephContext::do_command
+get_tracked_conf_keys
+
+void OSD::asok_command
+
+daemon -> def admin_socket(asok_path, cmd, format='')
+ceph.in
+
+
+pub/sub
+1 与mon建立链接
+
+2 向mon的TgtMapMonitor 注册一个回调函数，
+        因为TGT需要自己知道TGTMap，而实际上这个TGTMap是保存在TgtMapMonitor中，
+        所以需要当TgtMapMonitor::check_subs函数被调用是，且更新了TgtMap,则顺便将TgtMap同步给TGT进程。
+        如何将c++的 map同步给c程序呢？
+3 TGT向mon通知节点状态或者信息变更
+
+
+
+参考RadosClient、OSD、DSE，都是继承Dispatcher类，类成员保存一个MonClient的实例，
+        派生类提供函数完成以下动作：
+                MonClient对象实例创建、
+                设置messenger给MonClient并将其加入Dispatcher队列监听
+                MonClient 初始化、
+                向monitor发起认证&&认证成功后建立链接、向monitor注册订阅、
+                
+
+FR001_协议注册
+        tgtClient类设计
+        
+        class TgtClient::public Dispatcher
+                MonClient对象实例创建，参考cephd_osd、ceph_dse等函数
+                        MonClient mc(g_ceph_context)
+                        /* 1 初始化monmap*/
+                        mc.build_initial_monmap  
+                        mc.get_monmap_privately
+                /* 2 设置messenger给MonClient，并将其加入Dispatcher队列监听 */        
+                messenger = Messenger:;create_client_messenger(cct, "tgtclient");        
+                monc.sent_messenger(messenger);        
+                messenger->add_dispatcher_head(this)
+                
+                monc->set_want_keys
+                monc->init()         /* 2 MonClient 初始化*/
+                monc->set_log_client
+                monc->authenticate          /* 3 向monitor发起认证，认证成功后建立链接*/
+                while(monc->wait_auth_rotating(30.0 < 0))        
+                monc->sub_want                /* 4 向monitor注册订阅 */                
+                monc->renew_subs()  /* 5 即刻下发订阅请求 */
+                
+                ms_dispatch??
+                
+FR002_协议全局视图通知和维护
+        tgtmap类设计：
+                class tgtmap {
+                        feature  //结构体版本
+                        epoch
+                        start_time
+                        flag  //预留字段
+                        map<string, tgt_info_t> //key为tgt_name, value为tgt节点的一些信息
+                }        
+                接口：需要提供的接口较多，如contains、add、remove、get_***
+                struct tgt_info_t {
+                        tgt_name
+                        manage_network
+                        public_network
+                        block_service_network
+                        block_service_ipaddr
+                        down_epoch
+                        down_time
+                        up_epoch
+                        up_time
+                        is_up
+                        is_master
+                }
+                接口:encode 、decode 、print
+        工作量评估：参考MonMap实现，代码量在500行以上        
+                
+        TgtmapMonitor设计：
+                Monitor::handle_subscribe
+                        向单个订阅者发送最新的map
+                        TgtmapMonitor::check_sub
+
+
+                PaxosService::refresh
+                        向paxos系统请求最新的map数据，更新后再调用check_subs去通知订阅者
+                        TgtmapMonitor::update_from_paxos()
+                                遍历所有订阅者，并发送最新的map
+                                TgtmapMonitor::check_subs
+                                        TgtmapMonitor::check_sub
+                PaxosService::_active
+                        初始化pending_map,使其与当前全局的tgtmap一直
+                        TgtmapMonitor::create_pending()
+                        TgtmapMonitor::create_initial()
+                        TgtmapMonitor::upgrade_format()
+                        TgtmapMonitor::on_active()
+                
+                PaxosService::dispatch
+                        预处理tgtmap查询相关的请求、如查询节点信息、查询master节点，调用mon->reply_command进行回复客户端。
+                        TgtmapMonitor::preprocess_query(MonOpRequestRef op)
+
+                        处理tgtmap信息的更新，先对pending_map进行更新，以待集群共识后写入数据库
+                        TgtmapMonitor::perpare_update(MonOpRequestRef op)
+                        PaxosService::propose_pending
+                                将整个pending_map编码成一个bufferlist，再put到transaction
+                                TgtmapMonitor::encode_pending
+
+                提案初始化完成并写入本地后，调用do_refresh触发对非ONETIME sub的再次检查
+                Paxos::do_refresh
+                Monitor::init_paxos
+                        Monitor::refresh_from_paxos
+                                PaxosService::refresh
+                                        TgtmapMonitor::update_from_paxos()
+
+        工作量评估：参考monmapMonitor实现，代码量在1k左右
+
+                                
+        MonClient接口设计        
+                MonClient::ms_dispatch
+                        处理tgtmap的订阅响应,参考handle_monmap实现
+                        case CEPH_MSG_TGT_MAP:
+                                handle_tgtmap()
+
+Objecter::tick()堆栈
+#0  Objecter::tick (this=0x4e3520) at /home/xb/project/ceph/xb/ceph/src/osdc/Objecter.cc:2122
+#1  0x00007ffff7cf2eae in std::__invoke_impl<void, void (Objecter::*&)(), Objecter*&> (__f=@0x586b40: (void (Objecter::*)(Objecter * const)) 0x7ffff7c678d2 <Objecter::tick()>, __t=@0x586b50: 0x4e3520)
+    at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/invoke.h:74
+#2  0x00007ffff7cf2a81 in std::__invoke<void (Objecter::*&)(), Objecter*&> (__fn=@0x586b40: (void (Objecter::*)(Objecter * const)) 0x7ffff7c678d2 <Objecter::tick()>) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/invoke.h:96
+#3  0x00007ffff7cf25bb in std::_Bind<void (Objecter::*(Objecter*))()>::__call<void, , 0ul>(std::tuple<>&&, std::_Index_tuple<0ul>) (this=0x586b40, __args=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/librados.so.2, CU 0x623919, DIE 0x7fe088>)
+    at /opt/rh/devtoolset-11/root/usr/include/c++/11/functional:420
+#4  0x00007ffff7cf202f in std::_Bind<void (Objecter::*(Objecter*))()>::operator()<, void>() (this=0x586b40) at /opt/rh/devtoolset-11/root/usr/include/c++/11/functional:503
+#5  0x00007ffff7cf185d in fu2::abi_310::detail::invocation::invoke<std::_Bind<void (Objecter::*(Objecter*))()>&>(std::_Bind<void (Objecter::*(Objecter*))()>&) (callable=...) at /home/xb/project/ceph/xb/ceph/src/include/function2.hpp:126
+#6  0x00007ffff7cf0d53 in fu2::abi_310::detail::type_erasure::invocation_table::function_trait<void ()>::internal_invoker<fu2::abi_310::detail::type_erasure::box<false, std::_Bind<void (Objecter::*(Objecter*))()>, std::allocator<std::_Bind<void (Objecter::*(Objecter*))()> > >, false>::invoke(fu2::abi_310::detail::type_erasure::data_accessor*, unsigned long) (data=0x4c11d0, capacity=16) at /home/xb/project/ceph/xb/ceph/src/include/function2.hpp:518
+#7  0x00007ffff7cc9a4e in fu2::abi_310::detail::type_erasure::tables::vtable<fu2::abi_310::detail::property<true, false, void ()> >::invoke<0ul, fu2::abi_310::detail::type_erasure::data_accessor*, unsigned long const&>(fu2::abi_310::detail::type_erasure::data_accessor*&&, unsigned long const&) const (this=0x4c11e0) at /home/xb/project/ceph/xb/ceph/src/include/function2.hpp:921
+#8  0x00007ffff7cc9aaf in fu2::abi_310::detail::type_erasure::erasure<true, fu2::abi_310::detail::config<true, false, 16ul>, fu2::abi_310::detail::property<true, false, void ()> >::invoke<0ul, fu2::abi_310::detail::type_erasure::erasure<true, fu2::abi_310::detail::config<true, false, 16ul>, fu2::abi_310::detail::property<true, false, void ()> >&>(fu2::abi_310::detail::type_erasure::erasure<true, fu2::abi_310::detail::config<true, false, 16ul>, fu2::abi_310::detail::property<true, false, void ()> >&) (
+    erasure=...) at /home/xb/project/ceph/xb/ceph/src/include/function2.hpp:1123
+#9  0x00007ffff7cc9aea in fu2::abi_310::detail::type_erasure::invocation_table::operator_impl<0ul, fu2::abi_310::detail::function<fu2::abi_310::detail::config<true, false, 16ul>, fu2::abi_310::detail::property<true, false, void ()> >, void ()>::operator()()
+    (this=0x4c11d0) at /home/xb/project/ceph/xb/ceph/src/include/function2.hpp:702
+#10 0x00007ffff7cb7b23 in ceph::timer<ceph::coarse_mono_clock>::timer_thread (this=0x4e36a0) at /home/xb/project/ceph/xb/ceph/src/common/ceph_timer.h:122
+#11 0x00007ffff7cf4c22 in std::__invoke_impl<void, void (ceph::timer<ceph::coarse_mono_clock>::*)(), ceph::timer<ceph::coarse_mono_clock>*>(std::__invoke_memfun_deref, void (ceph::timer<ceph::coarse_mono_clock>::*&&)(), ceph::timer<ceph::coarse_mono_clock>*&&) (__f=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/librados.so.2, CU 0x623919, DIE 0x7f8db5>, __t=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/librados.so.2, CU 0x623919, DIE 0x7f8dc4>)
+    at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/invoke.h:74
+#12 0x00007ffff7cf4b81 in std::__invoke<void (ceph::timer<ceph::coarse_mono_clock>::*)(), ceph::timer<ceph::coarse_mono_clock>*>(void (ceph::timer<ceph::coarse_mono_clock>::*&&)(), ceph::timer<ceph::coarse_mono_clock>*&&) (
+    __fn=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/librados.so.2, CU 0x623919, DIE 0x7f9391>) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/invoke.h:96
+#13 0x00007ffff7cf4af1 in std::thread::_Invoker<std::tuple<void (ceph::timer<ceph::coarse_mono_clock>::*)(), ceph::timer<ceph::coarse_mono_clock>*> >::_M_invoke<0ul, 1ul> (this=0x4e7718) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_thread.h:253
+#14 0x00007ffff7cf49c4 in std::thread::_Invoker<std::tuple<void (ceph::timer<ceph::coarse_mono_clock>::*)(), ceph::timer<ceph::coarse_mono_clock>*> >::operator() (this=0x4e7718) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_thread.h:260
+#15 0x00007ffff7cf4868 in std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (ceph::timer<ceph::coarse_mono_clock>::*)(), ceph::timer<ceph::coarse_mono_clock>*> > >::_M_run (this=0x4e7710)
+    at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_thread.h:211
+#16 0x00007fffeef0a7c4 in execute_native_thread_routine () from /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2
+#17 0x00007fffec27bea5 in start_thread () from /lib64/libpthread.so.0
+#18 0x00007ffff78b5b0d in clone () from /lib64/libc.so.6
+
