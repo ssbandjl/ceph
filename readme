@@ -763,6 +763,39 @@ ceph osd pool create {pool-name} [{pg-num} [{pgp-num}]] erasure [erasure-code-pr
 cd build; ceph osd pool create p1 3 && ceph osd lspools && rados bench -p p1 5 write
 ceph osd pool stats p1
 
+import pdb; pdb.set_trace()
+ceph.in -> def main()
+parse_cmdargs
+name = 'client.admin'
+maybe_daemon_command
+run_in_thread -> RadosThread
+run_in_thread(cluster_handle.connect
+send_command_retry
+  def send_command -> cluster.osd_command <- src/pybind/ceph_argparse.py
+  rados_osd_command -> int librados::RadosClient::osd_command
+
+...
+extern "C" int rados_mon_command -> rados_mgr_command
+extern "C" int _rados_mgr_command
+
+osd
+case MSG_OSD_PG_CREATE
+handle_pg_create(op)
+
+
+
+osd 
+void OSD::_dispatch(Message *m) -> 
+handle_command
+  cct->get_admin_socket()->queue_tell_command(m)
+...
+void AdminSocket::entry()
+  ret = poll(fds, 2, -1)
+  void AdminSocket::do_tell_queue()
+    execute_command -> call_async -> osd->asok_command
+      pg->do_command
+
+
 
 rbd块设备: https://docs.ceph.com/en/quincy/rbd/rados-rbd-cmds/
 该rbd命令使您能够创建、列出、内省和删除块设备映像。您还可以使用它来克隆镜像、创建快照、将镜像回滚到快照、查看快照等。有关使用该命令的详细信息，rbd请参阅RBD – 管理 RADOS 块设备 (RBD) 镜像: https://docs.ceph.com/en/quincy/man/8/rbd/
@@ -1419,19 +1452,39 @@ rados_write.c:83 -> main
         wait_for_osdmap
           with_osdmap
       new librados::IoCtxImpl -> librados::IoCtxImpl::IoCtxImpl
-  rados_write -> ctx->write(oid, bl, len, off) -> extern "C" int _rados_write -> ctx->write(oid, bl, len, off) -> int librados::IoCtxImpl::write
-    prepare_assert_ops(&op)
-    mybl.substr_of(bl, 0, len) -> 获取子字符串, 截取子串
+  rados_write -> CEPH_RADOS_API int rados_write -> LIBRADOS_C_API_BASE_DEFAULT(rados_write) -> extern "C" int _rados_write -> ctx->write(oid, bl, len, off) -> int librados::IoCtxImpl::write
+    ::ObjectOperation op -> 构造OP
+    prepare_assert_ops(&op) -> 添加任何适合给定 IoCtx 中统计信息的版本断言操作，无论是目标版本断言还是任何 src 对象断言。 这些会影响单个 ioctx 操作，因此在我们执行操作时清除 ioctx 状态。 如果我们添加了任何事件，则返回指向 ObjectOperation 的指针； 这对于将 extra_ops 参数传递到 Objecter 方法中很方便
+    mybl.substr_of(bl, 0, len) -> 先申明mybl, 获取子字符串, 截取子串
     op.write(off, mybl) -> void write(uint64_t off, ceph::buffer::list& bl) -> write(off, bl, 0, 0)
       OSDOp& o = *ops.rbegin() -> 反向迭代
-      add_data(CEPH_OSD_OP_WRITE, off, bl.length(), bl)
+      add_data(CEPH_OSD_OP_WRITE, off, bl.length(), bl) -> 封装OP, 增加操作码 -> void add_data(int op, uint64_t off, uint64_t len, ceph::buffer::list& bl)
+        OSDOp& osd_op = add_op(op) -> 添加操作码
+          ops[s].op.op = op
+          ...
+        osd_op.indata.claim_append(bl) -> 将bl的数据复制_buffers (indata)的尾部/头部，然后接bl的数据清空 -> osd/osd_types：添加每个操作返回字段以记录 [dup] 记录，允许总体正返回值，以及请求中每个操作的每个操作返回值和输出数据
+      OSDOp& o = *ops.rbegin() -> 
     return operate(oid, &op, NULL) -> int librados::IoCtxImpl::operate
       Context *oncommit = new C_SafeCond(mylock, cond, &done, &r)
       objecter->prepare_mutate_op -> Op *prepare_mutate_op
       objecter->op_submit(objecter_op) -> void Objecter::op_submit -> _op_submit_with_budget(op, rl, ptid, ctx_budget) -> void Objecter::_op_submit_with_budget
         int op_budget = _take_op_budget(op, sul) -> 流控 -> _op_submit(op, sul, ptid) -> void Objecter::_op_submit
-          _calc_target -> target
+          bool check_for_latest_map = _calc_target(&op->target, nullptr) -> target
           (gdb) p op->target
+          get_epoch
+          get_pg_pool
+          if ((t->flags & CEPH_OSD_FLAG_IGNORE_OVERLAY) == 0) -> osdc/Objecter：在每次 _calc_target 调用时重新计算 target_*，任何时候我们被要求计算目标时，我们都应该应用池分层参数。 之前仅在未计算目标时才这样做的逻辑没有多大意义，并且破坏了我们为获取目标池的正确 pg_num 所需的 *pi 更新。 对于采用原始 pg 的旧集群来说，这并不重要，但对于 luminous 及其他集群，我们需要精确的 spg_t，这需要正确的 pg_num
+          pi = osdmap->get_pg_pool(t->target_oloc.pool)
+          int ret = osdmap->object_locator_to_pg(t->target_oid, t->target_oloc
+          ceph_stable_mod
+          lookup_pg_mapping
+          osdmap->pg_to_up_acting_osds
+          update_pg_mapping(actual_pgid, std::move(pg_mapping))
+        _get_session(op->target.osd, &s, sul)
+
+
+
+(gdb) p op->target
 $9 = {
   flags = 32, 
   epoch = 0, 
@@ -1496,20 +1549,6 @@ $9 = {
   osd = -1, 
   last_force_resend = 0
 }
-...
-  get_epoch
-  get_pg_pool
-  if ((t->flags & CEPH_OSD_FLAG_IGNORE_OVERLAY) == 0) -> osdc/Objecter：在每次 _calc_target 调用时重新计算 target_*，任何时候我们被要求计算目标时，我们都应该应用池分层参数。 之前仅在未计算目标时才这样做的逻辑没有多大意义，并且破坏了我们为获取目标池的正确 pg_num 所需的 *pi 更新。 对于采用原始 pg 的旧集群来说，这并不重要，但对于 luminous 及其他集群，我们需要精确的 spg_t，这需要正确的 pg_num
-  pi = osdmap->get_pg_pool(t->target_oloc.pool)
-  int ret = osdmap->object_locator_to_pg(t->target_oid, t->target_oloc
-  ceph_stable_mod
-  lookup_pg_mapping
-  osdmap->pg_to_up_acting_osds
-  update_pg_mapping(actual_pgid, std::move(pg_mapping))
-_get_session(op->target.osd, &s, sul)
-
-
-
 
         
 
@@ -2046,6 +2085,7 @@ Missing separate debuginfos, use: debuginfo-install libibverbs-1.1.8mlnx1-OFED.3
 
 yum install -y jq
 
+onestor:
 对象接口: src/include/rados/librados.h, objects, omap
 
 
@@ -2230,4 +2270,53 @@ Objecter::tick()堆栈
 #16 0x00007fffeef0a7c4 in execute_native_thread_routine () from /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2
 #17 0x00007fffec27bea5 in start_thread () from /lib64/libpthread.so.0
 #18 0x00007ffff78b5b0d in clone () from /lib64/libc.so.6
+
+
+layer:
+app: rados_aio_write
+librados: rados_aio_write -> LIBRADOS_C_API_BASE_DEFAULT(rados_aio_write) -> queue_aio_write -> aio_write_list.push_back(&c->aio_write_list_item)
+
+
+
+rados_write_full
+
+
+bool OSD::ms_dispatch(Message *m)
+|---如果是标记osd down的话，直接返回service.got_stop_ack()， return true
+|---如果osd已经已经停止服务，则return true
+|---do_waiters()      //list<OpRequestRef> finished 只保存pg创建的请求
+    |---dispatch_op(next)
+        |---handle_pg_create(op)   //处理新的请求的时候，需要等待创建pg的请求处理完成
+|---_dispatch(m)
+    |---handle_osd_map(static_cast<MOSDMap*>(m))    //CEPH_MSG_OSD_MAP 创建osd map
+        |---
+    |---handle_scrub(static_cast<MOSDScrub*>(m));  //MSG_OSD_SCRUB 
+        |---
+    |---handle_command(static_cast<MCommand*>(m))  //MSG_COMMAND
+        |---
+    |---osdmap    //MSG_OSD_PG_CREATE，如果是创建pg的前提是osdmap存在
+        |---如果osdmap不存在，则waiting_for_osdmap.push_back(op)，然后延时执行
+    |---dispatch_op(op)    //只处理MSG_OSD_PG_CREATE
+        |---handle_pg_create(op)  
+            |---
+
+void OSD::handle_pg_create(OpRequestRef op)
+|---require_mon_peer //如果不是由MON发过来的消息，则不能执行
+|---require_same_or_newer_map  //如果osdmap的epoch比消息中的epoch新，则不能执行
+|---op->mark_started()   //op is struct OpRequest : public TrackedOp
+    |---OpRequest::mark_flag_point
+|---for
+    |---如果处于split(分裂)状态，则不用处理
+    |---如果已经存在pool，则不用处理
+    |---osdmap->pg_to_up_acting_osds(on, &up, &up_primary, &acting, &acting_primary)  //OSDMap.h
+        |---void OSDMap::_pg_to_up_acting_osds(
+            |---acting_primary 获取主OSD的id
+    |---role = osdmap->calc_pg_role   //OSDMap::calc_pg_role
+        |---OSDMap::calc_pg_rank    //确定OSD的角色
+    |---如果当前osd不是主osd(MON只给主OSD发消息)，则不能处理
+    |---history.same_primary_since > m->epoch  如果之前处理的最新的epoch比该消息中的epoch新，则不能处理
+    |---enqueue_peering_evt
+|---op_shardedwq.queue   //入队，等待process处理
+
+
 
