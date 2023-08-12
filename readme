@@ -1457,30 +1457,74 @@ rados_write.c:83 -> main
     prepare_assert_ops(&op) -> 添加任何适合给定 IoCtx 中统计信息的版本断言操作，无论是目标版本断言还是任何 src 对象断言。 这些会影响单个 ioctx 操作，因此在我们执行操作时清除 ioctx 状态。 如果我们添加了任何事件，则返回指向 ObjectOperation 的指针； 这对于将 extra_ops 参数传递到 Objecter 方法中很方便
     mybl.substr_of(bl, 0, len) -> 先申明mybl, 获取子字符串, 截取子串
     op.write(off, mybl) -> void write(uint64_t off, ceph::buffer::list& bl) -> write(off, bl, 0, 0)
-      OSDOp& o = *ops.rbegin() -> 反向迭代
       add_data(CEPH_OSD_OP_WRITE, off, bl.length(), bl) -> 封装OP, 增加操作码 -> void add_data(int op, uint64_t off, uint64_t len, ceph::buffer::list& bl)
         OSDOp& osd_op = add_op(op) -> 添加操作码
           ops[s].op.op = op
           ...
         osd_op.indata.claim_append(bl) -> 将bl的数据复制_buffers (indata)的尾部/头部，然后接bl的数据清空 -> osd/osd_types：添加每个操作返回字段以记录 [dup] 记录，允许总体正返回值，以及请求中每个操作的每个操作返回值和输出数据
-      OSDOp& o = *ops.rbegin() -> 
-    return operate(oid, &op, NULL) -> int librados::IoCtxImpl::operate
-      Context *oncommit = new C_SafeCond(mylock, cond, &done, &r)
-      objecter->prepare_mutate_op -> Op *prepare_mutate_op
-      objecter->op_submit(objecter_op) -> void Objecter::op_submit -> _op_submit_with_budget(op, rl, ptid, ctx_budget) -> void Objecter::_op_submit_with_budget
-        int op_budget = _take_op_budget(op, sul) -> 流控 -> _op_submit(op, sul, ptid) -> void Objecter::_op_submit
-          bool check_for_latest_map = _calc_target(&op->target, nullptr) -> target
-          (gdb) p op->target
-          get_epoch
-          get_pg_pool
-          if ((t->flags & CEPH_OSD_FLAG_IGNORE_OVERLAY) == 0) -> osdc/Objecter：在每次 _calc_target 调用时重新计算 target_*，任何时候我们被要求计算目标时，我们都应该应用池分层参数。 之前仅在未计算目标时才这样做的逻辑没有多大意义，并且破坏了我们为获取目标池的正确 pg_num 所需的 *pi 更新。 对于采用原始 pg 的旧集群来说，这并不重要，但对于 luminous 及其他集群，我们需要精确的 spg_t，这需要正确的 pg_num
-          pi = osdmap->get_pg_pool(t->target_oloc.pool)
-          int ret = osdmap->object_locator_to_pg(t->target_oid, t->target_oloc
-          ceph_stable_mod
-          lookup_pg_mapping
-          osdmap->pg_to_up_acting_osds
-          update_pg_mapping(actual_pgid, std::move(pg_mapping))
-        _get_session(op->target.osd, &s, sul)
+      OSDOp& o = *ops.rbegin() -> 反向迭代, 返回反向迭代器以反向开始, 返回指向向量中最后一个元素（即其反向开头）的反向迭代器。反向迭代器向后迭代：增加它们将它们移向容器的开头。rbegin指向成员end指向的元素之前的元素。 请注意，与成员vector::back返回对同一元素的引用不同，此函数返回一个反向随机访问迭代器
+      o.op.extent.truncate_size = truncate_size -> 写操作支持截断参数
+    return operate(oid, &op, NULL) -> int librados::IoCtxImpl::operate -> 池IO上下文操作
+      Context *oncommit = new C_SafeCond(mylock, cond, &done, &r) -> 通知机制, finish -> cond.notify_all, 回调?
+      Objecter::Op *objecter_op = objecter->prepare_mutate_op(oid, oloc, *o, snapc, ut, flags, oncommit, &ver) -> 准备对象OP -> Op *prepare_mutate_op
+        Op *o = new Op(oid, oloc, op.ops, flags | global_op_flags | CEPH_OSD_FLAG_WRITE, oncommit, objver, nullptr, parent_trace) -> Op(const object_t& o, const object_locator_t& ol -> 构造对象OP, 设置回调, oncommit -> onfinish
+          ops.swap(op) -> 向量交换, 交换容器的内容
+          ...
+          trace.init("op", nullptr, parent_trace) -> 初始化跟踪, 为librados和objecter添加blkin跟踪
+      objecter->op_submit(objecter_op) -> 提交OP -> void Objecter::op_submit -> op->trace.event("op submit") 插入性能跟踪点 -> _op_submit_with_budget(op, rl, ptid, ctx_budget) 带预算 -> void Objecter::_op_submit_with_budget
+        int op_budget = _take_op_budget(op, sul) -> 流控,减去该Op的预算 -> _op_submit(op, sul, ptid) -> void Objecter::_op_submit
+          bool check_for_latest_map = _calc_target(&op->target, nullptr) -> 计算目标节点(crush) -> false -> target结构参考: (gdb) p op->target
+            get_epoch
+            get_pg_pool
+            if ((t->flags & CEPH_OSD_FLAG_IGNORE_OVERLAY) == 0) -> osdc/Objecter：在每次 _calc_target 调用时重新计算 target_*，任何时候我们被要求计算目标时，我们都应该应用池分层参数。 之前仅在未计算目标时才这样做的逻辑没有多大意义，并且破坏了我们为获取目标池的正确 pg_num 所需的 *pi 更新。 对于采用原始 pg 的旧集群来说，这并不重要，但对于 luminous 及其他集群，我们需要精确的 spg_t，这需要正确的 pg_num
+            pi = osdmap->get_pg_pool(t->target_oloc.pool)
+            int ret = osdmap->object_locator_to_pg(t->target_oid, t->target_oloc
+            ceph_stable_mod
+            lookup_pg_mapping
+            osdmap->pg_to_up_acting_osds
+            update_pg_mapping(actual_pgid, std::move(pg_mapping))
+        _get_session(op->target.osd, &s, sul) -> 获取会话 -> int Objecter::_get_session
+          map<int,OSDSession*>::iterator p = osd_sessions.find(osd)
+          if (p != osd_sessions.end())
+            *session = s -> 如果在会话(连接池)中找到了会话, 则直接返回该会话
+          OSDSession *s = new OSDSession(cct, osd) -> 新建OSD会话
+          s->con = messenger->connect_to_osd(osdmap->get_addrs(osd)) -> 连接目标OSD
+          *session = s -> 返回该会话
+        if (orig_epoch != osdmap->get_epoch()) -> 比较epoch(任期)
+        _send_op_account(op) -> 登记本次操作
+          if (op->onfinish) -> 如果有回调,则通过飞行计数器跟踪
+            num_in_flight++
+          op->target.flags & CEPH_OSD_FLAG_WRITE
+            logger->inc(l_osdc_op_w) -> 增加写计数(性能统计?)
+          case CEPH_OSD_OP_WRITE: code = l_osdc_osdop_write -> 设置code, ceph所有osd操作码: __CEPH_FORALL_OSD_OPS
+          logger->inc(code) -> 增加统计计数
+        if (op->target.paused) -> 目标osd处于暂停状态(不可用)
+          _maybe_request_map() -> 更新map
+            monc->sub_want("osdmap"
+            monc->renew_subs()
+        if (!s->is_homeless()) -> 不是无家可归(可放家里)(osd不是-1)
+          need_send = true -> 需要发送
+        _session_op_assign(s, op)
+          get_session(to) -> s->get()
+        if (need_send)
+          _send_op(op) -> 需要发送, 发送OP -> void Objecter::_send_op(Op *op)
+            backoff ? -> 退避, 客户端协议, https://docs.ceph.com/en/latest/dev/rados-client-protocol/
+            MOSDOp *m = _prepare_osd_op(op) -> 将对象op转化为MOSDop(多osd操作)，后面会以MOSDOp为对象进行处理的, MOSDOp封装了一些基本的请求。在ops里分装了多个OSDOp操作。每个OSDOp操作里又有一个soid, MOSDOp 封装的操作都是关于oid相关的操作，也就是说，一个MOSDOp只封装针对同一个oid 的操作。但是对于rados_clone_range这样的操作，有一个dest oid， 还有一个src oid，那么src oid 就保存在OSDOp的soid中
+              hobject_t hobj = op->target.get_hobj()
+              MOSDOp *m = new MOSDOp
+              m->set_snapid(op->snapid) -> 设置快照id, 快照序号, 快照等...
+              m->set_retry_attempt(op->attempts++) -> 设置重试
+              m->set_priority(cct->_conf->osd_client_op_priority) -> 设置op优先级
+              logger->inc(l_osdc_op_send)
+              logger->inc(l_osdc_op_send_bytes, sum) -> 增加统计计数
+            op->session->con->send_message(m) -> 通过操作的会话的连接发送消息 -> int AsyncConnection::send_message(Message *m)
+              is_blackhole -> 黑洞, 减少重复代码
+              protocol->send_message(m) -> 通过协议层发送 -> void ProtocolV2::send_message
+                const bool can_fast_prepare = messenger->ms_can_fast_dispatch(m)
+                out_queue[m->get_priority()].emplace_back -> 放入发送队列out_queue
+                ...
+      cond.wait(l, [&done] { return done;}) -> 等待OP返回
+      set_sync_op_version(ver)
 
 
 
@@ -2319,4 +2363,18 @@ void OSD::handle_pg_create(OpRequestRef op)
 |---op_shardedwq.queue   //入队，等待process处理
 
 
+
+连接堆栈:
+Breakpoint 3, ProtocolV2::send_message (this=0x580180, m=0x57e430) at /home/xb/project/ceph/xb/ceph/src/msg/async/ProtocolV2.cc:422
+422     void ProtocolV2::send_message(Message *m) {
+(gdb) bt
+#0  ProtocolV2::send_message (this=0x580180, m=0x57e430) at /home/xb/project/ceph/xb/ceph/src/msg/async/ProtocolV2.cc:422
+#1  0x00007fffee93f6a5 in AsyncConnection::send_message (this=0x57fd20, m=0x57e430) at /home/xb/project/ceph/xb/ceph/src/msg/async/AsyncConnection.cc:567
+#2  0x00007fffeeab00cd in MonConnection::start (this=0x579aa8, epoch=0, entity_name=...) at /home/xb/project/ceph/xb/ceph/src/mon/MonClient.cc:1770
+#3  0x00007fffeeaa29bb in MonClient::_reopen_session (this=0x7fffffffdd40, rank=-1) at /home/xb/project/ceph/xb/ceph/src/mon/MonClient.cc:726
+#4  0x00007fffeeaa0eaf in MonClient::authenticate (this=0x7fffffffdd40, timeout=300) at /home/xb/project/ceph/xb/ceph/src/mon/MonClient.cc:567
+#5  0x00007fffeea9c3b2 in MonClient::get_monmap_and_config (this=0x7fffffffdd40) at /home/xb/project/ceph/xb/ceph/src/mon/MonClient.cc:153
+#6  0x00007ffff7c3af87 in librados::v14_2_0::RadosClient::connect (this=0x4b1000) at /home/xb/project/ceph/xb/ceph/src/librados/RadosClient.cc:237
+#7  0x00007ffff7bb4d4b in _rados_connect (cluster=0x4b1000) at /home/xb/project/ceph/xb/ceph/src/librados/librados_c.cc:178
+#8  0x00000000004012d1 in main (argc=3, argv=0x7fffffffe628) at rados_write.c:50
 
