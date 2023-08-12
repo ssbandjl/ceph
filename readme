@@ -1358,29 +1358,53 @@ lrwxrwxrwx 1 root root   18 Jul 21 16:23 /opt/h3c/lib/librbd_tp.so.1 -> librbd_t
 参考文档, 深入理解ceph crush(3)—Object至PG映射源码分析: https://www.dovefi.com/post/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3crush3object%E8%87%B3pg%E6%98%A0%E5%B0%84%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/
 iopath, cd /home/xb/project/stor/ceph/xb/docker/ceph/test/librados_example; ./gdb_rados_write.sh
 rados_write.c:83 -> main
-  rados_create2 -> extern "C" int _rados_create2
-    CephInitParameters iparams(CEPH_ENTITY_TYPE_CLIENT) -> CephInitParameters::CephInitParameters -> name.set(module_type, "admin")
-    rados_create_cct -> static CephContext *rados_create_cct
-      common_preinit -> CephContext *common_preinit -> 注意：如果您正在编写 Ceph 守护进程，请忽略此函数并调用 global_init 来代替。 它会为您调用 common_preinit。 common_preinit 创建 CephContext。 该函数为您提供 CephContext 后，您需要设置 Ceph 配置，该配置位于 CephContext 内，名为 md_config_t。 初始设置不是很有用，因为它们没有反映用户的要求。 这通常是通过以下方式完成的：cct->_conf.parse_env(); cct->_conf.apply_changes(); 您的库还可能提供读取配置文件的函数
-        new CephContext -> class CephContext
-          _perf_counters_collection = new PerfCountersCollection(this)
-          _admin_socket = new AdminSocket(this)
-          _admin_hook = new CephContextHook(this)
-          _admin_socket->register_command("assert", _admin_hook, "")
+  rados_create2 -> extern "C" int _rados_create2 -> rados_create 的扩展版本，与 rados_create 类似，但不假设 client + id，允许完整指定名称允许指定集群名称标志以供将来扩展
+    CephInitParameters iparams(CEPH_ENTITY_TYPE_CLIENT) -> CephInitParameters::CephInitParameters -> name.set(module_type, "admin") -> librados、rados.py：添加rados_create2/init2、librados客户端，特别是ceph工具，需要能够指定完整的“名称”； rados_create 强制执行“client.<param>”，没有解决方法。 新界面。 Python Rados().__init__ 根据是否提供名称或 id 选择适当的创建函数
+      name.set(module_type, "admin") -> module_type=CEPH_ENTITY_TYPE_CLIENT(0x8)
+    rados_create_cct -> static CephContext *rados_create_cct -> 创建上下文
+      common_preinit CODE_ENVIRONMENT_LIBRARY -> CephContext *common_preinit -> 预初始化公共部分, 注意：如果您正在编写 Ceph 守护进程，请忽略此函数并调用 global_init 来代替。 它会为您调用 common_preinit。 common_preinit 创建 CephContext。 该函数为您提供 CephContext 后，您需要设置 Ceph 配置，该配置位于 CephContext 内，名为 md_config_t。 初始设置不是很有用，因为它们没有反映用户的要求。 这通常是通过以下方式完成的：cct->_conf.parse_env(); cct->_conf.apply_changes(); 您的库还可能提供读取配置文件的函数
+        注释良性种族大小, helgrind：注释假阳性竞争条件
+        new CephContext -> class CephContext -> 实例化ceph上下文
+          _log = new ceph::logging::Log(&_conf->subsys) -> 日志实例化
+          _log_obs = new LogObs(_log) -> 观察日志记录配置更改，日志记录子系统位于大多数 ceph 代码（包括配置子系统）下方，以保持简单且独立。 将与日志记录相关的配置更改馈送到日志中
+          _conf.add_observer(_log_obs) -> common,rbd,rgw,osd：将配置值提取到 ConfigValues 中，此更改引入了三个类：ConfigValues、ConfigProxy 和 ConfigReader。 在OSD的seastar端口中，每个CPU分片将保存自己的配置参考，并且在设置更改时，每个分片将使用异步的新设置进行更新。 所以这迫使我们能够同时保留两组配置。 所以我们需要将md_config_t中可更改的部分提取出来。 因此我们可以根据需要用新的替换旧的，并让不同的分片共享相同的未更改部分，以及选项映射和查找表等其他内容。 这就是我们需要 ConfigValues 的原因。 我们将为此类添加一个策略模板，这样我们就可以专门用于 Seastar 实现，以允许不同的 ConfigProxy 实例将 md_config_impl<> 指向不同的 ConfigValues。 由于观察者接口仍然使用md_config_t，为了尽量减少此更改的影响，handle_conf_change()和handle_subsys_change()没有改变。 但由于它接受一个 `const md_config_t`，它不能用于创建/引用持有它的 ConfigProxy，我们需要引入 ConfigReader 来以更简单的方式从 md_config_t 读取更新的设置，而不暴露内部“values”成员变量
+            obs_mgr.add_observer(obs) -> 我们可以将实现放在 .cc 文件中，并且仅显式实例化所使用的模板专业化，但这迫使我们在编译时涉及未使用的标头和库。 例如，为了实例化，要实例化seastar的ObserverMgr，我们需要包含seastar标头以获取必要的类型，但这将迫使我们将非seastar二进制文件链接到seastar库。 因此，为了避免以增加编译时间为代价引入未使用的依赖项，我们将实现放在头文件中
+              const char **keys = observer->get_tracked_conf_keys() -> 获取日志所有跟踪的键 -> "log_coarse_timestamps" ...
+              observers.emplace(*k, observer) -> 将日志键加入到观察服务器中
+            obs_call_gate.emplace(obs, std::make_unique<CallGate>()) -> 开关门机制? -> config: drop config_proxy::lock 当调用配置观察者时为了防止当观察者获取自己的锁（锁定顺序：config_proxy::lock -> foo::lock）并且另一个线程（比如IO路径）尝试获取配置值时发生死锁（ 锁定顺序：foo:lock -> config_proxy::lock)。 调用配置观察者时释放锁的副作用是，当观察者仍在执行时，remove_observer() 可能会潜入，导致释放后使用。 为了缓解这种情况，任何正在进行的观察者调用都需要在删除观察者之前完成。 此外，需要在不持有任何观察者锁的情况下调用remove_observer()，以免陷入死锁
+          _cct_obs = new CephContextObs(this) -> enable_experimental_unrecoverable_data_corrupting_features | crush_location | container_image
+          _lockdep_obs = new LockdepObs(this) -> lockdep
+          _perf_counters_collection = new PerfCountersCollection(this) -> 性能计数器收集器
+          _admin_socket = new AdminSocket(this) -> 实例化asok
+          _heartbeat_map = new HeartbeatMap(this) -> 心跳
+          _plugin_registry = new PluginRegistry(this) -> 注册插件, EC?
+          _admin_hook = new CephContextHook(this) -> asok 实例化管理套接字钩子
+          _admin_socket->register_command("assert", _admin_hook, "") -> int AdminSocket::register_command
+            cmddesc_get_prefix(cmddesc)
+            hooks.find(prefix)
+            hooks.emplace_hint -> emplace() 和 emplace_hint() 是 C++ 11 标准加入到 set 类模板中的，相比具有同样功能的 insert() 方法，完成同样的任务，emplace() 和 emplace_hint() 的效率会更高
           ...
+          _crypto_none = CryptoHandler::create(CEPH_CRYPTO_NONE)
+          _crypto_aes = CryptoHandler::create(CEPH_CRYPTO_AES)
+          _crypto_random.reset(new CryptoRandom())
+          lookup_or_create_singleton_object<MempoolObs>("mempool_obs", false, this) -> 实例化内存池
+        conf.set_val_default("log_to_stderr", "false")
       parse_env
-      apply_changes -> void apply_changes(std::ostream* oss)
-        _gather_changes
+      apply_changes -> void apply_changes(std::ostream* oss) -> 展开所有元变量。 进行任何挂起的观察者回调
+        _gather_changes -> “call_gate_leave”方法正在访问“obs_call_gate”映射，但未持有所需的锁。 该数据结构可以由观察者回调线程上下文下的另一个线程操作
           map_observer_changes
         call_observers
           obs->handle_conf_change
           call_gate_leave
+      TracepointProvider::initialize<tracepoint_traits>(cct) -> 初始化lttng跟踪点
     new librados::RadosClient -> librados::RadosClient::RadosClient
       add_observer -> void add_observer(md_config_obs_t* obs)
         obs_mgr.add_observer(obs) -> 我们可以将实现放在 .cc 文件中，并且仅显式实例化所使用的模板专业化，但这迫使我们在编译时涉及未使用的标头和库。 例如，为了实例化，要实例化seastar的ObserverMgr，我们需要包含seastar标头以获取必要的类型，但这将迫使我们将非seastar二进制文件链接到seastar库。 因此，为了避免以增加编译时间为代价引入未使用的依赖项，我们将实现放在头文件中
-          observers.emplace
+          observers.emplace -> rados_mon_op_timeout
         obs_call_gate.emplace -> 安置
-  rados_conf_read_file -> extern "C" int _rados_conf_read_file
+    cct->put() -> void CephContext::put() -> 减引用
+      if (--nref == 0)
+  rados_conf_read_file(cluster, "/home/xb/project/ceph/xb/ceph/build/ceph.conf") -> extern "C" int _rados_conf_read_file
     conf.parse_config_files
     parse_env
     apply_changes
@@ -1452,7 +1476,7 @@ rados_write.c:83 -> main
         wait_for_osdmap
           with_osdmap
       new librados::IoCtxImpl -> librados::IoCtxImpl::IoCtxImpl
-  rados_write -> CEPH_RADOS_API int rados_write -> LIBRADOS_C_API_BASE_DEFAULT(rados_write) -> extern "C" int _rados_write -> ctx->write(oid, bl, len, off) -> int librados::IoCtxImpl::write
+  rados_write 同步写 -> CEPH_RADOS_API int rados_write -> LIBRADOS_C_API_BASE_DEFAULT(rados_write) -> extern "C" int _rados_write -> bl.append(buf, len) 追加IO数据(将数据追加到_buffers尾部) -> ctx->write(oid, bl, len, off) -> int librados::IoCtxImpl::write
     ::ObjectOperation op -> 构造OP
     prepare_assert_ops(&op) -> 添加任何适合给定 IoCtx 中统计信息的版本断言操作，无论是目标版本断言还是任何 src 对象断言。 这些会影响单个 ioctx 操作，因此在我们执行操作时清除 ioctx 状态。 如果我们添加了任何事件，则返回指向 ObjectOperation 的指针； 这对于将 extra_ops 参数传递到 Objecter 方法中很方便
     mybl.substr_of(bl, 0, len) -> 先申明mybl, 获取子字符串, 截取子串
@@ -1466,7 +1490,7 @@ rados_write.c:83 -> main
       o.op.extent.truncate_size = truncate_size -> 写操作支持截断参数
     return operate(oid, &op, NULL) -> int librados::IoCtxImpl::operate -> 池IO上下文操作
       Context *oncommit = new C_SafeCond(mylock, cond, &done, &r) -> 通知机制, finish -> cond.notify_all, 回调?
-      Objecter::Op *objecter_op = objecter->prepare_mutate_op(oid, oloc, *o, snapc, ut, flags, oncommit, &ver) -> 准备对象OP -> Op *prepare_mutate_op
+      Objecter::Op *objecter_op = objecter->prepare_mutate_op(oid, oloc, *o, snapc, ut, flags, oncommit, &ver) -> 准备对象OP(把ObjectOperation封装为Op类型) -> Op *prepare_mutate_op
         Op *o = new Op(oid, oloc, op.ops, flags | global_op_flags | CEPH_OSD_FLAG_WRITE, oncommit, objver, nullptr, parent_trace) -> Op(const object_t& o, const object_locator_t& ol -> 构造对象OP, 设置回调, oncommit -> onfinish
           ops.swap(op) -> 向量交换, 交换容器的内容
           ...
@@ -1523,11 +1547,11 @@ rados_write.c:83 -> main
                 const bool can_fast_prepare = messenger->ms_can_fast_dispatch(m)
                 out_queue[m->get_priority()].emplace_back -> 放入发送队列out_queue
                 ...
-      cond.wait(l, [&done] { return done;}) -> 等待OP返回
+      cond.wait(l, [&done] { return done;}) -> 等待OP返回, 如: handle_osd_op_reply -> cond.notify_all()
       set_sync_op_version(ver)
 
 
-回调, 恢复:
+回调, 回复, 响应:
 Objecter::ms_dispatch -> case CEPH_MSG_OSD_OPREPLY -> void Objecter::handle_osd_op_reply
   op->trace.event("osd op reply")
   m->get_result()
@@ -1540,7 +1564,7 @@ Objecter::ms_dispatch -> case CEPH_MSG_OSD_OPREPLY -> void Objecter::handle_osd_
   if (onfinish) 
     onfinish->complete(rc) -> finish(r) -> void finish(int r) override
       *done = true
-      cond.notify_all() -> 唤醒等待该条件变量的线程
+      cond.notify_all() -> 唤醒等待该条件变量的线程 -> 唤醒 cond.wait(l, [&done] { return done;})
   m->put()
 
 
@@ -2284,7 +2308,7 @@ daemon -> def admin_socket(asok_path, cmd, format='')
 ceph.in
 
 
-pub/sub
+pub/sub, 发布订阅, map订阅和更新
 1 与mon建立链接
 
 2 向mon的TgtMapMonitor 注册一个回调函数，
@@ -2323,7 +2347,7 @@ FR001_协议注册
                 monc->authenticate          /* 3 向monitor发起认证，认证成功后建立链接*/
                 while(monc->wait_auth_rotating(30.0 < 0))        
                 monc->sub_want                /* 4 向monitor注册订阅 */                
-                monc->renew_subs()  /* 5 即刻下发订阅请求 */
+                monc->renew_subs()  /* 5 即刻下发订阅请求 */ -> MonClient::ms_dispatch -> 收到monitor的map更新
                 
                 ms_dispatch??
                 
@@ -2488,4 +2512,21 @@ Breakpoint 3, ProtocolV2::send_message (this=0x580180, m=0x57e430) at /home/xb/p
 #6  0x00007ffff7c3af87 in librados::v14_2_0::RadosClient::connect (this=0x4b1000) at /home/xb/project/ceph/xb/ceph/src/librados/RadosClient.cc:237
 #7  0x00007ffff7bb4d4b in _rados_connect (cluster=0x4b1000) at /home/xb/project/ceph/xb/ceph/src/librados/librados_c.cc:178
 #8  0x00000000004012d1 in main (argc=3, argv=0x7fffffffe628) at rados_write.c:50
+
+
+
+read, book, ceph之rados设计原理与实现:
+pg中的对象排序
+分层目录: hash值逆序, 老PG(祖先)和新PG(子孙), 在一个大目录下, 父包子, 修改文件夹归属即可, 无需移动对象(file), pgp(placement_group_placement): 分裂前的祖先, 
+涟漪式集群表传播机制, 可扩展的故障检测机制(类似swim, osd间心跳机制, 精挑小集群), 
+crush: ceph osd crush tunables default
+monitor: cluster_map串行化, 合并请求, 特定monitor统一发权威日志, leader和peon, mgr做统计, 
+
+
+
+
+map订阅和更新:
+monc->sub_want("osdmap"  -> 订阅osdmap
+
+monc->renew_subs() -> 更新osdmap
 

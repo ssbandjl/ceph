@@ -1,0 +1,45 @@
+FR004支持OP请求发送:SR002, FR001, FR003
+  1. 客户端调用rados_write
+  2. 调用池IO上下文的write方法
+  3. 构造对象OP
+  4. 调用对象操作的write方法, 封装为对象操作
+     添加数据: (1) 封装OP, 添加操作码, 比如: CEPH_OSD_OP_WRITE (2) 拷贝客户端IO
+     添加OP参数: 如: 截断参数
+  5. 执行对象操作
+     准备可变OP(将对象操作封装为更灵活的可变OP)
+       实例化可变OP, 设置回调
+       在OP上初始化调试跟踪(trace)
+     提交操作(发送OP)
+       插入性能跟踪点
+       计算目标OSD(调用crush算法)
+       OP操作序列化为RPC/BULK
+       增加性能统计计数,如:写计数(l_osdc_op_w)
+       发送RPC/BULK(hrpc_req_send)
+     轮训/中断(等响应事件)(hrpc_trigger/epoll_wait)
+     执行发送完成回调函数(如有)
+       释放OP到OP池(复用)
+
+
+FR005支持OP回复处理, 轮训/中断, 模式切换
+
+
+FR006支持map订阅和更新
+
+
+FR007engine故障场景OP发送控制, 引擎故障, backoff, map刷新, 超时检测和返回(网络层), 1, 2 homeless队列如何保证性能
+
+osd_state: up/down/in/out
+
+
+FR009性能统计
+
+FR007 asock功能支持
+
+F8: 池实例创建销毁和池级别io操作
+
+
+F9: fio压测对象语义
+
+F12: 支持op调度(tse?)
+
+
