@@ -1527,6 +1527,117 @@ rados_write.c:83 -> main
       set_sync_op_version(ver)
 
 
+回调, 恢复:
+Objecter::ms_dispatch -> case CEPH_MSG_OSD_OPREPLY -> void Objecter::handle_osd_op_reply
+  op->trace.event("osd op reply")
+  m->get_result()
+  if (op->onfinish)
+    onfinish = op->onfinish
+  _finish_op(op, 0) -> void Objecter::_finish_op
+    put_op_budget_bytes(op->budget)
+    _session_op_remove(op->session, op)
+    op->put()
+  if (onfinish) 
+    onfinish->complete(rc) -> finish(r) -> void finish(int r) override
+      *done = true
+      cond.notify_all() -> 唤醒等待该条件变量的线程
+  m->put()
+
+
+
+
+
+handle_osd_op_reply
+#0  C_SafeCond::finish (this=0x586520, r=0) at /home/xb/project/ceph/xb/ceph/src/common/Cond.h:66
+#1  0x00007ffff7bc5c49 in Context::complete (this=0x586520, r=0) at /home/xb/project/ceph/xb/ceph/src/include/Context.h:77
+#2  0x00007ffff7c73cf3 in Objecter::handle_osd_op_reply (this=0x4e5490, m=0x7fffd4013c60) at /home/xb/project/ceph/xb/ceph/src/osdc/Objecter.cc:3558
+#3  0x00007ffff7c5e6f7 in Objecter::ms_dispatch (this=0x4e5490, m=0x7fffd4013c60) at /home/xb/project/ceph/xb/ceph/src/osdc/Objecter.cc:996
+#4  0x00007ffff7c966aa in Objecter::ms_fast_dispatch (this=0x4e5490, m=0x7fffd4013c60) at /home/xb/project/ceph/xb/ceph/src/osdc/Objecter.h:2195
+#5  0x00007ffff7c44c3a in Dispatcher::ms_fast_dispatch2 (this=0x4e5498, m=...) at /home/xb/project/ceph/xb/ceph/src/msg/Dispatcher.h:84
+#6  0x00007fffee7fd18c in Messenger::ms_fast_dispatch (this=0x4de6a0, m=...) at /home/xb/project/ceph/xb/ceph/src/msg/Messenger.h:676
+#7  0x00007fffee7fb13a in DispatchQueue::fast_dispatch (this=0x4de9f8, m=...) at /home/xb/project/ceph/xb/ceph/src/msg/DispatchQueue.cc:72
+#8  0x00007fffee942ab3 in DispatchQueue::fast_dispatch (this=0x4de9f8, m=0x7fffd4013c60) at /home/xb/project/ceph/xb/ceph/src/msg/DispatchQueue.h:203
+#9  0x00007fffee9a1825 in ProtocolV2::handle_message (this=0x585920) at /home/xb/project/ceph/xb/ceph/src/msg/async/ProtocolV2.cc:1479
+#10 0x00007fffee99dc09 in ProtocolV2::handle_read_frame_dispatch (this=0x585920) at /home/xb/project/ceph/xb/ceph/src/msg/async/ProtocolV2.cc:1137
+#11 0x00007fffee99fc0b in ProtocolV2::_handle_read_frame_epilogue_main (this=0x585920) at /home/xb/project/ceph/xb/ceph/src/msg/async/ProtocolV2.cc:1325
+#12 0x00007fffee99fa44 in ProtocolV2::handle_read_frame_epilogue_main(std::unique_ptr<ceph::buffer::v15_2_0::ptr_node, ceph::buffer::v15_2_0::ptr_node::disposer>&&, int) (this=0x585920, 
+    buffer=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2, CU 0x2845a97, DIE 0x294b353>, r=0) at /home/xb/project/ceph/xb/ceph/src/msg/async/ProtocolV2.cc:1300
+#13 0x00007fffee9cc2ba in CtRxNode<ProtocolV2>::call (this=0x585cc8, foo=0x585920) at /home/xb/project/ceph/xb/ceph/src/msg/async/Protocol.h:67
+#14 0x00007fffee98f816 in ProtocolV2::run_continuation (this=0x585920, continuation=...) at /home/xb/project/ceph/xb/ceph/src/msg/async/ProtocolV2.cc:47
+#15 0x00007fffee998265 in operator() (__closure=0x58c610, buffer=0x7fffd400d970 "\021\002)", r=0) at /home/xb/project/ceph/xb/ceph/src/msg/async/ProtocolV2.cc:755
+#16 0x00007fffee9b6d73 in std::__invoke_impl<void, ProtocolV2::read(CONTINUATION_RXBPTR_TYPE<ProtocolV2>&, rx_buffer_t&&)::<lambda(char*, int)>&, char*, long int>(std::__invoke_other, struct {...} &) (__f=...)
+    at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/invoke.h:61
+#17 0x00007fffee9b694f in std::__invoke_r<void, ProtocolV2::read(CONTINUATION_RXBPTR_TYPE<ProtocolV2>&, rx_buffer_t&&)::<lambda(char*, int)>&, char*, long int>(struct {...} &) (__fn=...) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/invoke.h:111
+#18 0x00007fffee9b60cb in std::_Function_handler<void(char*, long int), ProtocolV2::read(CONTINUATION_RXBPTR_TYPE<ProtocolV2>&, rx_buffer_t&&)::<lambda(char*, int)> >::_M_invoke(const std::_Any_data &, <unknown type in /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2, CU 0x2845a97, DIE 0x292f28b>, <unknown type in /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2, CU 0x2845a97, DIE 0x292f29b>) (__functor=..., 
+    __args#0=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2, CU 0x2845a97, DIE 0x292f28b>, __args#1=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2, CU 0x2845a97, DIE 0x292f29b>)
+    at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_function.h:290
+#19 0x00007fffee94454f in std::function<void (char*, long)>::operator()(char*, long) const (this=0x58c610, __args#0=0x7fffd400d970 "\021\002)", __args#1=0) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_function.h:590
+#20 0x00007fffee93e40b in AsyncConnection::process (this=0x58c290) at /home/xb/project/ceph/xb/ceph/src/msg/async/AsyncConnection.cc:458
+#21 0x00007fffee94345e in C_handle_read::do_request (this=0x4b2b30, fd_or_id=21) at /home/xb/project/ceph/xb/ceph/src/msg/async/AsyncConnection.cc:71
+#22 0x00007fffee9d0368 in EventCenter::process_events (this=0x519ab0, timeout_microseconds=30000000, working_dur=0x7fffe3ffd230) at /home/xb/project/ceph/xb/ceph/src/msg/async/Event.cc:406
+#23 0x00007fffee9ddc23 in operator() (__closure=0x573b48) at /home/xb/project/ceph/xb/ceph/src/msg/async/Stack.cc:53
+#24 0x00007fffee9df78e in std::__invoke_impl<void, NetworkStack::add_thread(unsigned int)::<lambda()>&>(std::__invoke_other, struct {...} &) (__f=...) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/invoke.h:61
+#25 0x00007fffee9df675 in std::__invoke_r<void, NetworkStack::add_thread(unsigned int)::<lambda()>&>(struct {...} &) (__fn=...) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/invoke.h:111
+#26 0x00007fffee9df55c in std::_Function_handler<void(), NetworkStack::add_thread(unsigned int)::<lambda()> >::_M_invoke(const std::_Any_data &) (__functor=...) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_function.h:290
+#27 0x00007fffee9dd3f4 in std::function<void ()>::operator()() const (this=0x573b48) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_function.h:590
+#28 0x00007fffee9dd3a4 in std::__invoke_impl<void, std::function<void ()>>(std::__invoke_other, std::function<void ()>&&) (__f=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2, CU 0x2a65ef0, DIE 0x2ae0546>)
+    at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/invoke.h:61
+#29 0x00007fffee9dd359 in std::__invoke<std::function<void ()>>(std::function<void ()>&&) (__fn=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2, CU 0x2a65ef0, DIE 0x2ae0af2>)
+    at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/invoke.h:96
+#30 0x00007fffee9dd306 in std::thread::_Invoker<std::tuple<std::function<void ()> > >::_M_invoke<0ul>(std::_Index_tuple<0ul>) (this=0x573b48) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_thread.h:253
+#31 0x00007fffee9dd2da in std::thread::_Invoker<std::tuple<std::function<void ()> > >::operator()() (this=0x573b48) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_thread.h:260
+#32 0x00007fffee9dd2be in std::thread::_State_impl<std::thread::_Invoker<std::tuple<std::function<void ()> > > >::_M_run() (this=0x573b40) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_thread.h:211
+#33 0x00007fffeef0a7c4 in execute_native_thread_routine () from /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2
+#34 0x00007fffec27bea5 in start_thread () from /lib64/libpthread.so.0
+#35 0x00007ffff78b5b0d in clone () from /lib64/libc.so.6
+
+
+
+
+rados_write 堆栈:
+#0  Objecter::ms_dispatch (this=0x4e5490, m=0x7fffd4013c60) at /home/xb/project/ceph/xb/ceph/src/osdc/Objecter.cc:991
+#1  0x00007ffff7c966aa in Objecter::ms_fast_dispatch (this=0x4e5490, m=0x7fffd4013c60) at /home/xb/project/ceph/xb/ceph/src/osdc/Objecter.h:2195
+#2  0x00007ffff7c44c3a in Dispatcher::ms_fast_dispatch2 (this=0x4e5498, m=...) at /home/xb/project/ceph/xb/ceph/src/msg/Dispatcher.h:84
+#3  0x00007fffee7fd18c in Messenger::ms_fast_dispatch (this=0x4de6a0, m=...) at /home/xb/project/ceph/xb/ceph/src/msg/Messenger.h:676
+#4  0x00007fffee7fb13a in DispatchQueue::fast_dispatch (this=0x4de9f8, m=...) at /home/xb/project/ceph/xb/ceph/src/msg/DispatchQueue.cc:72
+#5  0x00007fffee942ab3 in DispatchQueue::fast_dispatch (this=0x4de9f8, m=0x7fffd4013c60) at /home/xb/project/ceph/xb/ceph/src/msg/DispatchQueue.h:203
+#6  0x00007fffee9a1825 in ProtocolV2::handle_message (this=0x585920) at /home/xb/project/ceph/xb/ceph/src/msg/async/ProtocolV2.cc:1479
+#7  0x00007fffee99dc09 in ProtocolV2::handle_read_frame_dispatch (this=0x585920) at /home/xb/project/ceph/xb/ceph/src/msg/async/ProtocolV2.cc:1137
+#8  0x00007fffee99fc0b in ProtocolV2::_handle_read_frame_epilogue_main (this=0x585920) at /home/xb/project/ceph/xb/ceph/src/msg/async/ProtocolV2.cc:1325
+#9  0x00007fffee99fa44 in ProtocolV2::handle_read_frame_epilogue_main(std::unique_ptr<ceph::buffer::v15_2_0::ptr_node, ceph::buffer::v15_2_0::ptr_node::disposer>&&, int) (this=0x585920, 
+    buffer=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2, CU 0x2845a97, DIE 0x294b353>, r=0) at /home/xb/project/ceph/xb/ceph/src/msg/async/ProtocolV2.cc:1300
+#10 0x00007fffee9cc2ba in CtRxNode<ProtocolV2>::call (this=0x585cc8, foo=0x585920) at /home/xb/project/ceph/xb/ceph/src/msg/async/Protocol.h:67
+#11 0x00007fffee98f816 in ProtocolV2::run_continuation (this=0x585920, continuation=...) at /home/xb/project/ceph/xb/ceph/src/msg/async/ProtocolV2.cc:47
+#12 0x00007fffee998265 in operator() (__closure=0x58c610, buffer=0x7fffd400d970 "\021\002)", r=0) at /home/xb/project/ceph/xb/ceph/src/msg/async/ProtocolV2.cc:755
+#13 0x00007fffee9b6d73 in std::__invoke_impl<void, ProtocolV2::read(CONTINUATION_RXBPTR_TYPE<ProtocolV2>&, rx_buffer_t&&)::<lambda(char*, int)>&, char*, long int>(std::__invoke_other, struct {...} &) (__f=...)
+    at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/invoke.h:61
+#14 0x00007fffee9b694f in std::__invoke_r<void, ProtocolV2::read(CONTINUATION_RXBPTR_TYPE<ProtocolV2>&, rx_buffer_t&&)::<lambda(char*, int)>&, char*, long int>(struct {...} &) (__fn=...) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/invoke.h:111
+#15 0x00007fffee9b60cb in std::_Function_handler<void(char*, long int), ProtocolV2::read(CONTINUATION_RXBPTR_TYPE<ProtocolV2>&, rx_buffer_t&&)::<lambda(char*, int)> >::_M_invoke(const std::_Any_data &, <unknown type in /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2, CU 0x2845a97, DIE 0x292f28b>, <unknown type in /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2, CU 0x2845a97, DIE 0x292f29b>) (__functor=..., 
+    __args#0=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2, CU 0x2845a97, DIE 0x292f28b>, __args#1=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2, CU 0x2845a97, DIE 0x292f29b>)
+    at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_function.h:290
+#16 0x00007fffee94454f in std::function<void (char*, long)>::operator()(char*, long) const (this=0x58c610, __args#0=0x7fffd400d970 "\021\002)", __args#1=0) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_function.h:590
+#17 0x00007fffee93e40b in AsyncConnection::process (this=0x58c290) at /home/xb/project/ceph/xb/ceph/src/msg/async/AsyncConnection.cc:458
+#18 0x00007fffee94345e in C_handle_read::do_request (this=0x4b2b30, fd_or_id=21) at /home/xb/project/ceph/xb/ceph/src/msg/async/AsyncConnection.cc:71
+#19 0x00007fffee9d0368 in EventCenter::process_events (this=0x519ab0, timeout_microseconds=30000000, working_dur=0x7fffe3ffd230) at /home/xb/project/ceph/xb/ceph/src/msg/async/Event.cc:406
+#20 0x00007fffee9ddc23 in operator() (__closure=0x573b48) at /home/xb/project/ceph/xb/ceph/src/msg/async/Stack.cc:53
+#21 0x00007fffee9df78e in std::__invoke_impl<void, NetworkStack::add_thread(unsigned int)::<lambda()>&>(std::__invoke_other, struct {...} &) (__f=...) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/invoke.h:61
+#22 0x00007fffee9df675 in std::__invoke_r<void, NetworkStack::add_thread(unsigned int)::<lambda()>&>(struct {...} &) (__fn=...) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/invoke.h:111
+#23 0x00007fffee9df55c in std::_Function_handler<void(), NetworkStack::add_thread(unsigned int)::<lambda()> >::_M_invoke(const std::_Any_data &) (__functor=...) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_function.h:290
+#24 0x00007fffee9dd3f4 in std::function<void ()>::operator()() const (this=0x573b48) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_function.h:590
+#25 0x00007fffee9dd3a4 in std::__invoke_impl<void, std::function<void ()>>(std::__invoke_other, std::function<void ()>&&) (__f=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2, CU 0x2a65ef0, DIE 0x2ae0546>)
+    at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/invoke.h:61
+#26 0x00007fffee9dd359 in std::__invoke<std::function<void ()>>(std::function<void ()>&&) (__fn=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2, CU 0x2a65ef0, DIE 0x2ae0af2>)
+    at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/invoke.h:96
+#27 0x00007fffee9dd306 in std::thread::_Invoker<std::tuple<std::function<void ()> > >::_M_invoke<0ul>(std::_Index_tuple<0ul>) (this=0x573b48) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_thread.h:253
+#28 0x00007fffee9dd2da in std::thread::_Invoker<std::tuple<std::function<void ()> > >::operator()() (this=0x573b48) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_thread.h:260
+#29 0x00007fffee9dd2be in std::thread::_State_impl<std::thread::_Invoker<std::tuple<std::function<void ()> > > >::_M_run() (this=0x573b40) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_thread.h:211
+#30 0x00007fffeef0a7c4 in execute_native_thread_routine () from /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2
+#31 0x00007fffec27bea5 in start_thread () from /lib64/libpthread.so.0
+#32 0x00007ffff78b5b0d in clone () from /lib64/libc.so.6
+(gdb) 
+
+
+
 
 (gdb) p op->target
 $9 = {
