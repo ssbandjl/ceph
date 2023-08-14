@@ -1358,7 +1358,7 @@ lrwxrwxrwx 1 root root   18 Jul 21 16:23 /opt/h3c/lib/librbd_tp.so.1 -> librbd_t
 参考文档, 深入理解ceph crush(3)—Object至PG映射源码分析: https://www.dovefi.com/post/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3crush3object%E8%87%B3pg%E6%98%A0%E5%B0%84%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/
 iopath, cd /home/xb/project/stor/ceph/xb/docker/ceph/test/librados_example; ./gdb_rados_write.sh
 rados_write.c:83 -> main
-  rados_create2 -> extern "C" int _rados_create2 -> rados_create 的扩展版本，与 rados_create 类似，但不假设 client + id，允许完整指定名称允许指定集群名称标志以供将来扩展
+  rados_create2(&cluster, cluster_name, user_name, flags) -> extern "C" int _rados_create2 -> rados_create 的扩展版本，与 rados_create 类似，但不假设 client + id，允许完整指定名称允许指定集群名称标志以供将来扩展
     CephInitParameters iparams(CEPH_ENTITY_TYPE_CLIENT) -> CephInitParameters::CephInitParameters -> name.set(module_type, "admin") -> librados、rados.py：添加rados_create2/init2、librados客户端，特别是ceph工具，需要能够指定完整的“名称”； rados_create 强制执行“client.<param>”，没有解决方法。 新界面。 Python Rados().__init__ 根据是否提供名称或 id 选择适当的创建函数
       name.set(module_type, "admin") -> module_type=CEPH_ENTITY_TYPE_CLIENT(0x8)
     rados_create_cct -> static CephContext *rados_create_cct -> 创建上下文
@@ -1405,18 +1405,31 @@ rados_write.c:83 -> main
     cct->put() -> void CephContext::put() -> 减引用
       if (--nref == 0)
   rados_conf_read_file(cluster, "/home/xb/project/ceph/xb/ceph/build/ceph.conf") -> extern "C" int _rados_conf_read_file
-    conf.parse_config_files
+    librados::RadosClient *client = (librados::RadosClient *)cluster -> 集群转rados客户端
+    conf.parse_config_files -> int md_config_t::parse_config_files
+      const char *c = getenv("CEPH_CONF") -> 没有指定配置文件就从环境变量中获取
+      void md_config_t::early_expand_meta
+        _expand_meta -> Option::value_t md_config_t::_expand_meta
+          ...
+        conf_stringify -> to_str -> stringify(v)
+      cf.parse_file
+      _get_my_sections
+      ...
     parse_env
     apply_changes
     complain_about_parse_error
   rados_conf_parse_argv -> extern "C" int _rados_conf_parse_argv
+    argv_to_vec
+    parse_argv -> int md_config_t::parse_argv -> Ceph 的命令行参数处理, 配置参数, 从命令行参数中读取配置值, https://runsisi.com/2019/02/23/ceph-opt/, 可配置参数: https://zhuanlan.zhihu.com/p/110079635
     conf.apply_changes
-  rados_connect -> extern "C" int _rados_connect(rados_t cluster)
+  rados_connect -> extern "C" int _rados_connect(rados_t cluster) -> 连接集群, 参考: https://www.jianshu.com/p/58956728dadc
     client->connect() -> int librados::RadosClient::connect()
+      state = CONNECTING -> 连接状态机 
       cct->_log->start()
         create("log") -> void Thread::create
-      MonClient mc_bootstrap(cct) -> MonClient::MonClient
-      MonClient::get_monmap_and_config
+      MonClient mc_bootstrap(cct) -> MonClient::MonClient -> 启动monitor客户端
+
+      MonClient::get_monmap_and_config -> 配置网络通信，并开启3个 msgr_worker 线程, 参考: https://blog.csdn.net/DeamonXiao/article/details/120879244
         init_crypto ... -> static void init() 
         build_initial_monmap
           int MonMap::build_initial
@@ -1437,6 +1450,14 @@ rados_write.c:83 -> main
           finisher.start() -> finisher_thread_entry -> ceph中的finisher类, https://blog.csdn.net/tiantao2012/article/details/79419556?ydreferer=aHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS8%3D, 要结束操作的类会把自己添加到finisher类的queue中，然后finisher类分别调用要结束操作类的complete函数
           schedule_tick() -> void MonClient::schedule_tick() -> void MonClient::tick()
             timer.add_event_after(hunt_interval, do_tick)
+      common_init_finish(cct)
+        cct->start_service_thread
+          _enable_perf_counter
+          call_all_observers -> 调用所有订阅者
+           _admin_socket->init -> bool AdminSocket::init -> 初始化asok -> 处理 ceph daemon 命令的线程, 和 service 线程一起提供了性能监控服务，service 线程更新各个模块性能参数，admin_socket 线程提供对外查询接口
+            create_wakeup_pipe 
+            bind_and_listen
+      monclient.build_initial_monmap()
       Messenger::create_client_messenger(cct, "radosclient")
       objecter = new (std::nothrow) Objecter(cct, messenger, &monclient, &finisher) -> Objecter::Objecter
         ...
@@ -1470,12 +1491,13 @@ rados_write.c:83 -> main
       timer.init()
       finisher.start()
       instance_id = monclient.get_global_id()
-  rados_ioctx_create -> extern "C" int _rados_ioctx_create
+  rados_ioctx_create(cluster, poolname, &io) -> extern "C" int _rados_ioctx_create -> 基于池和集群创建IO上下文, ioctx 的功能有：读写数据、读写属性、快照 pool、读取快照等
     create_ioctx -> int librados::RadosClient::create_ioctx(
-      lookup_pool -> int64_t librados::RadosClient::lookup_pool -> lookup_pg_pool_name
+      lookup_pool -> int64_t librados::RadosClient::lookup_pool -> lookup_pg_pool_name -> osdmap中查找池ID?
         wait_for_osdmap
           with_osdmap
-      new librados::IoCtxImpl -> librados::IoCtxImpl::IoCtxImpl
+      *io = new librados::IoCtxImpl(this, objecter, poolid, CEPH_NOSNAP) -> librados::IoCtxImpl::IoCtxImpl -> 用池ID,对象, 快照(无), 实例化io上下文
+    *io = ctx -> io即带有池和集群信息的上下文
   rados_write 同步写 -> CEPH_RADOS_API int rados_write -> LIBRADOS_C_API_BASE_DEFAULT(rados_write) -> extern "C" int _rados_write -> bl.append(buf, len) 追加IO数据(将数据追加到_buffers尾部) -> ctx->write(oid, bl, len, off) -> int librados::IoCtxImpl::write
     ::ObjectOperation op -> 构造OP
     prepare_assert_ops(&op) -> 添加任何适合给定 IoCtx 中统计信息的版本断言操作，无论是目标版本断言还是任何 src 对象断言。 这些会影响单个 ioctx 操作，因此在我们执行操作时清除 ioctx 状态。 如果我们添加了任何事件，则返回指向 ObjectOperation 的指针； 这对于将 extra_ops 参数传递到 Objecter 方法中很方便
