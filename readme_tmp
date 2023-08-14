@@ -15,7 +15,7 @@ FR004支持OP请求发送:SR002, FR001, FR003
     构造OP连接Monitor(待细化)
     启动定时任务线程
     启动性能统计线程
-    启动MAP订阅M线程
+    启动MAP订阅线程
     启动asok线程(并定端口, 监听和处理命令行)
     初始化HomeLess队列(IO无家可归(osd异常)时入该队列)
     对象初始化
@@ -43,13 +43,13 @@ FR004支持OP请求发送:SR002, FR001, FR003
        OP操作序列化为RPC/BULK
        增加性能统计计数,如:写计数(l_osdc_op_w)
        发送RPC/BULK(hrpc_req_send)
-     轮训/中断(等响应事件)(hrpc_trigger/epoll_wait)
-     执行发送完成回调函数(如有)
-       释放OP到OP池(复用)
+  6. 业务调用trigger: 轮训/中断(等响应事件)(hrpc_trigger/epoll_wait)
+      执行发送完成回调函数(如有)
+      释放OP到OP池(复用)
 
 
 FR005支持OP回复处理, 轮训/中断, 模式切换
-  参考请求发送(融合在发送流程中)
+业务调用trigger: 轮训/中断(等响应事件)(hrpc_trigger/epoll_wait)
 
 
 FR006支持map订阅和更新
@@ -83,11 +83,12 @@ F9: fio压测对象语义(未开始)
 F12: 支持op调度(tse?, 已调研, 待融合)
 
 
-OP语义:
-OP_WRITE -> rados_write 同步写
+OP语义, OP事务(class Transaction {):
+OP_WRITE -> rados_write 同步写 -> CEPH_RADOS_API int rados_write(rados_ioctx_t io, const char *oid, const char *buf, size_t len, uint64_t off)
 ...
 
-aio_write -> 异步写
+aio_write -> 异步写 -> CEPH_RADOS_API int rados_aio_write(rados_ioctx_t io, const char *oid, rados_completion_t completion, const char *buf, size_t len, uint64_t off)
+  ...
   Context *oncomplete = new C_aio_Complete(c)
   queue_aio_write(c)
     c->aio_write_seq = ++aio_write_seq
@@ -96,20 +97,47 @@ aio_write -> 异步写
   objecter->op_submit(o, &c->tid)
   ...
   flush_aio_writes
-  
-OP_WRITEFULL -> write_full -> CEPH_OSD_OP_WRITEFULL
-OP_READ
+
+OP_WRITEFULL -> write_full -> 异步写入整个对象 该对象填充有提供的数据。 如果该对象存在，则会自动截断该对象，然后写入。 将 write_full 排队并返回。 成功时完成的返回值为 0，失败时为负错误代码 -> CEPH_OSD_OP_WRITEFULL -> CEPH_RADOS_API int rados_aio_write_full(rados_ioctx_t io, const char *oid, rados_completion_t completion, const char *buf, size_t len)
+
+OP_READ -> 读 -> CEPH_RADOS_API int rados_read(rados_ioctx_t io, const char *oid, char *buf, size_t len, uint64_t off)
   CEPH_OSD_OP_READ
   operate_read
     Objecter::Op *objecter_op = objecter->prepare_read_op
     objecter->op_submit(objecter_op)
-OP_TRUNCATE
-OP_ZERO
-OP_CREATE
+
+
+OP_TRUNCATE -> 截断对象, 丢弃对象中超出指定大小的所有数据, 调整对象大小 如果这放大了对象，则新区域在逻辑上会用零填充。 如果这缩小了对象，多余的数据将被删除
+  CEPH_RADOS_API int rados_trunc(rados_ioctx_t io, const char *oid, uint64_t size);
+  op.truncate(size)
+    add_data(CEPH_OSD_OP_TRUNCATE, off, 0, bl)
+    ...
+  return operate(oid, &op, NULL)
+
+
+
+OP_ZERO -> 将对象清零, 将对象内指定的字节范围清零。 一些ObjectStore实例可能会对此进行优化以释放底层存储空间。 如果零范围超出了对象的末尾，则对象大小会扩展，就像我们正在写入一个充满零的缓冲区一样。 除非长度为 0，在这种情况下（就像 0 长度写入一样）我们不调整对象大小
+CEPH_RADOS_API void rados_write_op_zero(rados_write_op_t write_op,
+			                uint64_t offset,
+			                uint64_t len);
+  ((::ObjectOperation *)write_op)->zero(offset, len)
+    add_data(CEPH_OSD_OP_ZERO
+  
+
+OP_CREATE -> 新建对象 -> CEPH_OSD_OP_CREATE
+cls_cxx_create
+
+
 OP_DELETE
-OP_STAT
+RGWOp* RGWHandler_REST::get_op -> op_delete -> rgw语义?
+
+
+OP_STAT -> CEPH_RADOS_API int rados_stat(rados_ioctx_t io, const char *o, uint64_t *psize, time_t *pmtime)
+C_ObjectOperation_stat *h = new C_ObjectOperation_stat
+add_op(CEPH_OSD_OP_STAT)
+
 OP_CALL
 OMAP*
-OP_READ_REPAIE
+OP_READ_REPAIE(新加语义)
 OP_STAT_WRITE
 

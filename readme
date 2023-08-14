@@ -907,6 +907,7 @@ rbd 是一个用于操作 rados 块设备 (RBD) 映像的实用程序，由 Linu
 rbd create --size 1024 p1/image1 && rbd ls p1 && rbd info p1/image1
 
 
+
 下发io:
 rados bench -p .disk_pool1.rbd 5 write
 
@@ -2660,3 +2661,48 @@ monc->sub_want("osdmap"  -> 订阅osdmap
 
 monc->renew_subs() -> 更新osdmap
 
+
+
+
+rbd: 元数据, src/include/rbd_types.h, 创建rbd, 参考: https://zhuanlan.zhihu.com/p/643939797, ceph存储专栏: https://www.zhihu.com/column/c_1661407683897901056
+gdb --args ./bin/rbd create --size 1024 p1/image2
+src/tools/rbd/rbd.cc -> main -> return shell.execute(argc, argv) -> src\tools\rbd\action\Create.cc -> main -> 
+Shell::Action action({"create"}, {}, "Create an empty image.", at::get_long_features_help(),&get_arguments, &execute)
+int execute
+  utils::get_image_options
+  utils::get_image_options
+  utils::init(pool_name, namespace_name, &rados, &io_ctx)
+    int RGWRados::init_rados
+      rados->init_with_context(g_ceph_context) -> return rados_create_with_context
+        *cluster = librados_test_stub::get_cluster()->create_rados_client(cct)
+      rados.connect()
+  do_create -> //librbd层：生成RBD对象
+    return rbd.create4(io_ctx, imgname, size, opts) ->  librbd::create(io_ctx, name, "", size, opts, "", "", false) -> int create(IoCtx& io_ctx, const std::string &image_name
+      generate_image_id
+      detect_format
+      mirror_image_mode = RBD_MIRROR_IMAGE_MODE_JOURNAL
+      image::CreateRequest<> *req = image::CreateRequest<>::create
+      req->send() -> void CreateRequest<I>::send()
+        validate_features
+        validate_order
+        validate_striping(m_cct, m_order, m_stripe_unit, m_stripe_count) -> 校验条带单元 m_stripe_unit(条带单元大小)和条带宽度 m_stripe_count(条带横跨的object个数)
+        validate_data_pool()
+          RBD_FEATURE_DATA_POOL rados.ioctx_create(m_data_pool.c_str(), m_data_io_ctx)
+          set_namespace -> 设置隔离域namespace：一个pool就是一个数据隔离域
+          handle_validate_data_pool -> 回调函数
+            add_image_to_directory
+               cls_client::dir_add_image
+                op->exec("rbd", "dir_add_image", bl) -> rbd/cls_rbd_client层：添加image到RBD目录
+               create_rados_callback<klass, &klass::handle_add_image_to_directory>(this) -> 创建回调函数 <- librbd::util::detail::rados_callback<librbd::image::CreateRequest<librbd::ImageCtx><- Finisher::finisher_thread_entry < ...
+                添加成功后，创建ID对象，并设置回调处理函数handle_create_id_object() -> create_id_object
+                  op.create(true) -> 封装OP写操作：进入librados层，添加一个OSDOp CREATE，创建object_info_t对象 -> void librados::ObjectWriteOperation::create
+                    add_op(CEPH_OSD_OP_CREATE)
+                  cls_client::set_id(&op, m_image_id);//创建image的ID对象，并写入image id
+                  create_rados_callback<klass, &klass::handle_create_id_object>(this)
+                  m_io_ctx.aio_operate(m_id_obj, comp, &op) -> int librados::IoCtx::aio_operate
+                    
+               m_io_ctx.aio_operate(RBD_DIRECTORY, comp, &op) -> OP操作在"rbd_directory"执行
+          req->send()
+            read_rbd_info() -> 读"rbd_info"
+      r = cond.wait()
+  thick_write

@@ -86,3 +86,9 @@ build_bak/
 build_*
 
 test/librados_example/rados_write
+
+
+ceph-client
+*.o
+*_cpp
+*_c
