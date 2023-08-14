@@ -53,23 +53,63 @@ FR005支持OP回复处理, 轮训/中断, 模式切换
 
 
 FR006支持map订阅和更新
-  osdmap
+  MonC实例化和初始化
+  构造OP连接Monitor, 完成认证
+  向Monitor注册订阅(monc->sub_want, renew_subs)  // monitor通知monc
+  ...
+  处理Monitor发来的Map更新(MonClient::ms_dispatch)
+  case 消息类型 -> 执行各自的map更新处理逻辑
 
 
 FR007engine故障场景OP发送控制, 引擎故障, backoff, map刷新, 超时检测和返回(网络层), 1, 2 homeless队列如何保证性能
-
-osd_state: up/down/in/out
-
-
-FR009性能统计
-
-FR007 asock功能支持
-
-F8: 池实例创建销毁和池级别io操作
+参考: osd_state: up/down/in/out
+OSD异常
+判断是否将IO放入homeless
 
 
-F9: fio压测对象语义
 
-F12: 支持op调度(tse?)
+FR009性能统计(嵌入发送流程)
 
+FR007 asock功能支持(嵌入发送流程)
+
+F8: 池实例创建销毁和池级别io操作(未开始)
+创建集群, 解析参数(可选), 连接集群
+创建池(rados_pool_create(rados, pool_name))
+
+
+
+F9: fio压测对象语义(未开始)
+
+F12: 支持op调度(tse?, 已调研, 待融合)
+
+
+OP语义:
+OP_WRITE -> rados_write 同步写
+...
+
+aio_write -> 异步写
+  Context *oncomplete = new C_aio_Complete(c)
+  queue_aio_write(c)
+    c->aio_write_seq = ++aio_write_seq
+     aio_write_list.push_back(&c->aio_write_list_item) -> 将IO加入队列
+  prepare_write_op -> CEPH_OSD_OP_WRITE
+  objecter->op_submit(o, &c->tid)
+  ...
+  flush_aio_writes
+  
+OP_WRITEFULL -> write_full -> CEPH_OSD_OP_WRITEFULL
+OP_READ
+  CEPH_OSD_OP_READ
+  operate_read
+    Objecter::Op *objecter_op = objecter->prepare_read_op
+    objecter->op_submit(objecter_op)
+OP_TRUNCATE
+OP_ZERO
+OP_CREATE
+OP_DELETE
+OP_STAT
+OP_CALL
+OMAP*
+OP_READ_REPAIE
+OP_STAT_WRITE
 

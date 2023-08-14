@@ -661,10 +661,92 @@ conn->send_message(*p)
     STATE_CLOSED
   };
 
+
 bench-write
+先创建rbd卷: rbd create --size 1024 p1/image1 && rbd ls p1 && rbd info p1/image1
 gdb --args rbd bench-write .d2.rbd/500G3 --io-size 4M --io-pattern rand --io-threads 1 --io-total 100M
 /home/xb/project/stor/ceph/xb/docker/ceph/src/tools/rbd/rbd.cc main
   do_bench -> start_io aio_write2 ictx->io_work_queue->aio_write 
+
+
+aio_write | rbd bench --io-type write, 建议用新接口, 参考: https://docs.ceph.com/en/quincy/man/8/rbd/
+默认值为：-io-size 4096、-io-threads 16、-io-total 1G、-io-pattern seq、-rw-mix-read 50
+cd build
+gdb --args ./bin/rbd bench-write p1/image1 --io-size 4M --io-pattern rand --io-threads 1 --io-total 100M
+src/tools/rbd/rbd.cc -> main
+rbd::Shell shell
+return shell.execute(argc, argv) -> int Shell::execute
+  global_init
+  get_command_spec
+  Action *action = find_action(command_spec, &matching_spec, &is_alias)
+  add_options
+  (*action->execute)(vm, ceph_global_init_args) -> int execute_for_write -> return bench_execute(vm, IO_TYPE_WRITE)
+    ...
+    do_bench
+    ...
+    md_ctx.aio_flush()
+      aio_write_cond.wait  <- aio_write_cond.notify_all() <- complete_aio_write
+
+...
+#0  librados::IoCtxImpl::flush_aio_writes (this=0x55555609ee70) at /home/xb/project/ceph/xb/ceph/src/librados/IoCtxImpl.cc:338
+#1  0x00007ffff71edcdb in librados::v14_2_0::IoCtx::aio_flush (this=0x55555605bb28) at /home/xb/project/ceph/xb/ceph/src/librados/librados_cxx.cc:2003
+#2  0x00007ffff74aa3c6 in librbd::ImageCtx::~ImageCtx (this=0x5555560594d0, __in_chrg=<optimized out>) at /home/xb/project/ceph/xb/ceph/src/librbd/ImageCtx.cc:172
+#3  0x00007ffff74e3784 in librbd::ImageState<librbd::ImageCtx>::close (this=0x55555609d0b0) at /home/xb/project/ceph/xb/ceph/src/librbd/ImageState.cc:279
+#4  0x00007ffff7474f2b in librbd::Image::close (this=0x7fffffffdf00) at /home/xb/project/ceph/xb/ceph/src/librbd/librbd.cc:1572
+#5  0x00007ffff7474eea in librbd::Image::~Image (this=0x7fffffffdf00, __in_chrg=<optimized out>) at /home/xb/project/ceph/xb/ceph/src/librbd/librbd.cc:1562
+#6  0x0000555555a7ac7d in rbd::action::bench::bench_execute (vm=..., bench_io_type=rbd::action::bench::(anonymous namespace)::IO_TYPE_WRITE) at /home/xb/project/ceph/xb/ceph/src/tools/rbd/action/Bench.cc:558
+#7  0x0000555555a7af4c in rbd::action::bench::execute_for_write (vm=..., ceph_global_init_args=std::vector of length 0, capacity 0) at /home/xb/project/ceph/xb/ceph/src/tools/rbd/action/Bench.cc:563
+#8  0x0000555555a599c8 in rbd::Shell::execute (this=0x7fffffffe3c7, argc=11, argv=0x7fffffffe4b8) at /home/xb/project/ceph/xb/ceph/src/tools/rbd/Shell.cc:204
+#9  0x00005555559f39fc in main (argc=11, argv=0x7fffffffe4b8) at /home/xb/project/ceph/xb/ceph/src/tools/rbd/rbd.cc:9
+
+
+
+
+#0  librados::IoCtxImpl::complete_aio_write (this=0x55555609e5f0, c=0x7fffb0011de0) at /home/xb/project/ceph/xb/ceph/src/librados/IoCtxImpl.cc:290
+#1  0x00007ffff7225bd2 in librados::IoCtxImpl::C_aio_Complete::finish (this=0x7fffb0001e10, r=0) at /home/xb/project/ceph/xb/ceph/src/librados/IoCtxImpl.cc:1971
+#2  0x00007ffff71bfc49 in Context::complete (this=0x7fffb0001e10, r=0) at /home/xb/project/ceph/xb/ceph/src/include/Context.h:77
+#3  0x00007ffff726dcf3 in Objecter::handle_osd_op_reply (this=0x555555fa74e0, m=0x7fffdc000d30) at /home/xb/project/ceph/xb/ceph/src/osdc/Objecter.cc:3558
+#4  0x00007ffff72586f7 in Objecter::ms_dispatch (this=0x555555fa74e0, m=0x7fffdc000d30) at /home/xb/project/ceph/xb/ceph/src/osdc/Objecter.cc:996
+#5  0x00007ffff72906aa in Objecter::ms_fast_dispatch (this=0x555555fa74e0, m=0x7fffdc000d30) at /home/xb/project/ceph/xb/ceph/src/osdc/Objecter.h:2195
+#6  0x00007ffff723ec3a in Dispatcher::ms_fast_dispatch2 (this=0x555555fa74e8, m=...) at /home/xb/project/ceph/xb/ceph/src/msg/Dispatcher.h:84
+#7  0x00007fffed72018c in Messenger::ms_fast_dispatch (this=0x555555fa22c0, m=...) at /home/xb/project/ceph/xb/ceph/src/msg/Messenger.h:676
+#8  0x00007fffed71e13a in DispatchQueue::fast_dispatch (this=0x555555fa2618, m=...) at /home/xb/project/ceph/xb/ceph/src/msg/DispatchQueue.cc:72
+#9  0x00007fffed865ab3 in DispatchQueue::fast_dispatch (this=0x555555fa2618, m=0x7fffdc000d30) at /home/xb/project/ceph/xb/ceph/src/msg/DispatchQueue.h:203
+#10 0x00007fffed8c4825 in ProtocolV2::handle_message (this=0x7fffb0009060) at /home/xb/project/ceph/xb/ceph/src/msg/async/ProtocolV2.cc:1479
+#11 0x00007fffed8c0c09 in ProtocolV2::handle_read_frame_dispatch (this=0x7fffb0009060) at /home/xb/project/ceph/xb/ceph/src/msg/async/ProtocolV2.cc:1137
+#12 0x00007fffed8c2c0b in ProtocolV2::_handle_read_frame_epilogue_main (this=0x7fffb0009060) at /home/xb/project/ceph/xb/ceph/src/msg/async/ProtocolV2.cc:1325
+#13 0x00007fffed8c2a44 in ProtocolV2::handle_read_frame_epilogue_main(std::unique_ptr<ceph::buffer::v15_2_0::ptr_node, ceph::buffer::v15_2_0::ptr_node::disposer>&&, int) (this=0x7fffb0009060, 
+    buffer=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2, CU 0x2845a97, DIE 0x294b353>, r=0) at /home/xb/project/ceph/xb/ceph/src/msg/async/ProtocolV2.cc:1300
+#14 0x00007fffed8ef2ba in CtRxNode<ProtocolV2>::call (this=0x7fffb0009408, foo=0x7fffb0009060) at /home/xb/project/ceph/xb/ceph/src/msg/async/Protocol.h:67
+#15 0x00007fffed8b2816 in ProtocolV2::run_continuation (this=0x7fffb0009060, continuation=...) at /home/xb/project/ceph/xb/ceph/src/msg/async/ProtocolV2.cc:47
+#16 0x00007fffed8bb265 in operator() (__closure=0x7fffb0006ec0, buffer=0x7fffdc003e40 "\021\002)", r=0) at /home/xb/project/ceph/xb/ceph/src/msg/async/ProtocolV2.cc:755
+#17 0x00007fffed8d9d73 in std::__invoke_impl<void, ProtocolV2::read(CONTINUATION_RXBPTR_TYPE<ProtocolV2>&, rx_buffer_t&&)::<lambda(char*, int)>&, char*, long int>(std::__invoke_other, struct {...} &) (__f=...)
+    at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/invoke.h:61
+#18 0x00007fffed8d994f in std::__invoke_r<void, ProtocolV2::read(CONTINUATION_RXBPTR_TYPE<ProtocolV2>&, rx_buffer_t&&)::<lambda(char*, int)>&, char*, long int>(struct {...} &) (__fn=...) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/invoke.h:111
+#19 0x00007fffed8d90cb in std::_Function_handler<void(char*, long int), ProtocolV2::read(CONTINUATION_RXBPTR_TYPE<ProtocolV2>&, rx_buffer_t&&)::<lambda(char*, int)> >::_M_invoke(const std::_Any_data &, <unknown type in /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2, CU 0x2845a97, DIE 0x292f28b>, <unknown type in /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2, CU 0x2845a97, DIE 0x292f29b>) (__functor=..., 
+    __args#0=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2, CU 0x2845a97, DIE 0x292f28b>, __args#1=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2, CU 0x2845a97, DIE 0x292f29b>)
+    at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_function.h:290
+#20 0x00007fffed86754f in std::function<void (char*, long)>::operator()(char*, long) const (this=0x7fffb0006ec0, __args#0=0x7fffdc003e40 "\021\002)", __args#1=0) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_function.h:590
+#21 0x00007fffed86140b in AsyncConnection::process (this=0x7fffb0006b40) at /home/xb/project/ceph/xb/ceph/src/msg/async/AsyncConnection.cc:458
+#22 0x00007fffed86645e in C_handle_read::do_request (this=0x7fffb0006fb0, fd_or_id=24) at /home/xb/project/ceph/xb/ceph/src/msg/async/AsyncConnection.cc:71
+#23 0x00007fffed8f3368 in EventCenter::process_events (this=0x555555fdd8d0, timeout_microseconds=30000000, working_dur=0x7fffe71e8530) at /home/xb/project/ceph/xb/ceph/src/msg/async/Event.cc:406
+#24 0x00007fffed900c23 in operator() (__closure=0x555556037978) at /home/xb/project/ceph/xb/ceph/src/msg/async/Stack.cc:53
+#25 0x00007fffed90278e in std::__invoke_impl<void, NetworkStack::add_thread(unsigned int)::<lambda()>&>(std::__invoke_other, struct {...} &) (__f=...) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/invoke.h:61
+#26 0x00007fffed902675 in std::__invoke_r<void, NetworkStack::add_thread(unsigned int)::<lambda()>&>(struct {...} &) (__fn=...) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/invoke.h:111
+#27 0x00007fffed90255c in std::_Function_handler<void(), NetworkStack::add_thread(unsigned int)::<lambda()> >::_M_invoke(const std::_Any_data &) (__functor=...) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_function.h:290
+#28 0x00007fffed9003f4 in std::function<void ()>::operator()() const (this=0x555556037978) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_function.h:590
+#29 0x00007fffed9003a4 in std::__invoke_impl<void, std::function<void ()>>(std::__invoke_other, std::function<void ()>&&) (__f=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2, CU 0x2a65ef0, DIE 0x2ae0546>)
+    at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/invoke.h:61
+#30 0x00007fffed900359 in std::__invoke<std::function<void ()>>(std::function<void ()>&&) (__fn=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2, CU 0x2a65ef0, DIE 0x2ae0af2>)
+    at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/invoke.h:96
+#31 0x00007fffed900306 in std::thread::_Invoker<std::tuple<std::function<void ()> > >::_M_invoke<0ul>(std::_Index_tuple<0ul>) (this=0x555556037978) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_thread.h:253
+#32 0x00007fffed9002da in std::thread::_Invoker<std::tuple<std::function<void ()> > >::operator()() (this=0x555556037978) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_thread.h:260
+#33 0x00007fffed9002be in std::thread::_State_impl<std::thread::_Invoker<std::tuple<std::function<void ()> > > >::_M_run() (this=0x555556037970) at /opt/rh/devtoolset-11/root/usr/include/c++/11/bits/std_thread.h:211
+#34 0x00007fffede2d7c4 in execute_native_thread_routine () from /home/xb/project/ceph/xb/ceph/build/lib/libceph-common.so.2
+#35 0x00007fffeba04ea5 in start_thread () from /lib64/libpthread.so.0
+#36 0x00007fffea08bb0d in clone () from /lib64/libc.so.6
+
+
 
 客户端写, osd写, 参考
 https://my.oschina.net/u/2460844/blog/534390
@@ -763,6 +845,8 @@ ceph osd pool create {pool-name} [{pg-num} [{pgp-num}]] erasure [erasure-code-pr
 cd build; ceph osd pool create p1 3 && ceph osd lspools && rados bench -p p1 5 write
 ceph osd pool stats p1
 
+
+python入口:
 import pdb; pdb.set_trace()
 ceph.in -> def main()
 parse_cmdargs
@@ -781,6 +865,24 @@ extern "C" int _rados_mgr_command
 osd
 case MSG_OSD_PG_CREATE
 handle_pg_create(op)
+
+
+创池, pool_create
+examples/librados/hello_world_c.c -> main
+...
+rados_pool_create(rados, pool_name)
+rados_ioctx_create(rados, pool_name, &io_ctx)
+rados_write_full(io_ctx, object_name, hello, strlen(hello))
+rados_aio_create_completion2(NULL, NULL, &read_completion)
+rados_aio_read(io_ctx, object_name, read_completion, read_buf, read_len, 0)
+rados_aio_wait_for_complete(read_completion)
+rados_aio_get_return_value(read_completion)
+rados_aio_release(read_completion)
+rados_write_op_write_full(write_op, content, strlen(content)) -> 如果我们想变得非常酷，我们可以在一个原子操作中完成多项事情。 例如，我们可以更新对象的内容并同时设置版本
+rados_write_op_setxattr(write_op, "version", version, strlen(version))
+rados_write_op_operate(write_op, io_ctx, object_name, NULL, 0)
+rados_release_write_op(write_op)
+rados_create_write_op() -> 更酷的是，我们可以在写入之前确保对象看起来像我们期望的那样！ 请注意此尝试如何因 xattr 不同而失败
 
 
 
@@ -891,6 +993,12 @@ cmake --build .
 
 rbd接口使用:
 examples/librbd/hello_world.cc
+make
+gdb --args ./hello_world_cpp --conf=/home/xb/project/ceph/xb/ceph/build/ceph.conf
+rados.init("admin") -> int librados::Rados::init(const char * const id) -> extern "C" int _rados_create
+  ...
+rados.conf_parse_argv(argc, argv)
+
 
 
 
@@ -1869,6 +1977,7 @@ export PYTHONPATH=./pybind:/home/xb/project/stor/ceph/ceph/src/pybind:/home/xb/p
 export LD_LIBRARY_PATH=/home/xb/project/stor/ceph/ceph/build/lib
 
 export PYTHONPATH=/usr/local/lib64/python3.6/site-packages/babeltrace:$PYTHONPATH
+export CEPH_CONF=/home/xb/project/ceph/xb/ceph/build/ceph.conf
 
 sudo vim /etc/ld.so.conf.d/sb.conf
   $ sudo ldconfig 
@@ -2100,7 +2209,6 @@ python 调用 c++。在 c++ 里定义 PyObject* ceph_state_get(PyObject *self, P
 [ -z "$CEPH_OUT_DIR" ] && CEPH_OUT_DIR="$CEPH_DIR/out"
 [ -z "$CEPH_RGW_PORT" ] && CEPH_RGW_PORT=8000
 [ -z "$CEPH_CONF_PATH" ] && CEPH_CONF_PATH=$CEPH_DIR
-
 
 
 常用命令:
