@@ -67,3 +67,6 @@
 [submodule "src/pybind/mgr/rook/rook-client-python"]
 	path = src/pybind/mgr/rook/rook-client-python
 	url = https://github.com/ceph/rook-client-python.git
+[submodule "fio"]
+	path = fio
+	url = https://github.com/ssbandjl/fio.git

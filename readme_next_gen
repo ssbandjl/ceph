@@ -17,7 +17,7 @@ FR004支持OP请求发送:SR002, FR001, FR003
     启动性能统计线程
     启动MAP订阅线程
     启动asok线程(并定端口, 监听和处理命令行)
-    初始化HomeLess队列(IO无家可归(osd异常)时入该队列)
+    初始化HomeLess队列(IO无家可归(osd异常)时入该队列, flag: CEPH_OSDMAP_PAUSERD, homeless_session)
     对象初始化
       序列化的初始化(如性能统计)
       更新本地crush
@@ -82,7 +82,7 @@ OSD异常
 ...
 计算目标节点
 测试目标节点连通性
-  如果OSD无法访问, 判断是否将IO放入 homeless
+  如果OSD无法访问, 判断是否将IO放入 homeless_session
 ...
 
 
@@ -106,8 +106,15 @@ F8: 池实例创建销毁和池级别io操作(未开始)
 
 
 F9: fio压测对象语义(未开始)
-
-
+实现fio引擎语义(ioengine_ops ioengine)
+rados初始化
+rados IO入队(aio和回调)
+获取IO完成事件(判断当前是否还有没有处理完的io events)
+统计IO完成事件
+清理
+打开文件(不实现)
+IO初始化(io单元)
+IO释放
 
 
 F12: 支持op调度(tse?, 已调研, 待融合)

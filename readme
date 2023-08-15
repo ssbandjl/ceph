@@ -1,8 +1,10 @@
 https://github.com/ssbandjl/ceph/tree/v15.2.17
 https://github.com/ssbandjl/ceph/tree/main
 
-性能测试,fio: https://www.cnblogs.com/wangmo/p/11309080.html, https://github.com/get-set/fio-bench-disks-ceph, https://blog.csdn.net/get_set/article/details/108092302
+性能测试,fio: https://www.cnblogs.com/wangmo/p/11309080.html, https://github.com/get-set/fio-bench-disks-ceph, https://blog.csdn.net/get_set/article/details/108092302, https://access.redhat.com/documentation/en-us/red_hat_ceph_storage/1.3/html/administration_guide/performance_counters
+ceph管理手册_红帽: https://access.redhat.com/documentation/en-us/red_hat_ceph_storage/1.3/html/administration_guide/index
 
+监控集群: https://access.redhat.com/documentation/en-us/red_hat_ceph_storage/1.3/html/administration_guide/monitoring
 
 ceph客户端源码分析(librados,crush,objecter): https://blog.csdn.net/csnd_pan/category_7315843.html
 
@@ -1642,6 +1644,8 @@ rados_write.c:83 -> main
             osdmap->pg_to_up_acting_osds
             update_pg_mapping(actual_pgid, std::move(pg_mapping))
         _get_session(op->target.osd, &s, sul) -> 获取会话 -> int Objecter::_get_session
+          if (osd < 0) -> osd异常
+            *session = homeless_session -> 设置会话为无家可归会话(暂不发)
           map<int,OSDSession*>::iterator p = osd_sessions.find(osd)
           if (p != osd_sessions.end())
             *session = s -> 如果在会话(连接池)中找到了会话, 则直接返回该会话
@@ -1660,8 +1664,8 @@ rados_write.c:83 -> main
           _maybe_request_map() -> 更新map
             monc->sub_want("osdmap"
             monc->renew_subs()
-        if (!s->is_homeless()) -> 不是无家可归(可放家里)(osd不是-1)
-          need_send = true -> 需要发送
+        if (!s->is_homeless()) -> 不是无家可归(osd不是-1)
+          need_send = true -> 不是无家可归, 需要发送
         _session_op_assign(s, op)
           get_session(to) -> s->get()
         if (need_send)
@@ -2758,14 +2762,25 @@ fio_backend
   stat_init()
   run_threads
     setup_files
-      err = td->io_ops->setup(td) -> fio_rados_setup
+      err = td->io_ops->setup(td) -> static int fio_rados_setup
+        _fio_setup_rados_data
         _fio_rados_connect
           rados_create(&rados->cluster, o->client_name)
           pool_name -> rados
           rados_ioctx_create
-          rados_write(rados->io_ctx, f->file_name, "", 0, 0)
+          for td->o.nr_files 32个文件
+            rados_write(rados->io_ctx, f->file_name, "", 0, 0) -> filename=rbd_iodepth32.0.0 -> extern "C" int _rados_write
+            ...
 
 
+关键数据结构, 公共模块, src/common/
+hash对象 struct hobject_t {
 
+线程池: class ThreadPool
+void ThreadPool::start()
+
+共享线程池: class ShardedThreadPool
+
+定时器: class SafeTimer
 
 
