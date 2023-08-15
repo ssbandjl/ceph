@@ -1,6 +1,8 @@
 https://github.com/ssbandjl/ceph/tree/v15.2.17
 https://github.com/ssbandjl/ceph/tree/main
 
+性能测试,fio: https://www.cnblogs.com/wangmo/p/11309080.html, https://github.com/get-set/fio-bench-disks-ceph, https://blog.csdn.net/get_set/article/details/108092302
+
 
 ceph客户端源码分析(librados,crush,objecter): https://blog.csdn.net/csnd_pan/category_7315843.html
 
@@ -2743,4 +2745,27 @@ objecter->create_pool(name, onfinish, crush_rule)
   pool_op_submit(op) -> _pool_op_submit
      MPoolOp *m = new MPoolOp
      monc->send_mon_message(m) -> void Monitor::send_mon_message
+
+
+
+fio, 配置文件: static struct fio_option options[]
+fio --enghelp
+fio ./fio_rados.fio
+fio.c -> main
+fio_server_create_sk_key
+parse_options
+fio_backend
+  stat_init()
+  run_threads
+    setup_files
+      err = td->io_ops->setup(td) -> fio_rados_setup
+        _fio_rados_connect
+          rados_create(&rados->cluster, o->client_name)
+          pool_name -> rados
+          rados_ioctx_create
+          rados_write(rados->io_ctx, f->file_name, "", 0, 0)
+
+
+
+
 

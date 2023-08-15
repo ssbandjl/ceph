@@ -1,0 +1,14 @@
+
+[global]
+description="write test with block size of 4M"
+#默认读取 /etc/ceph/ceph.conf 文件。确保 fio 运行的服务器有ceph集群的/etc/ceph/文件夹，如果没有scp 拷贝到fio 服务器上
+ioengine=rbd
+clientname=admin
+pool=rbd
+rbdname=fio_test_image
+runtime=120
+rw=write #write 表示顺序写，randwrite 表示随机写，read 表示顺序读，randread 表示随机读
+bs=4M
+ 
+[iodepth]
+iodepth=32
