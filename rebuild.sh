@@ -1,5 +1,6 @@
 set -x 
 
+clear
 rm -rf build
 ./do_cmake.sh
 
