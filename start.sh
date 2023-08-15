@@ -1,6 +1,6 @@
 # ../src/vstart.sh --debug --new -o "osd_tracing = true"
 # ../src/vstart.sh --debug --new
-cd build
+# cd build
 FS=0 OSD=3 MON=3 MGR=3 ../src/vstart.sh --debug --new
 echo -e "create_pool: ceph osd pool create p1 3"
 

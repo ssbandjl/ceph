@@ -5,6 +5,7 @@ rm -rf build
 
 # 七牛云缓存加速, http://rz2fg6ogr.hn-bkt.clouddn.com/boost_1_72_0.tar.bz2
 cp boost_1_72_0.tar.bz2 build/boost/src/boost_1_72_0.tar.bz2
+# cp -r fio build/src/
 # cp boost_1_72_0.tar.bz2_tgz build/boost/src/boost_1_72_0.tar.bz2
 
 function print(){

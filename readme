@@ -779,7 +779,7 @@ handle_read_frame_dispatch
 handle_message
 Message *decode_message
   bad crc in front
-filter: *.cc, *.h, src/msg, *.sh, *.rst
+filter: *.cc, *.h, src/msg, *.sh, *.rst,    *.cc, *.h, *.hpp, *.cpp, *.c, *.py
 
 生成uudid: uuidgen
 NetworkStack::add_thread(unsigned int)::{lambda()#1}::operator()() const ()
@@ -2699,10 +2699,35 @@ int execute
                     add_op(CEPH_OSD_OP_CREATE)
                   cls_client::set_id(&op, m_image_id);//创建image的ID对象，并写入image id
                   create_rados_callback<klass, &klass::handle_create_id_object>(this)
-                  m_io_ctx.aio_operate(m_id_obj, comp, &op) -> int librados::IoCtx::aio_operate
-                    
+                  m_io_ctx.aio_operate(m_id_obj, comp, &op) -> int librados::IoCtx::aio_operate -> int librados::IoCtxImpl::aio_operate
+                    Context *oncomplete = new C_aio_Complete(c) -> 异步IO公共回调 -> void librados::IoCtxImpl::C_aio_Complete::finish
+                    queue_aio_write(c) -> aio入队
+                    Objecter::Op *op = objecter->prepare_mutate_op -> CEPH_OSD_FLAG_WRITE -> 把ObjectOperation封装为Op类型
+                    objecter->op_submit(op, &c->tid) -> 提交OP
                m_io_ctx.aio_operate(RBD_DIRECTORY, comp, &op) -> OP操作在"rbd_directory"执行
           req->send()
             read_rbd_info() -> 读"rbd_info"
       r = cond.wait()
   thick_write
+
+
+test: 单元测试, src/test
+src/test/librados/c_write_operations.cc
+
+
+
+test/librados_example/rados_write_op_create.c
+...
+rados_create_write_op -> extern "C" rados_write_op_t _rados_create_write_op()
+  new (std::nothrow)::ObjectOperation
+rados_write_op_create -> extern "C" void _rados_write_op_create
+  void create(bool excl)
+    OSDOp& o = add_op(CEPH_OSD_OP_CREATE)
+rados_write_op_write(op, "four", 4, 0) -> extern "C" void _rados_write_op_write
+  add_data(CEPH_OSD_OP_WRITE
+rados_write_op_operate(op, io, "test", NULL, 0)
+
+
+
+
+cmake --DEBUG_TEST=ON
