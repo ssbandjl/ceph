@@ -4,6 +4,7 @@ https://github.com/ssbandjl/ceph/tree/main
 
 ceph客户端源码分析(librados,crush,objecter): https://blog.csdn.net/csnd_pan/category_7315843.html
 
+cache: http://rz2fg6ogr.hn-bkt.clouddn.com/ceph_v15_2_17_with_submodule.tgz
 
 build:
 close mrg,dashboard in build/CMakeCache.txt
@@ -186,7 +187,7 @@ rsync -urpv root@ubuntu22:/root/project/stor/ceph/xb/docker/ceph/build/bin/ceph_
 rsync -urpv root@ubuntu22:/root/project/stor/ceph/xb/docker/ceph/build/lib/libceph-common.so.2 .
 
 
-编译ceph_msgr_perf工具:
+编译ceph_msgr_perf工具, 单元测试
 cmake -DWITH_TESTS=1 ../CMakeList.txt
 cd build
 make common, ceph-common, ceph_perf_msgr_client, ceph_perf_msgr_server,  
@@ -2731,3 +2732,15 @@ rados_write_op_operate(op, io, "test", NULL, 0)
 
 
 cmake --DEBUG_TEST=ON
+
+
+创建池(rados_pool_create(rados, pool_name)) -> rados_pool_create(*cluster, pool_name.c_str())
+wait_for_osdmap
+onfinish
+objecter->create_pool(name, onfinish, crush_rule)
+  lookup_pg_pool_name
+  op->pool_op = POOL_OP_CREATE
+  pool_op_submit(op) -> _pool_op_submit
+     MPoolOp *m = new MPoolOp
+     monc->send_mon_message(m) -> void Monitor::send_mon_message
+

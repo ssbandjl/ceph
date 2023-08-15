@@ -79,24 +79,35 @@ FR006支持map订阅和更新
 FR007engine故障场景OP发送控制, 引擎故障, backoff, map刷新, 超时检测和返回(网络层), 1, 2 homeless队列如何保证性能
 参考: osd_state: up/down/in/out
 OSD异常
-判断是否将IO放入homeless
+...
+计算目标节点
+测试目标节点连通性
+  如果OSD无法访问, 判断是否将IO放入 homeless
+...
 
 
 
 FR009性能统计(嵌入发送流程)
+
+
 
 FR007 asock功能支持(嵌入发送流程)
   实例化asok, 实例化套接字钩子, 注册命令行命令
   启动asok线程(并定端口, 监听和处理命令行)
 
 
+
 F8: 池实例创建销毁和池级别io操作(未开始)
 创建集群, 解析参数(可选), 连接集群
-创建池(rados_pool_create(rados, pool_name))
-
+创建池(rados_pool_create(rados, pool_name)) -> rados_pool_create(*cluster, pool_name.c_str())
+更新OSD_MAP
+设置创池操作(POOL_OP_CREATE)
+通过MonC给Monitor发送创池消息
 
 
 F9: fio压测对象语义(未开始)
+
+
 
 
 F12: 支持op调度(tse?, 已调研, 待融合)

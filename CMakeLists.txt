@@ -515,6 +515,8 @@ elseif(WITH_FIO)
     set(FIO_INCLUDE_DIR ${CMAKE_BINARY_DIR}/src/fio)
   endif()
   include(BuildFIO)
+  # execute_process()
+  # COMMAND ${CMAKE_COMMAND} -E copy fio ${CMAKE_BINARY_DIR}/src/fio
   build_fio()
 endif()
 

@@ -12,11 +12,14 @@ function print(){
   echo -e  "\n\033[32m`date +'%Y/%m/%d %H:%M:%S'` $*\033[0m"
 }
 
+# for i in {0..10};do echo "wait $i";done
+
 start_time=`date +%s`
 print "start build"
 
 cd build
 make -j64
+# make
 # make install
 
 # enable rdma

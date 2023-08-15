@@ -86,6 +86,7 @@ build_bak/
 build_*
 
 test/librados_example/rados_write
+test/librados_example/rados_write_op_create
 
 
 ceph-client

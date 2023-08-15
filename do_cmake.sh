@@ -75,10 +75,14 @@ ARGS+=" -DWITH_BLKIN=OFF"
 # ${CMAKE} $ARGS  -DCMAKE_C_FLAGS="-Og -g3" -DCMAKE_CXX_FLAGS="-Og -g3" "$@" $CEPH_GIT_DIR || exit 1
 # ${CMAKE} $ARGS  -DCMAKE_C_FLAGS="-g" -DCMAKE_CXX_FLAGS="-g" "$@" $CEPH_GIT_DIR || exit 1
 
-# 谷歌单元测试
-${CMAKE} $ARGS  -DCMAKE_C_FLAGS="-g" --DEBUG_TEST=ON -DCMAKE_CXX_FLAGS="-g" "$@" $CEPH_GIT_DIR || exit 1
-set +x
+ARGS+=" -DWITH_FIO=ON"
 
+# 谷歌单元测试
+${CMAKE} $ARGS  -DCMAKE_C_FLAGS="-g" -DWITH_TESTS=ON -DCMAKE_CXX_FLAGS="-g" "$@" $CEPH_GIT_DIR || exit 1
+cp -r fio build/src/
+
+
+set +x
 # minimal config to find plugins
 cat <<EOF > ceph.conf
 [global]
