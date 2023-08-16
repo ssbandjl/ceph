@@ -87,7 +87,17 @@ OSD异常
 
 
 
-FR009性能统计(嵌入发送流程)
+FR009性能统计(嵌入发送流程), dump指标: ceph daemon osd.0 perf dump, 增加计数: logger->inc, 指标demo: l_osdc_linger_send | l_osdc_op_w
+定义枚举(指标变量): enum -> 如: l_osdc_linger_send
+对象初始化中(注册指标): void Objecter::init()
+  pcb.add_u64_counter(l_osdc_linger_send, "linger_send", -> 增加计数器指标 | pcb.add_u64_avg -> 或增加均值指标
+  ...
+void Objecter::_send_linger
+  logger->inc(l_osdc_linger_send) -> 发送心跳业务中增加该计数器 -> 或: _send_op_account 登记OP中增加计数器(l_osdc_op_w)
+使用指标: ceph daemon osd.0 perf dump
+
+
+
 
 
 
@@ -97,7 +107,7 @@ FR007 asock功能支持(嵌入发送流程)
 
 
 
-F8: 池实例创建销毁和池级别io操作(未开始)
+F8: 池实例创建销毁和池级别io操作
 创建集群, 解析参数(可选), 连接集群
 创建池(rados_pool_create(rados, pool_name)) -> rados_pool_create(*cluster, pool_name.c_str())
 更新OSD_MAP
@@ -105,7 +115,7 @@ F8: 池实例创建销毁和池级别io操作(未开始)
 通过MonC给Monitor发送创池消息
 
 
-F9: fio压测对象语义(未开始)
+F9: fio压测对象语义
 实现fio引擎语义(ioengine_ops ioengine)
 rados初始化
 rados IO入队(aio和回调)
