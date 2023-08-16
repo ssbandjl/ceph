@@ -1,5 +1,5 @@
 FR004支持OP请求发送:SR002, FR001, FR003
-  ... 前置准备
+  ... 前置准备(sclient创建)
   客户端创建集群(rados_create2), 入参:集群地址, 集群名, 用户名, 标记
     实例化日志
     注册日志观察者
@@ -95,6 +95,7 @@ FR009性能统计(嵌入发送流程), dump指标: ceph daemon osd.0 perf dump, 
 void Objecter::_send_linger
   logger->inc(l_osdc_linger_send) -> 发送心跳业务中增加该计数器 -> 或: _send_op_account 登记OP中增加计数器(l_osdc_op_w)
 使用指标: ceph daemon osd.0 perf dump
+重置指标
 
 
 
