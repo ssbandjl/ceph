@@ -37,15 +37,15 @@ FR004支持OP请求发送:SR002, FR001, FR003
      准备可变OP(将对象操作封装为更灵活的可变OP)
        实例化可变OP, 设置回调
        在OP上初始化调试跟踪(trace)
+     -------------------------------- FR从这里开始
      提交操作(发送OP)
-       插入性能跟踪点
        计算目标OSD(调用crush算法)
-       OP操作序列化为RPC/BULK
-       增加性能统计计数,如:写计数(l_osdc_op_w)
+       检查OSD状态,是否将IO放入homeless -> op->target.paused -> _maybe_request_map -> epoch过期 -> 订阅和更新map
+       拆分EC/副本请求
+       OP操作序列化为RPC/BULK, 生成副本任务(依赖任务)
        发送RPC/BULK(hrpc_req_send)
   6. 业务调用trigger: 轮训/中断(等响应事件)(hrpc_trigger/epoll_wait)
       执行发送完成回调函数(如有)
-      释放OP到OP池(复用)
 
 
 FR005支持OP回复处理, 轮训/中断, 模式切换
@@ -66,7 +66,13 @@ epoll_wait
 解析出task -> 执行回调(参考轮训模式)
 
 
-FR006支持map订阅和更新
+
+
+
+FR007engine故障场景OP发送控制, 引擎故障, backoff, map刷新, 超时检测和返回(网络层), 1, 2 homeless队列如何保证性能
+参考: osd_state: up/down/in/out
+
+AR001(原FR006支持map订阅和更新)
   MonC实例化和初始化
   构造OP连接Monitor, 完成认证
   向Monitor注册订阅(monc->sub_want, renew_subs)  // monitor通知monc
@@ -74,10 +80,6 @@ FR006支持map订阅和更新
   处理Monitor发来的Map更新(MonClient::ms_dispatch)
   case 消息类型 -> 执行各自的map更新处理逻辑, 如: case CEPH_MSG_OSD_MAP -> return handle_osd_map
 
-
-
-FR007engine故障场景OP发送控制, 引擎故障, backoff, map刷新, 超时检测和返回(网络层), 1, 2 homeless队列如何保证性能
-参考: osd_state: up/down/in/out
 OSD异常
 ...
 计算目标节点

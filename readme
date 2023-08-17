@@ -1541,29 +1541,44 @@ rados_write.c:83 -> main
       state = CONNECTING -> 连接状态机 
       cct->_log->start()
         create("log") -> void Thread::create
-      MonClient mc_bootstrap(cct) -> MonClient::MonClient -> 启动monitor客户端
-
-      MonClient::get_monmap_and_config -> 配置网络通信，并开启3个 msgr_worker 线程, 参考: https://blog.csdn.net/DeamonXiao/article/details/120879244
+      MonClient mc_bootstrap(cct) -> MonClient::MonClient(CephContext *cct_) -> 实例化monitor客户端
+        want_monmap(true)
+      MonClient::get_monmap_and_config -> mon/MonClient：一次性 mon 连接开始获取配置，这不是特别有效，但它可以工作： - 连接到监视器以获取 monmap 和配置 - 将其全部拆除 - 继续正常启动（这可能涉及 再次重新连接到 mon）。 这允许我们设置可能影响 mon 通信本身的配置选项，例如 ms_type -> 配置网络通信，并开启3个 msgr_worker 线程, 参考: https://blog.csdn.net/DeamonXiao/article/details/120879244
         init_crypto ... -> static void init() 
         build_initial_monmap
           int MonMap::build_initial
-            init_with_ips
+            init_with_ips -> ceph.conf -> global -> mon host -> [v2:172.17.0.2:40287,v1:172.17.0.2:40288] [v2:172.17.0.2:40289,v1:172.17.0.2:40290] [v2:172.17.0.2:40291,v1:172.17.0.2:40292]
+              init_with_addrs ->
+                _add_ambiguous_addr -> no, 不明确的 mon addr 可能是遗留的，也可能是 msgr2——我们不确定何时发生这种情况，我们需要同时尝试它们（除非我们可以从端口号合理地推断出它是
+                add(name, addr, 0) -> void add(const std::string &name -> void add(const mon_info_t& m) -> 添加monitor到monmap, 优先级, 权重
+                  mon_info[m.name] = m -> noname-a:m
+                  calc_legacy_ranks()
+                  calc_addr_mons()
+                    addr_mons
             calc_legacy_ranks -> mon/MonMap：将排名顺序与entity_addr_t分开 我们当前根据mon地址的排序顺序定义mon排名顺序。 更改它，以便将排名顺序显式编码在 MonMap 的排名字段中。 如果我们加载旧版 MonMap，请计算旧版排序。 如果 monmap 尚不需要 nautilus 功能，请强制使用旧排序。 一旦所有 mons >= nautilus，我们就可以重新排序排名。 请注意，守护进程和客户端 (MonClients) 可能会看到不同的排名顺序。 那应该没问题
-        messenger = Messenger::create_client_messenger -> 创建客户端消息msg对象,启动3个work线程
+            calc_legacy_ranks -> 计算遗留ranks
+            monmap.print(*_dout) -> 打印monmap
+        messenger = Messenger::create_client_messenger temp_mon_client -> 创建mon临时客户端消息msg对象,启动3个work线程, messenger是MonC的属性
         add_dispatcher_head -> 启动2线程
         messenger->start() -> int AsyncMessenger::start()
         make_scope_guard
-        init() -> int MonClient::init()
+        init() -> int MonClient::init() -> MonC初始化
           refresh_config
           new RotatingKeyRing
           set_auth_client
           add_dispatcher_head
-          timer.init()
+          timer.init() -> 启动MonC定时任务
             thread = new SafeTimerThread(this)
             thread->create("safe_timer") -> void SafeTimer::timer_thread() -> ceph中的SafeTimer类详解: https://blog.csdn.net/turou3442/article/details/96441221, https://blog.csdn.net/tiantao2012/article/details/78426276?ydreferer=aHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS8%3D, 由于是thread的子类，从entry的实现就知道这个thread的回调函数是timer_thread, void *entry() override
-          finisher.start() -> finisher_thread_entry -> ceph中的finisher类, https://blog.csdn.net/tiantao2012/article/details/79419556?ydreferer=aHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS8%3D, 要结束操作的类会把自己添加到finisher类的queue中，然后finisher类分别调用要结束操作类的complete函数
+          finisher.start() -> finisher_thread_entry -> finisher_empty_cond.notify_all() -> 唤醒条件变量,执行回调函数 -> ceph中的finisher类, https://blog.csdn.net/tiantao2012/article/details/79419556?ydreferer=aHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS8%3D, 要结束操作的类会把自己添加到finisher类的queue中，然后finisher类分别调用要结束操作类的complete函数
           schedule_tick() -> void MonClient::schedule_tick() -> void MonClient::tick()
+            auto do_tick = make_lambda_context([this](int) { tick(); })
             timer.add_event_after(hunt_interval, do_tick)
+        map_cond.wait_for <- 等待monitor发配置给monc, monc处理消息并唤醒(MonClient::handle_config), 然后设置mon启动配置
+        cct->_conf.set_mon_vals(cct, config->config, config_cb) -> int set_mon_vals(CephContext *cct
+          config.set_mon_vals(cct, values, obs_mgr, kv, config_cb)
+          _gather_changes(values.changed, &rev_obs, nullptr)
+          call_observers(locker, rev_obs)
       common_init_finish(cct)
         cct->start_service_thread
           _enable_perf_counter
@@ -1571,13 +1586,15 @@ rados_write.c:83 -> main
            _admin_socket->init -> bool AdminSocket::init -> 初始化asok -> 处理 ceph daemon 命令的线程, 和 service 线程一起提供了性能监控服务，service 线程更新各个模块性能参数，admin_socket 线程提供对外查询接口
             create_wakeup_pipe 
             bind_and_listen
-      monclient.build_initial_monmap()
+      monclient.build_initial_monmap() -> 第二次获取monmap
       Messenger::create_client_messenger(cct, "radosclient")
       objecter = new (std::nothrow) Objecter(cct, messenger, &monclient, &finisher) -> Objecter::Objecter
         ...
         homeless_session(new OSDSession(cct, -1))
         ...
       objecter->set_balanced_budget()
+      monclient.set_messenger(messenger) -> monc绑定msg
+      mgrclient.set_messenger(messenger)
       objecter->init() -> void Objecter::init() -> ... -> create_rados_client
         PerfCountersBuilder pcb(cct, "objecter", l_osdc_first, l_osdc_last) -> 性能统计
         RequestStateHook
@@ -1591,10 +1608,16 @@ rados_write.c:83 -> main
       messenger->add_dispatcher_head(&mgrclient)
       messenger->add_dispatcher_tail(objecter)
       messenger->start()
-      monclient.set_want_keys -> monc会订阅Monitor的OSDMap、MonMap相关信息
-      monclient.init
+      monclient.set_want_keys -> monc会订阅Monitor的OSDMap、MonMap相关信息, EPH_ENTITY_TYPE_MON | CEPH_ENTITY_TYPE_OSD | CEPH_ENTITY_TYPE_MGR
+      monclient.init() -> monc正式初始化(非临时)
+      monclient.authenticate -> monc认证
       monclient.sub_want("mgrmap", 0, 0) -> 订阅mgrmap更新的信息, mgr订阅模式: https://blog.csdn.net/tiantao2012/article/details/80109739 -> == "xxx" -> switch (m->get_type()) -> bool Objecter::ms_dispatch(Message *m) -> case MSG_MGR_MAP -> handle_mgr_map
-      monclient.renew_subs()
+        return sub.want(what, start, flags) -> bool MonSub::want(
+      monclient.renew_subs() -> void renew_subs() -> void MonClient::_renew_subs
+        _reopen_session
+        _send_mon_message(std::move(m)) -> monc -> monitor
+          ...
+        sub.renewed()
       mgrclient.init()
       objecter->set_client_incarnation -> 客户端化身, 向Monitor订阅 osdmap 请求, 获取 osdmap 数据
       objecter->start()  -> void Objecter::start
@@ -2663,14 +2686,6 @@ monitor: cluster_map串行化, 合并请求, 特定monitor统一发权威日志,
 
 
 
-map订阅和更新:
-monc->sub_want("osdmap"  -> 订阅osdmap
-
-monc->renew_subs() -> 更新osdmap
-
-
-
-
 rbd: 元数据, #define CEPH_RBD_FEATURES_H, src/include/rbd_types.h, 创建rbd, 参考: https://zhuanlan.zhihu.com/p/643939797, ceph存储专栏: https://www.zhihu.com/column/c_1661407683897901056, image元数据: https://blog.csdn.net/easonwx/article/details/124155878
 卷信息目录: rbd_directory, 创池和rbd_image: ceph osd pool create blockpool 3; rbd create blockpool/vol_2 --size 100M
 查看rbd_image: rados -p blockpool ls; rados -p blockpool listomapvals rbd_directory; order为0x16，因此rados对象大小为1 << 0x16=4M=65536B
@@ -3168,3 +3183,38 @@ TEST(PerfCounters, SinglePerfCounters)
   PerfCountersCollection *coll = g_ceph_context->get_perfcounters_collection()
   PerfCounters* fake_pf = setup_test_perfcounters1(g_ceph_context)
     PerfCountersBuilder bld(cct, "test_perfcounter_1"
+
+
+
+
+#0  MonClient::handle_config (this=0x7fffffffda90, m=0x7fffd4003d60) at /home/xb/project/ceph/xb/ceph/src/mon/MonClient.cc:454
+#1  0x00007fffeea9f472 in MonClient::ms_dispatch (this=0x7fffffffda90, m=0x7fffd4003d60) at /home/xb/project/ceph/xb/ceph/src/mon/MonClient.cc:377 -> case MSG_CONFIG
+#2  0x00007fffeeab7db0 in Dispatcher::ms_dispatch2 (this=0x7fffffffda90, m=...) at /home/xb/project/ceph/xb/ceph/src/msg/Dispatcher.h:124
+#3  0x00007fffee7fd42b in Messenger::ms_deliver_dispatch (this=0x4ea1e0, m=...) at /home/xb/project/ceph/xb/ceph/src/msg/Messenger.h:703
+#4  0x00007fffee7fc0b1 in DispatchQueue::entry (this=0x4ea540) at /home/xb/project/ceph/xb/ceph/src/msg/DispatchQueue.cc:199
+
+
+void ConfigMonitor::check_sub
+  maybe_send_config
+    send_config(s)
+      new MConfig(s->last_config) -> 消息类型: MSG_CONFIG
+      s->con->send_message(m) -> monitor -> monc -> monc 收到消息后 -> MonClient::handle_config
+        map_cond.notify_all() -> 唤醒monc阻塞的条件变量
+        finisher.queue
+          cct->_conf.set_mon_vals
+          config_notify_cb()
+
+
+monc收到monitor的map更新
+
+bool Objecter::ms_dispatch(Message *m)
+handle_osd_map
+  monc->get_fsid()
+  osdmap->test_flag(CEPH_OSDMAP_PAUSERD)
+  osdmap->get_epoch()
+  first map.  we want the full thing
+  _scan_requests
+  osdmap->decode(m->maps[m->get_last()]) prune_pg_mapping -> osdc/Objecter：pg-mapping 缓存，基于 CRUSH 的寻址是某种 CPU 密集型任务，因此应尽可能避免。 该补丁引入了每个对象程序 pg 映射缓存，因此可以节省 10% 以上的 CPU（fio、4k 随机数）读取，24k IOPS）
+  _scan_requests(homeless_session
+
+
