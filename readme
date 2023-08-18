@@ -839,7 +839,7 @@ ceph osd pool ls
 ceph osd pool ls detail
 ceph osd dump|grep pool
 rados df
-ceph osd pool get {pool-name} {key}
+ceph osd pool get {pool-name} {key}; ceph osd pool get p1 all //查询所有属性
 ceph df
 
 
@@ -1571,7 +1571,7 @@ rados_write.c:83 -> main
             thread = new SafeTimerThread(this)
             thread->create("safe_timer") -> void SafeTimer::timer_thread() -> ceph中的SafeTimer类详解: https://blog.csdn.net/turou3442/article/details/96441221, https://blog.csdn.net/tiantao2012/article/details/78426276?ydreferer=aHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS8%3D, 由于是thread的子类，从entry的实现就知道这个thread的回调函数是timer_thread, void *entry() override
           finisher.start() -> finisher_thread_entry -> finisher_empty_cond.notify_all() -> 唤醒条件变量,执行回调函数 -> ceph中的finisher类, https://blog.csdn.net/tiantao2012/article/details/79419556?ydreferer=aHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS8%3D, 要结束操作的类会把自己添加到finisher类的queue中，然后finisher类分别调用要结束操作类的complete函数
-          schedule_tick() -> void MonClient::schedule_tick() -> void MonClient::tick()
+          schedule_tick() -> void MonClient::schedule_tick() -> 定时扫描发送, 设置了一个定时器，到时间后会被执行(scan_request)，执行完后重新设置新的定时器，所以会一直周期性地扫描 -> void MonClient::tick()
             auto do_tick = make_lambda_context([this](int) { tick(); })
             timer.add_event_after(hunt_interval, do_tick)
         map_cond.wait_for <- 等待monitor发配置给monc, monc处理消息并唤醒(MonClient::handle_config), 然后设置mon启动配置
@@ -3208,13 +3208,97 @@ void ConfigMonitor::check_sub
 monc收到monitor的map更新
 
 bool Objecter::ms_dispatch(Message *m)
-handle_osd_map
+handle_osd_map -> 全量/增量: https://blog.51cto.com/liangchaoxi/5068354, 函数分析: https://ouyangtao.gitbooks.io/ceph-/content/handle_osd_map.html, osd restart之后pg如何达到active+clean: https://zhuanlan.zhihu.com/p/423640688
   monc->get_fsid()
   osdmap->test_flag(CEPH_OSDMAP_PAUSERD)
   osdmap->get_epoch()
+  osdmap = std::move(new_osdmap)
   first map.  we want the full thing
   _scan_requests
   osdmap->decode(m->maps[m->get_last()]) prune_pg_mapping -> osdc/Objecter：pg-mapping 缓存，基于 CRUSH 的寻址是某种 CPU 密集型任务，因此应尽可能避免。 该补丁引入了每个对象程序 pg 映射缓存，因此可以节省 10% 以上的 CPU（fio、4k 随机数）读取，24k IOPS）
-  _scan_requests(homeless_session
+  _scan_requests(homeless_session -> void Objecter::_scan_requests -> 先扫描后重发
+    查找变化的
+  _send_linger(op, sul) -> 重发
+  _dump_active -> _dump_active(homeless_session)
+  monc->sub_got("osdmap", osdmap->get_epoch())
 
+
+
+
+osdmap, 集群map, rados原理与实现: https://e.dangdang.com/pc/reader/index.html?id=1901104772
+
+
+
+OP语义, OP事务(class Transaction {):
+OP_WRITE -> rados_write 同步写 -> CEPH_RADOS_API int rados_write(rados_ioctx_t io, const char *oid, const char *buf, size_t len, uint64_t off)
+...
+
+aio_write -> 异步写 -> CEPH_RADOS_API int rados_aio_write(rados_ioctx_t io, const char *oid, rados_completion_t completion, const char *buf, size_t len, uint64_t off)
+  ...
+  Context *oncomplete = new C_aio_Complete(c)
+  queue_aio_write(c)
+    c->aio_write_seq = ++aio_write_seq
+     aio_write_list.push_back(&c->aio_write_list_item) -> 将IO加入队列
+  prepare_write_op -> CEPH_OSD_OP_WRITE
+  objecter->op_submit(o, &c->tid)
+  ...
+  flush_aio_writes
+
+OP_WRITEFULL -> write_full -> 异步写入整个对象 该对象填充有提供的数据。 如果该对象存在，则会自动截断该对象，然后写入。 将 write_full 排队并返回。 成功时完成的返回值为 0，失败时为负错误代码 -> CEPH_OSD_OP_WRITEFULL -> CEPH_RADOS_API int rados_aio_write_full(rados_ioctx_t io, const char *oid, rados_completion_t completion, const char *buf, size_t len)
+
+OP_READ -> 读 -> CEPH_RADOS_API int rados_read(rados_ioctx_t io, const char *oid, char *buf, size_t len, uint64_t off)
+  CEPH_OSD_OP_READ
+  operate_read
+    Objecter::Op *objecter_op = objecter->prepare_read_op
+    objecter->op_submit(objecter_op)
+
+
+OP_TRUNCATE -> 截断对象, 丢弃对象中超出指定大小的所有数据, 调整对象大小 如果这放大了对象，则新区域在逻辑上会用零填充。 如果这缩小了对象，多余的数据将被删除
+  CEPH_RADOS_API int rados_trunc(rados_ioctx_t io, const char *oid, uint64_t size);
+  op.truncate(size)
+    add_data(CEPH_OSD_OP_TRUNCATE, off, 0, bl)
+    ...
+  return operate(oid, &op, NULL)
+
+
+
+OP_ZERO -> 将对象清零, 将对象内指定的字节范围清零。 一些ObjectStore实例可能会对此进行优化以释放底层存储空间。 如果零范围超出了对象的末尾，则对象大小会扩展，就像我们正在写入一个充满零的缓冲区一样。 除非长度为 0，在这种情况下（就像 0 长度写入一样）我们不调整对象大小
+CEPH_RADOS_API void rados_write_op_zero(rados_write_op_t write_op,
+			                uint64_t offset,
+			                uint64_t len);
+  ((::ObjectOperation *)write_op)->zero(offset, len)
+    add_data(CEPH_OSD_OP_ZERO
+  
+
+OP_CREATE -> 新建对象 -> CEPH_OSD_OP_CREATE, 应用场景,如:创建RBD image | cls_cxx_create
+...
+rbd/cls_rbd_client层：添加image到RBD目录
+handle_add_image_to_directory
+  op.create(true) -> 封装OP写操作
+  add_op(CEPH_OSD_OP_CREATE)
+  ...
+
+CEPH_RADOS_API void rados_write_op_create(rados_write_op_t write_op,
+                                          int exclusive, // 独占, 如果对象已存在，设置为 LIBRADOS_CREATE_EXCLUSIVE 或 LIBRADOS_CREATE_IDEMPOTENT 将出错
+                                          const char* category);
+
+
+
+OP_DELETE
+RGWOp* RGWHandler_REST::get_op -> op_delete -> rgw语义?
+
+
+OP_STAT -> CEPH_RADOS_API int rados_stat(rados_ioctx_t io, const char *o, uint64_t *psize, time_t *pmtime)
+C_ObjectOperation_stat *h = new C_ObjectOperation_stat
+add_op(CEPH_OSD_OP_STAT)
+
+
+OP_CALL
+OMAP*
+OP_READ_REPAIE(新加语义)
+OP_STAT_WRITE (新加语义)
+
+
+管理命令: https://docs.ceph.com/en/reef/man/8/ceph/
+ceph config-key ls
 
