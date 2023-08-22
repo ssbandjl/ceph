@@ -3123,6 +3123,7 @@ Objecter::ms_dispatch(Message *m)
  -> onfinish->complete(rc) // 丢finish队列，finish处理回调
 
 
+谷歌测试, TEST, 
 google_test, 性能计数示例代码,  -> test/perf_counters.cc -> main -> gdb ./unittest_perf_counters ->  main
 admin_socket get_rand_socket_path -> 获取临时随机asok文件
   tdir, (long int)getpid(), time(NULL) -> /tmp/perfcounters_test_socket.222280.1692164672 -> 根据临时目录, 进程id, 空时间生成
@@ -3301,4 +3302,17 @@ OP_STAT_WRITE (新加语义)
 
 管理命令: https://docs.ceph.com/en/reef/man/8/ceph/
 ceph config-key ls
+
+
+
+bluestor元数据及缓存, cache, https://www.zhihu.com/people/allincache/posts
+OSD::init()
+store->set_cache_shards(get_num_cache_shards())
+
+
+void BlueStore::_txc_state_proc(TransContext *txc)
+保序: void BlueStore::_txc_finish_io(TransContext *txc)
+
+
+
 
