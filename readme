@@ -533,7 +533,7 @@ NetworkStack::add_thread
       center->create_file_event EVENT_WRITABLE read_handler -> process
       logger->tinc -> void PerfCounters::tinc 性能统计(时延统计)
     ...
-    protocol->read_event() -> START_ACCEPT -> run_continuation(CONTINUATION(start_server_banner_exchange))
+    protocol->read_event() -> switch (state) -> 判断状态 -> START_ACCEPT -> run_continuation(CONTINUATION(start_server_banner_exchange)) -> 消息状态机 -> class ProtocolV2 : public Protocol 
       CONTINUATION_RUN(continuation)
       CtPtr ProtocolV2::read -> ssize_t AsyncConnection::read -> read_until
         read_bulk ->  nread = cs.read(buf, len) -> ssize_t RDMAConnectedSocketImpl::read -> eventfd_read(notify_fd, &event_val)
