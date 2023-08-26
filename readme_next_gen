@@ -132,6 +132,27 @@ rados IO入队(aio和回调)
 IO初始化(io单元)
 IO释放
 
+实现FIO设置, IO请求入队, 获取IO完成事件,
+rados_aio_is_complete, rados_release_write_op, rados_aio_release, rados_aio_create_completion, rados_aio_write, rados_aio_read, rados_create_write_op, rados_write_op_zero
+
+/* ioengine_ops for get_ioengine() */
+FIO_STATIC struct ioengine_ops ioengine = {
+	.name = "rados",
+	.version		= FIO_IOOPS_VERSION,
+	.flags			= FIO_DISKLESSIO,
+	.setup			= fio_rados_setup,
+	.queue			= fio_rados_queue,
+	.getevents		= fio_rados_getevents,
+	.event			= fio_rados_event,
+	.cleanup		= fio_rados_cleanup,
+	.open_file		= fio_rados_open,
+	.invalidate		= fio_rados_invalidate,
+	.options		= options,
+	.io_u_init		= fio_rados_io_u_init,
+	.io_u_free		= fio_rados_io_u_free,
+	.option_struct_size	= sizeof(struct rados_options),
+};
+
 
 F12: 支持op调度(tse,预计1k)
 tse_task_create 创建任务
