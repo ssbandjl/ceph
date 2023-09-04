@@ -1468,7 +1468,7 @@ lrwxrwxrwx 1 root root   14 Jul 21 16:23 /opt/h3c/lib/librbd_tp.so -> librbd_tp.
 lrwxrwxrwx 1 root root   18 Jul 21 16:23 /opt/h3c/lib/librbd_tp.so.1 -> librbd_tp.so.1.0.0
 -rwxr-xr-x 1 root root 468K Jul 21 16:23 /opt/h3c/lib/librbd_tp.so.1.0.0
 
-
+---------------------------------------- DL ----------------------------------------
 参考文档, 深入理解ceph crush(3)—Object至PG映射源码分析: https://www.dovefi.com/post/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3crush3object%E8%87%B3pg%E6%98%A0%E5%B0%84%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/
 iopath, cd /home/xb/project/stor/ceph/xb/docker/ceph/test/librados_example; ./gdb_rados_write.sh
 rados_write.c:83 -> main
@@ -2465,7 +2465,7 @@ get_tracked_conf_keys
 
 void OSD::asok_command
 
-daemon -> def admin_socket(asok_path, cmd, format='')
+ceph daemon xxx perf_dump -> def admin_socket(asok_path, cmd, format='')
 ceph.in
 
 
@@ -3212,7 +3212,7 @@ bool Objecter::ms_dispatch(Message *m)
 handle_osd_map -> 全量/增量: https://blog.51cto.com/liangchaoxi/5068354, 函数分析: https://ouyangtao.gitbooks.io/ceph-/content/handle_osd_map.html, osd restart之后pg如何达到active+clean: https://zhuanlan.zhihu.com/p/423640688
   monc->get_fsid()
   osdmap->test_flag(CEPH_OSDMAP_PAUSERD)
-  osdmap->get_epoch()
+  if (m->get_last() <= osdmap->get_epoch()) -> 如果订阅返回的epoch比当前osdmap更旧,则忽略
   osdmap = std::move(new_osdmap)
   first map.  we want the full thing
   _scan_requests
