@@ -1539,9 +1539,9 @@ rados_write.c:83 -> main
   rados_connect -> extern "C" int _rados_connect(rados_t cluster) -> 连接集群, 参考: https://www.jianshu.com/p/58956728dadc
     client->connect() -> int librados::RadosClient::connect()
       state = CONNECTING -> 连接状态机 
-      cct->_log->start()
+      cct->_log->start() -> 启动日志线程
         create("log") -> void Thread::create
-      MonClient mc_bootstrap(cct) -> MonClient::MonClient(CephContext *cct_) -> 实例化monitor客户端
+      MonClient mc_bootstrap(cct) -> MonClient::MonClient(CephContext *cct_) -> 实例化monitor客户端(启动monc)
         want_monmap(true)
       MonClient::get_monmap_and_config -> mon/MonClient：一次性 mon 连接开始获取配置，这不是特别有效，但它可以工作： - 连接到监视器以获取 monmap 和配置 - 将其全部拆除 - 继续正常启动（这可能涉及 再次重新连接到 mon）。 这允许我们设置可能影响 mon 通信本身的配置选项，例如 ms_type -> 配置网络通信，并开启3个 msgr_worker 线程, 参考: https://blog.csdn.net/DeamonXiao/article/details/120879244
         init_crypto ... -> static void init() 
@@ -3209,8 +3209,12 @@ void ConfigMonitor::check_sub
 
 monc收到monitor的map更新
 
-bool Objecter::ms_dispatch(Message *m)
-handle_osd_map -> 全量/增量: https://blog.51cto.com/liangchaoxi/5068354, 函数分析: https://ouyangtao.gitbooks.io/ceph-/content/handle_osd_map.html, osd restart之后pg如何达到active+clean: https://zhuanlan.zhihu.com/p/423640688
+b Objecter.cc:1159
+void DispatchQueue::entry()
+  if (dispatcher->ms_dispatch2(m))
+    if (ms_dispatch(mr.get())) -> bool Objecter::ms_dispatch(Message *m)
+      handle_osd_map(static_cast<MOSDMap*>(m)) -> ...
+void Objecter::handle_osd_map(MOSDMap *m) -> 全量/增量: https://blog.51cto.com/liangchaoxi/5068354, 函数分析: https://ouyangtao.gitbooks.io/ceph-/content/handle_osd_map.html, osd restart之后pg如何达到active+clean: https://zhuanlan.zhihu.com/p/423640688
   monc->get_fsid()
   osdmap->test_flag(CEPH_OSDMAP_PAUSERD)
   if (m->get_last() <= osdmap->get_epoch()) -> 如果订阅返回的epoch比当前osdmap更旧,则忽略
@@ -3317,4 +3321,28 @@ void BlueStore::_txc_state_proc(TransContext *txc)
 
 
 
+osdmap加载和更新流程: 上述osdmap加载过程中涉及到两个内存缓存：map_cache和map_bl_cache（还有一个map_bl_inc_cache是保存增量osdmap的bufferlist的缓存），这两个缓存都是基于LRU算法，在OSDService类的构造函数中初始化的，默认的缓存空间大小（缓存项最大数量）是由配置项osd_map_cache_size决定的，其默认值是500，因此在启动过程中缓存的osdmap数量是足够的（根据实际线程环境osdmap变化速度，有运维操作时版本变化量是150左右，osdmap变化数量跟osd状态变化次数强相关，没有操作时基本不变）
+ceph_osd.cc -> main
+osdmap = get_map(superblock.current_epoch)
+  OSDMapRef OSDService::try_get_map
+    return _add_map(map)
+
+osd启动: 
+void OSD::start_boot()
+void OSD::_preboot(epoch_t oldest, epoch_t newest)
+_send_boot
+  monc->send_mon_message(mboot) -> 发送osd boot消息给monitor，之后monitor就认为osd已经启动, monitor根据类型做处理: MSG_OSD_BOOT
+
+monitor发送全量或增量
+send_latest
+
+
+void OSD::osdmap_subscribe
+  monc->sub_want_increment("osdmap"
+  monc->renew_subs()
+
+osd处理map:
+void OSD::handle_osd_map(MOSDMap *m)
+  处理全量或增量map, 更新superblock中的newest_map版本, 设置OSD为Active状态, 继续更新superblock,  保存superblock到硬盘（leveldb), 更新OSD心跳互检的对端列表, 检查osd是否可以启动（是否能发送MOSDBoot消息
+给monitor，使osd变为up状态
 
