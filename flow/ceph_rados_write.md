@@ -16,6 +16,8 @@ librados -> librados: 解析命令行参数
 
 
 app -> librados: rados_connect 连接集群
+librados -> librados: 实例化rados客户端 librados::RadosClient *client
+librados -> librados: create_client_messenger(cct, "radosclient") 创建rados客户端消息对象
 librados -> librados: 实例化monitor客户端 \n\
 创建mon临时客户端消息msg对象 \n\
 启动3个work线程 \n\

@@ -1656,12 +1656,13 @@ rados_write.c:83 -> main
           trace.init("op", nullptr, parent_trace) -> 初始化跟踪, 为librados和objecter添加blkin跟踪
       objecter->op_submit(objecter_op) -> 提交OP -> void Objecter::op_submit -> op->trace.event("op submit") 插入性能跟踪点 -> _op_submit_with_budget(op, rl, ptid, ctx_budget) 带预算 -> void Objecter::_op_submit_with_budget
         int op_budget = _take_op_budget(op, sul) -> 流控,减去该Op的预算 -> _op_submit(op, sul, ptid) -> void Objecter::_op_submit
-          bool check_for_latest_map = _calc_target(&op->target, nullptr) -> 计算目标节点(crush) -> false -> target结构参考: (gdb) p op->target
+          bool check_for_latest_map = _calc_target(&op->target, nullptr) -> RECALC_OP_TARGET_POOL_DNE -> 计算目标节点(crush) -> false -> target结构参考: (gdb) p op->target -> 关键函数: int Objecter::_calc_target(op_target_t *t, Connection *con, bool any_change) -> crush算法
+            通过标记判断是读还是写, 获取epoch(85), 打印基本信息, 通过目标上的基本对象分布在哪个池(t->base_oloc.pool)来获取pg池, osdmap上有pools信息, 默认无分层, 
             get_epoch
-            get_pg_pool
-            if ((t->flags & CEPH_OSD_FLAG_IGNORE_OVERLAY) == 0) -> osdc/Objecter：在每次 _calc_target 调用时重新计算 target_*，任何时候我们被要求计算目标时，我们都应该应用池分层参数。 之前仅在未计算目标时才这样做的逻辑没有多大意义，并且破坏了我们为获取目标池的正确 pg_num 所需的 *pi 更新。 对于采用原始 pg 的旧集群来说，这并不重要，但对于 luminous 及其他集群，我们需要精确的 spg_t，这需要正确的 pg_num
+            get_pg_pool -> 对象定位器结构说明: 定位器限制对象的放置。 主要是进入哪个池, 3, 
+            if ((t->flags & CEPH_OSD_FLAG_IGNORE_OVERLAY) == 0) -> osdc/Objecter：在每次 _calc_target 调用时重新计算 target_*，任何时候我们被要求计算目标时，我们都应该应用池分层参数。 之前仅在未计算目标时才这样做的逻辑没有多大意义，并且破坏了我们为获取目标池的正确 pg_num 所需的 *pi 更新。 对于采用原始 pg 的旧集群来说，这并不重要，但对于 luminous 及其他集群，我们需要精确的 spg_t，这需要正确的 pg_num, 如果设置了该标志(CEPH_OSD_FLAG_IGNORE_OVERLAY)，则将操作发送到指定的池并忽略覆盖。 请注意，这会废弃全局 Objecter 标志
             pi = osdmap->get_pg_pool(t->target_oloc.pool)
-            int ret = osdmap->object_locator_to_pg(t->target_oid, t->target_oloc
+            int ret = osdmap->object_locator_to_pg(t->target_oid, t->target_oloc -> 将对象映射到放置组
             ceph_stable_mod
             lookup_pg_mapping
             osdmap->pg_to_up_acting_osds
@@ -3217,8 +3218,9 @@ handle_osd_map -> 全量/增量: https://blog.51cto.com/liangchaoxi/5068354, 函
   first map.  we want the full thing
   _scan_requests
   osdmap->decode(m->maps[m->get_last()]) prune_pg_mapping -> osdc/Objecter：pg-mapping 缓存，基于 CRUSH 的寻址是某种 CPU 密集型任务，因此应尽可能避免。 该补丁引入了每个对象程序 pg 映射缓存，因此可以节省 10% 以上的 CPU（fio、4k 随机数）读取，24k IOPS）
-  _scan_requests(homeless_session -> void Objecter::_scan_requests -> 先扫描后重发
-    查找变化的
+  _scan_requests(homeless_session -> void Objecter::_scan_requests -> 先扫描后重发, 从homeless会话中拿到op, 然后执行下面的重发
+    查找变化的,遍历homeless会话, 重新计算目标, 返回需要重发标记位, 需要重发的OP加入重发队列, 检查map是否更新, 确认需要重发的目标已经拿到最新的map, 重发请求(_send_op(op)), 重发命令, 完成等待map更新的所有上下文, 调用完成方法
+    map<ceph_tid_t,LingerOp*>::iterator lp = s->linger_ops.begin()
   _send_linger(op, sul) -> 重发
   _dump_active -> _dump_active(homeless_session)
   monc->sub_got("osdmap", osdmap->get_epoch())

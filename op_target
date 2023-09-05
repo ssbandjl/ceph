@@ -1,0 +1,69 @@
+(gdb) p op->target
+$6 = {
+  flags = 32, 
+  epoch = 0, 
+  base_oid = {
+    name = "neo-obj"
+  }, 
+  base_oloc = {
+    pool = 1, 
+    key = "", 
+    nspace = "", 
+    hash = -1
+  }, 
+
+  target_oid = {
+    name = ""
+  }, 
+  target_oloc = {
+    pool = -1, 
+    key = "", 
+    nspace = "", 
+    hash = -1
+  }, 
+  precalc_pgid = false, 
+  pool_ever_existed = false, 
+  base_pgid = {
+
+    m_pool = 0, 
+    m_seed = 0, 
+    static calc_name_buf_size = 36 '$'
+  }, 
+  pgid = {
+    m_pool = 0, 
+    m_seed = 0, 
+    static calc_name_buf_size = 36 '$'
+  }, 
+  actual_pgid = {
+    pgid = {
+      m_pool = 0, 
+
+      m_seed = 0, 
+      static calc_name_buf_size = 36 '$'
+    }, 
+    shard = {
+      id = -1 '\377', 
+      static NO_SHARD = {
+        id = -1 '\377', 
+        static NO_SHARD = <same as static member of an already seen type>
+      }
+    }, 
+    static calc_name_buf_size = 40 '('
+  }, 
+
+  pg_num = 0, 
+  pg_num_mask = 0, 
+  pg_num_pending = 0, 
+  up = std::vector of length 0, capacity 0, 
+  acting = std::vector of length 0, capacity 0, 
+  up_primary = -1, 
+  acting_primary = -1, 
+  size = -1, 
+  min_size = -1, 
+  sort_bitwise = false, 
+  recovery_deletes = false, 
+  used_replica = false, 
+  paused = false, 
+  osd = -1, 
+  last_force_resend = 0
+}
