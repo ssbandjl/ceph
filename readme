@@ -3425,6 +3425,8 @@ _write -> objectcacher->file_write ->
       __u32 stripe_count = layout->stripe_count
       upper_bound
   return writex(wr, oset, nullptr) -> ObjectCacher::writex
-    
+
+缓存写
+bool ObjectCacherObjectDispatch<I>::write
 
 
