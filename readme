@@ -2298,6 +2298,73 @@ write_iops_log=write_iops_log
 write_bw_log=write_bw_log
 write_lat_log=write_lat_log
 
+rbd引擎:
+FIO_STATIC struct ioengine_ops ioengine = {
+	.name			= "rbd",
+	.version		= FIO_IOOPS_VERSION,
+	.setup			= fio_rbd_setup,
+	.init			= fio_rbd_init,
+	.queue			= fio_rbd_queue,
+	.getevents		= fio_rbd_getevents,
+	.event			= fio_rbd_event,
+	.cleanup		= fio_rbd_cleanup,
+	.open_file		= fio_rbd_open,
+	.invalidate		= fio_rbd_invalidate,
+	.options		= options,
+	.io_u_init		= fio_rbd_io_u_init,
+	.io_u_free		= fio_rbd_io_u_free,
+	.option_struct_size	= sizeof(struct rbd_options),
+};
+
+rados引擎:
+FIO_STATIC struct ioengine_ops ioengine = {
+	.name = "rados",
+	.version		= FIO_IOOPS_VERSION,
+	.flags			= FIO_DISKLESSIO,
+	.setup			= fio_rados_setup,
+	.queue			= fio_rados_queue,
+	.getevents		= fio_rados_getevents,
+	.event			= fio_rados_event,
+	.cleanup		= fio_rados_cleanup,
+	.open_file		= fio_rados_open,
+	.invalidate		= fio_rados_invalidate,
+	.options		= options,
+	.io_u_init		= fio_rados_io_u_init,
+	.io_u_free		= fio_rados_io_u_free,
+	.option_struct_size	= sizeof(struct rados_options),
+};
+
+
+fio_rados参考配置:
+######################################################################
+# Example test for the RADOS engine.
+#
+# Runs a 4k random write test against a RADOS via librados
+#
+# NOTE: Make sure you have either Ceph pool named 'rados' or change
+#       the pool parameter.
+######################################################################
+[global]
+#logging
+#write_iops_log=write_iops_log
+#write_bw_log=write_bw_log
+#write_lat_log=write_lat_log
+ioengine=rados
+clientname=admin
+pool=rados
+conf=/etc/ceph/ceph.conf
+busy_poll=0
+rw=randwrite
+bs=4k
+
+[rbd_iodepth32]
+iodepth=32
+size=128m
+nr_files=32
+
+
+
+
 
 gdb --args rados bench -p p1 10 write --no-cleanup
 src/tools/rados/rados.cc -> main
@@ -3345,4 +3412,19 @@ osd处理map:
 void OSD::handle_osd_map(MOSDMap *m)
   处理全量或增量map, 更新superblock中的newest_map版本, 设置OSD为Active状态, 继续更新superblock,  保存superblock到硬盘（leveldb), 更新OSD心跳互检的对端列表, 检查osd是否可以启动（是否能发送MOSDBoot消息
 给monitor，使osd变为up状态
+
+
+---------- 条带 ----------
+文件数据线性地址: (object-name, offset, length) -> file_to_extents -> 三维地址空间(objectset, object, stripe)
+_write -> objectcacher->file_write -> 
+  OSDWrite *wr = prepare_write(snapc, bl, mtime, flags, 0)
+  Striper::file_to_extents(cct, oset->ino, layout, offset, len, oset->truncate_size, wr->extents)
+    file_to_extents(cct, buf, layout, offset, len, trunc_size, extents) -> 计算条带,负载均衡
+      __u32 object_size = layout->object_size
+      __u32 su = layout->stripe_unit
+      __u32 stripe_count = layout->stripe_count
+      upper_bound
+  return writex(wr, oset, nullptr) -> ObjectCacher::writex
+    
+
 
