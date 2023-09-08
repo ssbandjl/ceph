@@ -1,0 +1,68 @@
+'在线渲染: https://www.planttext.com/'
+'使用文档: https://plantuml.com/zh/sequence-diagram'
+
+
+'fio_rados 命令行参数: https://fio.readthedocs.io/en/latest/fio_doc.html, 或查看参考配置:fio_rado 参考配置, https://blog.csdn.net/DeamonXiao/article/details/120879653, fio源码解读测试: https://blog.csdn.net/weixin_38428439/article/details/121642171, '
+
+
+@startuml
+
+title FIO支持RADOS写
+header 随机写(轮训,创建对象): fio -name=ceph_rados -ioengine=rados -bs=4k -rw=randwrite -clustername=admin -clientname=admin -conf=ceph.conf -busy_poll=1 -touch_objects=1 -pool=p1 -size=4m -numjobs=1
+
+
+
+
+start
+
+:fio.c -> main
+initialize_fio 时钟, 小池(mmap), 大小端检查, cpu架构, 文件锁, 保留关键字
+parse_options 解析参数, 注册回调, 填充定义的线程数据, 设置共享线程区域;
+
+:fio_backend 启动后端;
+:run_threads(sk_out) 启动线程;
+:if (setup_files(td)) 初始化文件;
+:fio_rados_setup RADOS初始化
+_fio_setup_rados_data(td, &rados) 设置rados数据(连接状态,异步事件,锁, 完成操作等)
+
+_fio_rados_connect 连接RADOS集群;
+if () then(有集群名)
+  :rados_create2(&rados->cluster, o->cluster_name, client_name, 0) 连接集群;
+else (无集群名)
+  :rados_create(&rados->cluster, o->client_name) 连接集群; 
+endif
+
+:rados_conf_read_file 读配置文件;
+:rados_connect(rados->cluster) 连接集群;
+
+:(init_io_u(td)) 初始化IO
+fio_rados_io_u_init 初始化RADOS的IO;
+
+
+:do_io(td, bytes_done) 执行IO ;
+:td_io_queue(td, io_u) IO入队 ;
+:fio_rados_queue RADOS IO入队 ;
+
+
+:数据方向为(异步)写(DDIR_WRITE);
+:rados_aio_create_completion(fri, complete_callback, NULL, &fri->completion) 创建完成回调;
+:rados_aio_write(rados->io_ctx, object, fri->completion, io_u->xfer_buf, io_u->xfer_buflen, io_u->offset) 调用RADOS异步写;
+
+:wait_for_completions(td, &comp_time) 等待IO完成;
+:io_u_queued_complete;
+:td_io_getevents -> fio_rados_getevents 获取完成事件;
+:rados_aio_is_complete 检查AIO是否完成;
+
+:fio_rados_io_u_free IO完成释放资源;
+:rados_aio_release(fri->completion);
+:rados_release_write_op(fri->write_op);
+
+:fio_rados_cleanup 清理RADOS集群;
+:rados_remove(rados->io_ctx, f->file_name);
+:rados_ioctx_destroy(rados->io_ctx);
+:rados_shutdown(rados->cluster);
+
+
+stop
+
+@enduml
