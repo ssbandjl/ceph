@@ -3285,10 +3285,20 @@ void Objecter::handle_osd_map(MOSDMap *m) -> 全量/增量: https://blog.51cto.c
   monc->get_fsid()
   osdmap->test_flag(CEPH_OSDMAP_PAUSERD)
   if (m->get_last() <= osdmap->get_epoch()) -> 如果订阅返回的epoch比当前osdmap更旧,则忽略
+  handle_osd_map got epochs -> osdmap有效
   osdmap = std::move(new_osdmap)
-  first map.  we want the full thing
-  _scan_requests
-  osdmap->decode(m->maps[m->get_last()]) prune_pg_mapping -> osdc/Objecter：pg-mapping 缓存，基于 CRUSH 的寻址是某种 CPU 密集型任务，因此应尽可能避免。 该补丁引入了每个对象程序 pg 映射缓存，因此可以节省 10% 以上的 CPU（fio、4k 随机数）读取，24k IOPS）
+  first map.  we want the full thing -> 第一张map
+  _scan_requests -> 扫描请求
+  osdmap->decode(m->maps[m->get_last()]) -> void OSDMap::decode(ceph::buffer::list& bl) -> 使用完整的osdmap来启动，之前我们请求并解码了增量的完整历史记录，在启动过程中浪费了很大的时间
+    void OSDMap::decode -> 有关 osdmap 版本的说明以及引入时间，请参阅 doc/dev/osd_internals/osdmap_versions.txt
+      ...
+      crush->decode(cblp)
+      ...
+      post_decode()
+        calc_num_osds()
+        _calc_up_osd_features()
+  prune_pg_mapping -> 修剪放置组映射 -> osdc/Objecter：pg-mapping 缓存，基于 CRUSH 的寻址是某种 CPU 密集型任务，因此应尽可能避免。 该补丁引入了每个对象程序 pg 映射缓存，因此可以节省 10% 以上的 CPU（fio、4k 随机数）读取，24k IOPS）, https://github.com/ssbandjl/ceph/commit/8697db15c4ff59cd0c4dc021652576e72351dbaf
+    mapping_array.resize(pg_num)
   _scan_requests(homeless_session -> void Objecter::_scan_requests -> 先扫描后重发, 从homeless会话中拿到op, 然后执行下面的重发
     查找变化的,遍历homeless会话, 重新计算目标, 返回需要重发标记位, 需要重发的OP加入重发队列, 检查map是否更新, 确认需要重发的目标已经拿到最新的map, 重发请求(_send_op(op)), 重发命令, 完成等待map更新的所有上下文, 调用完成方法
     map<ceph_tid_t,LingerOp*>::iterator lp = s->linger_ops.begin()
@@ -3308,7 +3318,8 @@ OP_WRITE -> rados_write 同步写 -> CEPH_RADOS_API int rados_write(rados_ioctx_
 ...
 
 aio_write -> 异步写 -> CEPH_RADOS_API int rados_aio_write(rados_ioctx_t io, const char *oid, rados_completion_t completion, const char *buf, size_t len, uint64_t off)
-  ...
+...
+librados::IoCtxImpl::aio_write
   Context *oncomplete = new C_aio_Complete(c)
   queue_aio_write(c)
     c->aio_write_seq = ++aio_write_seq
@@ -3428,5 +3439,55 @@ _write -> objectcacher->file_write ->
 
 缓存写
 bool ObjectCacherObjectDispatch<I>::write
+
+
+https://github.com/ssbandjl/ceph/commit/8697db15c4ff59cd0c4dc021652576e72351dbaf
+基于 CRUSH 的寻址是某种 CPU 密集型任务，因此应尽可能避免, 该补丁引入了每个对象程序 pg 映射缓存，因此可以节省 10% 以上的 CPU（fio、4k 随机读取、24k IOPS,
+The CRUSH-based addressing is some kind of CPU intensive task and hence should be avoid whenever possible.
+
+The patch introduces a per objecter pg-mapping cache, which as
+a result can saved us 10%+ CPU (fio, 4k randow read, 24k IOPS):
+
+Was:
+$ top -Hp 415864
+top - 14:45:39 up 6 days, 5:45, 3 users, load average: 9.67, 8.66, 8.45
+Threads: 23 total, 3 running, 20 sleeping, 0 stopped, 0 zombie
+%Cpu(s): 21.6 us, 14.5 sy, 0.0 ni, 59.6 id, 1.4 wa, 0.0 hi, 3.0 si, 0.0 st
+KiB Mem : 19616576+total, 12773412+free, 50964508 used, 17467128 buff/cache
+KiB Swap: 4194300 total, 4194300 free, 0 used. 14352892+avail Mem
+
+PID USER PR NI VIRT RES SHR S %CPU %MEM TIME+ COMMAND
+415942 root 20 0 1957800 492820 123880 R 80.0 0.3 0:13.75 tp_librbd
+
+Now:
+$ top -Hp 475779
+top - 10:22:05 up 1:18, 4 users, load average: 2.65, 1.44, 1.60
+Threads: 23 total, 2 running, 21 sleeping, 0 stopped, 0 zombie
+%Cpu(s): 6.1 us, 2.2 sy, 0.0 ni, 91.4 id, 0.0 wa, 0.0 hi, 0.2 si, 0.0 st
+KiB Mem : 19616576+total, 13919555+free, 27280820 used, 29689392 buff/cache
+KiB Swap: 4194300 total, 4194300 free, 0 used. 16798102+avail Mem
+
+PID USER PR NI VIRT RES SHR S %CPU %MEM TIME+ COMMAND
+476231 root 20 0 1957808 491712 123836 S 71.1 0.3 0:41.47 tp_librbd
+
+And below is a more detailed report from the perf tool:
+
+Was:
+$ perf report -g graph
+Children Self Command Shared Object Symbol
++ 29.33% 0.03% tp_librbd librados.so.2.0.0 [.] Objecter::op_submit
++ 28.83% 0.09% tp_librbd librados.so.2.0.0 [.] Objecter::_op_submit_with_budget
++ 27.12% 0.17% tp_librbd librados.so.2.0.0 [.] Objecter::_op_submit
++ 16.47% 0.26% tp_librbd librados.so.2.0.0 [.] Objecter::_calc_target
++ 15.04% 0.10% tp_librbd libceph-common.so.0 [.] OSDMap::_pg_to_up_acting_osds
++ 13.52% 0.16% tp_librbd libceph-common.so.0 [.] OSDMap::_pg_to_raw_osds
+
+Now:
+$ perf report -g graph
+Children Self Command Shared Object Symbol
++ 17.84% 0.04% tp_librbd librados.so.2.0.0 [.] Objecter::op_submit
++ 17.34% 0.06% tp_librbd librados.so.2.0.0 [.] Objecter::_op_submit_with_budget
++ 15.80% 0.17% tp_librbd librados.so.2.0.0 [.] Objecter::_op_submit
++ 6.11% 2.02% tp_librbd librados.so.2.0.0 [.] Objecter::_calc_target
 
 
