@@ -2,15 +2,15 @@
  //gcc ceph_test_v2.c  -lrbd -lrados  -g -Wall
  //gcc rbd_write.c  -lrbd -lrados  -g -Wall  -Wl,-rpath=/opt/h3c/lib -lrados -L/opt/h3c/lib/
  
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
-//  #include <rados/librados.h>
-//  #include <rbd/librbd.h>
-//  #include <assert.h>
-//#include <rados/librados.h>
-#include </opt/h3c/include/rados/librados.h>
-#include </opt/h3c/include/rbd/librbd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <rados/librados.h>
+#include <rbd/librbd.h>
+#include <assert.h>
+
+// #include </opt/h3c/include/rados/librados.h>
+// #include </opt/h3c/include/rbd/librbd.h>
  
 //  static int print_progress_percent(uint64_t offset, uint64_t src_size,void *data)
 //  {
@@ -31,7 +31,8 @@
      rados_ioctx_t io; 
      //  char *poolname = "p0"; rados lspools
      //  char *poolname = ".d.rbd";
-     char *poolname = ".disk_pool1.rbd";
+    //  char *poolname = ".disk_pool1.rbd";
+     char *poolname = "ecpool";
  
      //Initialize the cluster handle with the "ceph" cluster name 
      //and the "client.admin" user name
@@ -45,7 +46,8 @@
      }   
      
      //Read a ceph configuration file to configure the cluster handle
-     rt_num = rados_conf_read_file(cluster, "/etc/ceph/ceph.conf");
+    //  rt_num = rados_conf_read_file(cluster, "/etc/ceph/ceph.conf");
+     rt_num = rados_conf_read_file(cluster, "/home/xb/project/ceph/xb/ceph/build/ceph.conf");
      if(rt_num<0){
          printf("%s:can't read config file: %s\n", argv[0], strerror(-rt_num));
          return -1;
@@ -83,7 +85,10 @@
          printf("\nCreated I/O context. \n");
      }
  
-     const char* name = "image_100g";
+    //  const char* name = "image_100g";
+    // 创建卷: rbd create --size 1024 p1/image1 && rbd ls p1 && rbd info p1/image1
+    const char* name = "image1";
+
     //  const char* name_01 = "img2";
     //  const char* name_02 = "rbd_test_02.img";
     //  uint64_t size = 1073741824;
@@ -129,7 +134,7 @@
      }
  
     //  size_t num = 1000<<20;
-     size_t num = 1<<20;
+     size_t num = 1<<20; // 1MB=1048576
     //  size_t num = 1<<16; // 1<<16=4M
      char* buf = (char*)malloc(num);
      sprintf((char *) buf, "Hello_world!\n");

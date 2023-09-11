@@ -1639,7 +1639,7 @@ rados_write.c:83 -> main
     ::ObjectOperation op -> 构造OP
     prepare_assert_ops(&op) -> 添加任何适合给定 IoCtx 中统计信息的版本断言操作，无论是目标版本断言还是任何 src 对象断言。 这些会影响单个 ioctx 操作，因此在我们执行操作时清除 ioctx 状态。 如果我们添加了任何事件，则返回指向 ObjectOperation 的指针； 这对于将 extra_ops 参数传递到 Objecter 方法中很方便
     mybl.substr_of(bl, 0, len) -> 先申明mybl, 获取子字符串, 截取子串
-    op.write(off, mybl) -> void write(uint64_t off, ceph::buffer::list& bl) -> write(off, bl, 0, 0)
+    op.write(off, mybl) -> void write(uint64_t off, ceph::buffer::list& bl) -> write(off, bl, 0 /* trunk_size */, 0 /* trunk_seq */)
       add_data(CEPH_OSD_OP_WRITE, off, bl.length(), bl) -> 封装OP, 增加操作码 -> void add_data(int op, uint64_t off, uint64_t len, ceph::buffer::list& bl)
         OSDOp& osd_op = add_op(op) -> 添加操作码
           ops[s].op.op = op
@@ -3489,5 +3489,63 @@ Children Self Command Shared Object Symbol
 + 17.34% 0.06% tp_librbd librados.so.2.0.0 [.] Objecter::_op_submit_with_budget
 + 15.80% 0.17% tp_librbd librados.so.2.0.0 [.] Objecter::_op_submit
 + 6.11% 2.02% tp_librbd librados.so.2.0.0 [.] Objecter::_calc_target
+
+
+ec, 类ECBackend实现了EC的读写操作。ECUtil里定义了编码和解码的函数实现。ECTransaction定了EC的事务
+int PrimaryLogPG::do_osd_ops(OpContext *ctx, vector<OSDOp>& ops)
+  case CEPH_OSD_OP_WRITE
+  requires_aligned_append
+  t->write(soid, op.extent.offset, op.extent.length, osd_op.indata, op.flags)
+
+
+默认情况下，Ceph 池是使用“复制”类型创建的。 在复制类型池中，每个对象都被复制到多个磁盘。 这种多重复制是一种称为“复制”的数据保护方法。  相比之下，纠删码池使用与复制不同的数据保护方法。 在纠删码中，数据被分成两种片段：数据块和奇偶校验块。 如果驱动器发生故障或损坏，奇偶校验块将用于重建数据。 在规模上，纠删码相对于复制可以节省空间。  在本文档中，数据块被称为“数据块”，奇偶校验块被称为“编码块”。  纠删码也称为“前向纠错码”。 第一个前向纠错码是由贝尔实验室的 Richard Hamming 于 1950 年开发的。
+https://docs.ceph.com/en/reef/rados/operations/erasure-code/
+
+ceph osd pool create ecpool erasure
+echo ABCDEFGHI | rados --pool ecpool put NYAN -
+rados --pool ecpool get NYAN -
+
+默认纠删码配置文件可以承受两个 OSD 的重叠丢失而不丢失数据。 此纠删码配置文件相当于大小为 3 的复制池，但具有不同的存储要求：它不需要 3TB 来存储 1TB，而是只需要 2TB 来存储 1TB。 可以使用此命令显示默认配置文件
+ceph osd erasure-code-profile get default
+k=2
+m=2
+plugin=jerasure
+crush-failure-domain=host
+technique=reed_sol_van
+
+默认纠删码池有两个数据块 (K) 和两个编码块 (M)。 默认纠删码池的配置文件是“k=2 m=2”。最简单的纠删码池有两个数据块 (K) 和一个编码块 (M)。 最简单的纠删码池的配置文件是“k=2 m=1”
+
+chunk，块, 当调用编码函数时，它返回彼此大小相同的块。 有两种块：（1）数据块，可以连接起来重建原始对象；（2）编码块，可以用来重建丢失的块
+K, 对象被划分为的数据块的数量。 例如，如果 K = 2，则将一个 10KB 的对象分为两个各 5KB 的对象
+M, 由编码函数计算的编码块的数量。 M 等于集群中可以丢失的 OSD 数量，而集群不会丢失数据。 例如，如果有两个编码块，则可以丢失两个 OSD 而不会丢失数据
+
+在冗余度（冗余度=实际存储空间/有效存储空间）方面，三副本方式下，每1个数据块都需要额外的2个数据块做副本，冗余度为3/1=3，而在RS-3-2的策略下，每3个数据块只需要额外的2个数据块就能够实现可靠性目标，冗余度为5/3=1.67, 最终，我们通过RS-3-2的方式能够在1.67倍冗余的情况下，实现近似三副本的可靠性
+
+class ECBackend : public PGBackend
+
+int OSDMonitor::prepare_command_pool_set
+  p.flags |= pg_pool_t::FLAG_EC_OVERWRITES
+
+
+rados -p ecpool bench 20 write -t 32 -b 4096 --no-cleanup
+rbd create rbd/myimage --size 1T --data-pool ec42
+
+设置可覆盖:
+ceph osd erasure-code-profile set ec32_nvme \
+  plugin=jerasure k=2 m=1 technique=reed_sol_van \
+  crush-root=default crush-failure-domain=host crush-device-class=nvme \
+  directory=/usr/lib/ceph/erasure-code
+
+ceph osd erasure-code-profile set ec32 \
+  plugin=jerasure k=2 m=1 technique=reed_sol_van \
+  crush-root=default crush-failure-domain=host \
+  directory=/usr/lib/ceph/erasure-code
+
+ceph osd pool create ec_pool 16 erasure ec32
+ceph osd pool set ec_pool allow_ec_overwrites true
+ceph osd pool application enable ec_pool rbd
+rbd create --size 1024 ec_pool/image1
+
+
 
 
