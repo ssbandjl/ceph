@@ -3491,6 +3491,8 @@ Children Self Command Shared Object Symbol
 + 6.11% 2.02% tp_librbd librados.so.2.0.0 [.] Objecter::_calc_target
 
 
+
+---------- ec ----------
 ec, 类ECBackend实现了EC的读写操作。ECUtil里定义了编码和解码的函数实现。ECTransaction定了EC的事务
 int PrimaryLogPG::do_osd_ops(OpContext *ctx, vector<OSDOp>& ops)
   case CEPH_OSD_OP_WRITE
@@ -3548,4 +3550,8 @@ rbd create --size 1024 ec_pool/image1
 
 
 
+/ErasureCodeClay.cc
+
+
+---------- ec ----------
 

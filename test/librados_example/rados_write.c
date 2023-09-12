@@ -9,7 +9,7 @@ int main (int argc, const char* argv[])
 {
         /* Declare the cluster handle and required arguments. */
         rados_t cluster;
-        char cluster_name[] = "ceph";
+char cluster_name[] = "ceph";
         // char cluster_name[] = "neo-neo";
         char user_name[] = "client.admin";
         uint64_t flags = 0;
@@ -64,7 +64,7 @@ int main (int argc, const char* argv[])
         rados_ioctx_t io;
         //char *poolname = "data";
         // char *poolname = ".disk_pool1.rbd";
-        char *poolname = "p1"; // ceph osd pool create p1 3 && ceph osd lspools && rados bench -p p1 5 write
+        char *poolname = "ec_pool"; // ceph osd pool create p1 3 && ceph osd lspools && rados bench -p p1 5 write
 
         err = rados_ioctx_create(cluster, poolname, &io);
         if (err < 0) {
@@ -72,7 +72,7 @@ int main (int argc, const char* argv[])
                 rados_shutdown(cluster);
                 exit(EXIT_FAILURE);
         } else {
-                printf("\nCreated I/O context.\n");
+                printf("\nCreated I/O context, pool:%s\n", poolname);
         }
 
         /* Write data to the cluster synchronously. */
