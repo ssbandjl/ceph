@@ -3494,6 +3494,7 @@ Children Self Command Shared Object Symbol
 
 ---------- ec ----------
 纠删码是一种将对象持久存储在 Ceph 存储集群中的方法，其中纠删码算法将对象分解为数据块 (k) 和编码块 (m)，并将这些块存储在不同的 OSD 中
+ceph_ec源码分析: https://zhuanlan.zhihu.com/p/96834610
 
 关键词: stripe_width 条带宽度=条带大小 * chunk_size, chunk, chunk_size(cell_size), strip_size 条带大小, 
 关键数据结构, pg_log: struct pg_log_entry_t
@@ -3518,9 +3519,20 @@ ErasureCodeTest erasure_code(k, m, chunk_size)
 erasure_code.get_chunk_count() -> k+m
 erasure_code.encode(want_to_encode, in, &encoded) -> int ErasureCode::encode
   encode_prepare(in, *encoded) -> int ErasureCode::encode_prepare
-    ...
+    bool buffer::list::rebuild_aligned_size_and_memory
+      round_up_to
   encode_chunks(want_to_encode, encoded)
 
+
+int ECUtil::encode 是将原始数据按条带宽度进行分割，然后对条带数据编码，得到条带的数据块和校验块。把每个条带化数据块和校验块有序的链接，形成数据块和校验块
+int ErasureCode::encode
+int ErasureCodeJerasure::encode_chunks
+  jerasure_encode(&chunks[0], &chunks[k], (*encoded)[0].length()) -> EC编码
+  void ErasureCodeJerasureReedSolomonVandermonde::jerasure_encode
+
+解码: int ECUtil::decode
+int ErasureCodeJerasure::decode_chunks
+  jerasure_decode(erasures, data, coding, blocksize)
 
 
 ec, 类 ECBackend 实现了EC的读写操作。ECUtil里定义了编码和解码的函数实现。ECTransaction定了EC的事务
