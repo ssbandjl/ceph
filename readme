@@ -3508,7 +3508,18 @@ EC事务: ECTransaction
 logical_offset_is_stripe_aligned
 void pg_pool_t::encode
 TestErasureCodeLrc.cc
+src/test/erasure-code/TestErasureCode.cc
 src/tools/erasure-code/ceph-erasure-code-tool.cc
+void ECTransaction::generate_transactions
+
+google单元测试: src/test/unit.cc -> int main(int argc, char **argv) -> RUN_ALL_TESTS
+b TestErasureCode.cc:90
+ErasureCodeTest erasure_code(k, m, chunk_size)
+erasure_code.get_chunk_count() -> k+m
+erasure_code.encode(want_to_encode, in, &encoded) -> int ErasureCode::encode
+  encode_prepare(in, *encoded) -> int ErasureCode::encode_prepare
+    ...
+  encode_chunks(want_to_encode, encoded)
 
 
 
