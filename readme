@@ -3493,7 +3493,26 @@ Children Self Command Shared Object Symbol
 
 
 ---------- ec ----------
-ec, 类ECBackend实现了EC的读写操作。ECUtil里定义了编码和解码的函数实现。ECTransaction定了EC的事务
+纠删码是一种将对象持久存储在 Ceph 存储集群中的方法，其中纠删码算法将对象分解为数据块 (k) 和编码块 (m)，并将这些块存储在不同的 OSD 中
+
+关键词: stripe_width 条带宽度=条带大小 * chunk_size, chunk, chunk_size(cell_size), strip_size 条带大小, 
+关键数据结构, pg_log: struct pg_log_entry_t
+本地回滚条目, 回滚信息: ObjectModDesc mod_desc;
+写操作的off和条带宽度对齐: int PrimaryLogPG::do_osd_ops 中
+pool.info.requires_aligned_append()
+op.extent.offset % pool.info.required_alignment() != 0
+EC读写: class PGBackend
+EC编码解码: namespace ECUtil
+EC事务: ECTransaction
+关键函数: int OSDMonitor::prepare_pool_stripe_width
+logical_offset_is_stripe_aligned
+void pg_pool_t::encode
+TestErasureCodeLrc.cc
+src/tools/erasure-code/ceph-erasure-code-tool.cc
+
+
+
+ec, 类 ECBackend 实现了EC的读写操作。ECUtil里定义了编码和解码的函数实现。ECTransaction定了EC的事务
 int PrimaryLogPG::do_osd_ops(OpContext *ctx, vector<OSDOp>& ops)
   case CEPH_OSD_OP_WRITE
   requires_aligned_append
