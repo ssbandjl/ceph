@@ -3528,7 +3528,11 @@ int ECUtil::encode 是将原始数据按条带宽度进行分割，然后对条�
 int ErasureCode::encode
 int ErasureCodeJerasure::encode_chunks
   jerasure_encode(&chunks[0], &chunks[k], (*encoded)[0].length()) -> EC编码
-  void ErasureCodeJerasureReedSolomonVandermonde::jerasure_encode
+  void ErasureCodeJerasureReedSolomonVandermonde::jerasure_encode -> jerasure_matrix_encode(k, m, w, matrix, data, coding, blocksize)
+    jerasure_matrix_dotprod -> JErasure库相关介绍: https://blog.csdn.net/weixin_42868849/article/details/109660456, https://durantthorvalds.top/2021/02/11/%E3%80%8C%E6%8E%A2%E7%A7%98%E3%80%8DJerasure%E9%82%A3%E4%BA%9B%E4%BA%8B/, 这将一行编码/解码矩阵乘以数据/幸存者。 源设备的ID（与矢量元素的ID相对应）位于src_id中。 目标设备的ID在目标ID中。 点积操作, 当矩阵中遇到一个1时，将执行正确的XOR /复制操作, Jerasure库提供Reed-Solomon和Cauchy Reed-Solomon两种编码算法的实现, Jerasure库接口简介及性能测试: https://www.cnblogs.com/yunnotes/archive/2013/04/19/3032308.html, 恢复指定块
+      galois_region_xor
+        galois_w32_region_xor
+    ...
 
 解码: int ECUtil::decode
 int ErasureCodeJerasure::decode_chunks
