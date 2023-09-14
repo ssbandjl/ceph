@@ -3601,3 +3601,24 @@ rbd create --size 1024 ec_pool/image1
 
 ---------- ec ----------
 
+-------- fs ----------
+cephfs, ceph文件系统
+ceph定义的文件操作函数都封装在类Client: class Client : public Dispatcher
+Client实例指针作为CephFuse::Handle类的成员变量: class CephFuse::Handle
+CephFuse::Handle实例指针又作为CephFuse类的成员变量，这样CephFuse实例可以通过client来调用文件系统操作函数来进行文件操作: class CephFuse
+
+ceph_fs参考: https://zhuanlan.zhihu.com/p/97510864
+ceph_fuse.cc -> main
+StandaloneClient *client;
+client = new StandaloneClient(messenger, mc)
+cfuse = new CephFuse(client, forker.get_signal_fd())
+client->mount(mountpoint, perms, fuse_require_active_mds)
+r = cfuse->start()
+...
+r = cfuse->loop() -> int CephFuse::Handle::loop()
+  fuse_session_loop_mt(se)
+...
+
+在fuse_do_work线程中获取到req后，通过 fuse_session_process_buf --> fuse_ll_process_buf，执行fuse_ll_ops[in->opcode].func(req, in->nodeid, inarg)。fuse_ll_ops中定义了函数操作码对应的具体的函数
+
+-------- fs ----------
