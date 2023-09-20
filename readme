@@ -879,6 +879,7 @@ rados_pool_create(rados, pool_name)
 rados_ioctx_create(rados, pool_name, &io_ctx)
 rados_write_full(io_ctx, object_name, hello, strlen(hello))
 rados_aio_create_completion2(NULL, NULL, &read_completion)
+  set_complete_callback
 rados_aio_read(io_ctx, object_name, read_completion, read_buf, read_len, 0)
 rados_aio_wait_for_complete(read_completion)
 rados_aio_get_return_value(read_completion)
@@ -3319,12 +3320,15 @@ OP_WRITE -> rados_write 同步写 -> CEPH_RADOS_API int rados_write(rados_ioctx_
 
 aio_write -> 异步写 -> CEPH_RADOS_API int rados_aio_write(rados_ioctx_t io, const char *oid, rados_completion_t completion, const char *buf, size_t len, uint64_t off)
 ...
-librados::IoCtxImpl::aio_write
+int librados::IoCtxImpl::aio_write
   Context *oncomplete = new C_aio_Complete(c)
   queue_aio_write(c)
     c->aio_write_seq = ++aio_write_seq
-     aio_write_list.push_back(&c->aio_write_list_item) -> 将IO加入队列
-  prepare_write_op -> CEPH_OSD_OP_WRITE
+     aio_write_list.push_back(&c->aio_write_list_item) -> 将回调加入队列
+  Objecter::Op *o = objecter->prepare_write_op(
+    oid, oloc,
+    off, len, snapc, bl, ut, 0,
+    oncomplete, &c->objver, nullptr, 0, &trace) -> CEPH_OSD_OP_WRITE -> 准备OP(objecter)
   objecter->op_submit(o, &c->tid)
   ...
   flush_aio_writes
