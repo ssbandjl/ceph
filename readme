@@ -1596,7 +1596,7 @@ rados_write.c:83 -> main
       objecter->set_balanced_budget()
       monclient.set_messenger(messenger) -> monc绑定msg
       mgrclient.set_messenger(messenger)
-      objecter->init() -> void Objecter::init() -> ... -> create_rados_client
+      objecter->init() -> void Objecter::init() -> ... -> create_rados_client -> 初始化objecter,打点等
         PerfCountersBuilder pcb(cct, "objecter", l_osdc_first, l_osdc_last) -> 性能统计
         RequestStateHook
         AdminSocket* admin_socket = cct->get_admin_socket()
@@ -1663,7 +1663,7 @@ rados_write.c:83 -> main
             get_pg_pool -> 对象定位器结构说明: 定位器限制对象的放置。 主要是进入哪个池, 3, 
             if ((t->flags & CEPH_OSD_FLAG_IGNORE_OVERLAY) == 0) -> osdc/Objecter：在每次 _calc_target 调用时重新计算 target_*，任何时候我们被要求计算目标时，我们都应该应用池分层参数。 之前仅在未计算目标时才这样做的逻辑没有多大意义，并且破坏了我们为获取目标池的正确 pg_num 所需的 *pi 更新。 对于采用原始 pg 的旧集群来说，这并不重要，但对于 luminous 及其他集群，我们需要精确的 spg_t，这需要正确的 pg_num, 如果设置了该标志(CEPH_OSD_FLAG_IGNORE_OVERLAY)，则将操作发送到指定的池并忽略覆盖。 请注意，这会废弃全局 Objecter 标志
             pi = osdmap->get_pg_pool(t->target_oloc.pool)
-            int ret = osdmap->object_locator_to_pg(t->target_oid, t->target_oloc -> 将对象映射到放置组
+            int ret = osdmap->object_locator_to_pg(t->target_oid, t->target_oloc, pgid) -> 将对象映射到放置组
             ceph_stable_mod
             lookup_pg_mapping
             osdmap->pg_to_up_acting_osds

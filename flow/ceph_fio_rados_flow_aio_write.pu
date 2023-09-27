@@ -32,6 +32,8 @@ else (无集群名)
   :rados_create(&rados->cluster, o->client_name) 连接集群; 
 endif
 
+note #FFAAAA: <故障 未提供池信息>
+
 :rados_conf_read_file 读配置文件;
 :rados_connect(rados->cluster) 连接集群;
 
