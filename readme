@@ -1164,8 +1164,7 @@ qingyun, brpc,  ucx, libfabric(cart), ceph_rdma,
 
 
 
-rbd_write -> 
-参考堆栈:
+rbd_open 参考堆栈:
 #0  Objecter::_op_submit (this=this@entry=0x9505c0, op=op@entry=0x997310, sul=..., ptid=ptid@entry=0x9971c0) at /block/gouxu/ceph-L/src/osdc/Objecter.cc:6185
 #1  0x00007ffff74a5ed6 in Objecter::_op_submit_with_budget (this=this@entry=0x9505c0, op=op@entry=0x997310, sul=..., ptid=ptid@entry=0x9971c0, ctx_budget=ctx_budget@entry=0x0) at /block/gouxu/ceph-L/src/osdc/Objecter.cc:5878
 #2  0x00007ffff74a6c19 in Objecter::op_submit (this=0x9505c0, op=0x997310, ptid=0x9971c0, ctx_budget=0x0) at /block/gouxu/ceph-L/src/osdc/Objecter.cc:5797
@@ -1181,8 +1180,6 @@ rbd_write ->
     at /block/gouxu/ceph-L/src/librbd/ImageState.cc:252
 #10 0x00007ffff78608d3 in rbd_open (p=<optimized out>, name=<optimized out>, image=0x7fffffffdf20, snap_name=<optimized out>) at /block/gouxu/ceph-L/src/librbd/librbd.cc:4604
 #11 0x0000000000400cc7 in main (argc=1, argv=0x7fffffffe098) at rbd_write.c:120
-
-
 
 test/librados_example/rbd_write.c -> rt_num = rbd_open( io, name, &image, NULL);
 extern "C" int rbd_open(rados_ioctx_t p, const char *name, rbd_image_t *image, const char *snap_name)
@@ -1225,7 +1222,8 @@ extern "C" int rbd_open(rados_ioctx_t p, const char *name, rbd_image_t *image, c
 
 
 
-
+参考: https://zhuanlan.zhihu.com/p/643941069, https://blog.csdn.net/CSND_PAN/article/details/78728743
+写RBD
 ok_size = rbd_write(image, ofs, num , buf) -> extern "C" ssize_t rbd_write(rbd_image_t image, uint64_t ofs, size_t len,const char *buf)
   bl.push_back(create_write_raw(ictx, buf, len, nullptr))
   int r = ictx->io_work_queue->write(ofs, len, std::move(bl), 0) -> ssize_t ImageRequestWQ<I>::write(uint64_t off, uint64_t len,bufferlist &&bl, int op_flags)
@@ -1236,7 +1234,7 @@ ok_size = rbd_write(image, ofs, num , buf) -> extern "C" ssize_t rbd_write(rbd_i
       start_in_flight_io(c) -> int ImageRequestWQ<I>::start_in_flight_io
       ImageDispatchSpec<I> *req = ImageDispatchSpec<I>::create_write_request(m_image_ctx, c, {{off, len}}, std::move(bl), op_flags, trace, tid)  
         queue(req) -> void ImageRequestWQ<I>::queue(ImageDispatchSpec<I> *req) 
-          ThreadPool::PointerWQ<ImageDispatchSpec<I> >::queue(req) -> 将请求插入线程池队列
+          ThreadPool::PointerWQ<ImageDispatchSpec<I> >::queue(req) -> 将请求插入线程池队列, 加入队列里面的额请求，都会用process来进行处理，最后调用ImageRequest::send 函数来处理
             void queue(T *item)
             std::lock_guard l(m_pool->_lock);
             m_items.push_back(item);
@@ -1244,7 +1242,7 @@ ok_size = rbd_write(image, ofs, num , buf) -> extern "C" ssize_t rbd_write(rbd_i
     r = cond.wait(); -> 等唤醒
 
 
-rbd_write堆栈:
+rbd_write 堆栈:
 (gdb) bt
 #0  ThreadPool::PointerWQ<librbd::io::ImageDispatchSpec<librbd::ImageCtx> >::queue (this=0x5e77a0, item=0x591e60) at /home/xb/project/ceph/xb/ceph/src/common/WorkQueue.h:376
 #1  0x00007ffff76ffd08 in librbd::io::ImageRequestWQ<librbd::ImageCtx>::queue (this=0x5e77a0, req=0x591e60) at /home/xb/project/ceph/xb/ceph/src/librbd/io/ImageRequestWQ.cc:1198
@@ -1255,6 +1253,114 @@ rbd_write堆栈:
 #4  0x00007ffff74860d1 in rbd_write (image=0x5a0ad0, ofs=0, len=1048576, buf=0x7fffe8153010 "Hello_world!\n") at /home/xb/project/ceph/xb/ceph/src/librbd/librbd.cc:5875
 #5  0x0000000000401513 in main (argc=1, argv=0x7fffffffe508) at rbd_write.c:151
 
+
+类 ImageWriteRequest 继承自 AbstractImageWriteRequest 所以最后调用的是，AbstractImageWriteRequest的send_request()函数。并且，后面调用的函数都类似，都是在ImageWriteRequest类的函数中调用AbstractImageWriteRequest对应的函数。因此直接看AbstractImageWriteReques对应的函数
+(gdb) b ImageRequest.cc:435
+void AbstractImageWriteRequest<I>::send_request()
+  Striper::file_to_extents(cct, &image_ctx.layout, extent.first, extent.second, 0, clip_len, &object_extents)
+  int ret = prune_object_extents(&object_extents) -> 修剪对象段
+  aio_comp->set_request_count(object_extents.size())
+  send_object_requests(object_extents, snapc, journal_tid) -> void AbstractImageWriteRequest<I>::send_object_requests
+    auto request = create_object_request(oe, snapc, journal_tid, single_extent, req_comp) -> ObjectDispatchSpec *ImageWriteRequest<I>::create_object_request
+      auto req = ObjectDispatchSpec::create_write(&image_ctx, OBJECT_DISPATCH_LAYER_NONE, object_extent.object_no,object_extent.offset, std::move(bl), snapc, m_op_flags, journal_tid, this->m_trace, on_finish);
+        static ObjectDispatchSpec* create_write
+    request->send() -> void ObjectDispatchSpec::send() -> object_dispatcher->send(this) -> void ObjectDispatcher<I>::send(ObjectDispatchSpec* object_dispatch_spec)
+      object_dispatch->get_object_dispatch_layer()
+      bool handled = boost::apply_visitor -> bool operator()(ObjectDispatchSpec::WriteRequest& write) -> return object_dispatch->write -> bool ObjectDispatch<I>::write
+        auto req = new ObjectWriteRequest
+        req->send(); -> void AbstractObjectWriteRequest<I>::send() 
+          pre_write_object_map_update() -> void AbstractObjectWriteRequest<I>::write_object()
+            librados::ObjectWriteOperation write -> class CEPH_RADOS_API ObjectWriteOperation : public ObjectOperation
+            add_write_ops(&write)
+              wr->write(this->m_object_off, m_write_data) -> void librados::ObjectWriteOperation::write
+                o->write(off, c) -> add_data(CEPH_OSD_OP_WRITE, off, bl.length(), bl)
+            librados::AioCompletion *rados_completion = create_rados_callback<AbstractObjectWriteRequest<I>,&AbstractObjectWriteRequest<I>::handle_write_object>(this); -> 创建回调 handle_write_object
+            nt r = image_ctx->data_ctx.aio_operate -> io_ctx_impl->aio_operate -> int librados::IoCtxImpl::aio_operate
+              queue_aio_write(c);
+              Objecter::Op *op = objecter->prepare_mutate_op
+              objecter->op_submit(op, &c->tid)
+              ...
+  update_stats(clip_len)
+
+
+(gdb) bt
+#0  librbd::io::AbstractObjectWriteRequest<librbd::ImageCtx>::write_object (this=0x7fffa4008c30) at /home/xb/project/ceph/xb/ceph/src/librbd/io/ObjectRequest.cc:458
+#1  0x00007ffff7854c7f in librbd::io::AbstractObjectWriteRequest<librbd::ImageCtx>::pre_write_object_map_update (this=0x7fffa4008c30) at /home/xb/project/ceph/xb/ceph/src/librbd/io/ObjectRequest.cc:440
+#2  0x00007ffff785460e in librbd::io::AbstractObjectWriteRequest<librbd::ImageCtx>::send (this=0x7fffa4008c30) at /home/xb/project/ceph/xb/ceph/src/librbd/io/ObjectRequest.cc:405
+#3  0x00007ffff784fa11 in librbd::io::ObjectDispatch<librbd::ImageCtx>::write(unsigned long, unsigned long, ceph::buffer::v15_2_0::list&&, SnapContext const&, int, ZTracer::Trace const&, int*, unsigned long*, librbd::io::DispatchResult*, Context**, Context*) (
+    this=0x592ab0, object_no=0, object_off=0, data=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/librbd.so.1, CU 0x5f3f957, DIE 0x5fdc68c>, snapc=..., op_flags=0, parent_trace=..., object_dispatch_flags=0x7fffa4006694, journal_tid=0x7fffa40066d8, 
+    dispatch_result=0x7fffa4006698, on_finish=0x7fffa4006680, on_dispatched=0x7fffa4006670) at /home/xb/project/ceph/xb/ceph/src/librbd/io/ObjectDispatch.cc:88
+#4  0x00007ffff7709e3b in librbd::io::ObjectDispatcher<librbd::ImageCtx>::SendVisitor::operator() (this=0x7fffc0ff5110, write=...) at /home/xb/project/ceph/xb/ceph/src/librbd/io/ObjectDispatcher.cc:130
+#5  0x00007ffff770cd65 in boost::detail::variant::invoke_visitor<librbd::io::ObjectDispatcher<librbd::ImageCtx>::SendVisitor const, false>::internal_visit<librbd::io::ObjectDispatchSpec::WriteRequest&> (this=0x7fffc0ff5018, operand=...)
+    at /home/xb/project/ceph/xb/ceph/build/boost/include/boost/variant/variant.hpp:1028
+#6  0x00007ffff770cb67 in boost::detail::variant::visitation_impl_invoke_impl<boost::detail::variant::invoke_visitor<librbd::io::ObjectDispatcher<librbd::ImageCtx>::SendVisitor const, false>, void*, librbd::io::ObjectDispatchSpec::WriteRequest> (visitor=..., 
+    storage=0x7fffa40066a8) at /home/xb/project/ceph/xb/ceph/build/boost/include/boost/variant/detail/visitation_impl.hpp:110
+#7  0x00007ffff770c955 in boost::detail::variant::visitation_impl_invoke<boost::detail::variant::invoke_visitor<librbd::io::ObjectDispatcher<librbd::ImageCtx>::SendVisitor const, false>, void*, librbd::io::ObjectDispatchSpec::WriteRequest, boost::variant<librbd::io::ObjectDispatchSpec::ReadRequest, librbd::io::ObjectDispatchSpec::DiscardRequest, librbd::io::ObjectDispatchSpec::WriteRequest, librbd::io::ObjectDispatchSpec::WriteSameRequest, librbd::io::ObjectDispatchSpec::CompareAndWriteRequest, librbd::io::ObjectDispatchSpec::FlushRequest>::has_fallback_type_> (internal_which=2, visitor=..., storage=0x7fffa40066a8, t=0x0) at /home/xb/project/ceph/xb/ceph/build/boost/include/boost/variant/detail/visitation_impl.hpp:150
+#8  0x00007ffff770b0fa in visitation_impl<mpl_::int_<0>, boost::detail::variant::visitation_impl_step<boost::mpl::l_iter<boost::mpl::l_item<mpl_::long_<6>, librbd::io::ObjectDispatchSpec::ReadRequest, boost::mpl::l_item<mpl_::long_<5>, librbd::io::ObjectDispatchSpec::DiscardRequest, boost::mpl::l_item<mpl_::long_<4>, librbd::io::ObjectDispatchSpec::WriteRequest, boost::mpl::l_item<mpl_::long_<3>, librbd::io::ObjectDispatchSpec::WriteSameRequest, boost::mpl::l_item<mpl_::long_<2>, librbd::io::ObjectDispatchSpec::CompareAndWriteRequest, boost::mpl::l_item<mpl_::long_<1>, librbd::io::ObjectDispatchSpec::FlushRequest, boost::mpl::l_end> > > > > > >, boost::mpl::l_iter<boost::mpl::l_end> >, boost::detail::variant::invoke_visitor<librbd::io::ObjectDispatcher<librbd::ImageCtx>::SendVisitor const, false>, void*, boost::variant<librbd::io::ObjectDispatchSpec::ReadRequest, librbd::io::ObjectDispatchSpec::DiscardRequest, librbd::io::ObjectDispatchSpec::WriteRequest, librbd::io::ObjectDispatchSpec::WriteSameRequest, librbd::io::ObjectDispatchSpec::CompareAndWriteRequest, librbd::io::ObjectDispatchSpec::FlushRequest>::has_fallback_type_> (no_backup_flag=..., storage=0x7fffa40066a8, visitor=..., logical_which=2, internal_which=2)
+    at /home/xb/project/ceph/xb/ceph/build/boost/include/boost/variant/detail/visitation_impl.hpp:231
+#9  internal_apply_visitor_impl<boost::detail::variant::invoke_visitor<librbd::io::ObjectDispatcher<librbd::ImageCtx>::SendVisitor const, false>, void*> (storage=0x7fffa40066a8, visitor=..., logical_which=2, internal_which=2)
+    at /home/xb/project/ceph/xb/ceph/build/boost/include/boost/variant/variant.hpp:2334
+#10 internal_apply_visitor<boost::detail::variant::invoke_visitor<librbd::io::ObjectDispatcher<librbd::ImageCtx>::SendVisitor const, false> > (visitor=..., this=0x7fffa40066a0) at /home/xb/project/ceph/xb/ceph/build/boost/include/boost/variant/variant.hpp:2346
+#11 _ZNR5boost7variantIN6librbd2io18ObjectDispatchSpec11ReadRequestEJNS3_14DiscardRequestENS3_12WriteRequestENS3_16WriteSameRequestENS3_22CompareAndWriteRequestENS3_12FlushRequestEEE13apply_visitorIKNS2_16ObjectDispatcherINS1_8ImageCtxEE11SendVisitorEEENT_11result_typeERSH_ (this=0x7fffa40066a0, visitor=...) at /home/xb/project/ceph/xb/ceph/build/boost/include/boost/variant/variant.hpp:2390
+#12 0x00007ffff770a7f0 in boost::apply_visitor<librbd::io::ObjectDispatcher<librbd::ImageCtx>::SendVisitor, boost::variant<librbd::io::ObjectDispatchSpec::ReadRequest, librbd::io::ObjectDispatchSpec::DiscardRequest, librbd::io::ObjectDispatchSpec::WriteRequest, librbd::io::ObjectDispatchSpec::WriteSameRequest, librbd::io::ObjectDispatchSpec::CompareAndWriteRequest, librbd::io::ObjectDispatchSpec::FlushRequest>&> (visitor=..., visitable=...)
+    at /home/xb/project/ceph/xb/ceph/build/boost/include/boost/variant/detail/apply_visitor_unary.hpp:68
+---Type <return> to continue, or q <return> to quit---
+#13 0x00007ffff770970d in librbd::io::ObjectDispatcher<librbd::ImageCtx>::send (this=0x5e99e0, object_dispatch_spec=0x7fffa4006670) at /home/xb/project/ceph/xb/ceph/src/librbd/io/ObjectDispatcher.cc:336
+#14 0x00007ffff77075ec in librbd::io::ObjectDispatchSpec::send (this=0x7fffa4006670) at /home/xb/project/ceph/xb/ceph/src/librbd/io/ObjectDispatchSpec.cc:37
+#15 0x00007ffff76ea0c9 in librbd::io::AbstractImageWriteRequest<librbd::ImageCtx>::send_object_requests (this=0x7fffc0ff56c0, object_extents=..., snapc=..., journal_tid=0) at /home/xb/project/ceph/xb/ceph/src/librbd/io/ImageRequest.cc:503
+#16 0x00007ffff76e99d0 in librbd::io::AbstractImageWriteRequest<librbd::ImageCtx>::send_request (this=0x7fffc0ff56c0) at /home/xb/project/ceph/xb/ceph/src/librbd/io/ImageRequest.cc:481
+#17 0x00007ffff76e8213 in librbd::io::ImageRequest<librbd::ImageCtx>::send (this=0x7fffc0ff56c0) at /home/xb/project/ceph/xb/ceph/src/librbd/io/ImageRequest.cc:245
+#18 0x00007ffff76e7b06 in librbd::io::ImageRequest<librbd::ImageCtx>::aio_write(librbd::ImageCtx*, librbd::io::AioCompletion*, std::vector<std::pair<unsigned long, unsigned long>, std::allocator<std::pair<unsigned long, unsigned long> > >&&, ceph::buffer::v15_2_0::list&&, int, ZTracer::Trace const&) (ictx=0x5a0930, c=0x5e3db0, image_extents=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/librbd.so.1, CU 0x23c16fb, DIE 0x24a728d>, 
+    bl=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/librbd.so.1, CU 0x23c16fb, DIE 0x24a729d>, op_flags=0, parent_trace=...) at /home/xb/project/ceph/xb/ceph/src/librbd/io/ImageRequest.cc:177
+#19 0x00007ffff76e1523 in librbd::io::ImageDispatchSpec<librbd::ImageCtx>::SendVisitor::operator() (this=0x7fffc0ff5900, write=...) at /home/xb/project/ceph/xb/ceph/src/librbd/io/ImageDispatchSpec.cc:35
+#20 0x00007ffff76e50c1 in boost::detail::variant::invoke_visitor<librbd::io::ImageDispatchSpec<librbd::ImageCtx>::SendVisitor const, false>::internal_visit<librbd::io::ImageDispatchSpec<librbd::ImageCtx>::Write&> (this=0x7fffc0ff5848, operand=...)
+    at /home/xb/project/ceph/xb/ceph/build/boost/include/boost/variant/variant.hpp:1028
+#21 0x00007ffff76e4899 in boost::detail::variant::visitation_impl_invoke_impl<boost::detail::variant::invoke_visitor<librbd::io::ImageDispatchSpec<librbd::ImageCtx>::SendVisitor const, false>, void*, librbd::io::ImageDispatchSpec<librbd::ImageCtx>::Write> (
+    visitor=..., storage=0x5a4118) at /home/xb/project/ceph/xb/ceph/build/boost/include/boost/variant/detail/visitation_impl.hpp:110
+#22 0x00007ffff76e400c in boost::detail::variant::visitation_impl_invoke<boost::detail::variant::invoke_visitor<librbd::io::ImageDispatchSpec<librbd::ImageCtx>::SendVisitor const, false>, void*, librbd::io::ImageDispatchSpec<librbd::ImageCtx>::Write, boost::variant<librbd::io::ImageDispatchSpec<librbd::ImageCtx>::Read, librbd::io::ImageDispatchSpec<librbd::ImageCtx>::Discard, librbd::io::ImageDispatchSpec<librbd::ImageCtx>::Write, librbd::io::ImageDispatchSpec<librbd::ImageCtx>::WriteSame, librbd::io::ImageDispatchSpec<librbd::ImageCtx>::CompareAndWrite, librbd::io::ImageDispatchSpec<librbd::ImageCtx>::Flush>::has_fallback_type_> (internal_which=2, visitor=..., storage=0x5a4118, t=0x0) at /home/xb/project/ceph/xb/ceph/build/boost/include/boost/variant/detail/visitation_impl.hpp:150
+#23 0x00007ffff76e2d38 in visitation_impl<mpl_::int_<0>, boost::detail::variant::visitation_impl_step<boost::mpl::l_iter<boost::mpl::l_item<mpl_::long_<6>, librbd::io::ImageDispatchSpec<librbd::ImageCtx>::Read, boost::mpl::l_item<mpl_::long_<5>, librbd::io::ImageDispatchSpec<librbd::ImageCtx>::Discard, boost::mpl::l_item<mpl_::long_<4>, librbd::io::ImageDispatchSpec<librbd::ImageCtx>::Write, boost::mpl::l_item<mpl_::long_<3>, librbd::io::ImageDispatchSpec<librbd::ImageCtx>::WriteSame, boost::mpl::l_item<mpl_::long_<2>, librbd::io::ImageDispatchSpec<librbd::ImageCtx>::CompareAndWrite, boost::mpl::l_item<mpl_::long_<1>, librbd::io::ImageDispatchSpec<librbd::ImageCtx>::Flush, boost::mpl::l_end> > > > > > >, boost::mpl::l_iter<boost::mpl::l_end> >, boost::detail::variant::invoke_visitor<librbd::io::ImageDispatchSpec<librbd::ImageCtx>::SendVisitor const, false>, void*, boost::variant<librbd::io::ImageDispatchSpec<librbd::ImageCtx>::Read, librbd::io::ImageDispatchSpec<librbd::ImageCtx>::Discard, librbd::io::ImageDispatchSpec<librbd::ImageCtx>::Write, librbd::io::ImageDispatchSpec<librbd::ImageCtx>::WriteSame, librbd::io::ImageDispatchSpec<librbd::ImageCtx>::CompareAndWrite, librbd::io::ImageDispatchSpec<librbd::ImageCtx>::Flush>::has_fallback_type_> (no_backup_flag=..., storage=0x5a4118, visitor=..., 
+    logical_which=2, internal_which=2) at /home/xb/project/ceph/xb/ceph/build/boost/include/boost/variant/detail/visitation_impl.hpp:231
+#24 internal_apply_visitor_impl<boost::detail::variant::invoke_visitor<librbd::io::ImageDispatchSpec<librbd::ImageCtx>::SendVisitor const, false>, void*> (storage=0x5a4118, visitor=..., logical_which=2, internal_which=2)
+    at /home/xb/project/ceph/xb/ceph/build/boost/include/boost/variant/variant.hpp:2334
+#25 internal_apply_visitor<boost::detail::variant::invoke_visitor<librbd::io::ImageDispatchSpec<librbd::ImageCtx>::SendVisitor const, false> > (visitor=..., this=0x5a4110) at /home/xb/project/ceph/xb/ceph/build/boost/include/boost/variant/variant.hpp:2346
+#26 _ZNR5boost7variantIN6librbd2io17ImageDispatchSpecINS1_8ImageCtxEE4ReadEJNS5_7DiscardENS5_5WriteENS5_9WriteSameENS5_15CompareAndWriteENS5_5FlushEEE13apply_visitorIKNS5_11SendVisitorEEENT_11result_typeERSG_ (this=0x5a4110, visitor=...)
+    at /home/xb/project/ceph/xb/ceph/build/boost/include/boost/variant/variant.hpp:2390
+#27 0x00007ffff76e1cf8 in boost::apply_visitor<librbd::io::ImageDispatchSpec<librbd::ImageCtx>::SendVisitor, boost::variant<librbd::io::ImageDispatchSpec<librbd::ImageCtx>::Read, librbd::io::ImageDispatchSpec<librbd::ImageCtx>::Discard, librbd::io::ImageDispatchSpec---Type <return> to continue, or q <return> to quit---
+<librbd::ImageCtx>::Write, librbd::io::ImageDispatchSpec<librbd::ImageCtx>::WriteSame, librbd::io::ImageDispatchSpec<librbd::ImageCtx>::CompareAndWrite, librbd::io::ImageDispatchSpec<librbd::ImageCtx>::Flush>&> (visitor=..., visitable=...)
+    at /home/xb/project/ceph/xb/ceph/build/boost/include/boost/variant/detail/apply_visitor_unary.hpp:68
+#28 0x00007ffff76e0edc in librbd::io::ImageDispatchSpec<librbd::ImageCtx>::send (this=0x5a40e0) at /home/xb/project/ceph/xb/ceph/src/librbd/io/ImageDispatchSpec.cc:115
+#29 0x00007ffff76ff9b2 in librbd::io::ImageRequestWQ<librbd::ImageCtx>::process_io (this=0x5e74f0, req=0x5a40e0, non_blocking_io=true) at /home/xb/project/ceph/xb/ceph/src/librbd/io/ImageRequestWQ.cc:1038
+#30 0x00007ffff76fd0b7 in librbd::io::ImageRequestWQ<librbd::ImageCtx>::process (this=0x5e74f0, req=0x5a40e0) at /home/xb/project/ceph/xb/ceph/src/librbd/io/ImageRequestWQ.cc:1058
+#31 0x00007ffff7707122 in ThreadPool::PointerWQ<librbd::io::ImageDispatchSpec<librbd::ImageCtx> >::_void_process (this=0x5e74f0, item=0x5a40e0, handle=...) at /home/xb/project/ceph/xb/ceph/src/common/WorkQueue.h:412
+#32 0x00007fffedbc93fb in ThreadPool::worker (this=0x5e6bf0, wt=0x5e6250) at /home/xb/project/ceph/xb/ceph/src/common/WorkQueue.cc:120
+#33 0x00007fffedbcd4c8 in ThreadPool::WorkThread::entry (this=0x5e6250) at /home/xb/project/ceph/xb/ceph/src/common/WorkQueue.h:475
+#34 0x00007fffedba5e10 in Thread::entry_wrapper (this=0x5e6250) at /home/xb/project/ceph/xb/ceph/src/common/Thread.cc:84
+#35 0x00007fffedba5d8e in Thread::_entry_func (arg=0x5e6250) at /home/xb/project/ceph/xb/ceph/src/common/Thread.cc:71
+#36 0x00007fffec53eea5 in start_thread () from /lib64/libpthread.so.0
+#37 0x00007ffff6eafb0d in clone () from /lib64/libc.so.6
+
+
+
+
+#0  librados::IoCtxImpl::aio_operate (this=0x5e6750, oid=..., o=0x7fffb0002fe0, c=0x7fffb0015540, snap_context=..., flags=0, trace_info=0x0) at /home/xb/project/ceph/xb/ceph/src/librados/IoCtxImpl.cc:757
+#1  0x00007ffff71eba37 in librados::v14_2_0::IoCtx::aio_operate (this=0x5a30a8, oid="rbd_header.10bd11cbce96", c=0x7fffb0011c40, o=0x7fffc17f68a0) at /home/xb/project/ceph/xb/ceph/src/librados/librados_cxx.cc:1546
+#2  0x00007ffff7752344 in librbd::managed_lock::AcquireRequest<librbd::ImageCtx>::send_lock (this=0x7fffa4003fc0) at /home/xb/project/ceph/xb/ceph/src/librbd/managed_lock/AcquireRequest.cc:117
+#3  0x00007ffff7751f37 in librbd::managed_lock::AcquireRequest<librbd::ImageCtx>::handle_get_locker (this=0x7fffa4003fc0, r=-2) at /home/xb/project/ceph/xb/ceph/src/librbd/managed_lock/AcquireRequest.cc:101
+#4  0x00007ffff77538cc in librbd::util::detail::C_CallbackAdapter<librbd::managed_lock::AcquireRequest<librbd::ImageCtx>, &librbd::managed_lock::AcquireRequest<librbd::ImageCtx>::handle_get_locker>::finish (this=0x7fffa4003f20, r=-2)
+    at /home/xb/project/ceph/xb/ceph/src/librbd/Utils.h:59
+#5  0x00007ffff748c9f7 in Context::complete (this=0x7fffa4003f20, r=-2) at /home/xb/project/ceph/xb/ceph/src/include/Context.h:77
+#6  0x00007ffff7759564 in librbd::managed_lock::GetLockerRequest<librbd::ImageCtx>::finish (this=0x7fffa4003870, r=-2) at /home/xb/project/ceph/xb/ceph/src/librbd/managed_lock/GetLockerRequest.cc:124
+#7  0x00007ffff7758559 in librbd::managed_lock::GetLockerRequest<librbd::ImageCtx>::handle_get_lockers (this=0x7fffa4003870, r=0) at /home/xb/project/ceph/xb/ceph/src/librbd/managed_lock/GetLockerRequest.cc:77
+#8  0x00007ffff7759860 in librbd::util::detail::rados_callback<librbd::managed_lock::GetLockerRequest<librbd::ImageCtx>, &librbd::managed_lock::GetLockerRequest<librbd::ImageCtx>::handle_get_lockers> (c=0x7fffa4004090, arg=0x7fffa4003870)
+    at /home/xb/project/ceph/xb/ceph/src/librbd/Utils.h:34
+#9  0x00007ffff722b53a in librados::C_AioComplete::finish (this=0x7fffd4007e90, r=0) at /home/xb/project/ceph/xb/ceph/src/librados/AioCompletionImpl.h:140
+#10 0x00007ffff71bfc49 in Context::complete (this=0x7fffd4007e90, r=0) at /home/xb/project/ceph/xb/ceph/src/include/Context.h:77
+#11 0x00007fffedb3146d in Finisher::finisher_thread_entry (this=0x4bd1f8) at /home/xb/project/ceph/xb/ceph/src/common/Finisher.cc:66
+#12 0x00007ffff723f118 in Finisher::FinisherThread::entry (this=0x4bd300) at /home/xb/project/ceph/xb/ceph/src/common/Finisher.h:63
+#13 0x00007fffedba5e10 in Thread::entry_wrapper (this=0x4bd300) at /home/xb/project/ceph/xb/ceph/src/common/Thread.cc:84
+#14 0x00007fffedba5d8e in Thread::_entry_func (arg=0x4bd300) at /home/xb/project/ceph/xb/ceph/src/common/Thread.cc:71
+#15 0x00007fffec53eea5 in start_thread () from /lib64/libpthread.so.0
+#16 0x00007ffff6eafb0d in clone () from /lib64/libc.so.6
 
 
 ---------------------------------------- DL ----------------------------------------
@@ -1514,10 +1620,6 @@ Ceph数据存储2-rbd client 端的数据请求处理_数据请求_03
 
 
 
-rbd_write.c:145 -> main -> rbd_write
-  librbd::ImageCtx *ictx = (librbd::ImageCtx *)image
-  bl.push_back(create_write_raw(ictx, buf, len, nullptr))
-  ictx->io_work_queue->write(ofs, len, std::move(bl), 0)
 
 
 
@@ -1966,14 +2068,6 @@ $9 = {
 
         
 
-
-
-rbd_write.c:145 -> rbd_write
-...
-get_handler_way
-start_in_flight_io
-create_write_request
-...
 
 
 
