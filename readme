@@ -1184,6 +1184,18 @@ rbd_write ->
 
 
 
+test/librados_example/rbd_write.c -> rt_num = rbd_open( io, name, &image, NULL);
+extern "C" int rbd_open(rados_ioctx_t p, const char *name, rbd_image_t *image, const char *snap_name)
+int r = ictx->state->open(0)
+
+ok_size = rbd_write(image, ofs, num , buf)
+ssize_t ImageRequestWQ<I>::write
+int r = clip_io(util::get_image_ctx(&m_image_ctx), off, &len)
+AioCompletion *c = AioCompletion::create(&cond); -> 创建完成对象
+aio_write(c, off, len, std::move(bl), op_flags, false); -> 异步写
+r = cond.wait(); -> 等唤醒
+
+
 
 ---------------------------------------- DL ----------------------------------------
 Ceph数据存储2-rbd client 端的数据请求处理 转载
