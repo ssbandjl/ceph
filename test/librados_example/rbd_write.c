@@ -32,7 +32,8 @@
      //  char *poolname = "p0"; rados lspools
      //  char *poolname = ".d.rbd";
     //  char *poolname = ".disk_pool1.rbd";
-     char *poolname = "ecpool";
+    //  char *poolname = "ecpool";
+     char *poolname = "p1";
  
      //Initialize the cluster handle with the "ceph" cluster name 
      //and the "client.admin" user name
@@ -86,7 +87,7 @@
      }
  
     //  const char* name = "image_100g";
-    // 创建卷: rbd create --size 1024 p1/image1 && rbd ls p1 && rbd info p1/image1
+    // 创建卷: ceph osd pool create p1 3; rbd create --size 1024 p1/image1 && rbd ls p1 && rbd info p1/image1
     const char* name = "image1";
 
     //  const char* name_01 = "img2";

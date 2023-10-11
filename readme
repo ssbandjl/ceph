@@ -1186,14 +1186,74 @@ rbd_write ->
 
 test/librados_example/rbd_write.c -> rt_num = rbd_open( io, name, &image, NULL);
 extern "C" int rbd_open(rados_ioctx_t p, const char *name, rbd_image_t *image, const char *snap_name)
-int r = ictx->state->open(0)
+  int r = ictx->state->open(0) -> int ImageState<I>::open(uint64_t flags)
+    open(flags, &ctx); -> void ImageState<I>::open(uint64_t flags, Context *on_finish)
+      Action action(ACTION_TYPE_OPEN)
+      action.refresh_seq = m_refresh_seq
+      execute_action_unlock(action, on_finish) -> void ImageState<I>::execute_action_unlock
+          m_actions_contexts.push_back({action, {}})
+          execute_next_action_unlock() -> void ImageState<I>::execute_next_action_unlock() -> send_open_unlock() -> void ImageState<I>::send_open_unlock()
+            Context *ctx = create_async_context_callback(*m_image_ctx, create_context_callback<ImageState<I>, &ImageState<I>::handle_open>(this));
+            image::OpenRequest<I> *req = image::OpenRequest<I>::create(m_image_ctx, m_open_flags, ctx);
+            req->send() -> 发送开卷请求 -> send_v2_detect_header()
+              op.stat(NULL, NULL, NULL)
+              librados::AioCompletion *comp = create_rados_callback<klass, &klass::handle_v2_detect_header>(this)
+              m_image_ctx->md_ctx.aio_operate(util::id_obj_name(m_image_ctx->name),comp, &op, &m_out_bl) -> int librados::IoCtx::aio_operate
+                return io_ctx_impl->aio_operate_read(obj, &o->impl->o, c->pc,0, pbl)
+                  Objecter::Op *objecter_op = objecter->prepare_read_op(oid, oloc, *o, snap_seq, pbl, flags, 
+                  oncomplete, &c->objver, nullptr, 0, &trace)
+                    Op *o = new Op(oid, oloc, op.ops, flags | global_op_flags | CEPH_OSD_FLAG_READ, onack, objver, data_offset, parent_trace)
+                  objecter->op_submit(objecter_op, &c->tid)
+    int r = ctx.wait();
 
-ok_size = rbd_write(image, ofs, num , buf)
-ssize_t ImageRequestWQ<I>::write
-int r = clip_io(util::get_image_ctx(&m_image_ctx), off, &len)
-AioCompletion *c = AioCompletion::create(&cond); -> 创建完成对象
-aio_write(c, off, len, std::move(bl), op_flags, false); -> 异步写
-r = cond.wait(); -> 等唤醒
+
+
+开卷参考堆栈:
+#0  Objecter::prepare_read_op (this=0x4f0580, oid=..., oloc=..., op=..., snapid=..., pbl=0x591e78, flags=0, onack=0x5e5ae0, objver=0x598720, data_offset=0x0, features=0, parent_trace=0x7fffffffdf06) at /home/xb/project/ceph/xb/ceph/src/osdc/Objecter.h:2365
+#1  0x00007ffff721f549 in librados::IoCtxImpl::aio_operate_read (this=0x5e6770, oid=..., o=0x592b40, c=0x598690, flags=0, pbl=0x591e78, trace_info=0x0) at /home/xb/project/ceph/xb/ceph/src/librados/IoCtxImpl.cc:744
+#2  0x00007ffff71ec25c in librados::v14_2_0::IoCtx::aio_operate (this=0x5a3128, oid="rbd_id.image1", c=0x5e5ea0, o=0x7fffffffdff0, pbl=0x591e78) at /home/xb/project/ceph/xb/ceph/src/librados/librados_cxx.cc:1617
+#3  0x00007ffff76a0c11 in librbd::image::OpenRequest<librbd::ImageCtx>::send_v2_detect_header (this=0x591e60) at /home/xb/project/ceph/xb/ceph/src/librbd/image/OpenRequest.cc:105
+#4  0x00007ffff76a02a4 in librbd::image::OpenRequest<librbd::ImageCtx>::send (this=0x591e60) at /home/xb/project/ceph/xb/ceph/src/librbd/image/OpenRequest.cc:50
+#5  0x00007ffff74e5dc5 in librbd::ImageState<librbd::ImageCtx>::send_open_unlock (this=0x5e49d0) at /home/xb/project/ceph/xb/ceph/src/librbd/ImageState.cc:603
+#6  0x00007ffff74e57fc in librbd::ImageState<librbd::ImageCtx>::execute_next_action_unlock (this=0x5e49d0) at /home/xb/project/ceph/xb/ceph/src/librbd/ImageState.cc:532
+#7  0x00007ffff74e5939 in librbd::ImageState<librbd::ImageCtx>::execute_action_unlock (this=0x5e49d0, action=..., on_finish=0x7fffffffe250) at /home/xb/project/ceph/xb/ceph/src/librbd/ImageState.cc:557
+#8  0x00007ffff74e36d6 in librbd::ImageState<librbd::ImageCtx>::open (this=0x5e49d0, flags=0, on_finish=0x7fffffffe250) at /home/xb/project/ceph/xb/ceph/src/librbd/ImageState.cc:270
+#9  0x00007ffff74e3438 in librbd::ImageState<librbd::ImageCtx>::open (this=0x5e49d0, flags=0) at /home/xb/project/ceph/xb/ceph/src/librbd/ImageState.cc:249
+#10 0x00007ffff7480c65 in rbd_open (p=0x5a0050, name=0x40217f "image1", image=0x7fffffffe3a0, snap_name=0x0) at /home/xb/project/ceph/xb/ceph/src/librbd/librbd.cc:4592
+#11 0x0000000000401448 in main (argc=1, argv=0x7fffffffe508) at rbd_write.c:130
+
+
+
+
+
+ok_size = rbd_write(image, ofs, num , buf) -> extern "C" ssize_t rbd_write(rbd_image_t image, uint64_t ofs, size_t len,const char *buf)
+  bl.push_back(create_write_raw(ictx, buf, len, nullptr))
+  int r = ictx->io_work_queue->write(ofs, len, std::move(bl), 0) -> ssize_t ImageRequestWQ<I>::write(uint64_t off, uint64_t len,bufferlist &&bl, int op_flags)
+    int r = clip_io(util::get_image_ctx(&m_image_ctx), off, &len)
+    AioCompletion *c = AioCompletion::create(&cond); -> 创建完成对象
+    aio_write(c, off, len, std::move(bl), op_flags, false); -> 异步写 -> void ImageRequestWQ<I>::aio_write(AioCompletion *c, uint64_t off, uint64_t len, bufferlist &&bl, int op_flags, bool native_async)
+      c->init_time(util::get_image_ctx(&m_image_ctx), AIO_TYPE_WRITE)
+      start_in_flight_io(c) -> int ImageRequestWQ<I>::start_in_flight_io
+      ImageDispatchSpec<I> *req = ImageDispatchSpec<I>::create_write_request(m_image_ctx, c, {{off, len}}, std::move(bl), op_flags, trace, tid)  
+        queue(req) -> void ImageRequestWQ<I>::queue(ImageDispatchSpec<I> *req) 
+          ThreadPool::PointerWQ<ImageDispatchSpec<I> >::queue(req) -> 将请求插入线程池队列
+            void queue(T *item)
+            std::lock_guard l(m_pool->_lock);
+            m_items.push_back(item);
+            m_pool->_cond.notify_one();
+    r = cond.wait(); -> 等唤醒
+
+
+rbd_write堆栈:
+(gdb) bt
+#0  ThreadPool::PointerWQ<librbd::io::ImageDispatchSpec<librbd::ImageCtx> >::queue (this=0x5e77a0, item=0x591e60) at /home/xb/project/ceph/xb/ceph/src/common/WorkQueue.h:376
+#1  0x00007ffff76ffd08 in librbd::io::ImageRequestWQ<librbd::ImageCtx>::queue (this=0x5e77a0, req=0x591e60) at /home/xb/project/ceph/xb/ceph/src/librbd/io/ImageRequestWQ.cc:1198
+#2  0x00007ffff76f8ad8 in librbd::io::ImageRequestWQ<librbd::ImageCtx>::aio_write(librbd::io::AioCompletion*, unsigned long, unsigned long, ceph::buffer::v15_2_0::list&&, int, bool) (this=0x5e77a0, c=0x598600, off=0, len=1048576, 
+    bl=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/librbd.so.1, CU 0x24ab120, DIE 0x25814e5>, op_flags=0, native_async=false) at /home/xb/project/ceph/xb/ceph/src/librbd/io/ImageRequestWQ.cc:368
+#3  0x00007ffff76f6162 in librbd::io::ImageRequestWQ<librbd::ImageCtx>::write(unsigned long, unsigned long, ceph::buffer::v15_2_0::list&&, int) (this=0x5e77a0, off=0, len=1048576, 
+    bl=<unknown type in /home/xb/project/ceph/xb/ceph/build/lib/librbd.so.1, CU 0x24ab120, DIE 0x258242a>, op_flags=0) at /home/xb/project/ceph/xb/ceph/src/librbd/io/ImageRequestWQ.cc:154
+#4  0x00007ffff74860d1 in rbd_write (image=0x5a0ad0, ofs=0, len=1048576, buf=0x7fffe8153010 "Hello_world!\n") at /home/xb/project/ceph/xb/ceph/src/librbd/librbd.cc:5875
+#5  0x0000000000401513 in main (argc=1, argv=0x7fffffffe508) at rbd_write.c:151
 
 
 
@@ -3638,3 +3698,103 @@ r = cfuse->loop() -> int CephFuse::Handle::loop()
 在fuse_do_work线程中获取到req后，通过 fuse_session_process_buf --> fuse_ll_process_buf，执行fuse_ll_ops[in->opcode].func(req, in->nodeid, inarg)。fuse_ll_ops中定义了函数操作码对应的具体的函数
 
 -------- fs ----------
+
+
+
+
+状态机和操作:
+private:
+  enum State {
+    STATE_UNINITIALIZED,
+    STATE_OPEN,
+    STATE_CLOSED,
+    STATE_OPENING,
+    STATE_CLOSING,
+    STATE_REFRESHING,
+    STATE_SETTING_SNAP,
+    STATE_PREPARING_LOCK
+  };
+
+  enum ActionType {
+    ACTION_TYPE_OPEN,
+    ACTION_TYPE_CLOSE,
+    ACTION_TYPE_REFRESH,
+    ACTION_TYPE_SET_SNAP,
+    ACTION_TYPE_LOCK
+  };
+
+
+private:
+  /**
+   * @verbatim
+   *
+   * <start>
+   *    |
+   *    | (v1)
+   *    |-----> V1_DETECT_HEADER
+   *    |           |
+   *    |           \-------------------------------\
+   *    | (v2)                                      |
+   *    \-----> V2_DETECT_HEADER                    |
+   *                |                               |
+   *                v                               |
+   *            V2_GET_ID|NAME                      |
+   *                |                               |
+   *                v (skip if have name)           |
+   *            V2_GET_NAME_FROM_TRASH              |
+   *                |                               |
+   *                v                               |
+   *            V2_GET_INITIAL_METADATA             |
+   *                |                               |
+   *                v                               |
+   *            V2_GET_STRIPE_UNIT_COUNT (skip if   |
+   *                |                     disabled) |
+   *                v                               |
+   *            V2_GET_CREATE_TIMESTAMP             |
+   *                |                               |
+   *                v                               |
+   *            V2_GET_ACCESS_MODIFIY_TIMESTAMP     |
+   *                |                               |
+   *                v                               |
+   *            V2_GET_DATA_POOL --------------> REFRESH
+   *                                                |
+   *                                                v
+   *                                             INIT_PARENT_CACHE(skip if
+   *                                                |               disable)
+   *                                                v
+   *                                             INIT_CACHE
+   *                                                |
+   *                                                v
+   *                                             REGISTER_WATCH (skip if
+   *                                                |            read-only)
+   *                                                v
+   *                                             SET_SNAP (skip if no snap)
+   *                                                |
+   *                                                v
+   *                                             <finish>
+   *                                                ^
+   *     (on error)                                 |
+   *    * * * * * * > CLOSE ------------------------/
+   *
+   * @endverbatim
+   */
+
+  OpenRequest(ImageCtxT *image_ctx, uint64_t flags, Context *on_finish); // 打开请求
+
+
+
+AIO类型:
+  typedef enum {
+  AIO_TYPE_NONE = 0,
+  AIO_TYPE_GENERIC,
+  AIO_TYPE_OPEN,
+  AIO_TYPE_CLOSE,
+  AIO_TYPE_READ,
+  AIO_TYPE_WRITE,
+  AIO_TYPE_DISCARD,
+  AIO_TYPE_FLUSH,
+  AIO_TYPE_WRITESAME,
+  AIO_TYPE_COMPARE_AND_WRITE,
+} aio_type_t;
+
+
