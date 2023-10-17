@@ -1837,7 +1837,12 @@ rados_write.c:83 -> main
             get_pg_pool -> 对象定位器结构说明: 定位器限制对象的放置。 主要是进入哪个池, 3, 
             if ((t->flags & CEPH_OSD_FLAG_IGNORE_OVERLAY) == 0) -> osdc/Objecter：在每次 _calc_target 调用时重新计算 target_*，任何时候我们被要求计算目标时，我们都应该应用池分层参数。 之前仅在未计算目标时才这样做的逻辑没有多大意义，并且破坏了我们为获取目标池的正确 pg_num 所需的 *pi 更新。 对于采用原始 pg 的旧集群来说，这并不重要，但对于 luminous 及其他集群，我们需要精确的 spg_t，这需要正确的 pg_num, 如果设置了该标志(CEPH_OSD_FLAG_IGNORE_OVERLAY)，则将操作发送到指定的池并忽略覆盖。 请注意，这会废弃全局 Objecter 标志
             pi = osdmap->get_pg_pool(t->target_oloc.pool)
-            int ret = osdmap->object_locator_to_pg(t->target_oid, t->target_oloc, pgid) -> 将对象映射到放置组
+            int ret = osdmap->object_locator_to_pg(t->target_oid, t->target_oloc, pgid) -> 将对象映射到放置组 -> int OSDMap::object_locator_to_pg(
+              return map_to_pg(loc.get_pool(), oid.name, loc.key, loc.nspace, &pg)
+                const pg_pool_t *pool = get_pg_pool(poolid)
+                pool->hash_key(key, nspace) -> uint32_t pg_pool_t::hash_key
+                  eturn ceph_str_hash(object_hash, &buf[0], len)
+                    return ceph_str_hash_linux(s, len) -> unsigned ceph_str_hash_linux(const char *str, unsigned length) -> hash算法
             ceph_stable_mod
             lookup_pg_mapping
             osdmap->pg_to_up_acting_osds
@@ -3891,4 +3896,17 @@ AIO类型:
   AIO_TYPE_COMPARE_AND_WRITE,
 } aio_type_t;
 
+
+
+
+
+
+crush算法:
+hash算法
+#define CEPH_STR_HASH_LINUX      0x1  /* linux dcache hash */
+#define CEPH_STR_HASH_RJENKINS   0x2  /* robert jenkins' */
+
+int SyntheticClient::lookup_hash -> 合成的客户端
+int Client::lookup_hash
+  ceph_str_hash
 

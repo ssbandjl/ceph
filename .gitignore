@@ -95,3 +95,7 @@ ceph-client
 *_c
 
 next_gen
+test/librados_example/rbd_write
+test/librados_example/rdb_write
+
+

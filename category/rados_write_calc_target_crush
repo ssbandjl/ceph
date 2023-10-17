@@ -1,0 +1,15 @@
+(gdb) bt
+#0  ceph_str_hash (type=2, s=0x58da38 "neo-obj", len=7) at /home/xb/project/ceph/xb/ceph/src/common/ceph_hash.cc:97
+#1  0x00007fffeec66c1a in pg_pool_t::hash_key (this=0x7fffc4008318, key="neo-obj", ns="") at /home/xb/project/ceph/xb/ceph/src/osd/osd_types.cc:1757
+#2  0x00007fffeebd19d2 in OSDMap::map_to_pg (this=0x4e6a60, poolid=2, name="neo-obj", key="", nspace="", pg=0x7fffffffdeb0) at /home/xb/project/ceph/xb/ceph/src/osd/OSDMap.cc:2357
+#3  0x00007fffeebd1afc in OSDMap::object_locator_to_pg (this=0x4e6a60, oid=..., loc=..., pg=...) at /home/xb/project/ceph/xb/ceph/src/osd/OSDMap.cc:2372
+#4  0x00007ffff7c6d24b in Objecter::_calc_target (this=0x4e6510, t=0x594ed8, con=0x0, any_change=false) at /home/xb/project/ceph/xb/ceph/src/osdc/Objecter.cc:2820
+#5  0x00007ffff7c6998a in Objecter::_op_submit (this=0x4e6510, op=0x594eb0, sul=..., ptid=0x7fffffffe1d8) at /home/xb/project/ceph/xb/ceph/src/osdc/Objecter.cc:2386
+#6  0x00007ffff7c6914d in Objecter::_op_submit_with_budget (this=0x4e6510, op=0x594eb0, sul=..., ptid=0x7fffffffe1d8, ctx_budget=0x0) at /home/xb/project/ceph/xb/ceph/src/osdc/Objecter.cc:2303
+#7  0x00007ffff7c68eba in Objecter::op_submit (this=0x4e6510, op=0x594eb0, ptid=0x7fffffffe1d8, ctx_budget=0x0) at /home/xb/project/ceph/xb/ceph/src/osdc/Objecter.cc:2270
+#8  0x00007ffff7c24c52 in librados::IoCtxImpl::operate (this=0x5941f0, oid=..., o=0x7fffffffe3d0, pmtime=0x0, flags=0) at /home/xb/project/ceph/xb/ceph/src/librados/IoCtxImpl.cc:672
+#9  0x00007ffff7c24419 in librados::IoCtxImpl::write (this=0x5941f0, oid=..., bl=..., len=4194304, off=0) at /home/xb/project/ceph/xb/ceph/src/librados/IoCtxImpl.cc:605
+#10 0x00007ffff7bb8c81 in _rados_write (io=0x5941f0, o=0x402240 "neo-obj", buf=0x7fffe8058010 "", len=4194304, off=0) at /home/xb/project/ceph/xb/ceph/src/librados/librados_c.cc:1183
+#11 0x000000000040136b in main (argc=<optimized out>, argv=0x7fffffffe628) at rados_write.c:86
+
+
