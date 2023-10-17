@@ -27,3 +27,8 @@ ceph支持daos后端(rgw, s3), src/rgw/rgw_sal_daos.cc, https://github.com/ceph/
 
 
 
+从源分支(上游分支)拉取并合并
+git remote set-url upstream https://github.com/ceph/ceph.git
+git remote add upstream https://github.com/ceph/ceph.git
+git fetch upstream
+git merge upstream/master
