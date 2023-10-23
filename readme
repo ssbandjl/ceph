@@ -1837,13 +1837,14 @@ rados_write.c:83 -> main
             get_pg_pool -> 对象定位器结构说明: 定位器限制对象的放置。 主要是进入哪个池, 3, 
             if ((t->flags & CEPH_OSD_FLAG_IGNORE_OVERLAY) == 0) -> osdc/Objecter：在每次 _calc_target 调用时重新计算 target_*，任何时候我们被要求计算目标时，我们都应该应用池分层参数。 之前仅在未计算目标时才这样做的逻辑没有多大意义，并且破坏了我们为获取目标池的正确 pg_num 所需的 *pi 更新。 对于采用原始 pg 的旧集群来说，这并不重要，但对于 luminous 及其他集群，我们需要精确的 spg_t，这需要正确的 pg_num, 如果设置了该标志(CEPH_OSD_FLAG_IGNORE_OVERLAY)，则将操作发送到指定的池并忽略覆盖。 请注意，这会废弃全局 Objecter 标志
             pi = osdmap->get_pg_pool(t->target_oloc.pool)
-            int ret = osdmap->object_locator_to_pg(t->target_oid, t->target_oloc, pgid) -> 将对象映射到放置组 -> int OSDMap::object_locator_to_pg(
+            int ret = osdmap->object_locator_to_pg(t->target_oid, t->target_oloc, pgid) -> 将对象(oid)映射到放置组pg -> int OSDMap::object_locator_to_pg( -> 执行后,仅得到对象的hash值, 为pool_id+pool_seed的对象pgid
               return map_to_pg(loc.get_pool(), oid.name, loc.key, loc.nspace, &pg)
                 const pg_pool_t *pool = get_pg_pool(poolid)
                 pool->hash_key(key, nspace) -> uint32_t pg_pool_t::hash_key
                   eturn ceph_str_hash(object_hash, &buf[0], len)
                     return ceph_str_hash_linux(s, len) -> unsigned ceph_str_hash_linux(const char *str, unsigned length) -> hash算法
-            ceph_stable_mod
+            ps_t actual_ps = ceph_stable_mod(pgid.ps(), pg_num, pg_num_mask) -> stable_mod -> ceph_stable_mod(int x, int b, int bmask) -> 稳定模函数, 用于控制放置组的数量(pg_num)。 与直接取模类似，但随着 b 随着时间的推移而增加，会产生稳定的映射。 b是bin数，bmask是2减1的包含幂，b <= bmask且bmask=(2**n)-1，例如，b=12 -> bmask=15，b=123 -> b掩码=127, 用hash算法得到的pool_seed(x)作为入参, 继续计算,得到最终的ps(实际的ps)
+            pg_t actual_pgid(actual_ps, pgid.pool())
             lookup_pg_mapping
             osdmap->pg_to_up_acting_osds
             update_pg_mapping(actual_pgid, std::move(pg_mapping))
@@ -3910,3 +3911,17 @@ int SyntheticClient::lookup_hash -> 合成的客户端
 int Client::lookup_hash
   ceph_str_hash
 
+
+crush流程
+main
+rados_write
+librados::IoCtxImpl::operate
+Objecter::op_submit
+Objecter::_op_submit_with_budget
+Objecter::_op_submit
+Objecter::_calc_target
+pg_to_up_acting_osds
+_pg_to_up_acting_osds
+_pg_to_raw_osds
+do_rule
+crush_do_rule ```
