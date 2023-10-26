@@ -1763,9 +1763,12 @@ rados_write.c:83 -> main
             bind_and_listen
       monclient.build_initial_monmap() -> 第二次获取monmap
       Messenger::create_client_messenger(cct, "radosclient")
-      objecter = new (std::nothrow) Objecter(cct, messenger, &monclient, &finisher) -> Objecter::Objecter
+      objecter = new (std::nothrow) Objecter(cct, messenger, &monclient, &finisher) -> Objecter::Objecter -> 构造函数
         ...
+        osdmap{std::make_unique<OSDMap>()}
         homeless_session(new OSDSession(cct, -1))
+        mon_timeout = cct->_conf.get_val<std::chrono::seconds>("rados_mon_op_timeout")
+        osd_timeout = cct->_conf.get_val<std::chrono::seconds>("rados_osd_op_timeout")
         ...
       objecter->set_balanced_budget()
       monclient.set_messenger(messenger) -> monc绑定msg
