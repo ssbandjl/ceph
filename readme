@@ -1,3 +1,6 @@
+配置文件: src/common/options.cc
+
+
 https://github.com/ssbandjl/ceph/tree/v15.2.17
 https://github.com/ssbandjl/ceph/tree/main
 
@@ -3484,6 +3487,16 @@ void Objecter::handle_osd_map(MOSDMap *m) -> 全量/增量: https://blog.51cto.c
 
 
 
+  enum recalc_op_target_result {
+    RECALC_OP_TARGET_NO_ACTION = 0,
+    RECALC_OP_TARGET_NEED_RESEND,
+    RECALC_OP_TARGET_POOL_DNE,
+    RECALC_OP_TARGET_OSD_DNE,
+    RECALC_OP_TARGET_OSD_DOWN,
+  };
+
+  
+
 
 osdmap, 集群map, rados原理与实现: https://e.dangdang.com/pc/reader/index.html?id=1901104772
 
@@ -3672,10 +3685,27 @@ Children Self Command Shared Object Symbol
 
 
 ---------- ec ----------
-纠删码是一种将对象持久存储在 Ceph 存储集群中的方法，其中纠删码算法将对象分解为数据块 (k) 和编码块 (m)，并将这些块存储在不同的 OSD 中
-ceph_ec源码分析: https://zhuanlan.zhihu.com/p/96834610
+概念
+chunk(块)
+当编码函数被调用时，它返回彼此大小相同的块。 有两种块：（1）数据块，可以连接起来重建原始对象；（2）编码块，可以用来重建丢失的块。
 
-关键词: stripe_width 条带宽度=条带大小 * chunk_size, chunk, chunk_size(cell_size), strip_size 条带大小, 
+K
+对象被划分为的数据块的数量。 例如，如果 K = 2，则将一个 10KB 的对象分为两个各 5KB 的对象。
+
+M
+由编码函数计算的编码块的数量。 M 等于集群中可以丢失的 OSD 数量，而集群不会丢失数据。 例如，如果有两个编码块，则可以丢失两个 OSD 而不会丢失数据。
+纠删码是一种将对象持久存储在 Ceph 存储集群中的方法，其中纠删码算法将对象分解为数据块 (k) 和编码块 (m)，并将这些块存储在不同的 OSD 中
+
+
+parse_erasure_code_profile
+
+ceph_ec源码分析: https://zhuanlan.zhihu.com/p/96834610
+配置: https://docs.ceph.com/en/quincy/rados/operations/erasure-code-profile/
+osd_pool_erasure_code_stripe_unit
+osd_pool_default_erasure_code_profile
+
+关键词: stripe_width 条带宽度 = 条带大小 * chunk_size, chunk, chunk_size(cell_size), strip_size 条带大小, 
+*stripe_width = data_chunks * erasure_code->get_chunk_size(stripe_unit * data_chunks)
 关键数据结构, pg_log: struct pg_log_entry_t
 本地回滚条目, 回滚信息: ObjectModDesc mod_desc;
 写操作的off和条带宽度对齐: int PrimaryLogPG::do_osd_ops 中
@@ -3684,7 +3714,11 @@ op.extent.offset % pool.info.required_alignment() != 0
 EC读写: class PGBackend
 EC编码解码: namespace ECUtil
 EC事务: ECTransaction
-关键函数: int OSDMonitor::prepare_pool_stripe_width
+关键函数: int OSDMonitor::prepare_pool_stripe_width -> 准备池条带宽度(准备条带大小)
+    case pg_pool_t::TYPE_ERASURE
+    ErasureCodeProfile profile = osdmap.get_erasure_code_profile(erasure_code_profile)
+    ErasureCodeInterfaceRef erasure_code;
+    err = get_erasure_code(erasure_code_profile, &erasure_code, ss)
 logical_offset_is_stripe_aligned
 void pg_pool_t::encode
 TestErasureCodeLrc.cc
@@ -3774,6 +3808,40 @@ ceph osd pool application enable ec_pool rbd
 rbd create --size 1024 ec_pool/image1
 
 
+
+ec:
+池上的ec配置, TYPE_ERASURE
+osd_types.h
+struct pg_pool_t
+
+bool requires_aligned_append() const {
+return is_erasure() && !has_flag(FLAG_EC_OVERWRITES);
+}
+
+
+1. 查看集群使用容量, ceph df
+ec
+class OSDMap {
+    mempool::osdmap::map<int64_t,pg_pool_t> pools;
+}
+
+float OSDMap::pool_raw_used_rate(int64_t poolid)
+
+auto& ecp =
+    get_erasure_code_profile(pool->erasure_code_profile);
+auto pm = ecp.find("m");
+auto pk = ecp.find("k");
+return (float)mk / k
+
+int OSDMonitor::get_erasure_code(const string &erasure_code_profile
+
+handle_osd_map 中解析纠删码
+	map<string,string> profile;
+	if (lastmap->get_pg_pool(j.first)->is_erasure()) {
+	  profile = lastmap->get_erasure_code_profile(
+	    lastmap->get_pg_pool(j.first)->erasure_code_profile);
+	}
+	encode(profile, bl);
 
 /ErasureCodeClay.cc
 
@@ -3928,3 +3996,12 @@ _pg_to_up_acting_osds
 _pg_to_raw_osds
 do_rule
 crush_do_rule ```
+
+
+
+
+
+
+
+
+
