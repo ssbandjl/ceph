@@ -80,6 +80,10 @@ CMakeCache.txt
 ON/OFF
 address sanitizer
 
+docker:
+docker load -i /d/download/ceph/tgz/docker_image_ceph_v15.2.17.tgz
+
+
 docker run -it -d --privileged --cap-add=ALL --name centos7  -p 22223:22 -p 6666:6666 -v /home/xb/project/stor/ceph/xb/docker/ceph:/home/xb/project/stor/ceph/xb/docker/ceph ceph_centos7:v15.2.17
 docker exec -u root -it ceph bash -c 'cd /home/xb/project/stor/ceph/xb/docker/ceph;exec "${SHELL:-sh}"'
 
@@ -2689,7 +2693,9 @@ op_shardedwq 工作队列,内部包含多个队列, osd_op_tp 线程池
 
 waiting_for_map
 
-execute_ctx
+
+void PrimaryLogPG::do_op(OpRequestRef& op)
+void PrimaryLogPG::execute_ctx(OpContext *ctx)
 
 
 admin socket asok: find / -name "*.asok"
@@ -2865,7 +2871,15 @@ librados: rados_aio_write -> LIBRADOS_C_API_BASE_DEFAULT(rados_aio_write) -> que
 
 
 
-rados_write_full
+CEPH_RADOS_API int rados_write_full(rados_ioctx_t io, const char *oid, const char *buf, size_t len); 覆盖写
+    librados::IoCtxImpl *ctx = (librados::IoCtxImpl *)io
+    int retval = ctx->write_full(oid, bl)
+        ::ObjectOperation op
+        op.write_full(bl)
+            add_data(CEPH_OSD_OP_WRITEFULL, 0, bl.length(), bl)
+        return operate(oid, &op, NULL) -> librados::IoCtxImpl::operate
+
+
 
 
 bool OSD::ms_dispatch(Message *m)
@@ -3969,10 +3983,6 @@ AIO类型:
 } aio_type_t;
 
 
-
-
-
-
 crush算法:
 hash算法
 #define CEPH_STR_HASH_LINUX      0x1  /* linux dcache hash */
@@ -3999,9 +4009,18 @@ crush_do_rule ```
 
 
 
+int librados::IoCtxImpl::aio_write_full
+    queue_aio_write(c)
+    Objecter::Op *o = objecter->prepare_write_full_op
+        int i = init_ops(ops, 1, extra_ops)
+        ops[i].op.op = CEPH_OSD_OP_WRITEFULL
+        new Op(oid, oloc, ops, flags | global_op_flags | CEPH_OSD_FLAG_WRITE, oncommit, objver)
+    objecter->op_submit(o, &c->tid)
 
 
 
+maybe_create_new_object
 
 
 
+void OSD::ms_fast_dispatch(Message *m)
