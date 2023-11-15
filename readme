@@ -88,10 +88,25 @@ docker run -it -d --privileged --cap-add=ALL --name centos7  -p 22223:22 -p 6666
 docker exec -u root -it ceph bash -c 'cd /home/xb/project/stor/ceph/xb/docker/ceph;exec "${SHELL:-sh}"'
 
 s131:
-docker run -it -d --privileged --cap-add=ALL --name ceph_v15  -p 22223:22 -p 6666:6666  -p 42922:42922 -p 44922:44922 -p 46922:46922 -v /home/xb/project/ceph/xb/ceph:/home/xb/project/ceph/xb/ceph ceph_centos7:v15.2.17
+docker run -it -d --privileged --cap-add=ALL --name ceph_v15  -p 22223:22 -p 6666:6666  -p 42922:42922 -p 44922:44922 -p 46922:46922 -v /home/xb/project/ceph:/home/xb/project/ceph/xb/ceph ceph_centos7:v15.2.17
 docker exec -u root -it ceph_v15 bash -c 'cd /home/xb/project/ceph/xb/ceph;exec "${SHELL:-sh}"'
+export http_proxy="http://s30893:xxx@proxy.xxx.com:8080"
+export https_proxy="http://s30893:xxx@proxy.xxx.com:8080"
 pip3 install prettytable
 yum install -y gdb
+git submodule update --init --recursive
+
+
+s63:
+docker run -it -d --privileged --cap-add=ALL --name ceph_v15  -p 22223:22 -p 6666:6666  -p 42922:42922 -p 44922:44922 -p 46922:46922 -v /home/xb/project/ceph:/home/xb/project/ceph/xb/ceph ceph_centos7:v15.2.17
+第三方模块, 缓存:
+for line in `cat .gitmodules |grep path |awk '{print$3}'`;do cp -r $line git_submodule_cache/;done
+git_submodule_cache.tgz
+
+
+
+
+
 
 env:
 export PYTHONPATH=/home/xb/project/ceph/xb/ceph/src/pybind:/home/xb/project/ceph/xb/ceph/build/lib/cython_modules/lib.3:/home/xb/project/ceph/xb/ceph/src/python-common:$PYTHONPATH
