@@ -4037,5 +4037,117 @@ int librados::IoCtxImpl::aio_write_full
 maybe_create_new_object
 
 
-
+OSD收到消息:
+https://bean-li.github.io/ceph-write-flow/
 void OSD::ms_fast_dispatch(Message *m)
+    dispatch_session_waiting(session, nextmap) -> void OSD::dispatch_session_waiting
+        if (!osdmap->get_primary_shard(actual_pgid, &pgid))
+            pg_to_acting_osds(pgid, &acting, &primary);
+                void OSDMap::_pg_to_up_acting_osds
+                    _pg_to_raw_osds
+                    _apply_upmap
+                    _raw_to_up_osds
+                    _pick_primary
+                    _apply_primary_affinity
+                        (crush_hash32_2(CRUSH_HASH_RJENKINS1, seed, o) >> 16) >= a)
+                            crush_hash32_rjenkins1_2(a, b);
+                        pool.can_shift_osds()
+        enqueue_op(pgid, std::move(op), m->get_map_epoch()) -> dequeue_op
+            op_shardedwq.queue(OpSchedulerItem(unique_ptr<OpSchedulerItem::OpQueueable>(new PGOpItem(pg, std::move(op))), cost, priority, stamp, owner, epoch))
+
+读流程: https://bean-li.github.io/ceph-read-2/
+void PGOpItem::run
+    osd->dequeue_op(pg, op, handle)
+        service.maybe_share_map(m->get_connection().get(), pg->get_osdmap(), op->sent_epoch)
+        pg->do_request(op, handle) -> void PrimaryLogPG::do_request -> 总控
+        switch (msg_type) -> case CEPH_MSG_OSD_OP
+            do_op(op) -> void PrimaryLogPG::do_op(OpRequestRef& op)
+                do_pg_op(op) -> void PrimaryLogPG::do_pg_op(OpRequestRef op)
+                    if (get_osdmap()->is_blacklisted(m->get_source_addr())) -> 黑名单
+                    op->mark_started()
+                    execute_ctx(ctx) -> void PrimaryLogPG::execute_ctx(OpContext *ctx)
+                        读请求, 4件事，加锁，prepare_transaction,解锁，回应
+                        prepare_transaction(ctx)
+                            int result = do_osd_ops(ctx, *ctx->ops)
+                                esult = do_read(ctx, osd_op) -> int PrimaryLogPG::do_read(OpContext *ctx, OSDOp& osd_op)
+                                    pgbackend->objects_read_sync(soid, op.extent.offset, op.extent.length, op.flags, &osd_op.outdata)
+                                        void ECBackend::objects_read_async -> EC读
+                                        ...
+
+
+
+
+
+
+
+
+
+
+
+            
+
+
+
+set env LD_LIBRARY_PATH /lib64
+
+
+post_dispatch
+操作类型:
+switch (m->get_type()) {
+case CEPH_MSG_PING:
+case CEPH_MSG_OSD_OP:
+case CEPH_MSG_OSD_BACKOFF:
+case MSG_OSD_SCRUB2:
+case MSG_OSD_FORCE_RECOVERY:
+case MSG_MON_COMMAND:
+case MSG_OSD_PG_CREATE2:
+case MSG_OSD_PG_QUERY:
+case MSG_OSD_PG_QUERY2:
+case MSG_OSD_PG_INFO:
+case MSG_OSD_PG_INFO2:
+case MSG_OSD_PG_NOTIFY:
+case MSG_OSD_PG_NOTIFY2:
+case MSG_OSD_PG_LOG:
+case MSG_OSD_PG_TRIM:
+case MSG_OSD_PG_REMOVE:
+case MSG_OSD_BACKFILL_RESERVE:
+case MSG_OSD_RECOVERY_RESERVE:
+case MSG_OSD_REPOP:
+case MSG_OSD_REPOPREPLY:
+case MSG_OSD_PG_PUSH:
+case MSG_OSD_PG_PULL:
+case MSG_OSD_PG_PUSH_REPLY:
+case MSG_OSD_PG_SCAN:
+case MSG_OSD_PG_BACKFILL:
+case MSG_OSD_PG_BACKFILL_REMOVE:
+case MSG_OSD_EC_WRITE:
+case MSG_OSD_EC_WRITE_REPLY:
+case MSG_OSD_EC_READ:
+case MSG_OSD_EC_READ_REPLY:
+case MSG_OSD_SCRUB_RESERVE:
+case MSG_OSD_REP_SCRUB:
+case MSG_OSD_REP_SCRUBMAP:
+case MSG_OSD_PG_UPDATE_LOG_MISSING:
+case MSG_OSD_PG_UPDATE_LOG_MISSING_REPLY:
+case MSG_OSD_PG_RECOVERY_DELETE:
+case MSG_OSD_PG_RECOVERY_DELETE_REPLY:
+case MSG_OSD_PG_LEASE:
+case MSG_OSD_PG_LEASE_ACK:
+
+
+OSD::OSD
+osd_op_tp(cct, "OSD::osd_op_tp", "tp_osd_tp", get_num_op_threads()),
+OSDService::OSDService(OSD *osd) 
+int OSD::init()
+osd_op_tp.start()
+ShardedThreadPool::start_threads
+void ShardedThreadPool::shardedthreadpool_worker
+    wq->_process(thread_index, hb) -> void OSD::ShardedOpWQ::_process(uint32_t thread_index, heartbeat_handle_d *hb) -> 线程池和工作队列是消息处理的核心，读这个请求的处理也不例外。对于OSD而言，将读请求放入到OSD的op_shardedwq这个队列，和该队列搭档工作的是线程池。线程池中的线程会负责取出消息，然后处理请求
+        andle_oncommits(oncommits)
+
+
+
+
+我们dump_ops_in_flight 可以看到当前的OP进行到了哪一步
+ceph daemon osd.7 dump_ops_in_flight
+
