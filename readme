@@ -4328,4 +4328,38 @@ void KernelDevice::aio_submit
 int aio_queue_t::submit_batch
     io_submit
 
-    
+
+
+读流程:
+read
+    _do_read
+
+
+
+int BlueStore::_open_bdev(bool create)
+    bdev->open -> int NVMEDevice::open(const string& p)
+        driver->register_device(this)
+
+
+new Task(dev, IOCommand::WRITE_COMMAND
+void SharedDriverQueueData::_aio_handle(Task *t, IOContext *ioc)
+    case IOCommand::WRITE_COMMAND
+        alloc_buf_from_pool(t, true)
+        spdk_nvme_ns_cmd_writev(ns, qpair, lba_off, lba_count, io_complete, t, 0, data_buf_reset_sgl, data_buf_next_sge)
+        logger->tinc(l_bluestore_nvmedevice_polling_lat, dur)
+
+
+
+rocks_db
+int BlueStore::_open_db(bool create, bool to_repair_db, bool read_only)
+
+
+BlueStore::_txc_add_transaction() 
+    -> BlueStore::_write() 
+        -> BlueStore::_do_write() 
+            -> BlueStore::_do_write_data() 
+                -> BlueStore::_do_alloc_write() 
+                    -> BlueStore::_wctx_finish()
+
+
+                    
