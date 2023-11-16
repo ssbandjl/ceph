@@ -4261,7 +4261,7 @@ issue_repop
             submit_manager.op_submit_start
             _op_journal_transactions(tbl, orig_len, o->op, ondisk, osd_op)
             do_transactions(tls, op)
-                _write(cid, oid, off, len, bl, fadvise_flags)
+                _write(cid, oid, off, len, bl, fadvise_flags) -> 多种实现: MemStore::_write | int BlueStore::_write
                 lfn_open(cid, oid, true, &fd)
                 bl.write_fd(**fd, offset);
                     do_writev(fd, iov, offset, iovlen, bytes)
@@ -4287,9 +4287,45 @@ pg->repop_commit(rm)
 
 
 
+int BlueStore::_do_write
+    _do_write_data(txc, c, o, offset, length, bl, &wctx)
+        _do_write_small(txc, c, o, offset, length, p, wctx)
+            bdev->aio_write(offset, t, &txc->ioc, wctx->buffered)
+            b->dirty_blob().calc_csum(b_off, bl);
+            _buffer_cache_write
+            wctx->write
+        _do_write_big(txc, c, o, middle_offset, middle_length, p, wctx)
+            can_reuse_blob
+            wctx->write(offset, b, l, b_off, t, b_off, l, false, new_blob)
+
+    _do_alloc_write(txc, c, o, &wctx)
+    _wctx_finish(txc, c, o, &wctx)
 
 
 
+src/os/ObjectStore.h
 
 
+BlueStore的异步I/O底层最终调⽤的是linux的libaio库，该库对于异步I/O的调⽤主要分为以下⼏步：
+○ ⾸先，调⽤在初始化时调⽤io_setup为异步I/O请求构造上下⽂坏境。
+○ 然后，对于每个异步I/O请求，先通过io_prep_pwritev和io_prep_pread构造iocb结构体，该结构体记录了读写的buffer，位置和回调
+函数，然后调⽤ io_submit 接⼝真正发起异步I/O操作。
+○ 最后通过 io_getevents 接⼝检查是否有完成的异步I/O，如果有的话可以获取返回值，并通过aio_callback接⼝调⽤该异步I/O的回调函
+数。上述过程皆为libaio库⾃带接⼝。
+• BlueStore对libaio库的封装实现在BlockDevice抽象类中。使⽤该抽象类进⾏异步I/O时，⾸先调⽤该类的aio_read或aio_write接⼝，在调⽤
+时需要传⼊⼀个IOContext类型的指针，aio_read和aio_write将该次I/O操作计⼊IOContext中，随后调⽤aio_submit(IOContext *ioc)将该
+IOContext中的I/O操作真正发出，完成之后会调⽤IOContext中的回调函数。BlockDevice有多个实现，在默认采⽤的实现KernelDevice
+中，aio_read或aio_write实际最终调⽤前⽂所述的libaio库中的io_prep_pwritev和io_prep_pread接⼝并将⽣成的iocb结构存⼊IOContext
+中，在  aio_submit  中批量为IOContext中的操作调⽤libaio库中的io_submit接⼝。另外，KernelDevice会启动⼀个线程_aio_thread，定期调
+⽤io_getevents并检查是否有完成的I/O，有的话修改IOContext的完成计数，如果全部完成则调⽤该I/O所属的IOContext的回调函数
+• 有了BlockDevice的抽象，BlueStore的上层就能轻松的使⽤异步I/O。在使⽤时，在执⾏⼀个事务时，需要I/O的位置先调⽤aio_read和
+aio_write接⼝，所有需要的I/O记录后再统⼀调⽤io_submit发送所有的I/O请求。最后等待KernelDevice的回调线程调⽤⾃⼰注册的回调函
+数即可
 
+
+NVMEDevice::write
+void KernelDevice::aio_submit
+int aio_queue_t::submit_batch
+    io_submit
+
+    
