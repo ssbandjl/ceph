@@ -3780,12 +3780,17 @@ int ErasureCodeJerasure::encode_chunks
 int ErasureCodeJerasure::decode_chunks
   jerasure_decode(erasures, data, coding, blocksize)
 
-
+写流程:
 ec, 类 ECBackend 实现了EC的读写操作。ECUtil里定义了编码和解码的函数实现。ECTransaction定了EC的事务
-int PrimaryLogPG::do_osd_ops(OpContext *ctx, vector<OSDOp>& ops)
-  case CEPH_OSD_OP_WRITE
-  requires_aligned_append
-  t->write(soid, op.extent.offset, op.extent.length, osd_op.indata, op.flags)
+int PrimaryLogPG::do_osd_ops(OpContext *ctx, vector<OSDOp>& ops) -> 主PG日志 执行OSD操作
+switch (op.op) -> 所有OSD操作: __CEPH_FORALL_OSD_OPS(GENERATE_ENUM_ENTRY)
+    case CEPH_OSD_OP_WRITE
+        requires_aligned_append
+        t->write(soid, op.extent.offset, op.extent.length, osd_op.indata, op.flags) -> void write(const coll_t& cid, const ghobject_t& oid, uint64_t off, uint64_t len, const ceph::buffer::list& write_data, uint32_t flags = 0) -> 将数据写入对象内的偏移量。 如果对象太小，则根据需要进行扩展。 可以指定超出对象当前末尾的偏移量，并且它将根据需要进行扩展。 ObjectStore 的简单实现只会将对象旧端和新提供的数据之间的数据清零。 更复杂的 ObjectStore 实现将省略未触及的数据并将其存储为文件中的“洞”。 请注意，0 长度写入不会影响对象的大小
+            _op->op = OP_WRITE
+            encode(write_data, data_bl)
+
+
 
 
 默认情况下，Ceph 池是使用“复制”类型创建的。 在复制类型池中，每个对象都被复制到多个磁盘。 这种多重复制是一种称为“复制”的数据保护方法。  相比之下，纠删码池使用与复制不同的数据保护方法。 在纠删码中，数据被分成两种片段：数据块和奇偶校验块。 如果驱动器发生故障或损坏，奇偶校验块将用于重建数据。 在规模上，纠删码相对于复制可以节省空间。  在本文档中，数据块被称为“数据块”，奇偶校验块被称为“编码块”。  纠删码也称为“前向纠错码”。 第一个前向纠错码是由贝尔实验室的 Richard Hamming 于 1950 年开发的。
@@ -4066,13 +4071,17 @@ void PGOpItem::run
                     if (get_osdmap()->is_blacklisted(m->get_source_addr())) -> 黑名单
                     op->mark_started()
                     execute_ctx(ctx) -> void PrimaryLogPG::execute_ctx(OpContext *ctx)
-                        读请求, 4件事，加锁，prepare_transaction,解锁，回应
+                        读请求, 4件事，加锁, prepare_transaction,解锁，回应, 读只做了简单的实现
                         prepare_transaction(ctx)
                             int result = do_osd_ops(ctx, *ctx->ops)
                                 esult = do_read(ctx, osd_op) -> int PrimaryLogPG::do_read(OpContext *ctx, OSDOp& osd_op)
                                     pgbackend->objects_read_sync(soid, op.extent.offset, op.extent.length, op.flags, &osd_op.outdata)
                                         void ECBackend::objects_read_async -> EC读
                                         ...
+                        finish_ctx(ctx,ctx->new_obs.exists ? pg_log_entry_t::MODIFY : pg_log_entry_t::DELETE, result);
+                            ctx->log.push_back -> finish_ctx函数里就会调用ctx->log.push_back就会构造pg_log_entry_t插入到vector log里
+                            
+
 
 
 
@@ -4150,4 +4159,137 @@ void ShardedThreadPool::shardedthreadpool_worker
 
 我们dump_ops_in_flight 可以看到当前的OP进行到了哪一步
 ceph daemon osd.7 dump_ops_in_flight
+
+
+
+所有OSD操作:
+CEPH_OSD_OP_READ = ((0x1000 | 0x0200 | (1)))
+CEPH_OSD_OP_STAT = ((0x1000 | 0x0200 | (2)))
+CEPH_OSD_OP_MAPEXT = ((0x1000 | 0x0200 | (3)))
+CEPH_OSD_OP_CHECKSUM = ((0x1000 | 0x0200 | (31)))
+CEPH_OSD_OP_MASKTRUNC = ((0x1000 | 0x0200 | (4)))
+CEPH_OSD_OP_SPARSE_READ = ((0x1000 | 0x0200 | (5)))
+CEPH_OSD_OP_NOTIFY = ((0x1000 | 0x0200 | (6)))
+CEPH_OSD_OP_NOTIFY_ACK = ((0x1000 | 0x0200 | (7)))
+CEPH_OSD_OP_ASSERT_VER = ((0x1000 | 0x0200 | (8)))
+CEPH_OSD_OP_LIST_WATCHERS = ((0x1000 | 0x0200 | (9)))
+CEPH_OSD_OP_LIST_SNAPS = ((0x1000 | 0x0200 | (10)))
+CEPH_OSD_OP_SYNC_READ = ((0x1000 | 0x0200 | (11)))
+CEPH_OSD_OP_WRITE = ((0x2000 | 0x0200 | (1)))
+CEPH_OSD_OP_WRITEFULL = ((0x2000 | 0x0200 | (2)))
+CEPH_OSD_OP_TRUNCATE = ((0x2000 | 0x0200 | (3)))
+CEPH_OSD_OP_ZERO = ((0x2000 | 0x0200 | (4)))
+CEPH_OSD_OP_DELETE = ((0x2000 | 0x0200 | (5)))
+CEPH_OSD_OP_APPEND = ((0x2000 | 0x0200 | (6)))
+CEPH_OSD_OP_STARTSYNC = ((0x2000 | 0x0200 | (7)))
+CEPH_OSD_OP_SETTRUNC = ((0x2000 | 0x0200 | (8)))
+CEPH_OSD_OP_TRIMTRUNC = ((0x2000 | 0x0200 | (9)))
+CEPH_OSD_OP_TMAPUP = ((0x3000 | 0x0200 | (10)))
+CEPH_OSD_OP_TMAPPUT = ((0x2000 | 0x0200 | (11)))
+CEPH_OSD_OP_TMAPGET = ((0x1000 | 0x0200 | (12)))
+CEPH_OSD_OP_CREATE = ((0x2000 | 0x0200 | (13)))
+CEPH_OSD_OP_ROLLBACK = ((0x2000 | 0x0200 | (14)))
+CEPH_OSD_OP_WATCH = ((0x2000 | 0x0200 | (15)))
+CEPH_OSD_OP_OMAPGETKEYS = ((0x1000 | 0x0200 | (17)))
+CEPH_OSD_OP_OMAPGETVALS = ((0x1000 | 0x0200 | (18)))
+CEPH_OSD_OP_OMAPGETHEADER = ((0x1000 | 0x0200 | (19)))
+CEPH_OSD_OP_OMAPGETVALSBYKEYS = ((0x1000 | 0x0200 | (20)))
+CEPH_OSD_OP_OMAPSETVALS = ((0x2000 | 0x0200 | (21)))
+CEPH_OSD_OP_OMAPSETHEADER = ((0x2000 | 0x0200 | (22)))
+CEPH_OSD_OP_OMAPCLEAR = ((0x2000 | 0x0200 | (23)))
+CEPH_OSD_OP_OMAPRMKEYS = ((0x2000 | 0x0200 | (24)))
+CEPH_OSD_OP_OMAPRMKEYRANGE = ((0x2000 | 0x0200 | (44)))
+CEPH_OSD_OP_OMAP_CMP = ((0x1000 | 0x0200 | (25)))
+CEPH_OSD_OP_COPY_FROM = ((0x2000 | 0x0200 | (26)))
+CEPH_OSD_OP_COPY_FROM2 = ((0x2000 | 0x0200 | (45)))
+CEPH_OSD_OP_UNDIRTY = ((0x2000 | 0x0200 | (28)))
+CEPH_OSD_OP_ISDIRTY = ((0x1000 | 0x0200 | (29)))
+CEPH_OSD_OP_COPY_GET = ((0x1000 | 0x0200 | (30)))
+CEPH_OSD_OP_CACHE_FLUSH = ((0x8000 | 0x0200 | (31)))
+CEPH_OSD_OP_CACHE_EVICT = ((0x8000 | 0x0200 | (32)))
+CEPH_OSD_OP_CACHE_TRY_FLUSH = ((0x8000 | 0x0200 | (33)))
+CEPH_OSD_OP_TMAP2OMAP = ((0x3000 | 0x0200 | (34)))
+CEPH_OSD_OP_SETALLOCHINT = ((0x2000 | 0x0200 | (35)))
+CEPH_OSD_OP_CACHE_PIN = ((0x2000 | 0x0200 | (36)))
+CEPH_OSD_OP_CACHE_UNPIN = ((0x2000 | 0x0200 | (37)))
+CEPH_OSD_OP_WRITESAME = ((0x2000 | 0x0200 | (38)))
+CEPH_OSD_OP_CMPEXT = ((0x1000 | 0x0200 | (32)))
+CEPH_OSD_OP_SET_REDIRECT = ((0x2000 | 0x0200 | (39)))
+CEPH_OSD_OP_SET_CHUNK = ((0x2000 | 0x0200 | (40)))
+CEPH_OSD_OP_TIER_PROMOTE = ((0x2000 | 0x0200 | (41)))
+CEPH_OSD_OP_UNSET_MANIFEST = ((0x2000 | 0x0200 | (42)))
+CEPH_OSD_OP_TIER_FLUSH = ((0x2000 | 0x0200 | (43)))
+CEPH_OSD_OP_GETXATTR = ((0x1000 | 0x0300 | (1)))
+CEPH_OSD_OP_GETXATTRS = ((0x1000 | 0x0300 | (2)))
+CEPH_OSD_OP_CMPXATTR = ((0x1000 | 0x0300 | (3)))
+CEPH_OSD_OP_SETXATTR = ((0x2000 | 0x0300 | (1)))
+CEPH_OSD_OP_SETXATTRS = ((0x2000 | 0x0300 | (2)))
+CEPH_OSD_OP_RESETXATTRS = ((0x2000 | 0x0300 | (3)))
+CEPH_OSD_OP_RMXATTR = ((0x2000 | 0x0300 | (4)))
+CEPH_OSD_OP_PULL = ((0x4000 | (1)))
+CEPH_OSD_OP_PUSH = ((0x4000 | (2)))
+CEPH_OSD_OP_BALANCEREADS = ((0x4000 | (3)))
+CEPH_OSD_OP_UNBALANCEREADS = ((0x4000 | (4)))
+CEPH_OSD_OP_SCRUB = ((0x4000 | (5)))
+CEPH_OSD_OP_SCRUB_RESERVE = ((0x4000 | (6)))
+CEPH_OSD_OP_SCRUB_UNRESERVE = ((0x4000 | (7)))
+CEPH_OSD_OP_SCRUB_MAP = ((0x4000 | (9)))
+CEPH_OSD_OP_CALL = ((0x1000 | 0x0400 | (1)))
+CEPH_OSD_OP_PGLS = ((0x1000 | 0x0500 | (1)))
+CEPH_OSD_OP_PGLS_FILTER = ((0x1000 | 0x0500 | (2)))
+CEPH_OSD_OP_PG_HITSET_LS = ((0x1000 | 0x0500 | (3)))
+CEPH_OSD_OP_PG_HITSET_GET = ((0x1000 | 0x0500 | (4)))
+CEPH_OSD_OP_PGNLS = ((0x1000 | 0x0500 | (5)))
+CEPH_OSD_OP_PGNLS_FILTER = ((0x1000 | 0x0500 | (6)))
+CEPH_OSD_OP_SCRUBLS = ((0x1000 | 0x0500 | (7))),
+
+
+写流程:
+in_progress_ops
+issue_repop
+    recovery_state.pre_submit_op
+    pgbackend->submit_transaction -> void ReplicatedBackend::submit_transaction -> 多种实现
+        in_progress_ops.insert
+        op.waiting_for_commit.insert
+        issue_op
+            wr = generate_subop -> Message * ReplicatedBackend::generate_subop
+                new MOSDRepOp -> MSG_OSD_REPOP
+            get_parent()->send_message_osd_cluster -> do_request
+                peer_con->send_message(m)
+        parent->queue_transactions(tls, op.op) -> int FileStore::queue_transactions -> 多种实现
+            journal->prepare_entry(o->tls, &tbl)
+            submit_manager.op_submit_start
+            _op_journal_transactions(tbl, orig_len, o->op, ondisk, osd_op)
+            do_transactions(tls, op)
+                _write(cid, oid, off, len, bl, fadvise_flags)
+                lfn_open(cid, oid, true, &fd)
+                bl.write_fd(**fd, offset);
+                    do_writev(fd, iov, offset, iovlen, bytes)
+                        ::pwritev(fd, vec, veclen, offset)
+                        ::writev(fd, vec, veclen) -> 或者
+                backend->_crc_update_write(**fd, offset, len, bl) -> 写入crc
+                    _crc_load_or_init(fd, &scm)
+                    scm.write(off, len, bl, &ss)
+                        t.crc32c(crc_iv)
+                            crc = ccrc.second ^ ceph_crc32c(ccrc.first ^ crc, NULL, node.length())
+                                return ceph_crc32c_func(crc, data, length)
+                    _crc_save(fd, &scm)
+
+
+
+bool ReplicatedBackend::_handle_message
+    case MSG_OSD_REPOP
+        do_repop(op) -> void ReplicatedBackend::do_repop(OpRequestRef op)
+
+回调:
+pg->repop_commit(rm)
+    new MOSDRepOpReply -> 给主回复消息
+
+
+
+
+
+
+
+
 
