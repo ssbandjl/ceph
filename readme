@@ -16,6 +16,11 @@ cache: http://rz2fg6ogr.hn-bkt.clouddn.com/ceph_v15_2_17_with_submodule.tgz
 build:
 close mrg,dashboard in build/CMakeCache.txt
 
+
+术语:
+op_wq: 操作的工作队列
+
+
 基准测试, 文档: messenger.rst
 https://blog.csdn.net/bandaoyu/article/details/114292690
 使用命令patchelf   修改工具依赖的动态库位置。避免和项目正在使用的库冲突: https://blog.csdn.net/bandaoyu/article/details/113181179
@@ -4362,4 +4367,31 @@ BlueStore::_txc_add_transaction()
                     -> BlueStore::_wctx_finish()
 
 
-                    
+_committed_osd_maps
+void PeeringState::activate_map
+    check_blacklisted_watchers
+        check_blacklisted_obc_watchers
+
+
+
+log_operation
+    append_log
+        write_if_dirty(t)
+            pl->prepare_write -> void BlueStore::DeferredBatch::prepare_write
+
+
+check_for_full
+prepare_single_write
+prepare_multi_write
+write_thread_entry
+    do_aio_write
+        write_aio_bl -> int FileJournal::write_aio_bl(off64_t& pos, bufferlist& bl, uint64_t seq)
+            aio_queue.push_back(aio_info(tbl, pos, bl.length() > 0 ? 0 : seq))
+            io_prep_pwritev(&aio.iocb, fd, aio.iov, n, pos)
+            int r = io_submit(aio_ctx, 1, &piocb) -> AIO提交IO
+            write_finish_cond.notify_all();
+
+
+            
+
+
