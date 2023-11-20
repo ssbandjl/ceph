@@ -2714,9 +2714,6 @@ op_shardedwq 工作队列,内部包含多个队列, osd_op_tp 线程池
 waiting_for_map
 
 
-void PrimaryLogPG::do_op(OpRequestRef& op)
-void PrimaryLogPG::execute_ctx(OpContext *ctx)
-
 
 admin socket asok: find / -name "*.asok"
 注册命令: register_command
@@ -3786,6 +3783,7 @@ int ErasureCodeJerasure::decode_chunks
   jerasure_decode(erasures, data, coding, blocksize)
 
 写流程:
+int PrimaryLogPG::prepare_transaction
 ec, 类 ECBackend 实现了EC的读写操作。ECUtil里定义了编码和解码的函数实现。ECTransaction定了EC的事务
 int PrimaryLogPG::do_osd_ops(OpContext *ctx, vector<OSDOp>& ops) -> 主PG日志 执行OSD操作
 switch (op.op) -> 所有OSD操作: __CEPH_FORALL_OSD_OPS(GENERATE_ENUM_ENTRY)
@@ -3794,6 +3792,9 @@ switch (op.op) -> 所有OSD操作: __CEPH_FORALL_OSD_OPS(GENERATE_ENUM_ENTRY)
         t->write(soid, op.extent.offset, op.extent.length, osd_op.indata, op.flags) -> void write(const coll_t& cid, const ghobject_t& oid, uint64_t off, uint64_t len, const ceph::buffer::list& write_data, uint32_t flags = 0) -> 将数据写入对象内的偏移量。 如果对象太小，则根据需要进行扩展。 可以指定超出对象当前末尾的偏移量，并且它将根据需要进行扩展。 ObjectStore 的简单实现只会将对象旧端和新提供的数据之间的数据清零。 更复杂的 ObjectStore 实现将省略未触及的数据并将其存储为文件中的“洞”。 请注意，0 长度写入不会影响对象的大小
             _op->op = OP_WRITE
             encode(write_data, data_bl)
+            ...
+void PrimaryLogPG::finish_ctx
+    ctx->log.push_back            
 
 
 
@@ -4065,6 +4066,7 @@ void OSD::ms_fast_dispatch(Message *m)
         enqueue_op(pgid, std::move(op), m->get_map_epoch()) -> dequeue_op
             op_shardedwq.queue(OpSchedulerItem(unique_ptr<OpSchedulerItem::OpQueueable>(new PGOpItem(pg, std::move(op))), cost, priority, stamp, owner, epoch))
 
+执行OP
 读流程: https://bean-li.github.io/ceph-read-2/
 void PGOpItem::run
     osd->dequeue_op(pg, op, handle)
@@ -4075,7 +4077,7 @@ void PGOpItem::run
                 do_pg_op(op) -> void PrimaryLogPG::do_pg_op(OpRequestRef op)
                     if (get_osdmap()->is_blacklisted(m->get_source_addr())) -> 黑名单
                     op->mark_started()
-                    execute_ctx(ctx) -> void PrimaryLogPG::execute_ctx(OpContext *ctx)
+                    execute_ctx(ctx) -> void PrimaryLogPG::execute_ctx(OpContext *ctx) -> *****
                         读请求, 4件事，加锁, prepare_transaction,解锁，回应, 读只做了简单的实现
                         prepare_transaction(ctx)
                             int result = do_osd_ops(ctx, *ctx->ops)
@@ -4084,9 +4086,24 @@ void PGOpItem::run
                                         void ECBackend::objects_read_async -> EC读
                                         ...
                         finish_ctx(ctx,ctx->new_obs.exists ? pg_log_entry_t::MODIFY : pg_log_entry_t::DELETE, result);
-                            ctx->log.push_back -> finish_ctx函数里就会调用ctx->log.push_back就会构造pg_log_entry_t插入到vector log里
-                            
+                            ctx->log.push_back -> finish_ctx函数里就会调用ctx->log.push_back就会构造 pg_log_entry_t 插入到 vector log 里
+                        register_on_commit
+                        register_on_success
+                        register_on_finish
+                        new_repop
+                        issue_repop(repop, ctx)
+                            publish_stats_to_osd()
+                        eval_repop(repop)
+                            publish_stats_to_osd
+        case CEPH_MSG_OSD_BACKOFF
+            handle_backoff(op)
+        case MSG_OSD_PG_SCAN
+            do_scan(op, handle)
+        case MSG_OSD_PG_BACKFILL
+            do_backfill(op)
+        ...
 
+struct pg_log_entry_t 
 
 
 
@@ -4249,6 +4266,7 @@ CEPH_OSD_OP_PGNLS_FILTER = ((0x1000 | 0x0500 | (6)))
 CEPH_OSD_OP_SCRUBLS = ((0x1000 | 0x0500 | (7))),
 
 
+PG_LOG: https://ivanzz1001.github.io/records/post/ceph/2019/02/05/ceph-src-code-part14_1
 写流程:
 in_progress_ops
 issue_repop
@@ -4261,6 +4279,9 @@ issue_repop
                 new MOSDRepOp -> MSG_OSD_REPOP
             get_parent()->send_message_osd_cluster -> do_request
                 peer_con->send_message(m)
+        parent->log_operation(log_entries,hset_history, trim_to, at_version, min_last_complete_ondisk, true, op_t)
+            recovery_state.append_log(logv, trim_to, roll_forward_to, min_last_complete_ondisk, t, transaction_applied, async) -> void PeeringState::append_log
+                
         parent->queue_transactions(tls, op.op) -> int FileStore::queue_transactions -> 多种实现
             journal->prepare_entry(o->tls, &tbl)
             submit_manager.op_submit_start
@@ -4392,6 +4413,7 @@ write_thread_entry
             write_finish_cond.notify_all();
 
 
-            
+submit_work
+
 
 
