@@ -4281,8 +4281,19 @@ issue_repop
                 peer_con->send_message(m)
         parent->log_operation(log_entries,hset_history, trim_to, at_version, min_last_complete_ondisk, true, op_t)
             recovery_state.append_log(logv, trim_to, roll_forward_to, min_last_complete_ondisk, t, transaction_applied, async) -> void PeeringState::append_log
-                
-        parent->queue_transactions(tls, op.op) -> int FileStore::queue_transactions -> 多种实现
+                pg_log.skip_rollforward()
+                add_log_entry(*p, transaction_applied) -> void PeeringState::add_log_entry
+                    pg_log.add(e, applied) -> void add(const pg_log_entry_t& e, bool applied = true)
+                        mark_writeout_from(e.version)
+                        log.add(e, applied)
+                pg_log.trim(trim_to, info, transaction_applied, async)
+                write_if_dirty(t)
+                    pl->prepare_write
+                         pglog.write_log_and_missing -> void PGLog::write_log_and_missing
+                            _write_log_and_missing
+                                p->encode_with_checksum(bl)
+                            undirty
+        parent->queue_transactions(tls, op.op) -> int FileStore::queue_transactions -> 多种实现, 写事务
             journal->prepare_entry(o->tls, &tbl)
             submit_manager.op_submit_start
             _op_journal_transactions(tbl, orig_len, o->op, ondisk, osd_op)
